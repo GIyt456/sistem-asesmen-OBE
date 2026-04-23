@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel TI - Sistem OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS STYLING (Tema Figma Dark Navy & Red) --- */
+        :root { 
+            --sidebar-bg: #161923; /* Warna dark navy dari figma */
+            --sidebar-text: #7b8395;
+            --sidebar-hover: #262936;
+            --sidebar-active-text: #ffffff;
+            --primary-red: #8b0000; /* Merah maroon untuk admin/TI */
+            --bg-main: #ffffff; 
+            --text-dark: #111827;
+            --border-dark: #161923;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
+        
+        /* SIDEBAR Sesuai Figma */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; }
+        
+        /* Profile Area Sidebar */
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .sidebar-profile-info { display: flex; flex-direction: column; }
+        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        
+        /* Garis Pemisah Sidebar Sesuai Figma */
+        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
+
+        /* Menu Sidebar (Scrollbar dihilangkan) */
+        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+
+        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
+        
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
+        .nav-item:hover { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+
+        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .nav-item.logout { color: #f87171; }
+        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+        
+        /* MAIN CONTENT */
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; background-color: var(--bg-main); }
+        
+        /* HEADER Sesuai Figma */
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        .header-title-area { display: flex; flex-direction: column; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary-red); }
+        
+        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
+
+        /* DASHBOARD CARDS Sesuai Figma (Outline Hitam Tebal) */
+        .section { display: none; animation: fadeIn 0.3s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 800px; }
+        
+        .figma-card { background: white; border: 2.5px solid var(--border-dark); border-radius: 16px; padding: 30px; display: flex; flex-direction: column; align-items: flex-start; }
+        .figma-card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; color: var(--text-dark); }
+        .figma-card p { color: #6b7280; font-size: 1rem; line-height: 1.6; margin-bottom: 24px; max-width: 90%; }
+        
+        .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .btn-dark:hover { background: #000000; transform: translateY(-2px); }
+
+        /* Tabel sementara untuk section lain (akan dirombak di tahap selanjutnya) */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #f3f4f6; color: var(--text-dark); padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
+        td { padding: 12px; border-bottom: 1px solid #ddd; }
+        .btn-primary { background: rgb(9, 15, 46); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+    
+        /* --- GAYA KHUSUS MAPPING MK-CPMK (Sesuai Figma) --- */
+        .custom-select-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 300px;
+            margin-bottom: 20px;
+            z-index: 10;
+        }
+        .custom-select-figma {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #111827;
+            background-color: #ffffff;
+            border: 2px solid #111827; /* Garis tepi tebal hitam */
+            border-radius: 6px;
+            appearance: none; /* Hilangkan panah bawaan browser */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            outline: none;
+            cursor: pointer;
+        }
+        .select-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #111827;
+            pointer-events: none;
+        }
+        
+        /* Kotak Abu-abu Konten Mapping */
+        .mapping-content-area {
+            background-color: #ededed; 
+            border-radius: 24px;
+            padding: 40px;
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Tulisan EMPTY!! */
+        .empty-state-figma {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            flex: 1;
+            text-align: center;
+            margin-top: 80px;
+        }
+        .empty-state-figma h1 {
+            font-size: 5.5rem;
+            font-weight: 900;
+            color: #000000;
+            margin: 0 0 10px 0;
+            letter-spacing: -2px;
+        }
+        .empty-state-figma p {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #111827;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-profile">
+            <img src="https://ui-avatars.com/api/?name=Admin&background=8b0000&color=fff&bold=true" id="sidebarAvatar" alt="User Avatar">
+            <div class="sidebar-profile-info">
+                <span class="name" id="adminName">Loading...</span>
+                <span class="role">FAKULTAS TEKNIK INFORMATIKA</span>
+            </div>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="nav-menu">
+            <div class="menu-category">MAIN</div>
+            <div class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')"><i class="fas fa-home"></i> Home</div>
+            <div class="nav-item" id="nav-mk" onclick="switchTab('mk')"><i class="fas fa-book"></i> Mata Kuliah</div>
+            <div class="nav-item" id="nav-cpl" onclick="switchTab('cpl')"><i class="fas fa-graduation-cap"></i> CPL</div>
+            <div class="nav-item" id="nav-cpmk" onclick="switchTab('cpmk')"><i class="fas fa-file-alt"></i> CPMK</div>
+            
+            <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')" style="justify-content: space-between;">
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <i class="fas fa-sitemap"></i> Mapping
+                </div>
+                <i class="fas fa-chevron-down" id="chevron-mapping" style="font-size: 0.8rem; width: auto; transition: transform 0.3s;"></i>
+            </div>
+            
+            <div id="submenu-mapping" style="display: none; flex-direction: column; margin-top: 2px;">
+                <div class="nav-item" id="nav-mapping" onclick="switchTab('mapping')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Mapping CPL - CPMK
+                </div>
+                <div class="nav-item" id="nav-mapping-mk" onclick="switchTab('mapping-mk')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Mapping MK - CPMK
+                </div>
+            </div>
+            <div class="nav-item" onclick="showSection('krs-upload')">
+                <i class="fas fa-file-excel"></i> Import KRS Mahasiswa
+            </div>
+
+            <div class="menu-category" style="margin-top: 20px;">AKSES DOSEN</div>
+            <div class="nav-item" onclick="window.location.href='input_nilai.html'" style="background: #10b981; color: white;">
+                <i class="fas fa-chalkboard-teacher"></i> Masuk Mode Input Nilai
+            </div>
+
+            <div class="menu-category" style="margin-top: 30px;">SETTINGS</div>
+            <div class="nav-item" onclick="switchTab('reset')"><i class="fas fa-lock"></i> Edit Password</div>
+            <div class="nav-item"><i class="fas fa-pen"></i> Edit Halaman Dosen</div>
+        </div>
+
+        <div class="nav-bottom">
+            <div class="nav-item"><i class="far fa-question-circle"></i> Help</div>
+            <div class="nav-item logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout Account
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header-container">
+            <div class="header-title-area">
+                <div class="header-subtitle" id="pageSubtitle">KELOLA KURIKULUM</div>
+                <h1 class="header-title" id="pageTitle">PANEL KENDALI <span>ADMIN</span></h1>
+            </div>
+            <div class="badge-prodi">
+                Teknik Informatika
+            </div>
+        </div>
+
+        <div id="content-dashboard" class="section active">
+            <div class="dashboard-grid">
+                <div class="figma-card">
+                    <h3>Pintasan Laporan Kelas</h3>
+                    <p>Lihat analisis transkrip nilai dan ketercapaian CPL dan CPMK mahasiswa secara spesifik per mata kuliah</p>
+                    <button class="btn-dark" onclick="window.location.href='laporan.html'">
+                        <i class="fas fa-external-link-alt"></i> Open
+                    </button>
+                </div>
+                
+                <div class="figma-card">
+                    <h3>Portofolio CPL Global</h3>
+                    <p>Cari dan lihat rekapitulasi persentase penguasaan CPL mahasiswa Teknik Informatika dari total seluruh mata kuliah</p>
+                    <button class="btn-dark" onclick="window.location.href='portofolio_admin.html'">
+                        <i class="fas fa-external-link-alt"></i> Open
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-mk" class="section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 700;">Daftar Mata Kuliah Program Studi</h3>
+                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
+                </div>
+                <button class="btn-dark" onclick="loadData('mk')"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <table>
+                <thead><tr><th width="15%">Kode MK</th><th>Nama Mata Kuliah</th><th width="10%">Aksi</th></tr></thead>
+                <tbody id="bodyMK"></tbody>
+            </table>
+            
+            <div id="pagination-mk" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+        </div>
+
+        <div id="content-cpl" class="section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 700;">Daftar CPL Program Studi</h3>
+                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
+                </div>
+                <button class="btn-dark" onclick="loadData('cpl')"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <table>
+                <thead><tr><th width="15%">Kode CPL</th><th>Deskripsi</th><th width="10%">Aksi</th></tr></thead>
+                <tbody id="bodyCPL"></tbody>
+            </table>
+            <div id="pagination-cpl" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+        </div>
+
+        <div id="content-cpmk" class="section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 700;">Daftar CPMK Program Studi</h3>
+                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
+                </div>
+                <button class="btn-dark" onclick="loadData('cpmk')"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <table>
+                <thead><tr><th width="15%">Kode CPMK</th><th>Deskripsi</th><th width="10%">Aksi</th></tr></thead>
+                <tbody id="bodyCPMK"></tbody>
+            </table>
+            <div id="pagination-cpmk" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+        </div>
+
+        <div id="content-mapping" class="section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 700;">Pemetaan CPL ke CPMK</h3>
+                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
+                </div>
+                <button class="btn-dark" onclick="loadMappingData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <table>
+                <thead><tr><th width="15%">Kode CPMK</th><th>Deskripsi CPMK</th><th width="25%">Referensi CPL TI</th><th width="10%">Aksi</th></tr></thead>
+                <tbody id="bodyMapping"></tbody>
+            </table>
+            <div id="pagination-mapping" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+        </div>
+
+        <div id="content-mapping-mk" class="section">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: #111827;">Mapping Mata Kuliah ke CPMK</h3>
+                    <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Menghubungkan antara Mata Kuliah dan cpmk sesuai dengan apa yang dibutuhkan</p>
+                </div>
+                <button class="btn-dark" onclick="simpanMappingMK()"><i class="fas fa-sync-alt"></i> Simpan Mapping</button>
+            </div>
+
+            <div class="custom-select-wrapper">
+                <select id="pilihMKMapping" class="custom-select-figma" onchange="loadMappingUI()">
+                    <option value="">Pilih Mata Kuliah</option>
+                </select>
+                <i class="fas fa-chevron-down select-icon"></i>
+            </div>
+
+            <div class="mapping-content-area">
+                
+                <div id="mappingEmptyState" style="display: flex; flex-direction: column; justify-content: center; height: 100%; flex: 1; margin-top: 40px; max-width: 500px; margin-left: auto; margin-right: auto;">
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #111827; text-align: center; margin-bottom: 30px;">Panduan Pemetaan Mata Kuliah</h3>
+                    
+                    <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #111827; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+                        <div>
+                            <h4 style="margin: 0 0 4px 0; color: #111827; font-size: 1rem;">Pilih Mata Kuliah</h4>
+                            <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Gunakan kotak dropdown di atas untuk memilih mata kuliah yang ingin diatur.</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #8b0000; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+                        <div>
+                            <h4 style="margin: 0 0 4px 0; color: #111827; font-size: 1rem;">Centang CPMK</h4>
+                            <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Beri centang pada capaian pembelajaran (CPMK) yang dibebankan pada mata kuliah tersebut.</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: flex-start; gap: 16px;">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #10b981; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;"><i class="fas fa-check"></i></div>
+                        <div>
+                            <h4 style="margin: 0 0 4px 0; color: #111827; font-size: 1rem;">Simpan Perubahan</h4>
+                            <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Klik tombol "Simpan Mapping" di sudut kanan atas untuk menyimpan data ke sistem.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="loadingMapping" style="display:none; color:#6b7280; font-style: italic; text-align: center; margin-top: 50px;">
+                    <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat data mapping...
+                </div>
+                
+                <div id="mappingContainer" style="display:none;">
+                    <div id="checklistArea"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="content-reset" class="section">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: #111827;">Reset Password Dosen</h3>
+                    <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Ubah kata sandi akun dosen Teknik Informatika dengan paksa</p>
+                </div>
+            </div>
+
+            <div style="background: white; border: 2.5px solid #111827; border-radius: 16px; padding: 40px; max-width: 600px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);">
+                
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 700; color: #111827; margin-bottom: 10px; font-size: 0.95rem;">Cari Nama Dosen / Username</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-user" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
+                        <input list="daftarDosenTI" id="targetUsername" placeholder="Ketik username atau nama..." style="width: 100%; padding: 14px 16px 14px 45px; border-radius: 8px; border: 2px solid #e5e7eb; font-size: 1rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#e5e7eb'">
+                        <datalist id="daftarDosenTI"></datalist>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 32px;">
+                    <label style="display: block; font-weight: 700; color: #111827; margin-bottom: 10px; font-size: 0.95rem;">Password Baru</label>
+                    <div style="position: relative;">
+                        <i class="fas fa-lock" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
+                        <input type="password" id="newPassword" placeholder="Masukkan password baru..." style="width: 100%; padding: 14px 16px 14px 45px; border-radius: 8px; border: 2px solid #e5e7eb; font-size: 1rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#e5e7eb'">
+                    </div>
+                    <p style="margin: 8px 0 0 0; font-size: 0.8rem; color: #6b7280;"><i class="fas fa-info-circle"></i> Pastikan password baru mudah diingat oleh dosen terkait.</p>
+                </div>
+                
+                <button onclick="prosesResetPassword()" class="btn-dark" style="width: 100%; padding: 16px; font-size: 1.05rem; justify-content: center; background: #8b0000; border: none; border-radius: 8px;">
+                    <i class="fas fa-key" style="margin-right: 8px;"></i> Paksa Reset Password
+                </button>
+            </div>
+        </div>
+        
+        <div id="krs-upload" class="section" style="display:none;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: #111827;">Import KRS Mahasiswa</h3>
+                    <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Format file yang didukung: Excel (.xlsx)</p>
+                </div>
+            </div>
+
+            <div style="background: #fafafa; border: 2.5px dashed #111827; border-radius: 16px; padding: 50px 40px; max-width: 550px; text-align: center; margin: 0 auto; transition: all 0.3s;">
+                
+                <i class="fas fa-cloud-upload-alt" style="font-size: 4rem; color: #8b0000; margin-bottom: 20px;"></i>
+                
+                <h4 style="font-size: 1.3rem; font-weight: 700; color: #111827; margin-bottom: 10px;">Upload File KRS</h4>
+                <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.5; margin-bottom: 30px;">
+                    Sistem akan otomatis mengekstrak data dan menyinkronkan Mahasiswa, Mata Kuliah, serta Dosen ke dalam database.
+                </p>
+                
+                <div style="margin-bottom: 30px; background: white; padding: 10px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                    <input type="file" id="krsFileInputTI" accept=".xlsx" style="width: 100%; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #4b5563; cursor: pointer; outline: none;">
+                </div>
+                
+                <button class="btn-dark" onclick="handleKRSUpload('TI')" style="width: 100%; justify-content: center; padding: 16px; font-size: 1.05rem; background: #111827; border: none; border-radius: 8px;">
+                    <i class="fas fa-magic" style="margin-right: 8px;"></i> Jalankan Otomatisasi n8n
+                </button>
+                
+            </div>
+        </div><div id="krs-upload" class="section" style="display:none;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: #111827;">Import KRS Mahasiswa</h3>
+                    <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Format file yang didukung: Excel (.xlsx)</p>
+                </div>
+            </div>
+
+            <div style="background: #fafafa; border: 2.5px dashed #111827; border-radius: 16px; padding: 50px 40px; max-width: 550px; text-align: center; margin: 0 auto; transition: all 0.3s;">
+                
+                <i class="fas fa-cloud-upload-alt" style="font-size: 4rem; color: #8b0000; margin-bottom: 20px;"></i>
+                
+                <h4 style="font-size: 1.3rem; font-weight: 700; color: #111827; margin-bottom: 10px;">Upload File KRS</h4>
+                <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.5; margin-bottom: 30px;">
+                    Sistem akan otomatis mengekstrak data dan menyinkronkan Mahasiswa, Mata Kuliah, serta Dosen ke dalam database.
+                </p>
+                
+                <div style="margin-bottom: 30px; background: white; padding: 10px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                    <input type="file" id="krsFileInputTI" accept=".xlsx" style="width: 100%; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #4b5563; cursor: pointer; outline: none;">
+                </div>
+                
+                <button class="btn-dark" onclick="handleKRSUpload('TI')" style="width: 100%; justify-content: center; padding: 16px; font-size: 1.05rem; background: #111827; border: none; border-radius: 8px;">
+                    <i class="fas fa-magic" style="margin-right: 8px;"></i> Jalankan Otomatisasi n8n
+                </button>
+                
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    
+    const PRODI = 'ti'; 
+    const API_URL = "http://localhost:5678/webhook/get-metadata?prodi=" + PRODI;
+    const API_UPDATE = "http://localhost:5678/webhook/admin-update-master";
+    const API_MAP_MK = "http://localhost:5678/webhook/admin-map-mk-cpmk";
+    const API_GET_USERS = "http://localhost:5678/webhook/get-users"; 
+    
+
+    // --- SATPAM ADMIN TI ---
+    const userLogin = localStorage.getItem("user_login");
+    const userRole = localStorage.getItem("user_role");
+    const userProdi = localStorage.getItem("prodi_aktif");
+
+    if (!userLogin) window.location.replace("login.html");
+    
+    // Update nama di Sidebar dan Avatar
+    document.getElementById("adminName").innerText = userLogin;
+    document.getElementById("sidebarAvatar").src = `https://ui-avatars.com/api/?name=${userLogin}&background=8b0000&color=fff&bold=true`;
+
+    // Cek Akses Role
+    if (userRole !== 'head_admin') {
+        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "input_nilai.html");
+        else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
+    }
+
+    // --- FUNGSI ANIMASI DROPDOWN SIDEBAR ---
+    function toggleDropdown(menuId, chevronId) {
+        const menu = document.getElementById(menuId);
+        const chevron = document.getElementById(chevronId);
+        if (menu.style.display === 'none' || menu.style.display === '') {
+            menu.style.display = 'flex';
+            chevron.style.transform = 'rotate(180deg)'; 
+        } else {
+            menu.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';   
+        }
+    }
+
+    // --- LOGIKA SIDEBAR & SECTION ---
+    function switchTab(type) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(el => { el.style.display = 'none'; el.classList.remove('active'); });
+        
+        const navBtn = document.getElementById('nav-' + type);
+        if(navBtn) navBtn.classList.add('active');
+        
+        const contentSection = document.getElementById('content-' + type);
+        if(contentSection) {
+            contentSection.style.display = 'block';
+            contentSection.classList.add('active');
+        }
+
+        const titles = { 
+            'dashboard': 'PANEL KENDALI <span>ADMIN</span>', 
+            'mk': 'KELOLA MATA <span>KULIAH</span>', 
+            'cpl': 'CAPAIAN PEMBELAJARAN <span>LULUSAN</span>',
+            'cpmk': 'CAPAIAN PEMBELAJARAN <span>MATA KULIAH</span>',
+            'mapping': 'MAPPING <span>CPL - CPMK</span>',
+            'mapping-mk': 'MAPPING <span>MK - CPMK</span>',
+            'reset': 'KELOLA <span>PASSWORD</span>'
+        };
+        document.getElementById('pageTitle').innerHTML = titles[type] || 'PANEL <span>ADMIN</span>';
+
+        if(type === 'mapping-mk') loadDropdownMK();
+        else if(type === 'mapping') loadMappingData();
+        else if(type === 'reset') loadUserList(); 
+        else if(type === 'mk' || type === 'cpl' || type === 'cpmk') loadData(type);
+    }
+
+    // --- VARIABEL PAGINASI PINTAR ---
+    const paginationState = {
+        'mk':      { data: [], page: 1, bodyId: 'bodyMK',      paginationId: 'pagination-mk' },
+        'cpl':     { data: [], page: 1, bodyId: 'bodyCPL',     paginationId: 'pagination-cpl' },
+        'cpmk':    { data: [], page: 1, bodyId: 'bodyCPMK',    paginationId: 'pagination-cpmk' },
+        'mapping': { data: [], page: 1, bodyId: 'bodyMapping', paginationId: 'pagination-mapping' } // ✨ Tambahan baru
+    };
+    const rowsPerPage = 5; 
+    let globalCPL = []; // ✨ Menyimpan data CPL untuk opsi dropdown mapping
+
+    // --- FUNGSI LOAD DATA UTAMA ---
+    async function loadData(tipe) { 
+        try {
+            const res = await fetch(API_URL); 
+            const data = await res.json();
+            
+            paginationState[tipe].data = data.filter(i => i.tipe === tipe);
+            paginationState[tipe].page = 1; 
+            
+            renderTablePaginated(tipe);
+        } catch(e) { console.error(e); }
+    }
+
+    // --- FUNGSI RENDER TABEL DINAMIS ---
+    function renderTablePaginated(tipe) {
+        const state = paginationState[tipe];
+        const tbody = document.getElementById(state.bodyId);
+        tbody.innerHTML = "";
+
+        const startIndex = (state.page - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const dataHalamanIni = state.data.slice(startIndex, endIndex);
+
+        // Jika yang sedang di-render adalah tabel mapping
+        if (tipe === 'mapping') {
+            dataHalamanIni.forEach(cpmk => {
+                let options = '<option value="">-- Pilih CPL --</option>';
+                globalCPL.forEach(cpl => { 
+                    const selected = (cpl.kode === cpmk.parent) ? 'selected' : ''; 
+                    options += `<option value="${cpl.kode}" ${selected}>${cpl.kode} - ${cpl.label.substring(0, 30)}...</option>`; 
+                });
+                tbody.innerHTML += `<tr>
+                    <td><strong>${cpmk.kode}</strong></td>
+                    <td style="text-align:left; font-size:0.9rem; color:#4b5563;">${cpmk.label}</td>
+                    <td><select id="sel-${cpmk.kode}" style="width:100%; padding:10px; border-radius:6px; border:1px solid #d1d5db; outline:none;">${options}</select></td>
+                    <td style="text-align:center;"><button class="btn-dark" style="padding: 10px 14px;" onclick="simpanMappingCPL('${cpmk.kode}')"><i class="fas fa-save"></i></button></td>
+                </tr>`;
+            });
+        } 
+        // Jika yang di-render adalah tabel biasa (MK, CPL, CPMK)
+        else {
+            dataHalamanIni.forEach(item => {
+                tbody.innerHTML += `<tr>
+                    <td><strong>${item.kode}</strong></td>
+                    <td><input type="text" id="in-${item.kode}" value="${item.label || ''}" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; outline:none; font-family:'Inter', sans-serif;"></td>
+                    <td style="text-align:center;"><button class="btn-dark" style="padding: 10px 14px;" onclick="simpanEdit('${tipe}', '${item.kode}')"><i class="fas fa-check"></i></button></td>
+                </tr>`;
+            });
+        }
+
+        renderPaginationUI(tipe);
+    }
+
+    // --- FUNGSI RENDER TOMBOL PREV & NEXT ---
+    function renderPaginationUI(tipe) {
+        const state = paginationState[tipe];
+        const container = document.getElementById(state.paginationId);
+        container.innerHTML = "";
+        
+        const totalPages = Math.ceil(state.data.length / rowsPerPage);
+        if (totalPages <= 1) return; 
+
+        // Tombol Prev
+        const btnPrev = document.createElement('button');
+        btnPrev.className = 'btn-dark';
+        btnPrev.innerHTML = '<i class="fas fa-chevron-left"></i> Prev';
+        btnPrev.disabled = state.page === 1;
+        btnPrev.onclick = () => { if (state.page > 1) { state.page--; renderTablePaginated(tipe); } };
+        container.appendChild(btnPrev);
+
+        // Keterangan Halaman
+        const info = document.createElement('span');
+        info.innerHTML = `Halaman <strong>${state.page}</strong> dari <strong>${totalPages}</strong>`;
+        info.style.fontSize = "0.95rem";
+        info.style.color = "#4b5563";
+        container.appendChild(info);
+
+        // Tombol Next
+        const btnNext = document.createElement('button');
+        btnNext.className = 'btn-dark';
+        btnNext.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+        btnNext.disabled = state.page === totalPages;
+        btnNext.onclick = () => { if (state.page < totalPages) { state.page++; renderTablePaginated(tipe); } };
+        container.appendChild(btnNext);
+    }
+
+    // --- FUNGSI RESET PASSWORD ---
+    async function loadUserList() { 
+        try {
+            const res = await fetch(API_GET_USERS);
+            if (!res.ok) return;
+            const data = await res.json();
+            const datalist = document.getElementById("daftarDosenTI");
+            datalist.innerHTML = ""; 
+            let users = Array.isArray(data) ? ((data[0] && data[0].data) ? data[0].data : data) : (data.data || []);
+            users.forEach(u => { if (u.role === 'dosen' && u.prodi === 'ti') { const option = document.createElement('option'); option.value = u.username; option.text = `${u.nama_lengkap} (Dosen TI)`; datalist.appendChild(option); } });
+        } catch (e) { console.error("Gagal memuat daftar dosen:", e); }
+    }
+
+    async function prosesResetPassword() { 
+        const username = document.getElementById("targetUsername").value.trim(); const newPassword = document.getElementById("newPassword").value.trim();
+        if (!username || !newPassword) { alert("⚠️ Username dan Password baru tidak boleh kosong!"); return; }
+        if (!confirm(`Apakah Anda yakin ingin mengganti password untuk akun "${username}"?`)) return;
+        try {
+            const res = await fetch("http://localhost:5678/webhook/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) });
+            const data = await res.json();
+            if (res.ok && data.status === "success") { alert(`✅ BERHASIL: ${data.message}`); document.getElementById("targetUsername").value = ""; document.getElementById("newPassword").value = ""; } 
+            else alert("❌ Gagal mereset password. Pastikan username benar.");
+        } catch (e) { alert("❌ Terjadi kesalahan koneksi ke server n8n."); }
+    }
+
+    // --- FUNGSI MAPPING DATA ---
+    async function loadMappingData() { 
+        try {
+            const res = await fetch(API_URL); 
+            const data = await res.json();
+            
+            // Simpan data CPL ke variabel global untuk dipakai dropdown
+            globalCPL = data.filter(i => i.tipe === 'cpl'); 
+            
+            // Simpan data CPMK ke dalam sistem paginasi mapping
+            paginationState['mapping'].data = data.filter(i => i.tipe === 'cpmk');
+            paginationState['mapping'].page = 1; // Reset halaman ke 1
+            
+            // Panggil render
+            renderTablePaginated('mapping');
+        } catch(e) { console.error(e); }
+    }
+
+    async function loadDropdownMK() { 
+        const res = await fetch(API_URL); const data = await res.json(); const select = document.getElementById("pilihMKMapping"); select.innerHTML = '<option value="">-- Pilih Mata Kuliah TI --</option>';
+        data.filter(i => i.tipe === 'mk').forEach(mk => { select.innerHTML += `<option value="${mk.kode}">${mk.kode} - ${mk.label}</option>`; });
+    }
+
+    async function loadMappingUI() { 
+        const mkKode = document.getElementById("pilihMKMapping").value; 
+        const area = document.getElementById("checklistArea"); 
+        const container = document.getElementById("mappingContainer"); 
+        const loading = document.getElementById("loadingMapping");
+        const emptyState = document.getElementById("mappingEmptyState"); // Tambahan untuk memanggil Empty State
+
+        // Jika user kembali memilih "Pilih Mata Kuliah" (Kosong)
+        if(!mkKode) { 
+            container.style.display = 'none'; 
+            loading.style.display = 'none';
+            emptyState.style.display = 'flex'; // Tampilkan kembali layar EMPTY
+            return; 
+        }
+        
+        // Sembunyikan EMPTY dan tampilkan Loading
+        emptyState.style.display = 'none'; 
+        loading.style.display = 'block'; 
+        container.style.display = 'none';
+        area.innerHTML = "";
+        
+        try {
+            const [resMeta, resMap] = await Promise.all([ fetch(API_URL), fetch(`http://localhost:5678/webhook/get-mapping-mk?mk=${mkKode}&prodi=${PRODI}`) ]);
+            const meta = await resMeta.json(); const existing = await resMap.json(); const checkedCPMKs = new Set(existing.map(e => e.kode_cpmk));
+            const listCPL = meta.filter(i => i.tipe === 'cpl'); const listCPMK = meta.filter(i => i.tipe === 'cpmk');
+            
+            listCPL.forEach(cpl => {
+                const childCPMK = listCPMK.filter(c => c.parent === cpl.kode);
+                if (childCPMK.length > 0) {
+                    let html = "";
+                    childCPMK.forEach(cpmk => { const isChecked = checkedCPMKs.has(cpmk.kode) ? "checked" : ""; html += `<div style="display:flex; align-items:center; padding: 12px; border-bottom:1px solid #e5e7eb; background: white;"><input type="checkbox" class="chk-cpmk" value="${cpmk.kode}" ${isChecked} style="width:18px; height:18px; margin-right:12px; cursor:pointer;"><div><strong style="color:#111827;">${cpmk.kode}</strong> - <span style="color:#4b5563;">${cpmk.label}</span></div></div>`; });
+                    area.innerHTML += `<div style="margin-bottom:16px; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden;"><div style="background:#fdf2f2; padding:12px 16px; font-weight:700; color:#8b0000; border-bottom:1px solid #e5e7eb;"><i class="fas fa-folder-open" style="margin-right:8px;"></i> ${cpl.kode}</div><div>${html}</div></div>`;
+                }
+            });
+            
+            loading.style.display = 'none'; 
+            container.style.display = 'block'; // Tampilkan daftar checklist
+        } catch (e) { alert("Error memuat UI Mapping!"); }
+    }
+
+    // --- FUNGSI SAVE/UPDATE KE N8N ---
+    async function simpanEdit(tipe, kode) { const value = document.getElementById(`in-${kode}`).value; const res = await fetch(API_UPDATE, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) }); if(res.ok) alert("✅ Berhasil diperbarui!"); }
+    async function simpanMappingCPL(kodeCpmk) { const kodeCpl = document.getElementById(`sel-${kodeCpmk}`).value; const res = await fetch(API_UPDATE, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ tipe: 'mapping', kode: kodeCpmk, value: kodeCpl, prodi: PRODI }) }); if(res.ok) alert("✅ Mapping CPL-CPMK Tersimpan!"); }
+    async function simpanMappingMK() { const mkKode = document.getElementById("pilihMKMapping").value; const listCpmk = Array.from(document.querySelectorAll('.chk-cpmk:checked')).map(cb => cb.value); const token = localStorage.getItem("api_token"); const res = await fetch(API_MAP_MK, { method: "POST", headers: {"Content-Type":"application/json", "Authorization": "Bearer " + token}, body: JSON.stringify({ kode_mk: mkKode, cpmk_list: listCpmk, prodi: PRODI }) }); if(res.ok) alert("✅ Mapping MK-CPMK TI Berhasil!"); }
+
+    window.onload = () => { switchTab('dashboard'); };
+    function logout() { localStorage.clear(); window.location.replace("login.html"); }
+    function showSection(sectionId) {
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.style.display = 'none';
+        });
+
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+        }
+    }
+    async function handleKRSUpload(role) {
+            const inputId = role === 'TI' ? 'krsFileInputTI' : (role === 'SI' ? 'krsFileInputSI' : 'krsFileInputHead');
+            const fileInput = document.getElementById(inputId);
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Silakan pilih file Excel (.xlsx) terlebih dahulu!");
+                return;
+            }
+
+            console.log(`Memulai upload KRS untuk role: ${role}`);
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('uploaded_by', role); 
+
+            try {
+                // GANTI URL DI BAWAH INI DENGAN URL WEBHOOK N8N ANDA NANTI
+                const response = await fetch('http://localhost:5678/webhook/upload-krs', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert("✅ File berhasil dikirim! n8n sedang memproses relasi Database.");
+                    fileInput.value = ""; 
+                } else {
+                    alert("❌ Gagal terhubung ke n8n. Pastikan workflow n8n sudah aktif.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Terjadi kesalahan jaringan saat menghubungi server n8n.");
+            }
+        }
+</script>
+</body>
+</html>

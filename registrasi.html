@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi Dosen - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- RESET & MENCEGAH SCROLL --- */
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            margin: 0; 
+            padding: 0;
+            height: 100vh; /* Tinggi pas 1 layar penuh */
+            width: 100vw;
+            display: flex; 
+            background-color: #ffffff;
+            overflow: hidden; /* ✨ Mencegah scrollbar muncul ✨ */
+        }
+
+        /* --- PANEL KIRI (FORM) --- */
+        .left-panel {
+            width: 35%; 
+            min-width: 350px;
+            max-width: 450px;
+            height: 100vh;
+            background: #ffffff;
+            padding: 20px 40px; /* Padding vertikal dikurangi agar tidak mentok */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+            overflow: hidden; /* Pastikan tidak ada scroll */
+        }
+
+        /* --- PANEL KANAN (BACKGROUND & LOGO BESAR) --- */
+        .right-panel {
+            flex-grow: 1; 
+            height: 100vh;
+            position: relative;
+            background-image: url('BackgroundUnaki.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .right-panel::before {
+            content: ''; 
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, #ffc561d0 0%, rgba(0, 2, 93, 0.9) 100%);
+            z-index: 1;
+        }
+
+        /* Logo Besar Putih di Panel Kanan */
+        .logo-large {
+            position: relative;
+            z-index: 2;
+            width: 60%;
+            max-width: 500px;
+            filter: brightness(0) invert(1); /* ✨ Otomatis mengubah logo jadi putih ✨ */
+            object-fit: contain;
+        }
+
+        /* --- STYLING ISI FORM (DIPADATKAN) --- */
+        .form-container { width: 100%; max-width: 320px; }
+        
+        /* Logo Kecil di Form (Warna Asli) */
+        .logo-small { 
+            height: 50px; 
+            object-fit: contain; 
+            margin-bottom: 15px; 
+            display: block; 
+            margin-left: auto; 
+            margin-right: auto; 
+            filter: none; /* ✨ Memastikan logo form pakai warna asli ✨ */
+        }
+        
+        h2 { color: #111827; margin-top: 0; margin-bottom: 20px; font-weight: 800; font-size: 1.3rem; text-align: center; }
+        
+        .input-group { margin-bottom: 12px; text-align: left; }
+        .input-group label { display: block; font-size: 0.8rem; font-weight: 700; color: #111827; margin-bottom: 4px; }
+        .input-group input, .input-group select { 
+            width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px; 
+            font-size: 0.9rem; outline: none; transition: 0.2s; color: #334155;
+        }
+        .input-group input::placeholder { color: #94a3b8; }
+        .input-group input:focus, .input-group select:focus { border-color: #111827; box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1); }
+        
+        /* Kotak Keamanan (Dipadatkan) */
+        .captcha-box { background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px; }
+        .btn-captcha-refresh {
+            background: #e2e8f0; border: none; color: #334155; border-radius: 6px;
+            font-size: 1rem; cursor: pointer; width: 38px; height: 38px; display: flex; 
+            align-items: center; justify-content: center; transition: 0.2s; margin: 0;
+        }
+        .btn-captcha-refresh:hover { background: #cbd5e1; color: #111827; }
+        .spinning { animation: spin 0.5s linear; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Tombol Submit */
+        button.btn-submit { 
+            width: 100%; padding: 12px; background-color: #111827; color: white; 
+            border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; 
+            font-weight: bold; transition: 0.3s; 
+        }
+        button.btn-submit:hover { background-color: #374151; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        .loading { color: #6b7280; font-style: italic; display: none; margin-top: 10px; font-size: 0.85rem; text-align: center; }
+        .login-link { margin-top: 15px; font-size: 0.85rem; color: #64748b; text-align: center; }
+        .login-link a { color: #111827; text-decoration: none; font-weight: 800; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; }
+            .left-panel { width: 100%; height: 100vh; box-shadow: none; justify-content: flex-start; padding-top: 50px; }
+            .right-panel { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="left-panel">
+    <div class="form-container">
+        <img src="LogoUnaki.png" alt="Logo Universitas AKI" class="logo-small">
+        
+        <h2>Registrasi Dosen</h2>
+        
+        <div class="input-group">
+            <label>Nama Lengkap</label>
+            <input type="text" id="nama_lengkap" placeholder="Masukkan Nama Lengkap dengan Gelar">
+        </div>
+
+        <div class="input-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Masukkan Username">
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Masukkan Password (min. 6 karakter)">
+        </div>
+        
+        <div class="input-group">
+            <label>Program Studi</label>
+            <select id="prodi" required>
+                <option value="" disabled selected>Pilih Program Studi</option>
+                <option value="ti">Teknik Informatika (TI)</option>
+                <option value="si">Sistem Informasi (SI)</option>
+                <option value="ti,si">Lintas Prodi (TI & SI)</option>
+            </select>
+        </div>
+
+        <div class="captcha-box">
+            <label style="display: block; font-weight: 700; margin-bottom: 6px; color: #374151; font-size: 0.8rem; text-align: center;">Verifikasi Keamanan</label>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <canvas id="captchaCanvas" width="140" height="38" style="border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff; letter-spacing: 5px; flex-grow: 1;"></canvas>
+                
+                <button class="btn-captcha-refresh" onclick="processRefreshCaptcha()" title="Ganti Kode">
+                    <i id="refreshIcon" class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            
+            <input type="text" id="captchaInput" placeholder="Ketik kode..." required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 0.9rem; text-transform: uppercase; text-align: center; font-weight: 600; letter-spacing: 2px; outline:none;">
+            <p id="captchaError" style="color: #dc2626; font-size: 0.8rem; margin-top: 5px; display: none; text-align: center; font-weight: 600;">❌ Kode CAPTCHA salah!</p>
+        </div>
+
+        <button class="btn-submit" onclick="prosesRegistrasi()">Daftar</button>
+        
+        <p id="loadingText" class="loading"><i class="fas fa-circle-notch fa-spin"></i> Memproses pendaftaran...</p>
+        
+        <div class="login-link">
+            Sudah punya akun? <a href="login.html">Masuk</a>
+        </div>
+    </div>
+</div>
+
+<div class="right-panel">
+    <img src="LogoUnaki.png" alt="Logo Universitas AKI" class="logo-large">
+</div>
+
+<script>
+    const REG_API = "http://localhost:5678/webhook/registrasi-user";
+
+    let currentCaptcha = "";
+
+    function generateCaptcha() {
+        const canvas = document.getElementById('captchaCanvas');
+        if (!canvas) return; 
+        const ctx = canvas.getContext('2d');
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
+        currentCaptcha = "";
+        for (let i = 0; i < 6; i++) {
+            currentCaptcha += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        for (let i = 0; i < 30; i++) {
+            ctx.fillStyle = `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255}, 0.3)`;
+            ctx.beginPath();
+            ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.font = "bold 20px 'Courier New', monospace";
+        ctx.fillStyle = "#111827"; 
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((Math.random() - 0.5) * 0.2); 
+        ctx.fillText(currentCaptcha, 0, 0);
+        ctx.restore();
+
+        for (let i = 0; i < 4; i++) {
+            ctx.strokeStyle = `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255}, 0.4)`;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+            ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+            ctx.stroke();
+        }
+
+        const errorP = document.getElementById("captchaError");
+        if(errorP) errorP.style.display = "none";
+        
+        const inputC = document.getElementById("captchaInput");
+        if(inputC) inputC.value = "";
+    }
+
+    function processRefreshCaptcha() {
+        const icon = document.getElementById('refreshIcon');
+        if (icon) icon.classList.add('spinning');
+        
+        generateCaptcha(); 
+        
+        setTimeout(() => {
+            if (icon) icon.classList.remove('spinning');
+        }, 600);
+    }
+
+    window.onload = () => { generateCaptcha(); };
+
+    async function prosesRegistrasi() {
+        const userInput = document.getElementById("captchaInput").value.trim().toUpperCase();
+        
+        if (userInput !== currentCaptcha) {
+            document.getElementById("captchaError").style.display = "block";
+            generateCaptcha(); 
+            return; 
+        }
+
+        const nama = document.getElementById('nama_lengkap').value;
+        const user = document.getElementById('username').value;
+        const passRaw = document.getElementById('password').value; 
+        const prodi = document.getElementById('prodi').value; 
+
+        if (!nama || !user || !passRaw || !prodi) {
+            alert("Semua kolom (termasuk Program Studi) wajib diisi!");
+            return;
+        }
+
+        const loading = document.getElementById('loadingText');
+        loading.style.display = 'block';
+
+        try {
+            const response = await fetch(REG_API, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    nama: nama, 
+                    username: user, 
+                    password: passRaw,
+                    prodi: prodi 
+                })
+            });
+
+            loading.style.display = 'none';
+
+            if (response.ok) {
+                alert("✅ Registrasi Berhasil! Silakan Login menggunakan akun baru Anda.");
+                window.location.href = "login.html";
+            } else {
+                alert("❌ Registrasi Gagal. Username mungkin sudah digunakan.");
+            }
+        } catch (error) {
+            loading.style.display = 'none';
+            alert("Gagal menghubungi server n8n.");
+        }
+    }
+</script>
+</body>
+</html>

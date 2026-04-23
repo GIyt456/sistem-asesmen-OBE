@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Input Nilai Dosen - OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <style>
+        /* =========================================
+           1. ROOT & RESET (TEMA BARU)
+        ========================================= */
+        :root {
+            --primary-navy: #0f172a;
+            --primary-blue: #1e3a8a;
+            --primary-red: #8b0000;
+            --btn-teal: #0d9488;
+            --btn-green: #16a34a;
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        /* BACKGROUND UTAMA SEKARANG PUTIH BERSIH */
+        body { background-color: #ffffff; color: var(--text-dark); }
+
+        /* =========================================
+           2. NAVBAR & HEADER (TETAP SAMA)
+        ========================================= */
+        .navbar {
+            position: absolute; top: 0; left: 0; width: 100%;
+            padding: 20px 60px; display: flex; justify-content: space-between; align-items: center;
+            z-index: 100; color: white;
+        }
+        .nav-links { display: flex; gap: 30px; font-weight: 500; font-size: 0.95rem; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; transition: 0.3s; padding-bottom: 4px; opacity: 0.8; }
+        .nav-links a:hover { opacity: 1; }
+        .nav-links a.active { opacity: 1; font-weight: 800; border-bottom: 2px solid #ffc561; }
+
+        .nav-user { display: flex; align-items: center; gap: 16px; font-weight: 600; }
+        
+        .user-chip {
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px;
+            color: #ffffff; backdrop-filter: blur(8px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-logout {
+            background: var(--primary-red); color: white;
+            padding: 8px 24px; border-radius: 50px; border: none;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            transition: all 0.2s ease; font-family: 'Inter', sans-serif;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
+
+        /* =========================================
+           3. HERO SECTION (JUMBOTRON) (TETAP SAMA)
+        ========================================= */
+        .hero {
+            position: relative; height: 600px; 
+            background-image: url('BackgroundUnaki.jpg'); 
+            background-size: cover; background-position: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; color: white; padding: 0 20px;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, #ffc561d0 0%, rgba(0, 2, 93, 0.9) 100%);
+            z-index: 1;
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 900px; }
+        .hero-title { font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; letter-spacing: -1px; }
+        .hero-subtitle { font-size: 1.1rem; font-weight: 400; opacity: 0.9; margin-bottom: 30px; line-height: 1.6; }
+
+        .pill-badge { 
+            background: #800000; color: white; padding: 14px 40px; border-radius: 50px; 
+            font-weight: 800; font-size: 1.15rem; display: inline-block; 
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); letter-spacing: 0.5px; 
+        }
+
+        /* =========================================
+           4. MAIN CONTENT & CARDS (DESAIN BARU)
+        ========================================= */
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        
+        /* Kartu Abu-abu Muda Elegan */
+        .figma-card { background: #f8fafc; border-radius: 16px; padding: 32px; margin-bottom: 30px; border: 1px solid #f1f5f9; }
+        .card-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; color: var(--text-dark); }
+        .card-subtitle { color: var(--text-gray); font-size: 0.9rem; margin-bottom: 20px; }
+
+        /* =========================================
+           5. TABEL & INPUT (SUDUT MELENGKUNG)
+        ========================================= */
+        #configTable { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; background: white; }
+        #configTable th { 
+            background: #002878; /* ✨ Warna biru dongker pekat sesuai gambar ✨ */
+            color: white; 
+            padding: 16px 12px; 
+            text-align: center; 
+            border-right: 1px solid rgba(255,255,255,0.15); /* ✨ Garis pembatas agak diterangkan agar terlihat ✨ */
+            font-size: 0.85rem; 
+            font-weight: 600; 
+        }
+        #configTable td { padding: 12px 8px; border-bottom: 1px solid #e5e7eb; border-right: 1px solid #e5e7eb; text-align: center; vertical-align: middle; font-size: 0.9rem; }
+        
+        /* Input Angka Oval */
+        input[type="number"] { width: 65px; padding: 8px; text-align: center; border: 1px solid #cbd5e1; border-radius: 50px; font-weight: 700; color: #111827; font-family: 'Inter', sans-serif; background: transparent; transition: all 0.2s; }
+        input[type="number"]:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        .btn-action { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; font-family: 'Inter', sans-serif; }
+        .btn-action:hover { opacity: 0.9; transform: translateY(-2px); }
+        
+        /* Tombol Hapus Pink Soft */
+        .btn-hapus-soft { background: #fee2e2; color: #ef4444; padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; border: none; cursor: pointer; transition: 0.2s; }
+        .btn-hapus-soft:hover { background: #fecaca; }
+
+        .grand-total { font-size: 1.1rem; font-weight: 900; }
+        .status-ok { color: #16a34a; } .status-err { color: #dc2626; }
+
+        /* Dropdown Mata Kuliah Minimalis */
+        .select-mk { 
+            width: 320px; padding: 10px 15px; border: 1px solid #cbd5e1; 
+            border-radius: 8px; font-size: 0.95rem; font-family: 'Inter', sans-serif; 
+            color: #334155; outline: none; background-color: white; cursor: pointer;
+        }
+        .select-mk:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        /* =========================================
+           6. TUTORIAL SLIDER BUTTONS & UPLOAD BOX
+        ========================================= */
+        .slider-btn { width: 45px; height: 45px; border-radius: 50%; padding: 0; background: #111827; color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .slider-btn:hover { background: var(--btn-teal); transform: scale(1.15); box-shadow: 0 6px 12px rgba(13, 148, 136, 0.3); }
+
+        .empty-upload-box { background: #e2e8f0; border-radius: 24px; padding: 100px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin-bottom: 24px; margin-top: 20px; }
+        .empty-upload-box h1 { font-size: 4rem; font-weight: 900; color: #334155; letter-spacing: -2px; margin-bottom: 10px; }
+        .empty-upload-box p { font-size: 1.1rem; color: #64748b; max-width: 500px; line-height: 1.5; }
+
+        /* Kotak Pencarian Clean */
+        .search-box { width: 100%; margin-bottom: 10px; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; background: white; font-family: 'Inter'; }
+        .select-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; font-size: 0.95rem; background: white; font-family: 'Inter'; }
+
+        /* =========================================
+           7. FOOTER
+        ========================================= */
+        .footer { background: var(--primary-navy); color: #9ca3af; padding: 60px 60px 30px 60px; margin-top: 50px; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .footer h4 { color: white; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: #9ca3af; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .footer-links a:hover { color: white; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <img src="LogoUnaki.png" alt="Logo Universitas AKI" style="height: 45px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);">
+        <div class="nav-links">
+            <a href="#" class="active">Home</a>
+            <a href="dashboard_dosen.html">Dashboard</a>
+            <a href="#">Upload Nilai</a>
+            <a href="laporan.html">Laporan</a>
+        </div>
+        <div class="nav-user">
+            <div class="user-chip">
+                <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i> 
+                <span id="dosenName">Dosen</span>
+            </div>
+            <button class="btn-logout" onclick="logout()">Log Out</button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span id="judul_dosen_val">Sistem Outcome Based Education</span>
+                <i id="edit_icon_judul" class="fas fa-pencil-alt" onclick="openEditDosenModal('judul_dosen')" style="display:none; font-size: 1.5rem; color: rgba(255,255,255,0.7); cursor: pointer; margin-left: 10px;"></i>
+            </h1>
+            <p class="hero-subtitle">
+                <span id="sub_judul_dosen_val">Platform automasi terpadu untuk mengelola, memantau, dan memvisualisasikan pencapaian Capaian Pembelajaran Lulusan (CPL) secara real-time dan akurat</span>
+                <i id="edit_icon_sub" class="fas fa-pencil-alt" onclick="openEditDosenModal('sub_judul_dosen')" style="display:none; font-size: 1rem; color: rgba(255,255,255,0.7); cursor: pointer; margin-left: 10px;"></i>
+            </p>
+            
+            <div class="pill-badge" style="margin-top: 10px;">Teknik Informatika</div>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <div class="tutorial-wrapper" style="margin-bottom: 25px;">
+            <div class="tutorial-header" onclick="toggleTutorial()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; padding-bottom: 30px; border-bottom: 1px solid #e5e7eb; margin-bottom: 30px;">
+                <div>
+                    <h2 style="font-size: 2.2rem; font-weight: 900; color: var(--text-dark); margin-bottom: 4px;">Tutorial</h2>
+                    <p style="color: var(--text-gray); font-size: 0.95rem; margin: 0; font-weight: 400;">Ini adalah tutorial bagaimana cara untuk menggunakan website ini</p>
+                </div>
+                <i id="tutorialIcon" class="fas fa-chevron-down" style="font-size: 1.5rem; color: var(--text-dark); transition: transform 0.3s;"></i>
+            </div>
+            <div id="tutorialContent" style="display: none; padding-top: 50px;">
+                <div style="background: #f8fafc; border-radius: 24px; padding: 50px; position: relative; display: flex; align-items: center; gap: 40px; border: 1px solid #f1f5f9; min-height: 300px;">
+                    <div id="stepBadge" style="position: absolute; top: -30px; left: -20px; width: 100px; height: 100px; background: #111827; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: 900; box-shadow: 0 10px 20px rgba(17, 24, 39, 0.3); z-index: 10;">#1</div>
+                    <div id="stepImage" style="width: 350px; height: 220px; background: #e2e8f0; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 3rem;">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div>
+                        <h3 id="stepTitle" style="font-size: 1.8rem; font-weight: 800; color: #111827; margin-bottom: 15px; line-height: 1.3;">Pilih Mata Kuliah</h3>
+                        <p id="stepDesc" style="font-size: 1.05rem; color: #4b5563; line-height: 1.6;">Gunakan daftar pencarian di bawah untuk memilih mata kuliah yang Anda ampu.</p>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
+                    <button onclick="prevStep()" class="slider-btn"><i class="fas fa-chevron-left"></i></button>
+                    <button onclick="nextStep()" class="slider-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div>
+                <h2 style="font-size: 2rem; font-weight: 800; color: #111827; margin-bottom: 4px;">Sistem Input Nilai</h2>
+                <p style="color: #6b7280; font-size: 0.95rem;">Data MK, CPL, CPMK terhubung langsung ke Database</p>
+            </div>
+            <button class="btn-action" style="background: #e0f2fe; color: #0369a1; padding: 10px 20px;" onclick="window.location.href='laporan.html'">
+                <i class="fas fa-chart-line"></i> Dashboard Laporan
+            </button>
+        </div>
+
+        <div id="warningMK" style="display: none; background: #fee2e2; border-left: 5px solid #ef4444; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+            <h4 style="margin: 0 0 5px 0; color: #991b1b;"><i class="fas fa-lock"></i> Akses Ditutup: Mata Kuliah Sudah Dihitung!</h4>
+            <p style="margin: 0; color: #7f1d1d; font-size: 0.95rem;">Nilai untuk mata kuliah ini sudah direkam di dalam sistem. Anda tidak bisa mengunggah nilai baru untuk mencegah duplikasi data.</p>
+        </div>
+
+        <div class="figma-card" id="card-bobot">
+            <h3 class="card-title">Konfigurasi Bobot Penilaian</h3>
+            <p class="card-subtitle" style="margin-bottom: 15px;">Pilih Terlebih Dahulu Mata Kuliah</p>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <select id="pilihMK" class="select-mk" onchange="loadMappingOtomatis()">
+                        <option value="" disabled selected>Pilih Mata Kuliah</option>
+                    </select>
+                    <div style="color: #64748b; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-info-circle"></i> Data MK, CPL, CPMK akan otomatis muncul berdasarkan mapping
+                    </div>
+                </div>
+
+                <button class="btn-action" style="background: #0f172a; color: white; padding: 8px 16px;" onclick="tambahBarisAsesmen()" id="btnTambahAsesmen" disabled>
+                    <i class="fas fa-plus"></i> Tambah Asesmen
+                </button>
+
+            </div>
+
+            <table id="configTable">
+                <thead>
+                    <tr>
+                        <th style="width: 12%;">Pertemuan</th> 
+                        <th style="width: 15%;">CPL</th> 
+                        <th style="width: 25%;">CPMK</th>
+                        <th style="width: 25%;">Bentuk Penilaian</th>
+                        <th style="width: 13%;">Bobot (%)</th>
+                        <th style="width: 10%;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="6" style="padding:30px; color:#94a3b8; font-style:italic; text-align: center;">Belum ada data. Silakan klik Mata Kuliah di atas.</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr style="background:#e0f2fe; color: #0369a1;">
+                        <td colspan="4" style="text-align:right; font-weight:800; padding-right:15px;">Total Bobot Keseluruhan:</td>
+                        <td id="grandTotal" class="grand-total status-err">0%</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        
+        </div>
+
+        <div class="figma-card" id="card-upload">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 class="card-title" style="margin: 0;">Upload Nilai Mahasiswa</h3>
+                <div style="display: flex; gap: 12px;">
+                    <button id="btnTemplate" type="button" class="btn-action" style="background: #10b981; color: white;" onclick="downloadTemplateExcel()">
+                        <i class="fas fa-download"></i> Download Template
+                    </button>
+                    <label id="labelUpload" class="btn-action" style="background: #16a34a; color: white; margin: 0; cursor: pointer;">
+                        <i class="fas fa-upload"></i> Upload Excel
+                        <input type="file" id="fileExcel" hidden onchange="handleFileUpload()">
+                    </label>
+                </div>
+            </div>
+
+            <div class="empty-upload-box" id="emptyUploadBox">
+                <h1>#EMPTY!!</h1>
+                <p>Upload terlebih dahulu excel yg telah dibuat dan nanti data akan muncul disini</p>
+            </div>
+
+            <div id="previewArea" style="margin-top:20px; display:none;">
+                <p style="margin-bottom:10px; color:#4b5563;"><strong>Preview Data:</strong> <span id="studentCount" style="color:#1e3a8a; font-weight:800;">0</span> Mahasiswa ditemukan.</p>
+                <div style="max-height:400px; overflow:auto; border:1px solid #e5e7eb; border-radius:12px; background: white;">
+                    <table style="margin-top:0; border: none; width: 100%; border-collapse: collapse; white-space: nowrap;">
+                        <thead id="studentHead" style="position:sticky; top:0; z-index:20; background: #f8fafc;">
+                        </thead>
+                        <tbody id="studentBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="area-simpan" style="text-align:right; margin-top:30px;">
+                <button id="btnSimpan" class="btn-action" style="background: #16a34a; padding: 12px 24px; font-size: 1.05rem;" onclick="simpanKeDatabase()">
+                    <i class="fas fa-save"></i> Simpan Semua Data
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div>
+                <h4>Sistem OBE</h4>
+                <p>Platform otomatis terpadu untuk mengelola, memantau, dan mengevaluasi Capaian Pembelajaran Lulusan (CPL) secara real-time. Memudahkan dosen dalam asesmen berbasis luaran.</p>
+            </div>
+            <div>
+                <h4>Menu Cepat</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Dashboard Utama</a></li>
+                    <li><a href="#">Laporan Nilai</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Dukungan Teknis</h4>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope" style="margin-right: 8px;"></i> helpdesk@kampus.ac.id</li>
+                    <li><i class="fas fa-building" style="margin-right: 8px;"></i> Gedung Utama Lt. 2</li>
+                </ul>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span>© 2026 Program Studi - Universitas AKI</span>
+            <span>Powered by <strong>N8N Workflow Automation</strong></span>
+        </div>
+    </footer>
+
+    <div id="editModalDosen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 32px; border-radius: 16px; width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+            <h3 style="margin-bottom: 20px; font-weight: 800; color: #111827;">Edit Teks Tampilan</h3>
+            <textarea id="editValueDosen" style="width:100%; padding:12px; margin-top:10px; border-radius: 8px; border: 1px solid #cbd5e1; min-height: 100px; font-family: 'Inter';"></textarea>
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+                <button class="btn-action" style="background: #e5e7eb; color: #374151;" onclick="closeDosenModal()">Batal</button>
+                <button class="btn-action" style="background: #16a34a;" onclick="saveDosenSettings()">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_SIMPAN = "http://localhost:5678/webhook/simpan-konfigurasi"; 
+        const API_GET_MAPPING = "http://localhost:5678/webhook/get-mapping-mk";
+        const API_GET_SETTINGS = "http://localhost:5678/webhook/get-settings";
+        const API_UPDATE_SETTINGS = "http://localhost:5678/webhook/update-settings";
+        const API_METADATA = "http://localhost:5678/webhook/get-metadata";
+        const API_GET_STUDENTS = "http://localhost:5678/webhook/get-mahasiswa-mk";
+
+        const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
+        const userNidn = localStorage.getItem("user_nidn");
+        const userRole = localStorage.getItem("user_role");
+        const userProdi = localStorage.getItem("prodi_aktif") || "ti";
+        
+        let allMetadata = []; 
+        let configData = [];
+        let studentData = [];
+        let currentEditTarget = "";
+        let mkSudahInput = [];
+        let templateAktif = "Template_Nilai_Mahasiswa.xlsx";
+
+        if (!userLogin) window.location.replace("login.html");
+        document.getElementById("dosenName").innerText = userLogin;
+
+        const tutorialData = [
+            { title: "Pilih Mata Kuliah", desc: "Gunakan fitur pencarian dan klik mata kuliah yang Anda ampu dari kotak TI atau SI.", imgIcon: "fa-list" },
+            { title: "Tentukan Bobot Penilaian (%)", desc: "Masukkan persentase bobot untuk komponen Att, Kuis, Tugas, dll. Pastikan total keseluruhan berwarna hijau (100%).", imgIcon: "fa-percentage" },
+            { title: "Download & Upload", desc: "Unduh template Excel, isi nilai mahasiswa secara offline, lalu unggah kembali file tersebut untuk direkam.", imgIcon: "fa-file-excel" }
+        ];
+        let currentStepIndex = 0;
+
+        function toggleTutorial() {
+            const content = document.getElementById('tutorialContent');
+            const icon = document.getElementById('tutorialIcon');
+            if (content.style.display === 'none') { content.style.display = 'block'; icon.style.transform = 'rotate(180deg)'; } 
+            else { content.style.display = 'none'; icon.style.transform = 'rotate(0deg)'; }
+        }
+        function updateTutorialUI() {
+            const data = tutorialData[currentStepIndex];
+            document.getElementById('stepBadge').innerText = `#${currentStepIndex + 1}`;
+            document.getElementById('stepTitle').innerText = data.title;
+            document.getElementById('stepDesc').innerText = data.desc;
+            document.getElementById('stepImage').innerHTML = `<i class="fas ${data.imgIcon}"></i>`;
+        }
+        function nextStep() { if (currentStepIndex < tutorialData.length - 1) { currentStepIndex++; updateTutorialUI(); } }
+        function prevStep() { if (currentStepIndex > 0) { currentStepIndex--; updateTutorialUI(); } }
+
+        async function cekMKSudahInput() {
+            try {
+                const res = await fetch("http://localhost:5678/webhook/ambil-laporan");
+                const data = await res.json();
+                const rawData = data.daftar_mahasiswa || [];
+                mkSudahInput = [...new Set(rawData.map(item => item.kode_mk))];
+            } catch(e) { console.log("Gagal mengecek status MK."); }
+        }
+
+        // --- FUNGSI LOAD METADATA TERBARU (UNTUK 1 DROPDOWN) ---
+        async function loadMetadata() {
+            await cekMKSudahInput(); 
+            let prodiArray = userProdi.split(','); 
+            allMetadata = [];
+
+            // Fokus memasukkan data hanya ke dropdown pilihMK
+            const selectMK = document.getElementById('pilihMK');
+            selectMK.innerHTML = '<option value="" disabled selected>Pilih Mata Kuliah</option>';
+
+            try {
+                for (let p of prodiArray) {
+                    let prodiBersih = p.trim().toLowerCase();
+                    const res = await fetch(`${API_METADATA}?prodi=${prodiBersih}&context=dosen&nidn=${userNidn}`);
+                    let textData = await res.text();
+                    if (textData.startsWith('=')) textData = textData.substring(1);
+                    let data = JSON.parse(textData);
+                    data = data.map(item => ({ ...item, prodi_asal: prodiBersih }));
+                    allMetadata = allMetadata.concat(data);
+                }
+
+                const uniqueMeta = []; const map = new Map();
+                for (const item of allMetadata) {
+                    if(!map.has(item.kode)) { map.set(item.kode, true); uniqueMeta.push(item); }
+                }
+                allMetadata = uniqueMeta;
+
+                const daftarMK = allMetadata.filter(item => item.tipe === 'mk');
+
+                // Jika database n8n kosong
+                if (daftarMK.length === 0) {
+                    selectMK.innerHTML = '<option value="" disabled selected>Tidak ada Mata Kuliah</option>';
+                    return;
+                }
+
+                // Masukkan semua MK yang ditemukan ke dalam Dropdown
+                daftarMK.forEach(mk => {
+                    const opt = document.createElement('option');
+                    opt.value = mk.kode;
+                    let statusText = mkSudahInput.includes(mk.kode) ? " 🔒 (Selesai)" : "";
+                    opt.textContent = `[${mk.kode}] ${mk.label}${statusText}`;
+                    selectMK.appendChild(opt);
+                });
+
+                // --- KODE BARU: BACA MEMORI MK TERAKHIR ---
+                const draftMK = localStorage.getItem("draft_mk_terpilih");
+                if (draftMK && Array.from(selectMK.options).some(opt => opt.value === draftMK)) {
+                    selectMK.value = draftMK;
+                    loadMappingOtomatis(); // Langsung otomatis buka tabelnya
+                }
+
+            } catch (e) { console.error("❌ Gagal memproses metadata:", e); }
+        }   
+
+        async function loadMappingOtomatis() {
+            const mkKode = document.getElementById("pilihMK").value;
+            const tbody = document.getElementById("tableBody");
+            const btnTambah = document.getElementById("btnTambahAsesmen");
+            
+            configData = [];
+            cpmkTersedia = [];
+            renderTableAsesmen();
+
+            if (!mkKode) { btnTambah.disabled = true; return; }
+
+            // --- KODE BARU: SIMPAN MEMORI MK TERPILIH ---
+            localStorage.setItem("draft_mk_terpilih", mkKode);
+
+            const mkInfo = allMetadata.find(m => m.kode === mkKode && m.tipe === 'mk');
+            const prodiQuery = mkInfo ? mkInfo.prodi_asal : localStorage.getItem("prodi_aktif");
+            templateAktif = `Template_Nilai_${mkKode}.xlsx`;
+
+            try {
+                const res = await fetch(`${API_GET_MAPPING}?mk=${mkKode}&prodi=${prodiQuery}`);
+                const mappedData = await res.json();
+
+                if (mappedData.length > 0) {
+                    btnTambah.disabled = false;
+                    mappedData.forEach(item => {
+                        const targetCPMK = item.kode_cpmk || item.KODE_CPMK;
+                        const detailCPMK = allMetadata.find(m => m.kode === targetCPMK && m.tipe === 'cpmk');
+                        if (detailCPMK) cpmkTersedia.push({ cpmk: targetCPMK, cpl: detailCPMK.parent });
+                    });
+                    
+                    // --- KODE BARU: CEK DRAFT BOBOT DARI LOCALSTORAGE ---
+                    const savedDraft = localStorage.getItem("draft_bobot_" + mkKode);
+                    if (savedDraft) {
+                        configData = JSON.parse(savedDraft); // Tarik data yang tersimpan
+                        renderTableAsesmen();
+                    } else if(configData.length === 0) {
+                        tambahBarisAsesmen(); // Buat baru jika tidak ada draf
+                    }
+                } else {
+                    throw new Error("Mapping Kosong"); 
+                }
+            } catch (e) { 
+                // ... (biarkan mode bypass yang ada di dalam catch tetap sama seperti sebelumnya)
+                console.warn("API n8n belum siap. Mengaktifkan Mode Bypass untuk Testing...");
+                const semuaCPMK = allMetadata.filter(m => m.tipe === 'cpmk');
+                if (semuaCPMK.length > 0) {
+                    btnTambah.disabled = false;
+                    semuaCPMK.forEach(c => { cpmkTersedia.push({ cpmk: c.kode, cpl: c.parent || "CPL-?" }); });
+                    
+                    // --- KODE BARU: CEK DRAFT DI MODE BYPASS ---
+                    const savedDraft = localStorage.getItem("draft_bobot_" + mkKode);
+                    if (savedDraft) {
+                        configData = JSON.parse(savedDraft);
+                        renderTableAsesmen();
+                    } else if(configData.length === 0) {
+                        tambahBarisAsesmen();
+                    }
+                } else {
+                    btnTambah.disabled = true;
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px;color:#dc2626;font-weight:bold;">⚠️ Gagal: Tabel CPMK di Database masih kosong.</td></tr>`;
+                    document.getElementById("grandTotal").innerText = "0%";
+                }
+            }
+        }
+
+        function tambahBarisAsesmen() {
+            if (cpmkTersedia.length === 0) return;
+            configData.push({ pertemuan: 1, cpl: cpmkTersedia[0].cpl, cpmk: cpmkTersedia[0].cpmk, bentuk: 'Tugas', bobot: 0 });
+            renderTableAsesmen();
+        }
+
+        function hapusBaris(i) { configData.splice(i, 1); renderTableAsesmen(); }
+
+        function renderTableAsesmen() {
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
+            let totalBobot = 0;
+
+            if(configData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="padding:30px; color:#94a3b8; font-style:italic; text-align: center;">Belum ada rencana asesmen. Klik Tambah Asesmen.</td></tr>`;
+                document.getElementById("grandTotal").innerText = "0%";
+                return;
+            }
+
+            let optCPMK = cpmkTersedia.map(c => `<option value="${c.cpmk}" data-cpl="${c.cpl}">${c.cpl} - ${c.cpmk}</option>`).join('');
+
+            configData.forEach((row, i) => {
+                totalBobot += row.bobot;
+                let currentOpt = optCPMK.replace(`value="${row.cpmk}"`, `value="${row.cpmk}" selected`);
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>
+                        <select style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" onchange="updateRow(${i}, 'pertemuan', this.value)">
+                            ${[...Array(16)].map((_, idx) => `<option value="${idx+1}" ${row.pertemuan == idx+1 ? 'selected':''}>Pert. ${idx+1}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td id="lbl-cpl-${i}" style="font-weight:700; color:#475569;">${row.cpl}</td>
+                    <td>
+                        <select style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" onchange="updateCPMK(${i}, this)">
+                            ${currentOpt}
+                        </select>
+                    </td>
+                    <td>
+                        <select style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" onchange="updateRow(${i}, 'bentuk', this.value)">
+                            <option value="Tugas" ${row.bentuk === 'Tugas' ? 'selected':''}>Tugas</option>
+                            <option value="Kuis" ${row.bentuk === 'Kuis' ? 'selected':''}>Kuis</option>
+                            <option value="Presentasi" ${row.bentuk === 'Presentasi' ? 'selected':''}>Presentasi</option>
+                            <option value="UTS" ${row.bentuk === 'UTS' ? 'selected':''}>Tes Tulis (UTS)</option>
+                            <option value="UAS" ${row.bentuk === 'UAS' ? 'selected':''}>Tes Tulis (UAS)</option>
+                        </select>
+                    </td>
+                    <td><input type="number" value="${row.bobot}" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" oninput="updateRow(${i}, 'bobot', this.value)"></td>
+                    <td style="text-align: center;"><button style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer;" onclick="hapusBaris(${i})"><i class="fas fa-trash"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const gt = document.getElementById("grandTotal");
+            gt.innerText = totalBobot + "%";
+            gt.style.color = totalBobot === 100 ? "#16a34a" : "#dc2626";
+
+            // --- KODE BARU: AUTO SAVE SETIAP ADA PERUBAHAN ---
+            const mkKode = document.getElementById("pilihMK").value;
+            if (mkKode && configData.length > 0) {
+                localStorage.setItem("draft_bobot_" + mkKode, JSON.stringify(configData));
+            }
+        }
+
+        function updateRow(i, field, val) {
+            if(field === 'bobot') val = parseFloat(val) || 0;
+            configData[i][field] = val;
+            renderTableAsesmen();
+        }
+
+        function updateCPMK(i, selectEl) {
+            const selectedOpt = selectEl.options[selectEl.selectedIndex];
+            configData[i].cpmk = selectedOpt.value;
+            configData[i].cpl = selectedOpt.getAttribute("data-cpl");
+            renderTableAsesmen();
+        }
+
+        async function downloadTemplateExcel() {
+            if(configData.length === 0) { alert("Buat minimal 1 rencana asesmen terlebih dahulu!"); return; }
+            const total = document.getElementById("grandTotal").innerText;
+            if(total !== "100%") { alert("Total bobot harus 100% sebelum mendownload template!"); return; }
+
+            const mkKode = document.getElementById("pilihMK").value;
+            let listMahasiswa = [];
+
+            const btnTemplate = document.getElementById("btnTemplate");
+            const originalText = btnTemplate.innerHTML;
+            btnTemplate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan Excel...';
+            btnTemplate.disabled = true;
+
+            try {
+                const res = await fetch(`${API_GET_STUDENTS}?mk=${mkKode}`);
+                if (res.ok) {
+                    let responseData = await res.json();
+                    if (Array.isArray(responseData)) { listMahasiswa = responseData; } 
+                    else if (responseData.data && Array.isArray(responseData.data)) { listMahasiswa = responseData.data; } 
+                    else { listMahasiswa = []; }
+                }
+            } catch (e) { console.warn("API n8n untuk data mahasiswa belum siap."); }
+
+            if (!Array.isArray(listMahasiswa) || listMahasiswa.length === 0) {
+                alert("⚠️ Data KRS Mahasiswa untuk MK ini tidak ditemukan di Database. Template akan diunduh dengan baris contoh.");
+                listMahasiswa = [{ nim: "22320001", nama: "Contoh: Fulan Bin Fulan" }];
+            }
+
+            // --- HELPER: Mengubah Angka (0,1,2) menjadi Huruf Kolom Excel (A,B,C... AA,AB) ---
+            function getColLetter(colIndex) {
+                let letter = '';
+                while (colIndex >= 0) {
+                    letter = String.fromCharCode((colIndex % 26) + 65) + letter;
+                    colIndex = Math.floor(colIndex / 26) - 1;
+                }
+                return letter;
+            }
+
+            // --- SUSUN HEADER DENGAN TAMBAHAN KOLOM TOTAL & GRADE ---
+            let rowCPL = ["", "", ...configData.map(c => c.cpl), "INFO", "INFO"];
+            let rowCPMK = ["", "", ...configData.map(c => c.cpmk), "INFO", "INFO"];
+            let rowBentuk = ["NIM", "NAMA MAHASISWA", ...configData.map(c => `P${c.pertemuan} - ${c.bentuk}`), "NILAI AKHIR", "GRADE"];
+            let rowBobot = ["", "BOBOT PENILAIAN (%)", ...configData.map(c => c.bobot + "%"), "100%", "-"];
+            
+            let finalDataExcel = [rowCPL, rowCPMK, rowBentuk, rowBobot];
+
+            // Baris data mahasiswa dimulai dari baris ke-5 di Excel
+            let currentRowExcel = 5; 
+
+            // --- LOOPING MAHASISWA DAN INJEKSI RUMUS EXCEL ---
+            listMahasiswa.forEach(mhs => {
+                let nimMhs = mhs.nim || mhs.NIM || mhs.Nim || "";
+                let namaMhs = mhs.nama || mhs.NAMA || mhs.nama_mahasiswa || mhs.nama || "";
+                
+                let rowMhs = [nimMhs, namaMhs];
+                
+                // Siapkan sel kosong untuk tempat dosen mengetik nilai
+                configData.forEach(() => rowMhs.push("")); 
+                
+                // 1. Merakit Rumus "NILAI AKHIR" (Perkalian silang nilai dengan bobot desimal)
+                // Contoh Hasil: =(C5*0.1)+(D5*0.25)+(E5*0.05)
+                let formulaParts = [];
+                configData.forEach((config, idx) => {
+                    let colLetter = getColLetter(idx + 2); // +2 karena NIM(A) dan Nama(B)
+                    let bobotDesimal = config.bobot / 100;
+                    formulaParts.push(`(${colLetter}${currentRowExcel}*${bobotDesimal})`);
+                });
+                let formulaTotal = formulaParts.join('+');
+                if (formulaParts.length === 0) formulaTotal = "0";
+
+                // 2. Merakit Rumus "GRADE" (IF Bertingkat otomatis)
+                let tCol = getColLetter(configData.length + 2); // Mencari huruf kolom Nilai Akhir
+                let formulaGrade = `IF(${tCol}${currentRowExcel}>=85,"A",IF(${tCol}${currentRowExcel}>=80,"A-",IF(${tCol}${currentRowExcel}>=75,"B+",IF(${tCol}${currentRowExcel}>=70,"B",IF(${tCol}${currentRowExcel}>=65,"B-",IF(${tCol}${currentRowExcel}>=60,"C+",IF(${tCol}${currentRowExcel}>=55,"C",IF(${tCol}${currentRowExcel}>=50,"D","E"))))))))`;
+
+                // 3. Suntikkan Rumus ke dalam Array Data menggunakan format Objek SheetJS
+                rowMhs.push({ t: 'n', f: formulaTotal }); // Kolom Nilai Akhir
+                rowMhs.push({ t: 's', f: formulaGrade }); // Kolom Grade
+                
+                finalDataExcel.push(rowMhs);
+                currentRowExcel++;
+            });
+
+            // Proses Cetak Excel
+            const worksheet = XLSX.utils.aoa_to_sheet(finalDataExcel);
+            
+            // Mengatur Lebar Kolom agar rapi
+            let colWidths = [{wch: 15}, {wch: 30}];
+            configData.forEach(() => colWidths.push({wch: 15}));
+            colWidths.push({wch: 15}); // Lebar kolom Nilai Akhir
+            colWidths.push({wch: 12}); // Lebar kolom Grade
+            worksheet['!cols'] = colWidths;
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Template Nilai");
+            XLSX.writeFile(workbook, templateAktif);
+
+            btnTemplate.innerHTML = originalText;
+            btnTemplate.disabled = false;
+        }
+
+        function processStudentData(raw) {
+            studentData = [];
+            const thead = document.getElementById("studentHead");
+            const tbody = document.getElementById("studentBody");
+            thead.innerHTML = "";
+            tbody.innerHTML = "";
+
+            // --- 1. BUAT HEADER TABEL DINAMIS (Sesuai Konfigurasi Excel) ---
+            // Buat kolom NIM dan Nama menjadi Sticky (lengket di kiri)
+            let headerRow = `<tr>
+                <th style="padding: 12px; border-bottom: 2px solid #e5e7eb; color: #475569; position: sticky; left: 0; background: #f8fafc; z-index: 21; box-shadow: 2px 0 5px rgba(0,0,0,0.05);">NIM</th>
+                <th style="text-align:left; padding: 12px; border-bottom: 2px solid #e5e7eb; color: #475569; position: sticky; left: 100px; background: #f8fafc; z-index: 21; box-shadow: 2px 0 5px rgba(0,0,0,0.05);">Nama Mahasiswa</th>`;
+            
+            // Generate Header P1, P2, dll sesuai jumlah pertemuan
+            configData.forEach(c => {
+                headerRow += `<th style="padding: 12px; border-bottom: 2px solid #e5e7eb; color: #475569; text-align: center; min-width: 110px;">
+                    P${c.pertemuan}<br>
+                    <small style="font-weight:600; color:#0ea5e9; display:block; margin-top:2px;">${c.bentuk}</small>
+                    <span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:800; margin-top:6px; display:inline-block;">${c.bobot}%</span>
+                </th>`;
+            });
+            
+            headerRow += `<th style="padding: 12px; border-bottom: 2px solid #e5e7eb; color: #475569; text-align: center;">Nilai Akhir</th>
+                          <th style="padding: 12px; border-bottom: 2px solid #e5e7eb; color: #475569; text-align: center;">Grade</th>
+                      </tr>`;
+            thead.innerHTML = headerRow;
+
+            // --- 2. PROSES DATA MAHASISWA & MASUKKAN KE TABEL ---
+            // Mengambil data mahasiswa (mulai dari baris ke-5 karena ada penambahan baris bobot)
+            const dataMhs = raw.slice(4);
+
+            dataMhs.forEach(m => {
+                const nim = m[0] || '-';
+                const nama = m[1] || '-';
+                if(nim === '-' && nama === '-') return; // Lewati baris kosong
+
+                let final = 0;
+                let detailNilai = []; 
+                let htmlNilaiDetail = ""; // Variabel untuk menyimpan kolom-kolom nilai
+
+                configData.forEach((config, idx) => {
+                    let colIndex = idx + 2; // Geser 2 kolom (karena NIM dan Nama)
+                    let nilaiMentah = parseFloat(m[colIndex]) || 0;
+                    let bobotDesimal = config.bobot / 100;
+                    
+                    // Hitung total nilai berjalan
+                    final += (nilaiMentah * bobotDesimal);
+                    
+                    // Simpan data detail untuk Database
+                    detailNilai.push({
+                        pertemuan: config.pertemuan,
+                        cpmk: config.cpmk,
+                        bentuk: config.bentuk,
+                        nilai: nilaiMentah
+                    });
+
+                    // Cetak kolom HTML untuk nilai mentah ini
+                    htmlNilaiDetail += `<td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center; color: #334155;">${nilaiMentah}</td>`;
+                });
+
+                // Tentukan Grade
+                let grade = 'E';
+                if(final>=85) grade='A'; else if(final>=80) grade='A-'; else if(final>=75) grade='B+'; else if(final>=70) grade='B'; else if(final>=65) grade='B-'; else if(final>=60) grade='C+'; else if(final>=55) grade='C'; else if(final>=50) grade='D';
+
+                studentData.push({ nim: nim, nama: nama, final: final.toFixed(2), grade: grade, detail: detailNilai });
+                
+                // Masukkan ke dalam body tabel
+                tbody.innerHTML += `<tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #475569; position: sticky; left: 0; background: white; z-index: 10; box-shadow: 2px 0 5px rgba(0,0,0,0.02);">${nim}</td>
+                    <td style="text-align:left; font-weight:600; padding: 12px; border-bottom: 1px solid #e5e7eb; color: #0f172a; position: sticky; left: 100px; background: white; z-index: 10; box-shadow: 2px 0 5px rgba(0,0,0,0.02);">${nama}</td>
+                    ${htmlNilaiDetail}
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; font-weight: 900; color: #0f172a; text-align: center; font-size: 1.05rem;">${final.toFixed(2)}</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; text-align: center;"><span style="background:#1e3a8a; color:white; padding:6px 12px; border-radius:6px; font-weight:800;">${grade}</span></td>
+                </tr>`;
+            });
+            
+            document.getElementById("emptyUploadBox").style.display = "none";
+            document.getElementById("previewArea").style.display = "block";
+            document.getElementById("studentCount").innerText = studentData.length;
+        }
+        function handleFileUpload() {
+            const fileInput = document.getElementById("fileExcel");
+            const file = fileInput.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                
+                // Konversi ke array of arrays (AOA)
+                const rawData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
+                processStudentData(rawData);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function simpanKeDatabase() {
+            const mkKode = document.getElementById("pilihMK").value;
+            if(!mkKode) { alert("Mata Kuliah belum dipilih!"); return; }
+            if(studentData.length === 0) { alert("Data Excel belum diupload!"); return; }
+            if(!confirm(`Apakah Anda yakin ingin menyimpan nilai untuk MK ${mkKode}?`)) return;
+            
+            const btn = document.getElementById("btnSimpan");
+            btn.innerHTML = "⏳ Mengirim Data..."; btn.disabled = true;
+
+            const payload = {
+                metadata: { 
+                    dosen: userLogin, 
+                    nidn: userNidn, 
+                    kode_mk: mkKode, 
+                    tanggal: new Date().toISOString() 
+                },
+                data_bobot: configData,
+                data_nilai: studentData
+            };
+
+            try {
+                const res = await fetch(API_SIMPAN, { 
+                    method: "POST", 
+                    headers: {
+                        "Content-Type":"application/json",
+                        "Authorization": "Bearer " + localStorage.getItem("api_token")
+                    }, 
+                    body: JSON.stringify(payload) 
+                });
+                
+                if(res.ok) { 
+                   localStorage.removeItem("draft_bobot_" + mkKode);
+                    localStorage.removeItem("draft_mk_terpilih");
+                    
+                    alert("✅ BERHASIL! Data Tersimpan di Database."); 
+                    window.location.href = "laporan.html"; 
+                } else { 
+                    alert("❌ Gagal menyimpan data ke server. Pastikan Token Valid."); 
+                }
+            } catch(e) { 
+                alert("⚠️ Error Koneksi ke n8n."); 
+            }
+            
+            btn.innerHTML = '<i class="fas fa-save"></i> Simpan Semua Data'; btn.disabled = false;
+        }
+
+        function logout() { localStorage.clear(); window.location.replace("login.html"); }
+
+        // Memunculkan tombol kembali khusus untuk Admin (Kaprodi)
+        document.addEventListener("DOMContentLoaded", function() {
+            loadMetadata();
+            const userRoleSekarang = localStorage.getItem("user_role");
+            const userProdiSekarang = localStorage.getItem("prodi_aktif");
+            
+            if (userRoleSekarang === "admin") {
+                const navLinks = document.querySelector(".nav-links");
+                const btnKembali = document.createElement("a");
+                
+                // Tentukan kembali ke TI atau SI
+                btnKembali.href = userProdiSekarang === "si" ? "admin_config_si.html" : "admin_config.html";
+                btnKembali.innerHTML = '<i class="fas fa-shield-alt"></i> Kembali ke Panel Admin';
+                btnKembali.style.background = "#8b0000";
+                btnKembali.style.padding = "8px 16px";
+                btnKembali.style.borderRadius = "8px";
+                btnKembali.style.fontWeight = "bold";
+                
+                navLinks.appendChild(btnKembali);
+            }
+        });
+    </script>
+</body>
+</html>

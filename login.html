@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistem Assesmen CPL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6; 
+            --navy: #1e3a8a;    
+            --dark: #111827;    
+            --text-main: #4b5563; 
+            --text-muted: #9ca3af; 
+            --bg: #ffffff;     
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        html, body { height: 100%; width: 100%; overflow: hidden; background-color: #f3f4f6; }
+
+        .login-container { display: flex; width: 100%; height: 100vh; }
+
+        .login-form-section {
+            width: 500px;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 70px;
+            box-shadow: 10px 0 50px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .logo-container { 
+            display: flex; align-items: center; justify-content: center;
+            gap: 15px; margin-top: 20px; margin-bottom: 50px; 
+        }
+        
+        .logo-container img { width: 150px; height: auto; align-items: center; }
+
+        .form-header { margin-bottom: 35px; text-align: center; }
+        .form-header h2 { font-size: 1.5rem; color: var(--dark); margin-bottom: 8px; font-weight: 700; letter-spacing: -0.5px; }
+        .form-header p { color: var(--text-main); font-size: 0.70rem; }
+
+        .input-group { margin-bottom: 22px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--dark); }
+        
+        .input-group input {
+            width: 100%; padding: 14px 16px; border: 1.5px solid #e5e7eb;
+            border-radius: 10px; outline: none; font-size: 1rem; color: var(--dark); transition: all 0.2s;
+        }
+        
+        .input-group input::placeholder { color: var(--text-muted); }
+        .input-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+
+        .btn-login {
+            width: 50%; display: block; margin: 20px auto 0 auto; padding: 16px;
+            background-color: #0b1630; color: white; border: none; border-radius: 10px;
+            font-weight: 700; font-size: 1rem; cursor: pointer; transition: transform 0.1s, background 0.2s;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-login:hover { background-color: #394c76; }
+        .btn-login:active { transform: scale(0.98); }
+
+        .footer-links { margin-top: 32px; text-align: center; font-size: 0.9rem; color: var(--text-main); }
+        .footer-links a { color: var(--primary); text-decoration: none; font-weight: 700; }
+
+        .login-visual {
+            flex: 1; background-image: url('BackgroundUnaki.jpg'); background-size: cover;
+            background-position: center; background-repeat: no-repeat; position: relative;
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 80px;
+        }
+
+        .login-visual::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, #ffc561d0 0%, rgba(0, 2, 93, 0.9) 100%);            
+            z-index: 1;
+        }
+
+        /* Kelas animasi tombol refresh dari kode lamamu */
+        .spinning { animation: spin 0.5s linear; }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .login-visual { display: none; }
+            .login-form-section { width: 100%; padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        
+        <div class="login-form-section">
+            <div class="logo-container">
+                <img src="LogoUnaki.png" alt="Logo Universitas AKI">
+            </div>
+
+            <div class="form-header">
+                <h2>Selamat Datang</h2>
+                <p>Silakan masuk menggunakan akun anda</p>
+            </div>
+
+            <div id="loginFormContainer">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Masukkan username" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                    
+                    <div style="text-align: left; margin-top: 8px;">
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">
+                            Lupa Password? 
+                            <a href="#" onclick="alert('Silahkan hubungi Admin Program Studi atau IT Support untuk mereset password Anda.'); return false;" style="color: var(--primary); text-decoration: none; font-weight: 600; transition: color 0.2s;">
+                                Silahkan Hubungi Admin
+                            </a>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div style="display: flex; gap: 10px; margin-bottom: 12px; align-items: center; justify-content: center;">
+                        <canvas id="captchaCanvas" width="160" height="48" style="border: 1.5px solid #e5e7eb; border-radius: 10px; background-color: #f8fafc; letter-spacing: 5px;"></canvas>
+                        
+                        <button type="button" id="refreshIcon" onclick="processRefreshCaptcha()" style="padding: 0 16px; border: 1.5px solid #e5e7eb; border-radius: 10px; background: white; cursor: pointer; color: var(--text-main); transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <input type="text" id="captchaInput" placeholder="Enter Captcha" autocomplete="off" required style="text-transform: uppercase;">
+                    <p id="captchaError" style="color: red; font-size: 0.85rem; margin-top: 5px; display: none; text-align: center;">❌ Kode CAPTCHA salah, silakan coba lagi!</p>
+                </div>
+
+                <button type="button" class="btn-login" id="loginBtn" onclick="prosesLogin()">Masuk</button>
+                
+                <p id="loadingText" style="color: #666; font-style: italic; display: none; margin-top: 15px; text-align: center;">Memeriksa akun...</p>
+                <p id="errorText" style="color: red; font-size: 14px; margin-top: 15px; display: none; text-align: center;"></p>
+            </div>
+
+            <div class="footer-links">
+                Belum punya akun? <a href="registrasi.html">Daftar di sini</a>
+            </div>
+        </div>
+
+        <div class="login-visual" style="justify-content: center; align-items: center; padding: 0;">
+            <img src="LogoUnaki.png" alt="Logo Universitas AKI" 
+                style="width: 400px; height: auto; z-index: 2; filter: brightness(0) invert(1);"> 
+        </div>
+
+    </div>
+
+<script>
+    const LOGIN_API = "http://localhost:5678/webhook/login-user";
+
+    let currentCaptcha = "";
+
+    function generateCaptcha() {
+        const canvas = document.getElementById('captchaCanvas');
+        if (!canvas) return; 
+        const ctx = canvas.getContext('2d');
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; 
+        currentCaptcha = "";
+        for (let i = 0; i < 6; i++) {
+            currentCaptcha += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        for (let i = 0; i < 30; i++) {
+            ctx.fillStyle = `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255}, 0.3)`;
+            ctx.beginPath();
+            ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.font = "bold 24px 'Courier New', monospace";
+        ctx.fillStyle = "#1a2980"; 
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((Math.random() - 0.5) * 0.2); 
+        ctx.fillText(currentCaptcha, 0, 0);
+        ctx.restore();
+
+        for (let i = 0; i < 4; i++) {
+            ctx.strokeStyle = `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255}, 0.5)`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+            ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+            ctx.stroke();
+        }
+
+        const errorP = document.getElementById("captchaError");
+        if(errorP) errorP.style.display = "none";
+        
+        const inputC = document.getElementById("captchaInput");
+        if(inputC) inputC.value = "";
+    }
+
+    function processRefreshCaptcha() {
+        const icon = document.getElementById('refreshIcon');
+        
+        if (icon) icon.classList.add('spinning');
+        
+        generateCaptcha(); 
+        
+        setTimeout(() => {
+            if (icon) icon.classList.remove('spinning');
+        }, 600);
+    }
+
+    window.onload = () => {
+        generateCaptcha();
+    };
+
+    async function prosesLogin() {
+        // Ambil captcha secara manual karena ada trik transform text uppercase dari kode lamamu
+        const rawInput = document.getElementById("captchaInput").value;
+        const userInput = rawInput ? rawInput.trim().toUpperCase() : "";
+        
+        if (userInput !== currentCaptcha) {
+            document.getElementById("captchaError").style.display = "block";
+            generateCaptcha(); 
+            return; 
+        }
+
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+        const errorText = document.getElementById('errorText');
+        const loading = document.getElementById('loadingText');
+
+        errorText.style.display = 'none';
+        
+        if (!user || !pass) {
+            errorText.innerText = "Username dan Password wajib diisi!";
+            errorText.style.display = 'block';
+            return;
+        }
+
+        loading.style.display = 'block';
+
+        try {
+            const response = await fetch(LOGIN_API, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    username: user, 
+                    password: pass
+                })
+            });
+
+            if (!response.ok) throw new Error("Server n8n bermasalah.");
+
+            const hasil = await response.json();
+            loading.style.display = 'none';
+
+            if (hasil.status === 'success') {
+                const prodiFinal = hasil.prodi;
+
+                if (!prodiFinal) {
+                    alert("❌ Sistem Gagal membaca data Prodi Anda. Silakan hubungi Admin atau cek pengaturan n8n.");
+                    loading.style.display = 'none';
+                    return; 
+                }
+
+                alert(`Selamat Datang, ${hasil.nama}!`);
+
+                localStorage.setItem("user_login", hasil.nama);
+                localStorage.setItem("user_nidn", user);
+                localStorage.setItem("user_role", hasil.role);
+                localStorage.setItem("prodi_aktif", hasil.prodi); 
+                localStorage.setItem("api_token", hasil.token);
+                
+                if (hasil.role === 'head_admin') {
+                    // 1. Head Admin murni
+                    window.location.href = "head_admin_panel.html"; 
+                    
+                } else if (hasil.role === 'admin') {
+                    if (prodiFinal === "ti") {
+                        window.location.href = "admin_config.html"; 
+                    } else if (prodiFinal === "si") {
+                        window.location.href = "admin_config_si.html"; 
+                    }
+                    
+                } else if (hasil.role === 'dosen') {
+                    // 3. Dosen murni
+                    window.location.href = "input_nilai.html";   
+                }
+            } else {
+                errorText.innerText = hasil.message || "Login Gagal. Periksa kembali Username dan Password Anda.";
+                errorText.style.display = 'block';
+                generateCaptcha();
+            }
+
+        } catch (error) {
+            loading.style.display = 'none';
+            errorText.innerText = "Gagal menghubungi server n8n.";
+            errorText.style.display = 'block';
+            generateCaptcha();
+        }
+    }
+</script>
+
+</body>
+</html>

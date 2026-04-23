@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel SI - Sistem OBE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS STYLING (Tema SI: Teal/Hijau) --- */
+        :root { --primary: #006064; --secondary: #0097a7; --bg: #f0f4f4; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; background: var(--bg); height: 100vh; overflow: hidden; color: #333; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 260px; background: var(--primary); color: white; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 30px 20px; text-align: center; font-size: 1.5rem; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-menu { flex: 1; padding: 20px 0; overflow-y: auto; }
+        .nav-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.3s; color: rgba(255,255,255,0.7); font-weight: 500;}
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: white; border-left: 4px solid var(--secondary); }
+        
+        /* MAIN CONTENT */
+        .main-content { flex: 1; overflow-y: auto; padding: 30px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 4px solid var(--primary); }
+        
+        .section { display: none; animation: fadeIn 0.3s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* DASHBOARD GRID */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+
+        /* TABEL & BUTTON */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: var(--primary); color: white; padding: 12px; text-align: center; border: 1px solid rgba(0,0,0,0.1); font-size: 0.9rem; }
+        td { padding: 10px; border: 1px solid #ddd; text-align: center; vertical-align: middle; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: white; transition: 0.2s; }
+        .btn-primary { background: linear-gradient(to right, var(--secondary), var(--primary)); }
+        .btn-success { background: #217346; }
+        .btn-danger { background: #fa5252; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header"><i class="fas fa-shield-alt"></i> Panel Admin SI</div>
+        <div class="nav-menu">
+            <div class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')"><i class="fas fa-home"></i> Dashboard Utama</div>
+            <div class="nav-item" id="nav-mk" onclick="switchTab('mk')"><i class="fas fa-book"></i> Mata Kuliah</div>
+            <div class="nav-item" id="nav-cpl" onclick="switchTab('cpl')"><i class="fas fa-bullseye"></i> CPL</div>
+            <div class="nav-item" id="nav-cpmk" onclick="switchTab('cpmk')"><i class="fas fa-tasks"></i> CPMK</div>
+            <div class="nav-item" id="nav-mapping" onclick="switchTab('mapping')"><i class="fas fa-project-diagram"></i> Mapping CPL-CPMK</div>
+            <div class="nav-item" id="nav-mapping-mk" onclick="switchTab('mapping-mk')"><i class="fas fa-link"></i> Mapping MK-CPMK</div>
+            <div class="nav-item" id="nav-reset" onclick="switchTab('reset')"><i class="fas fa-key"></i> Reset Password</div>
+            <div class="nav-item" onclick="showSection('krs-upload')"><i class="fas fa-file-excel"></i> Import KRS Mahasiswa</div>
+            <div class="menu-category" style="margin-top: 20px;">AKSES DOSEN</div>
+            <div class="nav-item" onclick="window.location.href='input_nilai.html'" style="background: #10b981; color: white;">
+                <i class="fas fa-chalkboard-teacher"></i> Masuk Mode Input Nilai
+            </div>
+            <div class="nav-item" onclick="logout()" style="margin-top: 20px; color: #b2ebf2; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2 id="pageTitle" style="margin: 0; color: #333;">📊 Dashboard Admin SI</h2>
+            <div style="font-weight: bold; color: var(--primary); background: white; padding: 10px 20px; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <i class="fas fa-user-shield"></i> <span id="adminName">Admin SI</span>
+            </div>
+        </header>
+
+        <div id="content-dashboard" class="section active">
+            <div class="dashboard-grid">
+                <div class="card" style="border-top: 4px solid #217346;">
+                    <h3 style="margin-top: 0; color: #217346;"><i class="fas fa-chart-pie"></i> Pintasan Laporan Kelas</h3>
+                    <p style="color: #666; line-height: 1.5; font-size: 0.95rem;">Lihat analisis transkrip nilai dan ketercapaian CPL/CPMK mahasiswa secara spesifik per Mata Kuliah.</p>
+                    <button class="btn btn-success" style="margin-top: 10px; width: 100%;" onclick="window.location.href='laporan.html'">
+                        <i class="fas fa-external-link-alt"></i> Buka Laporan Kelas
+                    </button>
+                </div>
+                
+                <div class="card" style="border-top: 4px solid var(--primary);">
+                    <h3 style="margin-top: 0; color: var(--primary);"><i class="fas fa-user-graduate"></i> Portofolio CPL Global</h3>
+                    <p style="color: #666; line-height: 1.5; font-size: 0.95rem;">Cari dan lihat rekapitulasi persentase penguasaan CPL mahasiswa (SI) dari total seluruh mata kuliah.</p>
+                    <button class="btn btn-primary" style="margin-top: 10px; width: 100%;" onclick="window.location.href='portofolio_admin.html'">
+                        <i class="fas fa-search"></i> Buka Portofolio CPL
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-mk" class="card section">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin:0;">Daftar Mata Kuliah SI</h3>
+                <button class="btn btn-success" onclick="loadData('mk')"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+            <table><thead><tr><th width="15%">Kode MK</th><th>Nama Mata Kuliah</th><th width="10%">Aksi</th></tr></thead><tbody id="bodyMK"></tbody></table>
+        </div>
+
+        <div id="content-cpl" class="card section">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin:0;">Daftar CPL SI</h3>
+                <button class="btn btn-success" onclick="loadData('cpl')"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+            <table><thead><tr><th width="15%">Kode CPL</th><th>Deskripsi</th><th width="10%">Aksi</th></tr></thead><tbody id="bodyCPL"></tbody></table>
+        </div>
+
+        <div id="content-cpmk" class="card section">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin:0;">Daftar CPMK SI</h3>
+                <button class="btn btn-success" onclick="loadData('cpmk')"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+            <table><thead><tr><th width="15%">Kode CPMK</th><th>Deskripsi</th><th width="10%">Aksi</th></tr></thead><tbody id="bodyCPMK"></tbody></table>
+        </div>
+
+        <div id="content-mapping" class="card section">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="margin:0;">Pemetaan CPL ke CPMK (SI)</h3>
+                <button class="btn btn-success" onclick="loadMappingData()"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+            <table><thead><tr><th width="15%">Kode CPMK</th><th>Deskripsi CPMK</th><th width="25%">Referensi CPL SI</th><th width="10%">Aksi</th></tr></thead><tbody id="bodyMapping"></tbody></table>
+        </div>
+
+        <div id="content-mapping-mk" class="card section">
+            <div style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end;">
+                <div style="width: 60%;">
+                    <label><strong>Pilih Mata Kuliah SI:</strong></label>
+                    <select id="pilihMKMapping" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;" onchange="loadMappingUI()">
+                        <option value="">-- Pilih Mata Kuliah --</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="simpanMappingMK()"><i class="fas fa-save"></i> Simpan Mapping</button>
+            </div>
+            <div id="loadingMapping" style="display:none; text-align:center; color:#666;">⏳ Memuat data SI...</div>
+            <div id="mappingContainer" style="display:none;">
+                <p style="background: #e0f2f1; padding: 10px; border-radius: 5px; color: #006064; font-size: 0.9rem;"><i class="fas fa-info-circle"></i> Centang CPMK SI yang dibebankan ke Mata Kuliah ini.</p>
+                <div id="checklistArea"></div>
+            </div>
+        </div>
+
+        <div id="content-reset" class="card section" style="max-width: 500px; margin: 0 auto;">
+            <h3 style="color: #006064; margin-top: 0;"><i class="fas fa-key"></i> Reset Password Dosen SI</h3>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Gunakan form ini jika ada Dosen Sistem Informasi (SI) yang lupa password mereka.</p>
+            <div style="margin-bottom: 15px;"><label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">Cari Nama Dosen SI / Username</label><input list="daftarDosenSI" id="targetUsername" placeholder="🔍 Ketik username atau nama..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1rem;"><datalist id="daftarDosenSI"></datalist></div>
+            <div style="margin-bottom: 20px;"><label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">Password Baru</label><input type="password" id="newPassword" placeholder="Masukkan password baru..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1rem;"></div>
+            <button onclick="prosesResetPassword()" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Paksa Reset Password</button>
+        </div>
+        <div id="krs-upload" class="section" style="display:none;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800; color: #111827;">Import KRS Mahasiswa</h3>
+                    <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Format file yang didukung: Excel (.xlsx)</p>
+                </div>
+            </div>
+
+            <div style="background: #fafafa; border: 2.5px dashed #111827; border-radius: 16px; padding: 50px 40px; max-width: 550px; text-align: center; margin: 0 auto; transition: all 0.3s;">
+                
+                <i class="fas fa-cloud-upload-alt" style="font-size: 4rem; color: #8b0000; margin-bottom: 20px;"></i>
+                
+                <h4 style="font-size: 1.3rem; font-weight: 700; color: #111827; margin-bottom: 10px;">Upload File KRS</h4>
+                <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.5; margin-bottom: 30px;">
+                    Sistem akan otomatis mengekstrak data dan menyinkronkan Mahasiswa, Mata Kuliah, serta Dosen ke dalam database.
+                </p>
+                
+                <div style="margin-bottom: 30px; background: white; padding: 10px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                    <input type="file" id="krsFileInputTI" accept=".xlsx" style="width: 100%; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #4b5563; cursor: pointer; outline: none;">
+                </div>
+                
+                <button class="btn-dark" onclick="handleKRSUpload('TI')" style="width: 100%; justify-content: center; padding: 16px; font-size: 1.05rem; background: #111827; border: none; border-radius: 8px;">
+                    <i class="fas fa-magic" style="margin-right: 8px;"></i> Jalankan Otomatisasi n8n
+                </button>
+                
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    const PRODI = 'si'; 
+    const API_URL = "http://localhost:5678/webhook/get-metadata?prodi=" + PRODI;
+    const API_UPDATE = "http://localhost:5678/webhook/admin-update-master";
+    const API_MAP_MK = "http://localhost:5678/webhook/admin-map-mk-cpmk";
+    const API_GET_USERS = "http://localhost:5678/webhook/get-users"; 
+
+    // --- SATPAM ADMIN SI ---
+    const userLogin = localStorage.getItem("user_login");
+    const userRole = localStorage.getItem("user_role");
+    const userProdi = localStorage.getItem("prodi_aktif");
+
+    if (!userLogin) window.location.replace("login.html");
+    document.getElementById("adminName").innerText = userLogin;
+
+    if (userRole !== 'head_admin') {
+        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "input_nilai.html");
+        else if (userRole === 'admin' && userProdi === 'ti') window.location.replace("admin_config.html");
+    }
+
+    // --- LOGIKA SIDEBAR & SECTION ---
+    function switchTab(type) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(el => { el.style.display = 'none'; el.classList.remove('active'); });
+        
+        const navBtn = document.getElementById('nav-' + type);
+        if(navBtn) navBtn.classList.add('active');
+        
+        const contentSection = document.getElementById('content-' + type);
+        if(contentSection) {
+            contentSection.style.display = 'block';
+            contentSection.classList.add('active');
+        }
+
+        const titles = { 
+            'dashboard': '📊 Dashboard Admin SI', 
+            'mk': '📚 Daftar Mata Kuliah', 
+            'cpl': '🎯 Daftar CPL',
+            'cpmk': '✅ Daftar CPMK',
+            'mapping': '🔗 Mapping CPL-CPMK',
+            'mapping-mk': '🔗 Mapping MK-CPMK',
+            'reset': '🔑 Reset Password'
+        };
+        document.getElementById('pageTitle').innerText = titles[type] || 'Panel Admin SI';
+
+        if(type === 'mapping-mk') loadDropdownMK();
+        else if(type === 'mapping') loadMappingData();
+        else if(type === 'reset') loadUserList(); 
+        else if(type === 'mk' || type === 'cpl' || type === 'cpmk') loadData(type);
+    }
+
+    // --- FUNGSI LAMA ADMIN ---
+    async function loadUserList() { 
+        try { const res = await fetch(API_GET_USERS); if (!res.ok) return; const data = await res.json(); const datalist = document.getElementById("daftarDosenSI"); datalist.innerHTML = ""; let users = Array.isArray(data) ? ((data[0] && data[0].data) ? data[0].data : data) : (data.data || []); users.forEach(u => { if (u.role === 'dosen' && u.prodi === 'si') { const option = document.createElement('option'); option.value = u.username; option.text = `${u.nama_lengkap} (Dosen SI)`; datalist.appendChild(option); } }); } catch (e) { console.error(e); }
+    }
+    async function prosesResetPassword() { 
+        const username = document.getElementById("targetUsername").value.trim(); const newPassword = document.getElementById("newPassword").value.trim(); if (!username || !newPassword) { alert("⚠️ Isi data!"); return; } if (!confirm(`Ganti password "${username}"?`)) return; try { const res = await fetch("http://localhost:5678/webhook/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) }); const data = await res.json(); if (res.ok && data.status === "success") { alert(`✅ ${data.message}`); document.getElementById("targetUsername").value = ""; document.getElementById("newPassword").value = ""; } else alert("❌ Gagal."); } catch (e) { alert("❌ Error."); }
+    }
+    async function loadData(tipe) { 
+        try { const res = await fetch(API_URL); const data = await res.json(); const bodyId = tipe === 'mk' ? 'bodyMK' : (tipe === 'cpl' ? 'bodyCPL' : 'bodyCPMK'); const tbody = document.getElementById(bodyId); tbody.innerHTML = "<tr><td colspan='3'>⏳ Memuat...</td></tr>"; data.filter(i => i.tipe === tipe).forEach(item => { tbody.innerHTML += `<tr><td><strong>${item.kode}</strong></td><td><input type="text" id="in-${item.kode}" value="${item.label || ''}" style="width:90%; padding:5px;"></td><td><button class="btn btn-primary" onclick="simpanEdit('${tipe}', '${item.kode}')"><i class="fas fa-check"></i></button></td></tr>`; }); } catch (e) { console.error(e); }
+    }
+    async function loadMappingData() { 
+        try { const res = await fetch(API_URL); const data = await res.json(); const listCPL = data.filter(i => i.tipe === 'cpl'); const listCPMK = data.filter(i => i.tipe === 'cpmk'); const tbody = document.getElementById('bodyMapping'); tbody.innerHTML = ""; listCPMK.forEach(cpmk => { let options = '<option value="">-- Pilih CPL --</option>'; listCPL.forEach(cpl => { const selected = (cpl.kode === cpmk.parent) ? 'selected' : ''; options += `<option value="${cpl.kode}" ${selected}>${cpl.kode} - ${cpl.label.substring(0, 30)}...</option>`; }); tbody.innerHTML += `<tr><td><strong>${cpmk.kode}</strong></td><td style="text-align:left; font-size:0.85rem;">${cpmk.label || '-'}</td><td><select id="sel-${cpmk.kode}" style="width:100%; padding:8px;">${options}</select></td><td><button class="btn btn-primary" onclick="simpanMappingCPL('${cpmk.kode}')"><i class="fas fa-save"></i></button></td></tr>`; }); } catch (e) { alert("Gagal memuat mapping SI!"); }
+    }
+    async function loadDropdownMK() { 
+        const res = await fetch(API_URL); const data = await res.json(); const mks = data.filter(i => i.tipe === 'mk'); const select = document.getElementById("pilihMKMapping"); select.innerHTML = '<option value="">-- Pilih Mata Kuliah SI --</option>'; mks.forEach(mk => { select.innerHTML += `<option value="${mk.kode}">${mk.kode} - ${mk.label}</option>`; });
+    }
+    async function loadMappingUI() { 
+        const mkKode = document.getElementById("pilihMKMapping").value; const area = document.getElementById("checklistArea"); const container = document.getElementById("mappingContainer"); const loading = document.getElementById("loadingMapping"); if(!mkKode) { container.style.display = 'none'; return; } loading.style.display = 'block'; area.innerHTML = ""; try { const [resMeta, resMap] = await Promise.all([ fetch(API_URL), fetch(`http://localhost:5678/webhook/get-mapping-mk?mk=${mkKode}&prodi=${PRODI}`) ]); const meta = await resMeta.json(); const existing = await resMap.json(); const checkedCPMKs = new Set(existing.map(e => e.kode_cpmk)); const listCPL = meta.filter(i => i.tipe === 'cpl'); const listCPMK = meta.filter(i => i.tipe === 'cpmk'); listCPL.forEach(cpl => { const childCPMK = listCPMK.filter(c => c.parent === cpl.kode); if (childCPMK.length > 0) { let htmlCPMK = ""; childCPMK.forEach(cpmk => { const isChecked = checkedCPMKs.has(cpmk.kode) ? "checked" : ""; htmlCPMK += `<div style="display:flex; align-items:center; padding: 8px; border-bottom:1px solid #eee;"><input type="checkbox" class="chk-cpmk" value="${cpmk.kode}" ${isChecked} style="width:18px; height:18px; margin-right:10px;"><div><strong>${cpmk.kode}</strong> - ${cpmk.label}</div></div>`; }); area.innerHTML += `<div class="card" style="margin-bottom:10px; border:1px solid #ddd; padding:0; border-top:3px solid #006064;"><div style="background:#f0f4f4; padding:8px 15px; font-weight:bold;">📂 ${cpl.kode}</div><div>${htmlCPMK}</div></div>`; } }); loading.style.display = 'none'; container.style.display = 'block'; } catch (e) { alert("Error memuat UI Mapping!"); }
+    }
+    async function simpanEdit(tipe, kode) { const value = document.getElementById(`in-${kode}`).value; const res = await fetch(API_UPDATE, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) }); if(res.ok) alert("✅ Berhasil diperbarui!"); }
+    async function simpanMappingCPL(kodeCpmk) { const kodeCpl = document.getElementById(`sel-${kodeCpmk}`).value; const res = await fetch(API_UPDATE, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ tipe: 'mapping', kode: kodeCpmk, value: kodeCpl, prodi: PRODI }) }); if(res.ok) alert("✅ Mapping CPL-CPMK Tersimpan!"); }
+    async function simpanMappingMK() { const mkKode = document.getElementById("pilihMKMapping").value; const listCpmk = Array.from(document.querySelectorAll('.chk-cpmk:checked')).map(cb => cb.value); const res = await fetch(API_MAP_MK, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ kode_mk: mkKode, cpmk_list: listCpmk, prodi: PRODI }) }); if(res.ok) alert("✅ Mapping MK-CPMK SI Berhasil!"); }
+
+    window.onload = () => { switchTab('dashboard'); };
+    function logout() { localStorage.clear(); window.location.replace("login.html"); }
+    async function handleKRSUpload(role) {
+            const inputId = role === 'TI' ? 'krsFileInputTI' : (role === 'SI' ? 'krsFileInputSI' : 'krsFileInputHead');
+            const fileInput = document.getElementById(inputId);
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Silakan pilih file Excel (.xlsx) terlebih dahulu!");
+                return;
+            }
+
+            console.log(`Memulai upload KRS untuk role: ${role}`);
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('uploaded_by', role); 
+
+            try {
+                // GANTI URL DI BAWAH INI DENGAN URL WEBHOOK N8N ANDA NANTI
+                const response = await fetch('http://localhost:5678/webhook/upload-krs', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert("✅ File berhasil dikirim! n8n sedang memproses relasi Database.");
+                    fileInput.value = ""; 
+                } else {
+                    alert("❌ Gagal terhubung ke n8n. Pastikan workflow n8n sudah aktif.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Terjadi kesalahan jaringan saat menghubungi server n8n.");
+            }
+        }
+</script>
+</body>
+</html>
