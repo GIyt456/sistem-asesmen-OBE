@@ -195,7 +195,7 @@
             </div>
 
             <div class="menu-category" style="margin-top: 20px;">AKSES DOSEN</div>
-            <div class="nav-item" onclick="window.location.href='input_nilai.html'" style="background: #10b981; color: white;">
+            <div class="nav-item" onclick="window.location.href='../../dosen/input_nilai.html'" style="background: #10b981; color: white;">
                 <i class="fas fa-chalkboard-teacher"></i> Masuk Mode Input Nilai
             </div>
 
@@ -474,7 +474,7 @@
 
     // Cek Akses Role
     if (userRole !== 'head_admin') {
-        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "input_nilai.html");
+        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
         else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
     }
 
