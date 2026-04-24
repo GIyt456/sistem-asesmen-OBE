@@ -2,3 +2,8 @@ docker-compose.yml
 .env
 n8n_data/
 mysql_data/
+*.exe
+*.sqlite
+*.log
+*.journal
+*.txt

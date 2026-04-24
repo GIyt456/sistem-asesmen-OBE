@@ -179,17 +179,17 @@
 
 <script>
     const PRODI = 'si'; 
-    const API_URL = "http://localhost:5678/webhook/get-metadata?prodi=" + PRODI;
-    const API_UPDATE = "http://localhost:5678/webhook/admin-update-master";
-    const API_MAP_MK = "http://localhost:5678/webhook/admin-map-mk-cpmk";
-    const API_GET_USERS = "http://localhost:5678/webhook/get-users"; 
+    const API_URL = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/get-metadata?prodi=" + PRODI;
+    const API_UPDATE = "https ://viewed-picked-sprint-includes.trycloudflare.com/webhook/admin-update-master";
+    const API_MAP_MK = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/admin-map-mk-cpmk";
+    const API_GET_USERS = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/get-users"; 
 
     // --- SATPAM ADMIN SI ---
     const userLogin = localStorage.getItem("user_login");
     const userRole = localStorage.getItem("user_role");
     const userProdi = localStorage.getItem("prodi_aktif");
 
-    if (!userLogin) window.location.replace("login.html");
+    if (!userLogin) window.location.replace("../login/login.html");
     document.getElementById("adminName").innerText = userLogin;
 
     if (userRole !== 'head_admin') {
@@ -233,7 +233,7 @@
         try { const res = await fetch(API_GET_USERS); if (!res.ok) return; const data = await res.json(); const datalist = document.getElementById("daftarDosenSI"); datalist.innerHTML = ""; let users = Array.isArray(data) ? ((data[0] && data[0].data) ? data[0].data : data) : (data.data || []); users.forEach(u => { if (u.role === 'dosen' && u.prodi === 'si') { const option = document.createElement('option'); option.value = u.username; option.text = `${u.nama_lengkap} (Dosen SI)`; datalist.appendChild(option); } }); } catch (e) { console.error(e); }
     }
     async function prosesResetPassword() { 
-        const username = document.getElementById("targetUsername").value.trim(); const newPassword = document.getElementById("newPassword").value.trim(); if (!username || !newPassword) { alert("⚠️ Isi data!"); return; } if (!confirm(`Ganti password "${username}"?`)) return; try { const res = await fetch("http://localhost:5678/webhook/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) }); const data = await res.json(); if (res.ok && data.status === "success") { alert(`✅ ${data.message}`); document.getElementById("targetUsername").value = ""; document.getElementById("newPassword").value = ""; } else alert("❌ Gagal."); } catch (e) { alert("❌ Error."); }
+        const username = document.getElementById("targetUsername").value.trim(); const newPassword = document.getElementById("newPassword").value.trim(); if (!username || !newPassword) { alert("⚠️ Isi data!"); return; } if (!confirm(`Ganti password "${username}"?`)) return; try { const res = await fetch("https://viewed-picked-sprint-includes.trycloudflare.com/webhook/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) }); const data = await res.json(); if (res.ok && data.status === "success") { alert(`✅ ${data.message}`); document.getElementById("targetUsername").value = ""; document.getElementById("newPassword").value = ""; } else alert("❌ Gagal."); } catch (e) { alert("❌ Error."); }
     }
     async function loadData(tipe) { 
         try { const res = await fetch(API_URL); const data = await res.json(); const bodyId = tipe === 'mk' ? 'bodyMK' : (tipe === 'cpl' ? 'bodyCPL' : 'bodyCPMK'); const tbody = document.getElementById(bodyId); tbody.innerHTML = "<tr><td colspan='3'>⏳ Memuat...</td></tr>"; data.filter(i => i.tipe === tipe).forEach(item => { tbody.innerHTML += `<tr><td><strong>${item.kode}</strong></td><td><input type="text" id="in-${item.kode}" value="${item.label || ''}" style="width:90%; padding:5px;"></td><td><button class="btn btn-primary" onclick="simpanEdit('${tipe}', '${item.kode}')"><i class="fas fa-check"></i></button></td></tr>`; }); } catch (e) { console.error(e); }
@@ -245,14 +245,14 @@
         const res = await fetch(API_URL); const data = await res.json(); const mks = data.filter(i => i.tipe === 'mk'); const select = document.getElementById("pilihMKMapping"); select.innerHTML = '<option value="">-- Pilih Mata Kuliah SI --</option>'; mks.forEach(mk => { select.innerHTML += `<option value="${mk.kode}">${mk.kode} - ${mk.label}</option>`; });
     }
     async function loadMappingUI() { 
-        const mkKode = document.getElementById("pilihMKMapping").value; const area = document.getElementById("checklistArea"); const container = document.getElementById("mappingContainer"); const loading = document.getElementById("loadingMapping"); if(!mkKode) { container.style.display = 'none'; return; } loading.style.display = 'block'; area.innerHTML = ""; try { const [resMeta, resMap] = await Promise.all([ fetch(API_URL), fetch(`http://localhost:5678/webhook/get-mapping-mk?mk=${mkKode}&prodi=${PRODI}`) ]); const meta = await resMeta.json(); const existing = await resMap.json(); const checkedCPMKs = new Set(existing.map(e => e.kode_cpmk)); const listCPL = meta.filter(i => i.tipe === 'cpl'); const listCPMK = meta.filter(i => i.tipe === 'cpmk'); listCPL.forEach(cpl => { const childCPMK = listCPMK.filter(c => c.parent === cpl.kode); if (childCPMK.length > 0) { let htmlCPMK = ""; childCPMK.forEach(cpmk => { const isChecked = checkedCPMKs.has(cpmk.kode) ? "checked" : ""; htmlCPMK += `<div style="display:flex; align-items:center; padding: 8px; border-bottom:1px solid #eee;"><input type="checkbox" class="chk-cpmk" value="${cpmk.kode}" ${isChecked} style="width:18px; height:18px; margin-right:10px;"><div><strong>${cpmk.kode}</strong> - ${cpmk.label}</div></div>`; }); area.innerHTML += `<div class="card" style="margin-bottom:10px; border:1px solid #ddd; padding:0; border-top:3px solid #006064;"><div style="background:#f0f4f4; padding:8px 15px; font-weight:bold;">📂 ${cpl.kode}</div><div>${htmlCPMK}</div></div>`; } }); loading.style.display = 'none'; container.style.display = 'block'; } catch (e) { alert("Error memuat UI Mapping!"); }
+        const mkKode = document.getElementById("pilihMKMapping").value; const area = document.getElementById("checklistArea"); const container = document.getElementById("mappingContainer"); const loading = document.getElementById("loadingMapping"); if(!mkKode) { container.style.display = 'none'; return; } loading.style.display = 'block'; area.innerHTML = ""; try { const [resMeta, resMap] = await Promise.all([ fetch(API_URL), fetch(`https://viewed-picked-sprint-includes.trycloudflare.com/webhook/get-mapping-mk?mk=${mkKode}&prodi=${PRODI}`) ]); const meta = await resMeta.json(); const existing = await resMap.json(); const checkedCPMKs = new Set(existing.map(e => e.kode_cpmk)); const listCPL = meta.filter(i => i.tipe === 'cpl'); const listCPMK = meta.filter(i => i.tipe === 'cpmk'); listCPL.forEach(cpl => { const childCPMK = listCPMK.filter(c => c.parent === cpl.kode); if (childCPMK.length > 0) { let htmlCPMK = ""; childCPMK.forEach(cpmk => { const isChecked = checkedCPMKs.has(cpmk.kode) ? "checked" : ""; htmlCPMK += `<div style="display:flex; align-items:center; padding: 8px; border-bottom:1px solid #eee;"><input type="checkbox" class="chk-cpmk" value="${cpmk.kode}" ${isChecked} style="width:18px; height:18px; margin-right:10px;"><div><strong>${cpmk.kode}</strong> - ${cpmk.label}</div></div>`; }); area.innerHTML += `<div class="card" style="margin-bottom:10px; border:1px solid #ddd; padding:0; border-top:3px solid #006064;"><div style="background:#f0f4f4; padding:8px 15px; font-weight:bold;">📂 ${cpl.kode}</div><div>${htmlCPMK}</div></div>`; } }); loading.style.display = 'none'; container.style.display = 'block'; } catch (e) { alert("Error memuat UI Mapping!"); }
     }
     async function simpanEdit(tipe, kode) { const value = document.getElementById(`in-${kode}`).value; const res = await fetch(API_UPDATE, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) }); if(res.ok) alert("✅ Berhasil diperbarui!"); }
     async function simpanMappingCPL(kodeCpmk) { const kodeCpl = document.getElementById(`sel-${kodeCpmk}`).value; const res = await fetch(API_UPDATE, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ tipe: 'mapping', kode: kodeCpmk, value: kodeCpl, prodi: PRODI }) }); if(res.ok) alert("✅ Mapping CPL-CPMK Tersimpan!"); }
     async function simpanMappingMK() { const mkKode = document.getElementById("pilihMKMapping").value; const listCpmk = Array.from(document.querySelectorAll('.chk-cpmk:checked')).map(cb => cb.value); const res = await fetch(API_MAP_MK, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ kode_mk: mkKode, cpmk_list: listCpmk, prodi: PRODI }) }); if(res.ok) alert("✅ Mapping MK-CPMK SI Berhasil!"); }
 
     window.onload = () => { switchTab('dashboard'); };
-    function logout() { localStorage.clear(); window.location.replace("login.html"); }
+    function logout() { localStorage.clear(); window.location.replace("../login/login.html"); }
     async function handleKRSUpload(role) {
             const inputId = role === 'TI' ? 'krsFileInputTI' : (role === 'SI' ? 'krsFileInputSI' : 'krsFileInputHead');
             const fileInput = document.getElementById(inputId);
@@ -271,7 +271,7 @@
 
             try {
                 // GANTI URL DI BAWAH INI DENGAN URL WEBHOOK N8N ANDA NANTI
-                const response = await fetch('http://localhost:5678/webhook/upload-krs', {
+                const response = await fetch('https://viewed-picked-sprint-includes.trycloudflare.com/webhook/upload-krs', {
                     method: 'POST',
                     body: formData
                 });

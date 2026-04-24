@@ -343,9 +343,9 @@
 </div>
 
 <script>
-    const API_URL = "http://localhost:5678/webhook/ambil-laporan";
-    const API_METADATA = "http://localhost:5678/webhook/get-metadata"; 
-    const API_UPDATE_REMIDI = "http://localhost:5678/webhook/update-remidi"; // URL Webhook Baru
+    const API_URL = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/ambil-laporan";
+    const API_METADATA = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/get-metadata"; 
+    const API_UPDATE_REMIDI = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/update-remidi"; // URL Webhook Baru
     
     let chartGrade = null; 
     let chartRadar = null;
@@ -716,7 +716,7 @@ function toggleAccordion(contentId, headerElement) {
         };
 
         try {
-            const res = await fetch("http://localhost:5678/webhook/update-bobot-mk", {
+            const res = await fetch("https://viewed-picked-sprint-includes.trycloudflare.com/webhook/update-bobot-mk", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });

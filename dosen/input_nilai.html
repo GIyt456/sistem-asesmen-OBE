@@ -62,7 +62,7 @@
         ========================================= */
         .hero {
             position: relative; height: 600px; 
-            background-image: url('BackgroundUnaki.jpg'); 
+            background-image: url('../gambar/BackgroundUnaki.jpg'); 
             background-size: cover; background-position: center;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             text-align: center; color: white; padding: 0 20px;
@@ -158,12 +158,12 @@
 <body>
 
     <nav class="navbar">
-        <img src="LogoUnaki.png" alt="Logo Universitas AKI" style="height: 45px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);">
+        <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 45px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);">
         <div class="nav-links">
             <a href="#" class="active">Home</a>
             <a href="dashboard_dosen.html">Dashboard</a>
             <a href="#">Upload Nilai</a>
-            <a href="laporan.html">Laporan</a>
+            <a href="../kaprodi/laporan.html">Laporan</a>
         </div>
         <div class="nav-user">
             <div class="user-chip">
@@ -222,7 +222,7 @@
                 <h2 style="font-size: 2rem; font-weight: 800; color: #111827; margin-bottom: 4px;">Sistem Input Nilai</h2>
                 <p style="color: #6b7280; font-size: 0.95rem;">Data MK, CPL, CPMK terhubung langsung ke Database</p>
             </div>
-            <button class="btn-action" style="background: #e0f2fe; color: #0369a1; padding: 10px 20px;" onclick="window.location.href='laporan.html'">
+            <button class="btn-action" style="background: #e0f2fe; color: #0369a1; padding: 10px 20px;" onclick="window.location.href='../kaprodi/laporan.html'">
                 <i class="fas fa-chart-line"></i> Dashboard Laporan
             </button>
         </div>
@@ -356,12 +356,12 @@
     </div>
 
     <script>
-        const API_SIMPAN = "http://localhost:5678/webhook/simpan-konfigurasi"; 
-        const API_GET_MAPPING = "http://localhost:5678/webhook/get-mapping-mk";
-        const API_GET_SETTINGS = "http://localhost:5678/webhook/get-settings";
-        const API_UPDATE_SETTINGS = "http://localhost:5678/webhook/update-settings";
-        const API_METADATA = "http://localhost:5678/webhook/get-metadata";
-        const API_GET_STUDENTS = "http://localhost:5678/webhook/get-mahasiswa-mk";
+        const API_SIMPAN = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/simpan-konfigurasi"; 
+        const API_GET_MAPPING = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/get-mapping-mk";
+        const API_GET_SETTINGS = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/get-settings";
+        const API_UPDATE_SETTINGS = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/update-settings";
+        const API_METADATA = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/get-metadata";
+        const API_GET_STUDENTS = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/get-mahasiswa-mk";
 
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
         const userNidn = localStorage.getItem("user_nidn");
@@ -375,7 +375,7 @@
         let mkSudahInput = [];
         let templateAktif = "Template_Nilai_Mahasiswa.xlsx";
 
-        if (!userLogin) window.location.replace("login.html");
+        if (!userLogin) window.location.replace("../login/login.html");
         document.getElementById("dosenName").innerText = userLogin;
 
         const tutorialData = [
@@ -403,7 +403,7 @@
 
         async function cekMKSudahInput() {
             try {
-                const res = await fetch("http://localhost:5678/webhook/ambil-laporan");
+                const res = await fetch("https://viewed-picked-sprint-includes.trycloudflare.com/webhook/ambil-laporan");
                 const data = await res.json();
                 const rawData = data.daftar_mahasiswa || [];
                 mkSudahInput = [...new Set(rawData.map(item => item.kode_mk))];
@@ -839,7 +839,7 @@
                     localStorage.removeItem("draft_mk_terpilih");
                     
                     alert("✅ BERHASIL! Data Tersimpan di Database."); 
-                    window.location.href = "laporan.html"; 
+                    window.location.href = "../kaprodi/laporan.html"; 
                 } else { 
                     alert("❌ Gagal menyimpan data ke server. Pastikan Token Valid."); 
                 }
@@ -850,7 +850,7 @@
             btn.innerHTML = '<i class="fas fa-save"></i> Simpan Semua Data'; btn.disabled = false;
         }
 
-        function logout() { localStorage.clear(); window.location.replace("login.html"); }
+        function logout() { localStorage.clear(); window.location.replace("../login/login.html"); }
 
         // Memunculkan tombol kembali khusus untuk Admin (Kaprodi)
         document.addEventListener("DOMContentLoaded", function() {
@@ -863,7 +863,7 @@
                 const btnKembali = document.createElement("a");
                 
                 // Tentukan kembali ke TI atau SI
-                btnKembali.href = userProdiSekarang === "si" ? "admin_config_si.html" : "admin_config.html";
+                btnKembali.href = userProdiSekarang === "si" ? "../kaprodi/kaprodi_si/admin_config_si.html" : "../kaprodi/kaprodi_ti/admin_config.html";
                 btnKembali.innerHTML = '<i class="fas fa-shield-alt"></i> Kembali ke Panel Admin';
                 btnKembali.style.background = "#8b0000";
                 btnKembali.style.padding = "8px 16px";
