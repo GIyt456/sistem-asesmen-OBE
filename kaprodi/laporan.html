@@ -3,126 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Capaian OBE - Universitas AKI</title>
+    <title>Laporan OBE - Universitas AKI</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --navy: #0f172a; --blue: #1e3a8a; --bg: #f8fafc; }
+        :root { --navy: #0f172a; --blue: #1e3a8a; --red: #8b0000; --bg: #f8fafc; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .container { max-width: 1100px; margin: auto; }
-        .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px; }
-        .grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 24px; }
-        h2 { color: var(--navy); display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .select-mk { width: 100%; max-width: 400px; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 20px; font-size: 1rem; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f1f5f9; color: #475569; padding: 12px; text-align: left; font-size: 0.85rem; }
-        td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
-        .badge { padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.75rem; }
+        .container { max-width: 1250px; margin: auto; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px; }
+        
+        .table-wrapper { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 800px; }
+        th { background: var(--navy); color: white; padding: 12px; text-align: center; font-size: 0.85rem; border: 1px solid #334155; }
+        td { padding: 10px; border: 1px solid #e2e8f0; text-align: center; font-size: 0.85rem; color: #334155; }
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; }
         .success { background: #dcfce7; color: #166534; }
         .danger { background: #fee2e2; color: #991b1b; }
+        
+        .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        select { padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%; max-width: 400px; }
+        @media (max-width: 900px) { .grid-top { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <h2><i class="fas fa-chart-pie"></i> Laporan Capaian Pembelajaran Lulusan (CPL)</h2>
-            <p style="color:#64748b; margin-bottom:15px;">Pilih mata kuliah untuk melihat visualisasi pencapaian</p>
-            <select id="pilihMK" class="select-mk" onchange="loadLaporan()">
+            <h2 style="color: var(--navy); margin-top:0;"><i class="fas fa-university"></i> Laporan Capaian OBE - Teknik Informatika</h2>
+            <select id="pilihMK" onchange="loadLaporan()">
                 <option value="" disabled selected>Memuat Mata Kuliah...</option>
             </select>
         </div>
-        
-        <div class="grid">
-            <div class="card"><canvas id="radarCPL"></canvas></div>
+
+        <div class="grid-top" style="margin-bottom: 24px;">
+            <div class="card"><canvas id="radarChart"></canvas></div>
             <div class="card">
-                <h3>Evaluasi & Tindak Lanjut</h3>
-                <table>
+                <h3 style="margin-top:0; color:var(--navy);"><i class="fas fa-tasks"></i> Evaluasi Kelas</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>CPL</th><th>Rata-rata</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="bodyEvaluasi"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:0; color:var(--navy);"><i class="fas fa-users"></i> Detail Capaian Mahasiswa</h3>
+            <div class="table-wrapper">
+                <table id="tableDetail">
                     <thead>
-                        <tr><th>Kode CPL</th><th>Rata-rata</th><th>Status</th><th>Tindak Lanjut</th></tr>
+                        <tr id="headerCPL"></tr>
+                        <tr id="subHeaderCPL"></tr>
                     </thead>
-                    <tbody id="evalBody">
-                        <tr><td colspan="4" style="text-align:center; padding:40px; color:#94a3b8;">Pilih mata kuliah terlebih dahulu</td></tr>
-                    </tbody>
+                    <tbody id="bodyDetail"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <script>
-        const API_METADATA = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/get-metadata";
-        const API_GET_REPORT = "https://viewed-picked-sprint-includes.trycloudflare.com/webhook/get-report-obe";
-        const userNidn = localStorage.getItem("user_nidn");
-        const userProdi = localStorage.getItem("prodi_aktif") || "ti";
+    <script>    
+        const API_METADATA = `https://solve-delivery-geology-bet.trycloudflare.com/webhook/get-metadata`;
+        const API_GET_REPORT = `https://solve-delivery-geology-bet.trycloudflare.com/webhook/get-report-obe`;
+        const TARGET_PASS = 75;
 
-        // 1. Memuat daftar MK ke dropdown agar "Master MK Baru" muncul
+        // Mode Aman: Jika belum login, gunakan NIDN default untuk testing
+        if (!localStorage.getItem("user_nidn")) {
+            console.warn("Mode Testing: Menggunakan NIDN default karena sesi login kosong.");
+            localStorage.setItem("user_nidn", "0610029301"); // NIDN Anda
+            localStorage.setItem("prodi_aktif", "ti");
+        }
+
+        const userNidn = localStorage.getItem("user_nidn");
+        const userProdi = localStorage.getItem("prodi_aktif");
+
+        async function init() {
+            await loadMetadata();
+            const lastMK = localStorage.getItem("draft_mk_terpilih");
+            if (lastMK) {
+                const select = document.getElementById("pilihMK");
+                if(select.querySelector(`option[value="${lastMK}"]`)) {
+                    select.value = lastMK;
+                    loadLaporan();
+                }
+            }
+        }
+
         async function loadMetadata() {
             const selectMK = document.getElementById('pilihMK');
             try {
                 const res = await fetch(`${API_METADATA}?prodi=${userProdi}&context=dosen&nidn=${userNidn}`);
+                if (!res.ok) throw new Error("Jaringan bermasalah");
                 const data = await res.json();
+                
                 selectMK.innerHTML = '<option value="" disabled selected>Pilih Mata Kuliah</option>';
                 data.filter(item => item.tipe === 'mk').forEach(mk => {
-                    const opt = document.createElement('option');
-                    opt.value = mk.kode;
-                    opt.textContent = `[${mk.kode}] ${mk.label}`;
-                    selectMK.appendChild(opt);
+                    selectMK.innerHTML += `<option value="${mk.kode}">[${mk.kode}] ${mk.label}</option>`;
                 });
-            } catch (e) { selectMK.innerHTML = '<option>Gagal memuat data</option>'; }
+            } catch (e) {
+                selectMK.innerHTML = '<option value="">⚠️ Error Koneksi (Cek Cloudflare/n8n)</option>';
+            }
         }
 
-        // 2. Mengambil data capaian CPL asli dari n8n
         async function loadLaporan() {
             const mkKode = document.getElementById("pilihMK").value;
             if(!mkKode) return;
+            localStorage.setItem("draft_mk_terpilih", mkKode);
 
             try {
                 const res = await fetch(`${API_GET_REPORT}?mk=${mkKode}`);
-                const data = await res.json();
-                renderChart(data);
-                renderTable(data);
-            } catch (e) { console.error("Gagal memuat laporan"); }
+                
+                // 1. TANGKAP SEBAGAI TEKS DULU (Agar tidak error JSON)
+                const textData = await res.text(); 
+                
+                // 2. CEK JIKA KOSONG
+                if (!textData) {
+                    throw new Error("n8n mengirim respons kosong. Pasti ada Node yang Error di n8n!");
+                }
+
+                // 3. UBAH KE JSON JIKA AMAN
+                const flatData = JSON.parse(textData);
+
+                if(!flatData || flatData.length === 0) {
+                    document.getElementById("bodyDetail").innerHTML = `<tr><td colspan="10" style="padding:20px; color:red;">Data nilai belum ada di database untuk mata kuliah ini.</td></tr>`;
+                    return;
+                }
+
+                renderDetailTable(flatData);
+                calculateAndRenderSummary(flatData);
+                
+            } catch (e) {
+                console.error("Gagal load laporan:", e);
+                document.getElementById("bodyDetail").innerHTML = `<tr><td colspan="10" style="padding:20px; color:red; font-weight:bold;">⚠️ Sistem Gagal: ${e.message} <br>Silakan cek tab 'Executions' di n8n Anda.</td></tr>`;
+            }
         }
 
-        function renderChart(data) {
-            const ctx = document.getElementById('radarCPL').getContext('2d');
-            if(window.myRadarChart) window.myRadarChart.destroy();
-            window.myRadarChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: data.map(d => d.kode_cpl),
-                    datasets: [{
-                        label: 'Capaian Riil (%)',
-                        data: data.map(d => parseFloat(d.rata_rata).toFixed(2)),
-                        backgroundColor: 'rgba(30, 58, 138, 0.2)',
-                        borderColor: '#1e3a8a'
-                    }, {
-                        label: 'Target (75%)',
-                        data: data.map(() => 75),
-                        borderColor: '#f97316',
-                        borderDash: [5, 5],
-                        fill: false
-                    }]
-                },
-                options: { scales: { r: { min: 0, max: 100 } } }
+        function renderDetailTable(flatData) {
+        const headCPL = document.getElementById("headerCPL");
+        const subHead = document.getElementById("subHeaderCPL");
+        const body = document.getElementById("bodyDetail");
+
+        const studentMap = {};
+        const cplMap = {}; 
+
+        flatData.forEach(row => {
+            if (!cplMap[row.kode_cpl]) {
+                cplMap[row.kode_cpl] = { 
+                    cpmk: row.kode_cpmk || "-", 
+                    maks: parseFloat(row.total_poin_maks) || 0 
+                };
+            }
+            if (!studentMap[row.nim]) {
+                studentMap[row.nim] = { nama: row.nama || row.nim, nilai: {} };
+            }
+            studentMap[row.nim].nilai[row.kode_cpl] = parseFloat(row.total_poin_riil) || 0;
+        });
+
+        // Header Styling sesuai Gambar
+        headCPL.innerHTML = '<th rowspan="2" style="background:#0f172a; vertical-align:middle;">NIM</th>' +
+                           '<th rowspan="2" style="background:#0f172a; vertical-align:middle; text-align:left;">Nama Mahasiswa</th>';
+        subHead.innerHTML = '';
+        
+        const sortedCPLs = Object.keys(cplMap).sort(); 
+
+        sortedCPLs.forEach(cpl => {
+            const info = cplMap[cpl];
+            headCPL.innerHTML += `<th colspan="3" style="background:#1e3a8a;">${cpl}<br><small>(${info.cpmk})</small></th>`;
+            subHead.innerHTML += `<th style="background:#334155;">Poin</th><th style="background:#334155;">%</th><th style="background:#334155;">Status</th>`;
+        });
+
+        // Isi Tabel
+        body.innerHTML = "";
+        Object.keys(studentMap).forEach(nim => {
+            const mhs = studentMap[nim];
+            let rowHTML = `<tr><td style="font-weight:bold;">${nim}</td><td style="text-align:left;">${mhs.nama}</td>`;
+            
+            sortedCPLs.forEach(cpl => {
+                const info = cplMap[cpl];
+                const riil = mhs.nilai[cpl] || 0;
+                const persen = info.maks > 0 ? ((riil / info.maks) * 100).toFixed(2) : "0.00";
+                const isLulus = persen >= 75;
+                
+                rowHTML += `
+                    <td style="color:#475569;">${riil.toFixed(1)} / ${info.maks}</td>
+                    <td style="font-weight:bold; color:${isLulus ? '#16a34a' : '#dc2626'}">${persen}%</td>
+                    <td><span class="badge ${isLulus ? 'success' : 'danger'}">${isLulus ? 'LULUS' : 'GAGAL'}</span></td>`;
             });
-        }
+            rowHTML += `</tr>`;
+            body.innerHTML += rowHTML;
+        });
+    }
 
-        function renderTable(data) {
-            const tbody = document.getElementById("evalBody");
-            tbody.innerHTML = "";
-            data.forEach(d => {
-                const nilai = parseFloat(d.rata_rata).toFixed(2);
-                const isLulus = nilai >= 75;
-                tbody.innerHTML += `<tr>
-                    <td><b>${d.kode_cpl}</b></td>
-                    <td>${nilai}%</td>
-                    <td><span class="badge ${isLulus ? 'success' : 'danger'}">${isLulus ? 'TERCAPAI' : 'DI BAWAH TARGET'}</span></td>
-                    <td><textarea style="width:100%; border-radius:4px; border:1px solid #ddd;"></textarea></td>
+        function calculateAndRenderSummary(flatData) {
+            const summaryMap = {};
+            flatData.forEach(row => {
+                const persen = (row.total_poin_riil / row.total_poin_maks) * 100;
+                if(!summaryMap[row.kode_cpl]) summaryMap[row.kode_cpl] = { sum: 0, count: 0 };
+                summaryMap[row.kode_cpl].sum += Math.min(persen, 100); // Cegah over 100%
+                summaryMap[row.kode_cpl].count++;
+            });
+
+            const labels = [], dataRata = [];
+            const tbodyEval = document.getElementById("bodyEvaluasi");
+            tbodyEval.innerHTML = "";
+
+            Object.keys(summaryMap).sort().forEach(cpl => {
+                const rata = (summaryMap[cpl].sum / summaryMap[cpl].count).toFixed(2);
+                labels.push(cpl);
+                dataRata.push(rata);
+                
+                const isLulus = rata >= TARGET_PASS;
+                tbodyEval.innerHTML += `<tr>
+                    <td style="font-weight:bold;">${cpl}</td>
+                    <td style="font-weight:bold; color:${isLulus ? '#16a34a':'#dc2626'}">${rata}%</td>
+                    <td><span class="badge ${isLulus ? 'success':'danger'}">${isLulus ? 'TERCAPAI':'DI BAWAH TARGET'}</span></td>
                 </tr>`;
             });
+
+            renderChart(labels, dataRata);
         }
 
-        window.onload = loadMetadata;
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if(window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Capaian Kelas (%)',
+                        data: data,
+                        backgroundColor: 'rgba(30, 58, 138, 0.2)',
+                        borderColor: '#1e3a8a',
+                        pointBackgroundColor: '#1e3a8a'
+                    }, {
+                        label: 'Target (75%)',
+                        data: labels.map(() => 75),
+                        borderColor: '#8b0000',
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: { responsive: true, scales: { r: { min: 0, max: 100 } } }
+            });
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>
