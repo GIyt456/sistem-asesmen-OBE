@@ -359,12 +359,12 @@
     </div>
 
     <script>
-        const API_SIMPAN = "https://clear-disk-fiber-tension.trycloudflare.com/webhook/simpan-konfigurasi"; 
-        const API_GET_MAPPING = "https://clear-disk-fiber-tension.trycloudflare.com/webhook/get-mapping-mk";
-        const API_GET_SETTINGS = "https://clear-disk-fiber-tension.trycloudflare.com/webhook/get-settings";
-        const API_UPDATE_SETTINGS = "https://clear-disk-fiber-tension.trycloudflare.com/webhook/update-settings";
-        const API_METADATA = "https://clear-disk-fiber-tension.trycloudflare.com/webhook/get-metadata";
-        const API_GET_STUDENTS = "https://clear-disk-fiber-tension.trycloudflare.com/webhook/get-mahasiswa-mk";
+        const API_SIMPAN = "https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/simpan-konfigurasi"; 
+        const API_GET_MAPPING = "https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/get-mapping-mk";
+        const API_GET_SETTINGS = "https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/get-settings";
+        const API_UPDATE_SETTINGS = "https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/update-settings";
+        const API_METADATA = "https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/get-metadata";
+        const API_GET_STUDENTS = "https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/get-mahasiswa-mk";
 
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
         const userNidn = localStorage.getItem("user_nidn");
@@ -470,7 +470,7 @@
 
         async function cekMKSudahInput() {
             try {
-                const res = await fetch("https://clear-disk-fiber-tension.trycloudflare.com/webhook/ambil-laporan");
+                const res = await fetch("https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/ambil-laporan");
                 const data = await res.json();
                 const rawData = data.daftar_mahasiswa || [];
                 mkSudahInput = [...new Set(rawData.map(item => item.kode_mk))];

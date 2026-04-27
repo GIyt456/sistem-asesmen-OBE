@@ -229,7 +229,7 @@
                 <div class="figma-card">
                     <h3>Pintasan Laporan Kelas</h3>
                     <p>Lihat analisis transkrip nilai dan ketercapaian CPL dan CPMK mahasiswa secara spesifik per mata kuliah</p>
-                    <button class="btn-dark" onclick="window.location.href='laporan.html'">
+                    <button class="btn-dark" onclick="window.location.href='../../Kaprodi/laporan.html'">
                         <i class="fas fa-external-link-alt"></i> Open
                     </button>
                 </div>
@@ -455,10 +455,10 @@
 <script>
     
     const PRODI = 'ti'; 
-    const API_URL = "https://clear-disk-fiber-tension.trycloudflare.com/webhook/get-metadata?prodi=" + PRODI;
-    const API_UPDATE = "https://clear-disk-fiber-tension.trycloudflare.com/webhook/admin-update-master";
-    const API_MAP_MK = "https://clear-disk-fiber-tension.trycloudflare.com/webhook/admin-map-mk-cpmk";
-    const API_GET_USERS = "https://clear-disk-fiber-tension.trycloudflare.com/webhook/get-users"; 
+    const API_URL = "https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/get-metadata?prodi=" + PRODI;
+    const API_UPDATE = "https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/admin-update-master";
+    const API_MAP_MK = "https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/admin-map-mk-cpmk";
+    const API_GET_USERS = "https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/get-users"; 
     
 
     // --- SATPAM ADMIN TI ---
@@ -636,7 +636,7 @@
         if (!username || !newPassword) { alert("⚠️ Username dan Password baru tidak boleh kosong!"); return; }
         if (!confirm(`Apakah Anda yakin ingin mengganti password untuk akun "${username}"?`)) return;
         try {
-            const res = await fetch("https://clear-disk-fiber-tension.trycloudflare.com/webhook/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) });
+            const res = await fetch("https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) });
             const data = await res.json();
             if (res.ok && data.status === "success") { alert(`✅ BERHASIL: ${data.message}`); document.getElementById("targetUsername").value = ""; document.getElementById("newPassword").value = ""; } 
             else alert("❌ Gagal mereset password. Pastikan username benar.");
@@ -688,7 +688,7 @@
         area.innerHTML = "";
         
         try {
-            const [resMeta, resMap] = await Promise.all([ fetch(API_URL), fetch(`https://clear-disk-fiber-tension.trycloudflare.com/webhook/get-mapping-mk?mk=${mkKode}&prodi=${PRODI}`) ]);
+            const [resMeta, resMap] = await Promise.all([ fetch(API_URL), fetch(`https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/get-mapping-mk?mk=${mkKode}&prodi=${PRODI}`) ]);
             const meta = await resMeta.json(); const existing = await resMap.json(); const checkedCPMKs = new Set(existing.map(e => e.kode_cpmk));
             const listCPL = meta.filter(i => i.tipe === 'cpl'); const listCPMK = meta.filter(i => i.tipe === 'cpmk');
             
@@ -742,7 +742,7 @@
 
             try {
                 // GANTI URL DI BAWAH INI DENGAN URL WEBHOOK N8N ANDA NANTI
-                const response = await fetch('https://clear-disk-fiber-tension.trycloudflare.com/webhook/upload-krs', {
+                const response = await fetch('https://calendar-boutique-acoustic-incentive.trycloudflare.com/webhook/upload-krs', {
                     method: 'POST',
                     body: formData
                 });
