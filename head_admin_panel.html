@@ -380,11 +380,11 @@
     </div>
 
 <script>
-    const API_METADATA = "http://localhost:5678/webhook/get-metadata";
-    const API_LOG = "http://localhost:5678/webhook/ambil-log-login";
-    const API_CRUD = "http://localhost:5678/webhook/head-admin-crud";
-    const API_GET_USERS = "http://localhost:5678/webhook/get-users";
-    const API_ADD_USER = "http://localhost:5678/webhook/tambah-user"; 
+    const API_METADATA = "https://enterprises-ensemble-processors-knowledge.trycloudflare.com/webhook/get-metadata";
+    const API_LOG = "https://enterprises-ensemble-processors-knowledge.trycloudflare.com/webhook/ambil-log-login";
+    const API_CRUD = "https://enterprises-ensemble-processors-knowledge.trycloudflare.com/webhook/head-admin-crud";
+    const API_GET_USERS = "https://enterprises-ensemble-processors-knowledge.trycloudflare.com/webhook/get-users";
+    const API_ADD_USER = "https://enterprises-ensemble-processors-knowledge.trycloudflare.com/webhook/tambah-user"; 
 
     let currentLoginLogs = [];
     let currentPageMonitoring = 1;
@@ -478,7 +478,7 @@
         if (!confirm(`Apakah yakin mengganti password untuk "${username}"?`)) return;
 
         try {
-            const res = await fetch("http://localhost:5678/webhook/reset-password", {
+            const res = await fetch("https://enterprises-ensemble-processors-knowledge.trycloudflare.com/webhook/reset-password", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username: username, new_password: newPassword })
             });
