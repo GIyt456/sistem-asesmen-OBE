@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Mata Kuliah - Sistem OBE</title>
+    <title>Master Tahun Kurikulum - Sistem OBE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -21,22 +21,16 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
+        
         /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
-      /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
         body { 
+            display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark);
             animation: transitionIn 0.3s ease-in-out; 
         }
         
         @keyframes transitionIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(8px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* GAYA SIDEBAR */
@@ -79,44 +73,42 @@
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <!-- HEADER HALAMAN -->
         <div class="header-container">
             <div class="header-title-area">
-                <div class="header-subtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title">KELOLA MATA <span>KULIAH</span></h1>
+                <div class="header-subtitle">MASTER DATA</div>
+                <h1 class="header-title">TAHUN <span>KURIKULUM</span></h1>
             </div>
             <div class="badge-prodi">Teknik Informatika</div>
         </div>
 
-        <!-- AREA TABEL MATA KULIAH -->
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mata Kuliah Program Studi</h3>
+                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Tahun Kurikulum</h3>
                     <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
                 </div>
-                <button class="btn-dark" onclick="loadData('mk')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button class="btn-dark" onclick="loadData('tahun')"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
             
             <table>
                 <thead>
                     <tr>
-                        <th width="15%">Kode MK</th>
-                        <th>Nama Mata Kuliah</th>
+                        <th width="15%">Kode Tahun</th>
+                        <th>Deskripsi / Label</th>
                         <th width="10%" style="text-align: center;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="bodyMK">
+                <tbody id="bodyTahun">
                     <!-- Data dari n8n akan masuk ke sini -->
                 </tbody>
             </table>
             
-            <div id="pagination-mk" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+            <div id="pagination-tahun" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
         </div>
     </div>
 
 <script>
-    // 1. PENGATURAN API N8N (Sesuai dengan update dari teman Anda)
+    // 1. PENGATURAN API N8N 
     const PRODI = 'ti'; 
     const API_BASE = "https://hopkins-wise-breakdown-promptly.trycloudflare.com/webhook"; 
     const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`;
@@ -139,19 +131,26 @@
             const response = await fetch('components/sidebar.html');
             const html = await response.text();
             
-            // Masukkan HTML Sidebar ke dalam container
             document.getElementById('sidebar-container').outerHTML = html;
 
-            // Masukkan data profil ke Sidebar
             document.getElementById("adminName").innerText = userLogin;
             document.getElementById("sidebarAvatar").src = `https://ui-avatars.com/api/?name=${userLogin}&background=8b0000&color=fff&bold=true`;
 
-            // Nonaktifkan menu Home, dan Aktifkan menu Mata Kuliah agar warna menyala
+            // Logika UI Sidebar Khusus Halaman Dropdown
             setTimeout(() => {
                 const navDashboard = document.getElementById('nav-dashboard');
-                const navMk = document.getElementById('nav-mk');
+                const navTahun = document.getElementById('nav-tahun');
+                const menuMaster = document.getElementById('menu-master');
+                const chevronMaster = document.getElementById('chevron-master');
+
                 if(navDashboard) navDashboard.classList.remove('active');
-                if(navMk) navMk.classList.add('active');
+                if(navTahun) navTahun.classList.add('active'); // Nyalakan menu Tahun
+                
+                // Buka otomatis dropdown Master Data
+                if(menuMaster && chevronMaster) {
+                    menuMaster.style.display = 'flex';
+                    chevronMaster.style.transform = 'rotate(180deg)';
+                }
             }, 100);
 
         } catch (error) {
@@ -159,7 +158,6 @@
         }
     }
 
-    // Fungsi tambahan untuk animasi dropdown di sidebar
     function toggleDropdown(menuId, chevronId) {
         const menu = document.getElementById(menuId);
         const chevron = document.getElementById(chevronId);
@@ -172,9 +170,9 @@
 
     function logout() { localStorage.clear(); window.location.replace("login.html"); }
 
-    // 4. LOGIKA DATA MATA KULIAH (TABEL & PAGINASI)
+    // 4. LOGIKA DATA TAHUN (TABEL & PAGINASI)
     const paginationState = {
-        'mk': { data: [], page: 1, bodyId: 'bodyMK', paginationId: 'pagination-mk' }
+        'tahun': { data: [], page: 1, bodyId: 'bodyTahun', paginationId: 'pagination-tahun' }
     };
     const rowsPerPage = 5; 
 
@@ -199,7 +197,6 @@
         const endIndex = startIndex + rowsPerPage;
         const dataHalamanIni = state.data.slice(startIndex, endIndex);
 
-        // Render khusus tabel Mata Kuliah
         dataHalamanIni.forEach(item => {
             tbody.innerHTML += `<tr>
                 <td><strong>${item.kode}</strong></td>
@@ -240,7 +237,7 @@
         container.appendChild(btnNext);
     }
 
-    // 5. FUNGSI SIMPAN PERUBAHAN NAMA MATA KULIAH KE N8N
+    // 5. FUNGSI SIMPAN PERUBAHAN
     async function simpanEdit(tipe, kode) { 
         const value = document.getElementById(`in-${kode}`).value; 
         try {
@@ -250,7 +247,7 @@
                 body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) 
             }); 
             if(res.ok) {
-                alert("✅ Berhasil diperbarui!");
+                alert("✅ Tahun Kurikulum berhasil diperbarui!");
             } else {
                 alert("❌ Gagal menyimpan data ke server.");
             }
@@ -261,8 +258,8 @@
 
     // 6. JALANKAN SAAT WEB PERTAMA KALI DIBUKA
     window.onload = () => { 
-        loadSidebar(); // Panggil sidebar terlebih dahulu
-        loadData('mk'); // Langsung tarik data Mata Kuliah tanpa perlu switchTab
+        loadSidebar(); 
+        loadData('tahun'); 
     };
 </script>
 </body>

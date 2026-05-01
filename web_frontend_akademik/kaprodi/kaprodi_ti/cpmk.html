@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Mata Kuliah - Sistem OBE</title>
+    <title>Kelola CPMK - Sistem OBE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -21,22 +21,16 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
+        
         /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
-      /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
         body { 
+            display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark);
             animation: transitionIn 0.3s ease-in-out; 
         }
         
         @keyframes transitionIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(8px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* GAYA SIDEBAR */
@@ -83,40 +77,40 @@
         <div class="header-container">
             <div class="header-title-area">
                 <div class="header-subtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title">KELOLA MATA <span>KULIAH</span></h1>
+                <h1 class="header-title">CAPAIAN PEMBELAJARAN <span>MATA KULIAH</span></h1>
             </div>
             <div class="badge-prodi">Teknik Informatika</div>
         </div>
 
-        <!-- AREA TABEL MATA KULIAH -->
+        <!-- AREA TABEL CPMK -->
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mata Kuliah Program Studi</h3>
+                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar CPMK Program Studi</h3>
                     <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
                 </div>
-                <button class="btn-dark" onclick="loadData('mk')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button class="btn-dark" onclick="loadData('cpmk')"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
             
             <table>
                 <thead>
                     <tr>
-                        <th width="15%">Kode MK</th>
-                        <th>Nama Mata Kuliah</th>
+                        <th width="15%">Kode CPMK</th>
+                        <th>Deskripsi CPMK</th>
                         <th width="10%" style="text-align: center;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="bodyMK">
-                    <!-- Data dari n8n akan masuk ke sini -->
+                <tbody id="bodyCPMK">
+                    <!-- Data CPMK dari n8n akan masuk ke sini -->
                 </tbody>
             </table>
             
-            <div id="pagination-mk" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+            <div id="pagination-cpmk" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
         </div>
     </div>
 
 <script>
-    // 1. PENGATURAN API N8N (Sesuai dengan update dari teman Anda)
+    // 1. PENGATURAN API N8N 
     const PRODI = 'ti'; 
     const API_BASE = "https://hopkins-wise-breakdown-promptly.trycloudflare.com/webhook"; 
     const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`;
@@ -139,19 +133,17 @@
             const response = await fetch('components/sidebar.html');
             const html = await response.text();
             
-            // Masukkan HTML Sidebar ke dalam container
             document.getElementById('sidebar-container').outerHTML = html;
 
-            // Masukkan data profil ke Sidebar
             document.getElementById("adminName").innerText = userLogin;
             document.getElementById("sidebarAvatar").src = `https://ui-avatars.com/api/?name=${userLogin}&background=8b0000&color=fff&bold=true`;
 
-            // Nonaktifkan menu Home, dan Aktifkan menu Mata Kuliah agar warna menyala
+            // Nyalakan warna menu CPMK dan matikan yang Home
             setTimeout(() => {
                 const navDashboard = document.getElementById('nav-dashboard');
-                const navMk = document.getElementById('nav-mk');
+                const navCpmk = document.getElementById('nav-cpmk');
                 if(navDashboard) navDashboard.classList.remove('active');
-                if(navMk) navMk.classList.add('active');
+                if(navCpmk) navCpmk.classList.add('active');
             }, 100);
 
         } catch (error) {
@@ -159,7 +151,6 @@
         }
     }
 
-    // Fungsi tambahan untuk animasi dropdown di sidebar
     function toggleDropdown(menuId, chevronId) {
         const menu = document.getElementById(menuId);
         const chevron = document.getElementById(chevronId);
@@ -172,9 +163,9 @@
 
     function logout() { localStorage.clear(); window.location.replace("login.html"); }
 
-    // 4. LOGIKA DATA MATA KULIAH (TABEL & PAGINASI)
+    // 4. LOGIKA DATA CPMK (TABEL & PAGINASI)
     const paginationState = {
-        'mk': { data: [], page: 1, bodyId: 'bodyMK', paginationId: 'pagination-mk' }
+        'cpmk': { data: [], page: 1, bodyId: 'bodyCPMK', paginationId: 'pagination-cpmk' }
     };
     const rowsPerPage = 5; 
 
@@ -199,7 +190,7 @@
         const endIndex = startIndex + rowsPerPage;
         const dataHalamanIni = state.data.slice(startIndex, endIndex);
 
-        // Render khusus tabel Mata Kuliah
+        // Render baris tabel CPMK dengan Input form untuk diedit
         dataHalamanIni.forEach(item => {
             tbody.innerHTML += `<tr>
                 <td><strong>${item.kode}</strong></td>
@@ -240,7 +231,7 @@
         container.appendChild(btnNext);
     }
 
-    // 5. FUNGSI SIMPAN PERUBAHAN NAMA MATA KULIAH KE N8N
+    // 5. FUNGSI SIMPAN PERUBAHAN CPMK KE N8N
     async function simpanEdit(tipe, kode) { 
         const value = document.getElementById(`in-${kode}`).value; 
         try {
@@ -250,7 +241,7 @@
                 body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) 
             }); 
             if(res.ok) {
-                alert("✅ Berhasil diperbarui!");
+                alert("✅ Deskripsi CPMK berhasil diperbarui!");
             } else {
                 alert("❌ Gagal menyimpan data ke server.");
             }
@@ -261,8 +252,8 @@
 
     // 6. JALANKAN SAAT WEB PERTAMA KALI DIBUKA
     window.onload = () => { 
-        loadSidebar(); // Panggil sidebar terlebih dahulu
-        loadData('mk'); // Langsung tarik data Mata Kuliah tanpa perlu switchTab
+        loadSidebar(); 
+        loadData('cpmk'); // Tarik data khusus CPMK
     };
 </script>
 </body>
