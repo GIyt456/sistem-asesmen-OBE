@@ -359,12 +359,13 @@
     </div>
 
     <script>
-        const API_SIMPAN = "https://fewer-ide-deposit-loop.trycloudflare.com/webhook/simpan-konfigurasi"; 
-        const API_GET_MAPPING = "https://fewer-ide-deposit-loop.trycloudflare.com/webhook/get-mapping-mk";
-        const API_GET_SETTINGS = "https://fewer-ide-deposit-loop.trycloudflare.com/webhook/get-settings";
-        const API_UPDATE_SETTINGS = "https://fewer-ide-deposit-loop.trycloudflare.com/webhook/update-settings";
-        const API_METADATA = "https://fewer-ide-deposit-loop.trycloudflare.com/webhook/get-metadata";
-        const API_GET_STUDENTS = "https://fewer-ide-deposit-loop.trycloudflare.com/webhook/get-mahasiswa-mk";
+        const API_BASE = "https://hopkins-wise-breakdown-promptly.trycloudflare.com/webhook";
+        const API_SIMPAN = "${API_BASE}/simpan-konfigurasi"; 
+        const API_GET_MAPPING = "${API_BASE}/get-mapping-mk";
+        const API_GET_SETTINGS = "${API_BASE}/get-settings";
+        const API_UPDATE_SETTINGS = "${API_BASE}/update-settings";
+        const API_METADATA = "${API_BASE}/get-metadata";
+        const API_GET_STUDENTS = "${API_BASE}/get-mahasiswa-mk";
 
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
         const userNidn = localStorage.getItem("user_nidn");
@@ -470,7 +471,7 @@
 
         async function cekMKSudahInput() {
             try {
-                const res = await fetch("https://fewer-ide-deposit-loop.trycloudflare.com/webhook/ambil-laporan");
+                const res = await fetch("${API_BASE}/ambil-laporan");
                 const data = await res.json();
                 const rawData = data.daftar_mahasiswa || [];
                 mkSudahInput = [...new Set(rawData.map(item => item.kode_mk))];
