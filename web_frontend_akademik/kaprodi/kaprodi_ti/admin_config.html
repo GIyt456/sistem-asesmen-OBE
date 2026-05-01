@@ -456,10 +456,10 @@
     
     const PRODI = 'ti'; 
     const API_BASE = "https://hopkins-wise-breakdown-promptly.trycloudflare.com/webhook";
-    const API_URL = "${API_BASE}/get-metadata?prodi=" + PRODI;
-    const API_UPDATE = "${API_BASE}/admin-update-master";
-    const API_MAP_MK = "${API_BASE}/admin-map-mk-cpmk";
-    const API_GET_USERS = "${API_BASE}/get-users"; 
+    const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
+    const API_UPDATE = `${API_BASE}/admin-update-master`;
+    const API_MAP_MK = `${API_BASE}/admin-map-mk-cpmk`;
+    const API_GET_USERS = `${API_BASE}/get-users`; 
     
 
     // --- SATPAM ADMIN TI ---
@@ -637,7 +637,7 @@
         if (!username || !newPassword) { alert("⚠️ Username dan Password baru tidak boleh kosong!"); return; }
         if (!confirm(`Apakah Anda yakin ingin mengganti password untuk akun "${username}"?`)) return;
         try {
-            const res = await fetch("${API_BASE}/reset-password", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) });
+            const res = await fetch(`${API_BASE}/reset-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) });
             const data = await res.json();
             if (res.ok && data.status === "success") { alert(`✅ BERHASIL: ${data.message}`); document.getElementById("targetUsername").value = ""; document.getElementById("newPassword").value = ""; } 
             else alert("❌ Gagal mereset password. Pastikan username benar.");
