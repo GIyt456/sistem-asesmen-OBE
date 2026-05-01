@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Mata Kuliah - Sistem OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS STYLING UTAMA --- */
+        :root { 
+            --sidebar-bg: #161923; 
+            --sidebar-text: #7b8395;
+            --sidebar-hover: #262936;
+            --sidebar-active-text: #ffffff;
+            --primary-red: #8b0000; 
+            --bg-main: #ffffff; 
+            --text-dark: #111827;
+            --border-dark: #161923;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
+        /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
+        body { 
+            animation: transitionIn 0.4s ease-in-out; 
+        }
+        
+        @keyframes transitionIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* GAYA SIDEBAR */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; }
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .sidebar-profile-info { display: flex; flex-direction: column; }
+        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
+        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
+        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .nav-item.logout { color: #f87171; }
+        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+
+        /* GAYA MAIN CONTENT & TABEL */
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; background-color: var(--bg-main); }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        .header-title-area { display: flex; flex-direction: column; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary-red); }
+        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
+        .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .btn-dark:hover { background: #000000; transform: translateY(-2px); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+        th { background: #f3f4f6; color: var(--text-dark); padding: 14px 16px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+        td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; }
+        tbody tr:hover { background-color: #f9fafb; }
+    </style>
+</head>
+<body>
+
+    <!-- ✨ TEMPAT SIDEBAR OTOMATIS MUNCUL ✨ -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <!-- HEADER HALAMAN -->
+        <div class="header-container">
+            <div class="header-title-area">
+                <div class="header-subtitle">KELOLA KURIKULUM</div>
+                <h1 class="header-title">KELOLA MATA <span>KULIAH</span></h1>
+            </div>
+            <div class="badge-prodi">Teknik Informatika</div>
+        </div>
+
+        <!-- AREA TABEL MATA KULIAH -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mata Kuliah Program Studi</h3>
+                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
+                </div>
+                <button class="btn-dark" onclick="loadData('mk')"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th width="15%">Kode MK</th>
+                        <th>Nama Mata Kuliah</th>
+                        <th width="10%" style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyMK">
+                    <!-- Data dari n8n akan masuk ke sini -->
+                </tbody>
+            </table>
+            
+            <div id="pagination-mk" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+        </div>
+    </div>
+
+<script>
+    // 1. PENGATURAN API N8N (Sesuai dengan update dari teman Anda)
+    const PRODI = 'ti'; 
+    const API_BASE = "https://hopkins-wise-breakdown-promptly.trycloudflare.com/webhook"; 
+    const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`;
+    const API_UPDATE = `${API_BASE}/admin-update-master`;
+    
+    // 2. SISTEM KEAMANAN & SATPAM AKUN
+    const userLogin = localStorage.getItem("user_login");
+    const userRole = localStorage.getItem("user_role");
+    const userProdi = localStorage.getItem("prodi_aktif");
+
+    if (!userLogin) window.location.replace("../login/login.html");
+    if (userRole !== 'head_admin') {
+        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
+        else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
+    }
+
+    // 3. FUNGSI PEMANGGIL SIDEBAR OTOMATIS
+    async function loadSidebar() {
+        try {
+            const response = await fetch('components/sidebar.html');
+            const html = await response.text();
+            
+            // Masukkan HTML Sidebar ke dalam container
+            document.getElementById('sidebar-container').outerHTML = html;
+
+            // Masukkan data profil ke Sidebar
+            document.getElementById("adminName").innerText = userLogin;
+            document.getElementById("sidebarAvatar").src = `https://ui-avatars.com/api/?name=${userLogin}&background=8b0000&color=fff&bold=true`;
+
+            // Nonaktifkan menu Home, dan Aktifkan menu Mata Kuliah agar warna menyala
+            setTimeout(() => {
+                const navDashboard = document.getElementById('nav-dashboard');
+                const navMk = document.getElementById('nav-mk');
+                if(navDashboard) navDashboard.classList.remove('active');
+                if(navMk) navMk.classList.add('active');
+            }, 100);
+
+        } catch (error) {
+            console.error('Gagal memuat sidebar:', error);
+        }
+    }
+
+    // Fungsi tambahan untuk animasi dropdown di sidebar
+    function toggleDropdown(menuId, chevronId) {
+        const menu = document.getElementById(menuId);
+        const chevron = document.getElementById(chevronId);
+        if (menu.style.display === 'none' || menu.style.display === '') {
+            menu.style.display = 'flex'; chevron.style.transform = 'rotate(180deg)'; 
+        } else {
+            menu.style.display = 'none'; chevron.style.transform = 'rotate(0deg)';   
+        }
+    }
+
+    function logout() { localStorage.clear(); window.location.replace("login.html"); }
+
+    // 4. LOGIKA DATA MATA KULIAH (TABEL & PAGINASI)
+    const paginationState = {
+        'mk': { data: [], page: 1, bodyId: 'bodyMK', paginationId: 'pagination-mk' }
+    };
+    const rowsPerPage = 5; 
+
+    async function loadData(tipe) { 
+        try {
+            const res = await fetch(API_URL); 
+            const data = await res.json();
+            
+            paginationState[tipe].data = data.filter(i => i.tipe === tipe);
+            paginationState[tipe].page = 1; 
+            
+            renderTablePaginated(tipe);
+        } catch(e) { console.error("Gagal menarik data dari n8n:", e); }
+    }
+
+    function renderTablePaginated(tipe) {
+        const state = paginationState[tipe];
+        const tbody = document.getElementById(state.bodyId);
+        tbody.innerHTML = "";
+
+        const startIndex = (state.page - 1) * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
+        const dataHalamanIni = state.data.slice(startIndex, endIndex);
+
+        // Render khusus tabel Mata Kuliah
+        dataHalamanIni.forEach(item => {
+            tbody.innerHTML += `<tr>
+                <td><strong>${item.kode}</strong></td>
+                <td><input type="text" id="in-${item.kode}" value="${item.label || ''}" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; outline:none; font-family:'Inter', sans-serif;"></td>
+                <td style="text-align:center;"><button class="btn-dark" style="padding: 10px 14px;" onclick="simpanEdit('${tipe}', '${item.kode}')"><i class="fas fa-check"></i></button></td>
+            </tr>`;
+        });
+
+        renderPaginationUI(tipe);
+    }
+
+    function renderPaginationUI(tipe) {
+        const state = paginationState[tipe];
+        const container = document.getElementById(state.paginationId);
+        container.innerHTML = "";
+        
+        const totalPages = Math.ceil(state.data.length / rowsPerPage);
+        if (totalPages <= 1) return; 
+
+        const btnPrev = document.createElement('button');
+        btnPrev.className = 'btn-dark';
+        btnPrev.innerHTML = '<i class="fas fa-chevron-left"></i> Prev';
+        btnPrev.disabled = state.page === 1;
+        btnPrev.onclick = () => { if (state.page > 1) { state.page--; renderTablePaginated(tipe); } };
+        container.appendChild(btnPrev);
+
+        const info = document.createElement('span');
+        info.innerHTML = `Halaman <strong>${state.page}</strong> dari <strong>${totalPages}</strong>`;
+        info.style.fontSize = "0.95rem";
+        info.style.color = "#4b5563";
+        container.appendChild(info);
+
+        const btnNext = document.createElement('button');
+        btnNext.className = 'btn-dark';
+        btnNext.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
+        btnNext.disabled = state.page === totalPages;
+        btnNext.onclick = () => { if (state.page < totalPages) { state.page++; renderTablePaginated(tipe); } };
+        container.appendChild(btnNext);
+    }
+
+    // 5. FUNGSI SIMPAN PERUBAHAN NAMA MATA KULIAH KE N8N
+    async function simpanEdit(tipe, kode) { 
+        const value = document.getElementById(`in-${kode}`).value; 
+        try {
+            const res = await fetch(API_UPDATE, { 
+                method: "POST", 
+                headers: {"Content-Type":"application/json"}, 
+                body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) 
+            }); 
+            if(res.ok) {
+                alert("✅ Berhasil diperbarui!");
+            } else {
+                alert("❌ Gagal menyimpan data ke server.");
+            }
+        } catch (e) {
+            alert("Terjadi kesalahan jaringan.");
+        }
+    }
+
+    // 6. JALANKAN SAAT WEB PERTAMA KALI DIBUKA
+    window.onload = () => { 
+        loadSidebar(); // Panggil sidebar terlebih dahulu
+        loadData('mk'); // Langsung tarik data Mata Kuliah tanpa perlu switchTab
+    };
+</script>
+</body>
+</html>

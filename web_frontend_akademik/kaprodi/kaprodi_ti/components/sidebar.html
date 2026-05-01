@@ -1,0 +1,84 @@
+
+<div class="sidebar">
+        <div class="sidebar-profile">
+            <img src="https://ui-avatars.com/api/?name=Admin&background=8b0000&color=fff&bold=true" id="sidebarAvatar" alt="User Avatar">
+            <div class="sidebar-profile-info">
+                <span class="name" id="adminName">Loading...</span>
+                <span class="role">FAKULTAS TEKNIK INFORMATIKA</span>
+            </div>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="nav-menu">
+            <div class="menu-category">MAIN</div>
+            <div class="nav-item" id="nav-dashboard" onclick="window.location.href='admin_config.html'"><i class="fas fa-home"></i> Home</div>
+            <div class="nav-item" id="nav-mk" onclick="window.location.href='mk.html'"><i class="fas fa-book"></i> Mata Kuliah</div>
+            <div class="nav-item" onclick="window.location.href='cpl.html'"><i class="fas fa-graduation-cap"></i> CPL</div>
+                
+            <div class="nav-item" onclick="toggleDropdown('submenu-master', 'chevron-master')" style="justify-content: space-between;">
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <i class="fas fa-database"></i> Master Data
+                </div>
+                <i class="fas fa-chevron-down" id="chevron-master" style="font-size: 0.8rem; width: auto; transition: transform 0.3s;"></i>
+            </div>
+            <div id="submenu-master" style="display: none; flex-direction: column; margin-top: 2px;">
+                <div class="nav-item" id="nav-tahun" onclick="switchTab('tahun')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Tahun Kurikulum
+                </div>
+                <div class="nav-item" id="nav-rumpun" onclick="switchTab('rumpun')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Rumpun Mata Kuliah
+                </div>
+                <div class="nav-item" id="nav-jenis-cpl" onclick="switchTab('jenis-cpl')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Jenis CPL
+                </div>
+                <div class="nav-item" id="nav-mahasiswa" onclick="switchTab('mahasiswa')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Mahasiswa
+                </div>
+                <div class="nav-item" id="nav-dosen" onclick="switchTab('dosen')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Dosen
+                </div>
+                <div class="nav-item" id="nav-mengajar" onclick="switchTab('mengajar')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Mengajar
+                </div>
+                <div class="nav-item" id="nav-skripsi" onclick="switchTab('skripsi')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Skripsi
+                </div>
+            </div>
+
+            <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')" style="justify-content: space-between;">
+                <div style="display: flex; gap: 16px; align-items: center;">
+                    <i class="fas fa-sitemap"></i> Mapping
+                </div>
+                <i class="fas fa-chevron-down" id="chevron-mapping" style="font-size: 0.8rem; width: auto; transition: transform 0.3s;"></i>
+            </div>
+            
+            <div id="submenu-mapping" style="display: none; flex-direction: column; margin-top: 2px;">
+                <div class="nav-item" id="nav-mapping" onclick="switchTab('mapping')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Mapping CPL - CPMK
+                </div>
+                <div class="nav-item" id="nav-mapping-mk" onclick="switchTab('mapping-mk')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                    Mapping MK - CPMK
+                </div>
+            </div>
+            <div class="nav-item" onclick="switchTab('krs')">
+                <i class="fas fa-file-excel"></i> Import KRS Mahasiswa
+            </div>
+
+            <div class="menu-category" style="margin-top: 20px;">AKSES DOSEN</div>
+            <div class="nav-item" onclick="window.location.href='../../dosen/input_nilai.html'" style="background: #10b981; color: white;">
+                <i class="fas fa-chalkboard-teacher"></i> Masuk Mode Input Nilai
+            </div>
+
+            <div class="menu-category" style="margin-top: 30px;">SETTINGS</div>
+            <div class="nav-item" onclick="switchTab('reset')"><i class="fas fa-lock"></i> Edit Password</div>
+            <div class="nav-item"><i class="fas fa-pen"></i> Edit Halaman Dosen</div>
+        </div>
+
+        <div class="nav-bottom">
+            <div class="nav-item"><i class="far fa-question-circle"></i> Help</div>
+            <div class="nav-item logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout Account
+            </div>
+        </div>
+    </div>
