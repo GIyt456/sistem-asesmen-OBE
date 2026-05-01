@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan OBE - Universitas AKI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --navy: #0f172a; --blue: #1e3a8a; --red: #8b0000; --bg: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        .container { max-width: 1250px; margin: auto; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px; }
+        .table-wrapper { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 800px; }
+        th, td { padding: 8px 12px; border: 1px solid #e2e8f0; text-align: center; font-size: 0.85rem; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; }
+        .success { background: #dcfce7; color: #166534; }
+        .danger { background: #fee2e2; color: #991b1b; }
+        .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        select { padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%; max-width: 400px; }
+        @media (max-width: 900px) { .grid-top { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2 style="color: var(--navy); margin-top:0;"><i class="fas fa-university"></i> Laporan Capaian OBE</h2>
+            <select id="pilihMK" onchange="loadLaporan()"></select>
+        </div>
+
+        <div class="grid-top" style="margin-bottom: 24px;">
+            <div class="card"><canvas id="radarChart"></canvas></div>
+            <div class="card">
+                <h3 style="margin-top:0; color:var(--navy);"><i class="fas fa-tasks"></i> Evaluasi Kelas</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>CPL (CPMK)</th><th>Rata-rata</th><th>Status</th></tr></thead>
+                        <tbody id="bodyEvaluasi"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:0; color:var(--navy);"><i class="fas fa-users"></i> Detail Capaian Mahasiswa</h3>
+            <div class="table-wrapper">
+                <table id="tableDetail">
+                    <thead></thead>
+                    <tbody id="bodyDetail"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. CONFIGURASI URL
+        const API_BASE = "https://fewer-ide-deposit-loop.trycloudflare.com/webhook";
+        const API_METADATA = `${API_BASE}/get-metadata`;
+        const API_GET_REPORT = `${API_BASE}/get-report-obe`;    
+        const TARGET_PASS = 75;
+
+        // 2. SISTEM AUTENTIKASI (Hanya membaca sesi, tidak lagi memaksa login untuk mempermudah tes)
+        let userNidn = localStorage.getItem("user_nidn");
+        let userProdi = localStorage.getItem("prodi_aktif");
+
+        // Jika Anda ingin menguji tanpa login, cukup biarkan NIDN ini aktif:
+        if (!userNidn) {
+            userNidn = "0610029301";
+            userProdi = "ti";
+        }
+
+        async function init() {
+            await loadMetadata();
+            const lastMK = localStorage.getItem("draft_mk_terpilih");
+            if (lastMK) {
+                const select = document.getElementById("pilihMK");
+                if ([...select.options].some(o => o.value === lastMK)) {
+                    select.value = lastMK;
+                    loadLaporan();
+                }
+            }
+        }
+
+        async function loadMetadata() {
+            const selectMK = document.getElementById('pilihMK');
+            try {
+                const res = await fetch(`${API_METADATA}?prodi=${userProdi}&context=dosen&nidn=${userNidn}`);
+                const data = await res.json();
+                selectMK.innerHTML = '<option value="" disabled selected>Pilih Mata Kuliah</option>';
+                
+                if(Array.isArray(data)) {
+                    // MESIN PENYARING ANTI-DUPLIKAT
+                    const mkTersimpan = new Set(); // Set hanya menyimpan data unik
+                    
+                    data.filter(item => item.tipe === 'mk').forEach(mk => {
+                        // Jika kode mata kuliah belum ada di dalam Set, maka tambahkan
+                        if (!mkTersimpan.has(mk.kode)) {
+                            mkTersimpan.add(mk.kode); // Catat kodenya agar tidak dobel
+                            selectMK.innerHTML += `<option value="${mk.kode}">[${mk.kode}] ${mk.label}</option>`;
+                        }
+                    });
+                }
+            } catch (e) {
+                selectMK.innerHTML = '<option value="">⚠️ Error Koneksi API Metadata</option>';
+            }
+        }
+
+        async function loadLaporan() {
+            const mkKode = document.getElementById("pilihMK").value;
+            if(!mkKode) return;
+            localStorage.setItem("draft_mk_terpilih", mkKode);
+
+            try {
+                const res = await fetch(`${API_GET_REPORT}?mk=${mkKode}`);
+                const textData = await res.text();
+                if (!textData) throw new Error("Respons n8n kosong.");
+                
+                const flatData = JSON.parse(textData);
+                
+                // MENCEGAH ERROR "forEach is not a function" JIKA N8N MENGIRIM PESAN ERROR MYSQL
+                if(!Array.isArray(flatData)) {
+                    console.error("Error n8n:", flatData);
+                    throw new Error("n8n gagal mengeksekusi SQL. Cek Log Executions di n8n!");
+                }
+
+                if(flatData.length === 0) {
+                    document.getElementById("bodyDetail").innerHTML = `<tr><td colspan="10" style="color:red; text-align:center;">Data tidak ditemukan untuk mata kuliah ini.</td></tr>`;
+                    return;
+                }
+
+                processAndRenderAll(flatData);
+            } catch (e) {
+                document.getElementById("bodyDetail").innerHTML = `<tr><td colspan="10" style="color:red; font-weight:bold;">⚠️ Error: ${e.message}</td></tr>`;
+            }
+        }
+
+        function processAndRenderAll(flatData) {
+            const studentMap = {};
+            const groupMap = {}; 
+
+            flatData.forEach(row => {
+                const groupKey = `${row.kode_cpl}|${row.kode_cpmk}`;
+                const pNum = row.pertemuan;
+                
+                if (!groupMap[groupKey]) {
+                    groupMap[groupKey] = { cpl: row.kode_cpl, cpmk: row.kode_cpmk, p: [], bobot: {} };
+                }
+                if (!groupMap[groupKey].p.includes(pNum)) {
+                    groupMap[groupKey].p.push(pNum);
+                    groupMap[groupKey].p.sort((a, b) => a - b);
+                }
+                groupMap[groupKey].bobot[pNum] = parseFloat(row.bobot_maks_pertemuan) || 0;
+
+                const nim = row.nim;
+                if (!studentMap[nim]) studentMap[nim] = { nama: row.nama, nilai: {} };
+                
+                studentMap[nim].nilai[`${groupKey}_P${pNum}`] = {
+                    asli: parseFloat(row.nilai_asli) || 0,
+                    poin: parseFloat(row.poin_pertemuan) || 0
+                };
+            });
+
+            const sortedGroups = Object.keys(groupMap).sort();
+
+            const thead = document.querySelector("#tableDetail thead");
+            const body = document.getElementById("bodyDetail");
+
+            let h1 = `<th rowspan="3" style="background:#0f172a; color:white; vertical-align:middle;">NIM</th>
+                      <th rowspan="3" style="background:#0f172a; color:white; vertical-align:middle; text-align:left;">NAMA</th>`;
+            let h2 = ``; let h3 = ``;
+
+            sortedGroups.forEach(key => {
+                const item = groupMap[key];
+                const numP = item.p.length;
+                const totalColspan = numP + 3;
+
+                h1 += `<th colspan="${totalColspan}" style="background:#1e3a8a; color:white;">${item.cpl}</th>`;
+                h2 += `<th colspan="${numP}" style="background:#334155; color:white;">${item.cpmk}</th>
+                       <th rowspan="2" style="background:#1e3a8a; color:white; vertical-align:middle;">TOTAL</th>
+                       <th rowspan="2" style="background:#1e3a8a; color:white; vertical-align:middle;">%</th>
+                       <th rowspan="2" style="background:#1e3a8a; color:white; vertical-align:middle;">CAPAIAN</th>`;
+                item.p.forEach(pNum => { h3 += `<th style="background:#475569; color:white;">P${pNum}</th>`; });
+            });
+            thead.innerHTML = `<tr>${h1}</tr><tr>${h2}</tr><tr>${h3}</tr>`;
+
+            let bobotRow = `<tr><td colspan="2" style="text-align:right; font-weight:bold; background:#f1f5f9;">BOBOT PENILAIAN (%)</td>`;
+            sortedGroups.forEach(key => {
+                const item = groupMap[key];
+                let sumBobot = 0;
+                item.p.forEach(pNum => {
+                    const b = item.bobot[pNum] || 0; sumBobot += b;
+                    bobotRow += `<td style="font-weight:bold; background:#f1f5f9; color:#1e3a8a;">${b}</td>`;
+                });
+                bobotRow += `<td style="font-weight:bold; background:#e2e8f0;">${sumBobot}</td><td colspan="2" style="background:#e2e8f0;"></td>`;
+            });
+            body.innerHTML = bobotRow + "</tr>";
+
+            Object.keys(studentMap).sort().forEach(nim => {
+                const mhs = studentMap[nim];
+                let rowHTML = `<tr><td style="font-weight:bold;">${nim}</td><td style="text-align:left;">${mhs.nama}</td>`;
+                
+                sortedGroups.forEach(key => {
+                    const item = groupMap[key];
+                    let totalPoin = 0; let totalBobot = 0;
+
+                    item.p.forEach(pNum => {
+                        const dataNilai = mhs.nilai[`${key}_P${pNum}`];
+                        const nilaiAsli = dataNilai ? dataNilai.asli : 0; 
+                        const poinKonversi = dataNilai ? dataNilai.poin : 0;
+                        
+                        totalPoin += poinKonversi;
+                        totalBobot += item.bobot[pNum];
+                        rowHTML += `<td>${nilaiAsli}</td>`; 
+                    });
+
+                    const persen = totalBobot > 0 ? ((totalPoin / totalBobot) * 100).toFixed(2) : "0.00";
+                    const isLulus = persen >= TARGET_PASS;
+
+                    rowHTML += `
+                        <td style="font-weight:bold; background:#f8fafc;">${totalPoin.toFixed(1)}</td>
+                        <td style="font-weight:bold; color:${isLulus ? '#16a34a' : '#dc2626'}">${persen}%</td>
+                        <td><span class="badge ${isLulus ? 'success' : 'danger'}">${isLulus ? 'TERPENUHI' : 'TIDAK'}</span></td>`;
+                });
+                body.innerHTML += `<tr>${rowHTML}</tr>`;
+            });
+
+            // Panggil fungsi evaluasi dengan 3 parameter yang aman
+            calculateAndRenderSummary(groupMap, studentMap, sortedGroups);
+        }
+
+        function calculateAndRenderSummary(structureMap, studentMap, sortedGroups) {
+            // Mencegah error jika parameter tidak terlempar dengan benar
+            if(!sortedGroups || !Array.isArray(sortedGroups)) return;
+
+            const summaryMap = {};
+            sortedGroups.forEach(key => { summaryMap[key] = { sumPersen: 0, count: 0 }; });
+
+            Object.keys(studentMap).forEach(nim => {
+                const mhs = studentMap[nim];
+                sortedGroups.forEach(key => {
+                    let studentPoin = 0; let cplBobot = 0;
+                    structureMap[key].p.forEach(pNum => {
+                        cplBobot += (structureMap[key].bobot[pNum] || 0);
+                        if(mhs.nilai[`${key}_P${pNum}`]) studentPoin += mhs.nilai[`${key}_P${pNum}`].poin;
+                    });
+                    const persen = cplBobot > 0 ? (studentPoin / cplBobot) * 100 : 0;
+                    summaryMap[key].sumPersen += Math.min(persen, 100);
+                    summaryMap[key].count++;
+                });
+            });
+
+            const labels = [], dataRata = [];
+            const tbodyEval = document.getElementById("bodyEvaluasi");
+            tbodyEval.innerHTML = "";
+
+            sortedGroups.forEach(key => {
+                const rata = (summaryMap[key].sumPersen / summaryMap[key].count).toFixed(2);
+                const labelTampil = `${structureMap[key].cpl} (${structureMap[key].cpmk})`;
+                labels.push(labelTampil); 
+                dataRata.push(rata);
+                
+                const isLulus = rata >= TARGET_PASS;
+                tbodyEval.innerHTML += `<tr>
+                    <td style="font-weight:bold; color:#0f172a;">${labelTampil}</td>
+                    <td style="font-weight:bold; color:${isLulus ? '#16a34a':'#dc2626'}">${rata}%</td>
+                    <td><span class="badge ${isLulus ? 'success':'danger'}">${isLulus ? 'TERCAPAI' : 'DI BAWAH TARGET'}</span></td>
+                </tr>`;
+            });
+            renderChart(labels, dataRata);
+        }
+
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if(window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Capaian Kelas (%)',
+                        data: data,
+                        backgroundColor: 'rgba(30, 58, 138, 0.2)',
+                        borderColor: '#1e3a8a',
+                        pointBackgroundColor: '#1e3a8a'
+                    }, {
+                        label: 'Target (75%)',
+                        data: labels.map(() => 75),
+                        borderColor: '#8b0000',
+                        borderDash: [5, 5],
+                        fill: false, pointRadius: 0
+                    }]
+                },
+                options: { responsive: true, scales: { r: { min: 0, max: 100 } } }
+            });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>

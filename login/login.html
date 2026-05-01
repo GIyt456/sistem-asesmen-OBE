@@ -159,8 +159,7 @@
     </div>
 
 <script>
-    const LOGIN_API = "https://enterprises-ensemble-processors-knowledge.trycloudflare.com/webhook/login-user";
-
+    const LOGIN_API = "https://fewer-ide-deposit-loop.trycloudflare.com/webhook/login-user";
     let currentCaptcha = "";
 
     function generateCaptcha() {
@@ -286,18 +285,18 @@
                 
                 if (hasil.role === 'head_admin') {
                     // 1. Head Admin murni
-                    window.location.href = "head_admin_panel.html"; 
+                    window.location.href = "../headadmin/head_admin_panel.html"; 
                     
                 } else if (hasil.role === 'admin') {
                     if (prodiFinal === "ti") {
-                        window.location.href = "admin_config.html"; 
+                        window.location.href = "../kaprodi/kaprodi_ti/admin_config.html"; 
                     } else if (prodiFinal === "si") {
-                        window.location.href = "admin_config_si.html"; 
+                        window.location.href = "../kaprodi/kaprodi_si/admin_config_si.html"; 
                     }
                     
                 } else if (hasil.role === 'dosen') {
                     // 3. Dosen murni
-                    window.location.href = "input_nilai.html";   
+                    window.location.href = "../dosen/input_nilai.html";   
                 }
             } else {
                 errorText.innerText = hasil.message || "Login Gagal. Periksa kembali Username dan Password Anda.";
