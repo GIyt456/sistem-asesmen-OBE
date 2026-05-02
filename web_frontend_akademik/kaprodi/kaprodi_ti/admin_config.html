@@ -115,13 +115,20 @@
         .empty-state-figma h1 { font-size: 5.5rem; font-weight: 900; color: #000000; margin: 0 0 10px 0; letter-spacing: -2px; }
         .empty-state-figma p { font-size: 1.1rem; font-weight: 500; color: #111827; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
         /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
+       /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
         body { 
             animation: transitionIn 0.3s ease-in-out; 
         }
         
         @keyframes transitionIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(8px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
         }
     </style>
 </head>
@@ -142,8 +149,8 @@
             <div class="menu-category">MAIN</div>
             <div class="nav-item active" id="nav-dashboard" onclick="window.location.href='admin_config.html'"><i class="fas fa-home"></i> Home</div>
             <div class="nav-item" id="nav-mk" onclick="window.location.href='mk.html'"><i class="fas fa-book"></i> Mata Kuliah</div>
-            <div class="nav-item" id="nav-cpl" onclick="switchTab('cpl')"><i class="fas fa-graduation-cap"></i> CPL</div>
-            <div class="nav-item" id="nav-cpmk" onclick="switchTab('cpmk')"><i class="fas fa-file-alt"></i> CPMK</div>
+            <div class="nav-item" id="nav-cpl" onclick="window.location.href='cpl.html'"><i class="fas fa-graduation-cap"></i> CPL</div>
+            <div class="nav-item" id="nav-cpmk" onclick="window.location.href='cpmk.html'"><i class="fas fa-file-alt"></i> CPMK</div>
             
             <div class="nav-item" onclick="toggleDropdown('submenu-master', 'chevron-master')" style="justify-content: space-between;">
                 <div style="display: flex; gap: 16px; align-items: center;">
@@ -632,51 +639,6 @@
             <div id="pagination-skripsi" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
         </div>
 
-        <div id="content-mk" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mata Kuliah Program Studi</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
-                </div>
-                <button class="btn-dark" onclick="loadData('mk')"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <table>
-                <thead><tr><th width="15%">Kode MK</th><th>Nama Mata Kuliah</th><th width="10%" style="text-align: center;">Aksi</th></tr></thead>
-                <tbody id="bodyMK"></tbody>
-            </table>
-            <div id="pagination-mk" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-        </div>
-
-        <div id="content-cpl" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar CPL Program Studi</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
-                </div>
-                <button class="btn-dark" onclick="loadData('cpl')"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <table>
-                <thead><tr><th width="15%">Kode CPL</th><th>Deskripsi</th><th width="10%" style="text-align: center;">Aksi</th></tr></thead>
-                <tbody id="bodyCPL"></tbody>
-            </table>
-            <div id="pagination-cpl" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-        </div>
-
-        <div id="content-cpmk" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar CPMK Program Studi</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
-                </div>
-                <button class="btn-dark" onclick="loadData('cpmk')"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <table>
-                <thead><tr><th width="15%">Kode CPMK</th><th>Deskripsi</th><th width="10%" style="text-align: center;">Aksi</th></tr></thead>
-                <tbody id="bodyCPMK"></tbody>
-            </table>
-            <div id="pagination-cpmk" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-        </div>
-
         <div id="content-mapping" class="section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
@@ -796,17 +758,6 @@
 
     </div>
 
-<<<<<<< HEAD
-<script>
-    
-    const PRODI = 'ti'; 
-    const API_BASE = "https://reynolds-martial-guild-professional.trycloudflare.com/webhook";
-    const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
-    const API_UPDATE = `${API_BASE}/admin-update-master`;
-    const API_MAP_MK = `${API_BASE}/admin-map-mk-cpmk`;
-    const API_GET_USERS = `${API_BASE}/get-users`; 
-    
-=======
     <div id="modalKurikulum" class="modal-overlay">
         <div class="modal-box">
             <h3 id="modalTitle" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Tahun Kurikulum</h3>
@@ -836,7 +787,6 @@
             </div>
         </div>
     </div>
->>>>>>> 0c69c4363d99afcb37cb8321017b25a0bdd182b0
 
     <div id="modalRumpun" class="modal-overlay">
         <div class="modal-box">
@@ -989,7 +939,11 @@
 
     // 2. Variabel API otomatis menyesuaikan Base URL di atas
     const PRODI = 'ti'; 
+<<<<<<< HEAD
     const API_BASE = "https://reynolds-martial-guild-professional.trycloudflare.com/webhook"; // Ganti dengan link yang nyala
+=======
+    const API_BASE = "https://hopkins-wise-breakdown-promptly.trycloudflare.com/webhook";
+>>>>>>> bead4882ad1bc69d707f0bd5773b402ba10a3947
     const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_INSERT = `${API_BASE}/admin-insert-master`;

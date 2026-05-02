@@ -23,13 +23,20 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
         /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
+      /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
         body { 
-            animation: transitionIn 0.4s ease-in-out; 
+            animation: transitionIn 0.3s ease-in-out; 
         }
         
         @keyframes transitionIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(8px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
         }
         
         /* GAYA SIDEBAR */

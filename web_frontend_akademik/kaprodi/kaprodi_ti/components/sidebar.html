@@ -14,37 +14,32 @@
             <div class="menu-category">MAIN</div>
             <div class="nav-item" id="nav-dashboard" onclick="window.location.href='admin_config.html'"><i class="fas fa-home"></i> Home</div>
             <div class="nav-item" id="nav-mk" onclick="window.location.href='mk.html'"><i class="fas fa-book"></i> Mata Kuliah</div>
-            <div class="nav-item" onclick="window.location.href='cpl.html'"><i class="fas fa-graduation-cap"></i> CPL</div>
+            <div class="nav-item" id="nav-cpl" onclick="window.location.href='cpl.html'"><i class="fas fa-graduation-cap"></i> CPL</div>
+            <div class="nav-item" id="nav-cpmk" onclick="window.location.href='cpmk.html'"><i class="fas fa-file-alt"></i> CPMK</div>
+            
                 
-            <div class="nav-item" onclick="toggleDropdown('submenu-master', 'chevron-master')" style="justify-content: space-between;">
-                <div style="display: flex; gap: 16px; align-items: center;">
-                    <i class="fas fa-database"></i> Master Data
-                </div>
-                <i class="fas fa-chevron-down" id="chevron-master" style="font-size: 0.8rem; width: auto; transition: transform 0.3s;"></i>
-            </div>
-            <div id="submenu-master" style="display: none; flex-direction: column; margin-top: 2px;">
-                <div class="nav-item" id="nav-tahun" onclick="switchTab('tahun')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Tahun Kurikulum
-                </div>
-                <div class="nav-item" id="nav-rumpun" onclick="switchTab('rumpun')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Rumpun Mata Kuliah
-                </div>
-                <div class="nav-item" id="nav-jenis-cpl" onclick="switchTab('jenis-cpl')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Jenis CPL
-                </div>
-                <div class="nav-item" id="nav-mahasiswa" onclick="switchTab('mahasiswa')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Mahasiswa
-                </div>
-                <div class="nav-item" id="nav-dosen" onclick="switchTab('dosen')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Dosen
-                </div>
-                <div class="nav-item" id="nav-mengajar" onclick="switchTab('mengajar')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Mengajar
-                </div>
-                <div class="nav-item" id="nav-skripsi" onclick="switchTab('skripsi')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Skripsi
-                </div>
-            </div>
+            <!-- Menu Utama Dropdown -->
+        <div class="nav-item" onclick="toggleDropdown('menu-master', 'chevron-master')">
+            <i class="fas fa-database"></i> Master Data 
+            <i id="chevron-master" class="fas fa-chevron-down" style="margin-left: auto; transition: 0.3s;"></i>
+        </div>
+        
+        <!-- Sub-menu (Pastikan ID-nya sesuai agar bisa kita nyalakan warnanya) -->
+       <!-- Sub-menu Master Data (Sudah Lengkap) -->
+        <div id="menu-master" style="display: none; flex-direction: column; padding-left: 20px; margin-top: 4px;">
+            <div class="nav-item" id="nav-tahun" onclick="window.location.href='master_tahun.html'"><i class="fas fa-calendar-alt"></i> Tahun Kurikulum</div>
+            <div class="nav-item" id="nav-rumpun" onclick="window.location.href='master_rumpun.html'"><i class="fas fa-layer-group"></i> Rumpun MK</div>
+            
+            <!-- Tambahan Menu Baru -->
+            <div class="nav-item" id="nav-mengajar" onclick="window.location.href='master_mengajar.html'"><i class="fas fa-chalkboard"></i> Mengajar</div>
+            <div class="nav-item" id="nav-jenis-cpl" onclick="window.location.href='master_jenis_cpl.html'"><i class="fas fa-tags"></i> Jenis CPL</div>
+            
+            <div class="nav-item" id="nav-mhs" onclick="window.location.href='master_mahasiswa.html'"><i class="fas fa-users"></i> Mahasiswa</div>
+            <div class="nav-item" id="nav-dsn" onclick="window.location.href='master_dosen.html'"><i class="fas fa-chalkboard-teacher"></i> Dosen</div>
+            
+            <!-- Tambahan Menu Skripsi -->
+            <div class="nav-item" id="nav-skripsi" onclick="window.location.href='master_skripsi.html'"><i class="fas fa-book-reader"></i> Skripsi</div>
+        </div>
 
             <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')" style="justify-content: space-between;">
                 <div style="display: flex; gap: 16px; align-items: center;">

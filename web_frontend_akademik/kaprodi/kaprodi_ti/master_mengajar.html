@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Mengajar - Sistem OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --primary-red: #8b0000; 
+            --bg-main: #ffffff; 
+            --text-dark: #111827;
+            --border-light: #e5e7eb;
+            --btn-dark: #161923;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            display: flex; background: var(--bg-main); height: 100vh; overflow: hidden;
+            animation: transitionIn 0.3s ease-in-out; 
+        }
+        
+        @keyframes transitionIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .sidebar { 
+            width: 280px; 
+            background: var(--sidebar-bg); 
+            color: var(--sidebar-text); 
+            display: flex; 
+            flex-direction: column; 
+            padding: 24px 16px; 
+            min-height: 100vh;
+        }
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .sidebar-profile-info { display: flex; flex-direction: column; }
+        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
+        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
+        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .nav-item.logout { color: #f87171; }
+        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+
+        /* CSS untuk Dropdown Master Data di Sidebar */
+        #menu-master .nav-item { padding-left: 20px; font-size: 0.75rem; }
+
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
+
+        /* Header Styling */
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid var(--border-light); padding-bottom: 20px; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: #1f2937; }
+        .header-title span { color: var(--primary-red); }
+        .badge-prodi { background: var(--primary-red); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; }
+
+        /* Action Buttons Area */
+        .action-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .action-left h3 { font-size: 1.25rem; font-weight: 700; color: #111827; }
+        .action-left p { color: #6b7280; font-size: 0.9rem; margin-top: 4px; }
+        .btn-group { display: flex; gap: 10px; }
+
+        .btn { padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; display: flex; align-items: center; gap: 8px; color: white; transition: 0.2s; }
+        .btn-tambah { background: #8b0000; }
+        .btn-import { background: #111827; }
+        .btn-excel { background: #8b0000; }
+        .btn-refresh { background: #111827; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Control Area (Search & Show) */
+        .control-area { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 0.85rem; color: #374151; }
+        .search-box input { padding: 8px 12px; border: 1px solid var(--border-light); border-radius: 6px; width: 250px; margin-left: 10px; }
+
+        /* Table Styling */
+        table { width: 100%; border-collapse: collapse; border: 1px solid var(--border-light); font-size: 0.85rem; }
+        th { background: #f9fafb; padding: 15px 12px; text-align: left; font-weight: 700; color: #374151; border-bottom: 2px solid var(--border-light); }
+        td { padding: 12px; border-bottom: 1px solid var(--border-light); vertical-align: middle; }
+        
+        .mk-code { color: #9ca3af; font-size: 0.75rem; font-weight: 500; display: block; }
+        .mk-name { color: #111827; font-weight: 700; font-size: 0.9rem; }
+
+        /* Dropdown inside table */
+        select { padding: 6px 10px; border: 1px solid var(--border-light); border-radius: 6px; width: 100%; min-width: 80px; font-size: 0.85rem; background-color: white; color: #374151; }
+        
+        .link-dosen { color: #2563eb; text-decoration: none; font-weight: 600; }
+        .link-dosen:hover { text-decoration: underline; }
+
+        .btn-opsi { padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; border: none; width: 100%; margin-bottom: 4px; cursor: pointer; color: white; }
+        .btn-detail { background: #111827; }
+        .btn-hapus { background: #ef4444; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header-container">
+            <div class="header-title-area">
+                <div class="header-subtitle">KELOLA KURIKULUM</div>
+                <h1 class="header-title">DATA <span>MENGAJAR</span></h1>
+            </div>
+            <div class="badge-prodi">Teknik Informatika</div>
+        </div>
+
+        <!-- Action Area -->
+        <div class="action-area">
+            <div class="action-left">
+                <h3>Data Mengajar</h3>
+                <p>Kelola plotting dosen mengajar per mata kuliah dan kelas.</p>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-tambah"><i class="fas fa-plus"></i> Tambah</button>
+                <button class="btn btn-import"><i class="fas fa-download"></i> Import dari pusat</button>
+                <button class="btn btn-excel"><i class="fas fa-file-excel"></i> Upload Excel</button>
+                <button class="btn btn-refresh" onclick="loadData('mengajar')"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+        </div>
+
+        <!-- Control Area -->
+        <div class="control-area">
+            <div>Show 
+                <select style="width: auto; display: inline-block;">
+                    <option>10</option>
+                    <option>25</option>
+                </select> entries
+            </div>
+            <div class="search-box">
+                Search: <input type="text" placeholder="Ketik pencarian...">
+            </div>
+        </div>
+
+        <!-- Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th width="50">#</th>
+                    <th>MATA KULIAH</th>
+                    <th width="120">TAHUN</th>
+                    <th width="120">KURIKULUM</th>
+                    <th width="100">SEMESTER</th>
+                    <th width="100">ANGKATAN</th>
+                    <th>DOSEN KOORDINATOR DAN ANGGOTA</th>
+                    <th width="100">KELAS</th>
+                    <th width="100">OPSI</th>
+                </tr>
+            </thead>
+            <tbody id="bodyMengajar">
+                <!-- Contoh baris seperti di screenshot -->
+                <tr>
+                    <td style="text-align: center;">1</td>
+                    <td>
+                        <span class="mk-code">2023W276</span>
+                        <span class="mk-name">AI Programming</span>
+                    </td>
+                    <td>
+                        <select><option>Tahun?</option></select>
+                    </td>
+                    <td>
+                        <select><option>2025</option></select>
+                    </td>
+                    <td>
+                        <select><option>6</option></select>
+                    </td>
+                    <td>
+                        <select><option>2025</option></select>
+                    </td>
+                    <td>
+                        <a href="#" class="link-dosen">Belum Dinamai</a>
+                    </td>
+                    <td>
+                        <span style="color: #9ca3af;">Kelas?</span>
+                    </td>
+                    <td>
+                        <button class="btn-opsi btn-detail">Detail</button>
+                        <button class="btn-opsi btn-hapus">Hapus</button>
+                    </td>
+                </tr>
+                <!-- Tambahkan baris dinamis di sini -->
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div id="pagination-mengajar" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+    </div>
+
+<script>
+    // Logic Sidebar & Auth tetap sama
+    const userLogin = localStorage.getItem("user_login");
+    const PRODI = 'ti';
+
+    async function loadSidebar() {
+        try {
+            const response = await fetch('components/sidebar.html');
+            const html = await response.text();
+            document.getElementById('sidebar-container').outerHTML = html;
+            
+            // Set active menu khusus untuk dropdown Mengajar
+            setTimeout(() => {
+                document.getElementById('nav-mengajar').classList.add('active');
+                const menuMaster = document.getElementById('menu-master');
+                const chevronMaster = document.getElementById('chevron-master');
+                if(menuMaster) {
+                    menuMaster.style.display = 'flex';
+                    chevronMaster.style.transform = 'rotate(180deg)';
+                }
+                document.getElementById("adminName").innerText = userLogin;
+            }, 100);
+        } catch (e) { console.error(e); }
+    }
+
+    // Fungsi Load Data (Nanti hubungkan dengan n8n Anda)
+    async function loadData(tipe) {
+        console.log("Memuat data plotting mengajar...");
+        // Logika fetch data plotting Anda di sini
+    }
+
+    window.onload = () => {
+        loadSidebar();
+        loadData('mengajar');
+    }
+</script>
+</body>
+</html>
