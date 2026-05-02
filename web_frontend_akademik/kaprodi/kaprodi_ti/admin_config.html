@@ -6,7 +6,8 @@
     <title>Admin Panel TI - Sistem OBE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         /* --- CSS STYLING (Tema Figma Dark Navy & Red) --- */
         :root { 
@@ -133,820 +134,771 @@
     </style>
 </head>
 <body>
+    <div id="sidebar-container"></div>
 
-    <div class="sidebar">
-        <div class="sidebar-profile">
-            <img src="https://ui-avatars.com/api/?name=Admin&background=8b0000&color=fff&bold=true" id="sidebarAvatar" alt="User Avatar">
-            <div class="sidebar-profile-info">
-                <span class="name" id="adminName">Loading...</span>
-                <span class="role">FAKULTAS TEKNIK INFORMATIKA</span>
-            </div>
-        </div>
+        <div class="main-content">
+            <div id="navbar-container"></div>
+                <div class="header-container">
+                    <div class="header-title-area">
+                        <div class="header-subtitle" id="pageSubtitle">KELOLA KURIKULUM</div>
+                        <h1 class="header-title" id="pageTitle">PANEL KENDALI <span>ADMIN</span></h1>
+                    </div>
+                    <div class="badge-prodi">Teknik Informatika</div>
+                </div>
 
-        <div class="sidebar-divider"></div>
+                <div id="content-dashboard" class="section active">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
+                        <div style="background: var(--border-dark); color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                            <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #9ca3af;">Total Mahasiswa Dinilai</h4>
+                            <h2 id="totMhs" style="margin: 0; font-size: 2.2rem;">0</h2>
+                        </div>
+                        <div style="background: #10b981; color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                            <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #d1fae5;">Mahasiswa Lulus (A - C)</h4>
+                            <h2 id="totLulus" style="margin: 0; font-size: 2.2rem;">0</h2>
+                        </div>
+                        <div style="background: #ef4444; color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                            <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #fee2e2;">Tidak Lulus (D - E)</h4>
+                            <h2 id="totGagal" style="margin: 0; font-size: 2.2rem;">0</h2>
+                        </div>
+                    </div>
 
-        <div class="nav-menu">
-            <div class="menu-category">MAIN</div>
-            <div class="nav-item active" id="nav-dashboard" onclick="window.location.href='admin_config.html'"><i class="fas fa-home"></i> Home</div>
-            <div class="nav-item" id="nav-mk" onclick="window.location.href='mk.html'"><i class="fas fa-book"></i> Mata Kuliah</div>
-            <div class="nav-item" id="nav-cpl" onclick="window.location.href='cpl.html'"><i class="fas fa-graduation-cap"></i> CPL</div>
-            <div class="nav-item" id="nav-cpmk" onclick="window.location.href='cpmk.html'"><i class="fas fa-file-alt"></i> CPMK</div>
-            
-            <div class="nav-item" onclick="toggleDropdown('submenu-master', 'chevron-master')" style="justify-content: space-between;">
-                <div style="display: flex; gap: 16px; align-items: center;">
-                    <i class="fas fa-database"></i> Master Data
-                </div>
-                <i class="fas fa-chevron-down" id="chevron-master" style="font-size: 0.8rem; width: auto; transition: transform 0.3s;"></i>
-            </div>
-            <div id="submenu-master" style="display: none; flex-direction: column; margin-top: 2px;">
-                <div class="nav-item" id="nav-tahun" onclick="switchTab('tahun')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Tahun Kurikulum
-                </div>
-                <div class="nav-item" id="nav-rumpun" onclick="switchTab('rumpun')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Rumpun Mata Kuliah
-                </div>
-                <div class="nav-item" id="nav-jenis-cpl" onclick="switchTab('jenis-cpl')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Jenis CPL
-                </div>
-                <div class="nav-item" id="nav-mahasiswa" onclick="switchTab('mahasiswa')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Mahasiswa
-                </div>
-                <div class="nav-item" id="nav-dosen" onclick="switchTab('dosen')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Dosen
-                </div>
-                <div class="nav-item" id="nav-mengajar" onclick="switchTab('mengajar')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Mengajar
-                </div>
-                <div class="nav-item" id="nav-skripsi" onclick="switchTab('skripsi')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Skripsi
-                </div>
-            </div>
+                    <!-- Area Kanvas Grafik -->
+                    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; max-width: 100%;">
+                        <div class="figma-card" style="width: 100%;">
+                            <h3>Distribusi Nilai (Grade) Prodi</h3>
+                            <div style="position: relative; height: 300px; width: 100%; display: flex; justify-content: center;">
+                                <canvas id="gradeChart"></canvas>
+                            </div>
+                        </div>
 
-            <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')" style="justify-content: space-between;">
-                <div style="display: flex; gap: 16px; align-items: center;">
-                    <i class="fas fa-sitemap"></i> Mapping
+                        <div class="figma-card" style="width: 100%;">
+                            <h3>Rata-rata Pencapaian CPL</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="cplChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-grid">
+                        <div class="figma-card">
+                            <h3>Pintasan Laporan Kelas</h3>
+                            <p>Lihat analisis transkrip nilai dan ketercapaian CPL dan CPMK mahasiswa secara spesifik per mata kuliah</p>
+                            <button class="btn-dark" onclick="window.location.href='../../Kaprodi/laporan.html'">
+                                <i class="fas fa-external-link-alt"></i> Open
+                            </button>
+                        </div>
+                        
+                        <div class="figma-card">
+                            <h3>Portofolio CPL Global</h3>
+                            <p>Cari dan lihat rekapitulasi persentase penguasaan CPL mahasiswa Teknik Informatika dari total seluruh mata kuliah</p>
+                            <button class="btn-dark" onclick="window.location.href='portofolio_admin.html'">
+                                <i class="fas fa-external-link-alt"></i> Open
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <i class="fas fa-chevron-down" id="chevron-mapping" style="font-size: 0.8rem; width: auto; transition: transform 0.3s;"></i>
-            </div>
-            
-            <div id="submenu-mapping" style="display: none; flex-direction: column; margin-top: 2px;">
-                <div class="nav-item" id="nav-mapping" onclick="switchTab('mapping')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Mapping CPL - CPMK
-                </div>
-                <div class="nav-item" id="nav-mapping-mk" onclick="switchTab('mapping-mk')" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                    Mapping MK - CPMK
-                </div>
-            </div>
-            <div class="nav-item" onclick="switchTab('krs')">
-                <i class="fas fa-file-excel"></i> Import KRS Mahasiswa
-            </div>
 
-            <div class="menu-category" style="margin-top: 20px;">AKSES DOSEN</div>
-            <div class="nav-item" onclick="window.location.href='../../dosen/input_nilai.html'" style="background: #10b981; color: white;">
-                <i class="fas fa-chalkboard-teacher"></i> Masuk Mode Input Nilai
-            </div>
-
-            <div class="menu-category" style="margin-top: 30px;">SETTINGS</div>
-            <div class="nav-item" onclick="switchTab('reset')"><i class="fas fa-lock"></i> Edit Password</div>
-            <div class="nav-item"><i class="fas fa-pen"></i> Edit Halaman Dosen</div>
-        </div>
-
-        <div class="nav-bottom">
-            <div class="nav-item"><i class="far fa-question-circle"></i> Help</div>
-            <div class="nav-item logout" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Logout Account
-            </div>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <div class="header-container">
-            <div class="header-title-area">
-                <div class="header-subtitle" id="pageSubtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title" id="pageTitle">PANEL KENDALI <span>ADMIN</span></h1>
-            </div>
-            <div class="badge-prodi">Teknik Informatika</div>
-        </div>
-
-        <div id="content-dashboard" class="section active">
-            <div class="dashboard-grid">
-                <div class="figma-card">
-                    <h3>Pintasan Laporan Kelas</h3>
-                    <p>Lihat analisis transkrip nilai dan ketercapaian CPL dan CPMK mahasiswa secara spesifik per mata kuliah</p>
-                    <button class="btn-dark" onclick="window.location.href='../../Kaprodi/laporan.html'">
-                        <i class="fas fa-external-link-alt"></i> Open
-                    </button>
-                </div>
-                
-                <div class="figma-card">
-                    <h3>Portofolio CPL Global</h3>
-                    <p>Cari dan lihat rekapitulasi persentase penguasaan CPL mahasiswa Teknik Informatika dari total seluruh mata kuliah</p>
-                    <button class="btn-dark" onclick="window.location.href='portofolio_admin.html'">
-                        <i class="fas fa-external-link-alt"></i> Open
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="content-tahun" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Tahun Kurikulum</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data master acuan tahun kurikulum untuk pemetaan OBE.</p>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn-primary-red" onclick="bukaModalTahun()"><i class="fas fa-plus"></i> Tambah Tahun</button>
-                    <button class="btn-dark" onclick="loadDataTahun()"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%" style="text-align: center;">No</th>
-                        <th width="15%">Kode</th>
-                        <th>Nama (Tahun)</th>
-                        <th style="text-align: center;">Prosentase Minimal Lulus</th>
-                        <th style="text-align: center;">Status</th>
-                        <th width="20%" style="text-align: center;">Opsi</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyTahunKurikulum">
-                    <tr>
-                        <td style="text-align: center;">1</td>
-                        <td><strong>K-21</strong></td>
-                        <td>2021</td>
-                        <td style="text-align: center; font-weight: 600;">41%</td>
-                        <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
-                        <td style="text-align: center;">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: center;">2</td>
-                        <td><strong>K-25</strong></td>
-                        <td>2025</td>
-                        <td style="text-align: center; font-weight: 600;">41%</td>
-                        <td style="text-align: center;"><span class="badge-status status-nonaktif">Nonaktif</span></td>
-                        <td style="text-align: center;">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div id="content-rumpun" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Rumpun Mata Kuliah</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola pengelompokkan keahlian dosen dan mata kuliah.</p>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn-primary-red" onclick="bukaModalRumpun()"><i class="fas fa-plus"></i> Tambah</button>
-                    <button class="btn-dark" onclick="loadDataRumpun()"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%" style="text-align: center;">#</th>
-                        <th width="35%">Nama</th>
-                        <th>Koordinator</th>
-                        <th width="15%" style="text-align: center;">NIK</th>
-                        <th width="20%" style="text-align: center;">Opsi</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyRumpunMK">
-                    <tr>
-                        <td style="text-align: center;">1</td>
-                        <td style="font-weight: 600;">Project Management</td>
-                        <td>Atik Nurmasani, M.Kom</td>
-                        <td style="text-align: center;">190302354</td>
-                        <td style="text-align: center;">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: center;">2</td>
-                        <td style="font-weight: 600;">User Experience Design</td>
-                        <td>Eli Pujiastuti, M.Kom</td>
-                        <td style="text-align: center;">190302227</td>
-                        <td style="text-align: center;">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div id="content-jenis-cpl" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Jenis CPL SN DIKTI</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola kategori Capaian Pembelajaran Lulusan.</p>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn-primary-red" onclick="bukaModalJenisCPL()"><i class="fas fa-plus"></i> Tambah</button>
-                    <button class="btn-dark" onclick="loadDataJenisCPL()"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%" style="text-align: center;">#</th>
-                        <th>Jenis</th>
-                        <th width="20%" style="text-align: center;">Opsi</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyJenisCPL">
-                    <tr>
-                        <td style="text-align: center;">1</td>
-                        <td style="font-weight: 600;">SIKAP (S)</td>
-                        <td style="text-align: center;">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: center;">2</td>
-                        <td style="font-weight: 600;">KETERAMPILAN UMUM (KU)</td>
-                        <td style="text-align: center;">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: center;">3</td>
-                        <td style="font-weight: 600;">KETERAMPILAN KHUSUS (KK)</td>
-                        <td style="text-align: center;">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: center;">4</td>
-                        <td style="font-weight: 600;">PENGETAHUAN (P)</td>
-                        <td style="text-align: center;">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div id="content-mahasiswa" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mahasiswa</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk mahasiswa Teknik Informatika.</p>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn-primary-red" onclick="bukaModalMahasiswa()"><i class="fas fa-plus"></i> Tambah</button>
-                    <button class="btn-dark" onclick="loadData('mahasiswa')"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                    Show 
-                    <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
-                        <option>5</option>
-                        <option selected>10</option>
-                        <option>25</option>
-                    </select> 
-                    entries
-                </div>
-                
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                    <input type="text" id="searchMahasiswa" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#d1d5db'">
-                </div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%" style="text-align: center;">No</th>
-                        <th width="15%">NIM</th>
-                        <th>Nama Mahasiswa</th>
-                        <th width="15%" style="text-align: center;">Angkatan</th>
-                        <th width="15%" style="text-align: center;">Status</th>
-                        <th width="20%" style="text-align: center;">Opsi</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyMahasiswa">
-                    <tr>
-                        <td style="text-align: center;">1</td>
-                        <td><strong>223220042</strong></td>
-                        <td style="font-weight: 600;">Georgius Krisna</td>
-                        <td style="text-align: center;">2022</td>
-                        <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
-                        <td style="text-align: center;">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div id="pagination-mahasiswa" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-        </div>
-        <div id="content-dosen" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Dosen</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk dosen pengajar.</p>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn-primary-red" onclick="alert('Fitur Upload Excel sedang disiapkan!')" style="background: var(--primary-red);"><i class="fas fa-file-excel"></i> Upload Excel</button>
-                    <button class="btn-dark" onclick="loadData('dosen')"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                    Show 
-                    <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
-                        <option>5</option>
-                        <option selected>10</option>
-                        <option>25</option>
-                    </select> 
-                    entries
-                </div>
-                
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                    <input type="text" id="searchDosen" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#d1d5db'">
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%" style="text-align: center;">#</th>
-                        <th width="5%" style="text-align: center;">ID</th>
-                        <th width="25%">Nama</th>
-                        <th width="20%">Homebase</th>
-                        <th width="15%">NIDN</th>
-                        <th width="20%">Email</th>
-                        <th width="10%" style="text-align: center;">Opsi</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyDosen">
-                    <tr>
-                        <td style="text-align: center;">1</td>
-                        <td style="text-align: center;">256</td>
-                        <td style="font-weight: 600;">Prof. Dr. Amba, M.M.</td>
-                        <td>Doktor Informatika</td>
-                        <td>190302001</td>
-                        <td>amba@tukam.ac.id</td>
-                        <td style="text-align: center;">
-                            <button class="btn-action" style="background: white; color: var(--primary-red); border: 1.5px solid var(--primary-red); font-weight: 700;" onclick="alert('Masuk ke mode Rasuk')">Rasuk</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: center;">2</td>
-                        <td style="text-align: center;">272</td>
-                        <td style="font-weight: 600;">Dr. Drs. fuad, M.M.</td>
-                        <td>-</td>
-                        <td>190302004</td>
-                        <td>fuad@kebun.ac.id</td>
-                        <td style="text-align: center;">
-                            <button class="btn-action" style="background: white; color: var(--primary-red); border: 1.5px solid var(--primary-red); font-weight: 700;" onclick="alert('Masuk ke mode Rasuk')">Rasuk</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div id="pagination-dosen" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-        </div>
-        <div id="content-mengajar" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Data Mengajar</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola plotting dosen mengajar per mata kuliah dan kelas.</p>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-primary-red" onclick="bukaModalMengajar()">Tambah</button>
-                    <button class="btn-dark" onclick="alert('Fitur Import dari pusat sedang disiapkan!')">Import dari pusat</button>
-                    <button class="btn-primary-red" onclick="alert('Fitur Upload Excel sedang disiapkan!')">Upload Excel</button>
-                    <button class="btn-dark" onclick="loadData('mengajar')"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                    Show 
-                    <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
-                        <option>5</option>
-                        <option selected>10</option>
-                        <option>25</option>
-                    </select> 
-                    entries
-                </div>
-                
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                    <input type="text" id="searchMengajar" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#d1d5db'">
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th width="3%" style="text-align: center;">#</th>
-                        <th width="18%">Mata Kuliah</th>
-                        <th width="10%" style="text-align: center;">Tahun</th>
-                        <th width="10%" style="text-align: center;">Kurikulum</th>
-                        <th width="8%" style="text-align: center;">Semester</th>
-                        <th width="10%" style="text-align: center;">Angkatan</th>
-                        <th width="20%">Dosen Koordinator dan Anggota</th>
-                        <th width="15%">Kelas</th>
-                        <th width="6%" style="text-align: center;">Opsi</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyMengajar">
-                    <tr>
-                        <td style="text-align: center; vertical-align: top; padding-top: 18px;">1</td>
-                        <td style="vertical-align: top; padding-top: 18px;">
-                            <span style="display:block; color:#6b7280; font-size:0.8rem; margin-bottom: 4px;">SI038</span>
-                            <strong style="color: var(--text-dark); font-size: 0.9rem;">MATEMATIKA DISKRET</strong>
-                        </td>
-                        <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025/2026</option></select></td>
-                        <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025</option></select></td>
-                        <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>1</option></select></td>
-                        <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025</option></select></td>
-                        <td style="vertical-align: top; font-size: 0.85rem; color: #4338ca; padding-top: 18px; line-height: 1.6;">
-                            Sri Mulyatun, Dra., M.M<br>
-                            Dina Maulina, S.Kom., M.Kom.
-                        </td>
-                        <td style="vertical-align: top; font-size: 0.8rem; color: #6b7280; padding-top: 18px; line-height: 1.6;">
-                            25S1SI01-Matemat(SI038)<br>
-                            25S1SI02-Matemat(SI038)<br>
-                            25S1SI03-Matemat(SI038)
-                        </td>
-                        <td style="text-align: center; vertical-align: top; padding-top: 18px;">
-                            <button class="btn-action" style="background: var(--border-dark); color: white; width: 100%; justify-content: center; margin-bottom: 6px;">Detail</button>
-                            <button class="btn-action btn-delete" style="width: 100%; justify-content: center;">Hapus</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div id="pagination-mengajar" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-        </div>
-        <div id="content-skripsi" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Skripsi</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data tugas akhir mahasiswa dan dosen pembimbing.</p>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn-dark" style="background: #6b21a8; border-color: #6b21a8;" onclick="alert('Fitur Import sedang disiapkan!')">Import Dari Pusat</button>
-                    <button class="btn-dark" onclick="loadData('skripsi')"><i class="fas fa-sync-alt"></i> Refresh</button>
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                    Show 
-                    <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer;">
-                        <option selected>10</option>
-                        <option>25</option>
-                    </select> entries
-                </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                    <input type="text" id="searchSkripsi" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none;">
-                </div>
-            </div>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th width="8%" style="text-align: center;">Kode MK</th>
-                        <th width="45%">Mahasiswa & Dosen</th>
-                        <th width="15%">Pendadaran</th>
-                        <th width="12%">Nilai</th>
-                        <th width="10%" style="text-align: center;">Opsi</th>
-                    </tr>
-                </thead>
-                <tbody id="bodySkripsi">
+                <div id="content-tahun" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Tahun Kurikulum</h3>
+                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data master acuan tahun kurikulum untuk pemetaan OBE.</p>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn-primary-red" onclick="bukaModalTahun()"><i class="fas fa-plus"></i> Tambah Tahun</button>
+                            <button class="btn-dark" onclick="loadDataTahun()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="5%" style="text-align: center;">No</th>
+                                <th width="15%">Kode</th>
+                                <th>Nama (Tahun)</th>
+                                <th style="text-align: center;">Prosentase Minimal Lulus</th>
+                                <th style="text-align: center;">Status</th>
+                                <th width="20%" style="text-align: center;">Opsi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyTahunKurikulum">
+                        <tr>
+                            <td style="text-align: center;">1</td>
+                            <td><strong>K-21</strong></td>
+                            <td>2021</td>
+                            <td style="text-align: center; font-weight: 600;">41%</td>
+                            <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
+                            <td style="text-align: center;">
+                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
+                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">2</td>
+                            <td><strong>K-25</strong></td>
+                            <td>2025</td>
+                            <td style="text-align: center; font-weight: 600;">41%</td>
+                            <td style="text-align: center;"><span class="badge-status status-nonaktif">Nonaktif</span></td>
+                            <td style="text-align: center;">
+                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
+                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                            </td>
+                        </tr>
                     </tbody>
-            </table>
-            <div id="pagination-skripsi" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-        </div>
-
-        <div id="content-mapping" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Pemetaan CPL ke CPMK</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
+                    </table>
                 </div>
-                <button class="btn-dark" onclick="loadMappingData()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-            <table>
-                <thead><tr><th width="15%">Kode CPMK</th><th>Deskripsi CPMK</th><th width="25%">Referensi CPL TI</th><th width="10%" style="text-align: center;">Aksi</th></tr></thead>
-                <tbody id="bodyMapping"></tbody>
-            </table>
-            <div id="pagination-mapping" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-        </div>
 
-        <div id="content-mapping-mk" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800;">Mapping Mata Kuliah ke CPMK</h3>
-                    <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Menghubungkan antara Mata Kuliah dan CPMK sesuai kebutuhan</p>
-                </div>
-                <button class="btn-dark" onclick="simpanMappingMK()"><i class="fas fa-save"></i> Simpan Mapping</button>
-            </div>
-
-            <div class="custom-select-wrapper">
-                <select id="pilihMKMapping" class="custom-select-figma" onchange="loadMappingUI()">
-                    <option value="">Pilih Mata Kuliah</option>
-                </select>
-                <i class="fas fa-chevron-down select-icon"></i>
-            </div>
-
-            <div class="mapping-content-area">
-                <div id="mappingEmptyState" style="display: flex; flex-direction: column; justify-content: center; height: 100%; flex: 1; margin-top: 40px; max-width: 500px; margin-left: auto; margin-right: auto;">
-                    <h3 style="font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 30px;">Panduan Pemetaan Mata Kuliah</h3>
-                    <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;">
-                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #111827; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+                <!-- ... (Biarkan section lainnya seperti rumpun, cpl, mahasiswa, skripsi tetap ada di sini) ... -->
+                <div id="content-rumpun" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <div>
-                            <h4 style="margin: 0 0 4px 0; font-size: 1rem;">Pilih Mata Kuliah</h4>
-                            <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Gunakan kotak dropdown di atas untuk memilih mata kuliah.</p>
+                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Rumpun Mata Kuliah</h3>
+                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola pengelompokkan keahlian dosen dan mata kuliah.</p>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn-primary-red" onclick="bukaModalRumpun()"><i class="fas fa-plus"></i> Tambah</button>
+                            <button class="btn-dark" onclick="loadDataRumpun()"><i class="fas fa-sync-alt"></i> Refresh</button>
                         </div>
                     </div>
-                    <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;">
-                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #8b0000; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="5%" style="text-align: center;">#</th>
+                                <th width="35%">Nama</th>
+                                <th>Koordinator</th>
+                                <th width="15%" style="text-align: center;">NIK</th>
+                                <th width="20%" style="text-align: center;">Opsi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyRumpunMK">
+                            <tr>
+                                <td style="text-align: center;">1</td>
+                                <td style="font-weight: 600;">Project Management</td>
+                                <td>Atik Nurmasani, M.Kom</td>
+                                <td style="text-align: center;">190302354</td>
+                                <td style="text-align: center;">
+                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
+                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">2</td>
+                                <td style="font-weight: 600;">User Experience Design</td>
+                                <td>Eli Pujiastuti, M.Kom</td>
+                                <td style="text-align: center;">190302227</td>
+                                <td style="text-align: center;">
+                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
+                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="content-jenis-cpl" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <div>
-                            <h4 style="margin: 0 0 4px 0; font-size: 1rem;">Centang CPMK</h4>
-                            <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Beri centang pada capaian pembelajaran yang dibebankan.</p>
+                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Jenis CPL SN DIKTI</h3>
+                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola kategori Capaian Pembelajaran Lulusan.</p>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn-primary-red" onclick="bukaModalJenisCPL()"><i class="fas fa-plus"></i> Tambah</button>
+                            <button class="btn-dark" onclick="loadDataJenisCPL()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="5%" style="text-align: center;">#</th>
+                                <th>Jenis</th>
+                                <th width="20%" style="text-align: center;">Opsi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyJenisCPL">
+                            <tr>
+                                <td style="text-align: center;">1</td>
+                                <td style="font-weight: 600;">SIKAP (S)</td>
+                                <td style="text-align: center;">
+                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
+                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">2</td>
+                                <td style="font-weight: 600;">KETERAMPILAN UMUM (KU)</td>
+                                <td style="text-align: center;">
+                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
+                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">3</td>
+                                <td style="font-weight: 600;">KETERAMPILAN KHUSUS (KK)</td>
+                                <td style="text-align: center;">
+                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
+                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">4</td>
+                                <td style="font-weight: 600;">PENGETAHUAN (P)</td>
+                                <td style="text-align: center;">
+                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
+                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="content-mahasiswa" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mahasiswa</h3>
+                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk mahasiswa Teknik Informatika.</p>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn-primary-red" onclick="bukaModalMahasiswa()"><i class="fas fa-plus"></i> Tambah</button>
+                            <button class="btn-dark" onclick="loadData('mahasiswa')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
+                            Show 
+                            <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
+                                <option>5</option>
+                                <option selected>10</option>
+                                <option>25</option>
+                            </select> 
+                            entries
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
+                            <input type="text" id="searchMahasiswa" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#d1d5db'">
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="5%" style="text-align: center;">No</th>
+                                <th width="15%">NIM</th>
+                                <th>Nama Mahasiswa</th>
+                                <th width="15%" style="text-align: center;">Angkatan</th>
+                                <th width="15%" style="text-align: center;">Status</th>
+                                <th width="20%" style="text-align: center;">Opsi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyMahasiswa">
+                            <tr>
+                                <td style="text-align: center;">1</td>
+                                <td><strong>223220042</strong></td>
+                                <td style="font-weight: 600;">Georgius Krisna</td>
+                                <td style="text-align: center;">2022</td>
+                                <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
+                                <td style="text-align: center;">
+                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
+                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="pagination-mahasiswa" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+                </div>
+                <div id="content-dosen" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Dosen</h3>
+                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk dosen pengajar.</p>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn-primary-red" onclick="alert('Fitur Upload Excel sedang disiapkan!')" style="background: var(--primary-red);"><i class="fas fa-file-excel"></i> Upload Excel</button>
+                            <button class="btn-dark" onclick="loadData('dosen')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
+                            Show 
+                            <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
+                                <option>5</option>
+                                <option selected>10</option>
+                                <option>25</option>
+                            </select> 
+                            entries
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
+                            <input type="text" id="searchDosen" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#d1d5db'">
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="5%" style="text-align: center;">#</th>
+                                <th width="5%" style="text-align: center;">ID</th>
+                                <th width="25%">Nama</th>
+                                <th width="20%">Homebase</th>
+                                <th width="15%">NIDN</th>
+                                <th width="20%">Email</th>
+                                <th width="10%" style="text-align: center;">Opsi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyDosen">
+                            <tr>
+                                <td style="text-align: center;">1</td>
+                                <td style="text-align: center;">256</td>
+                                <td style="font-weight: 600;">Prof. Dr. Amba, M.M.</td>
+                                <td>Doktor Informatika</td>
+                                <td>190302001</td>
+                                <td>amba@tukam.ac.id</td>
+                                <td style="text-align: center;">
+                                    <button class="btn-action" style="background: white; color: var(--primary-red); border: 1.5px solid var(--primary-red); font-weight: 700;" onclick="alert('Masuk ke mode Rasuk')">Rasuk</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">2</td>
+                                <td style="text-align: center;">272</td>
+                                <td style="font-weight: 600;">Dr. Drs. fuad, M.M.</td>
+                                <td>-</td>
+                                <td>190302004</td>
+                                <td>fuad@kebun.ac.id</td>
+                                <td style="text-align: center;">
+                                    <button class="btn-action" style="background: white; color: var(--primary-red); border: 1.5px solid var(--primary-red); font-weight: 700;" onclick="alert('Masuk ke mode Rasuk')">Rasuk</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="pagination-dosen" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+                </div>
+                <div id="content-mengajar" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Data Mengajar</h3>
+                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola plotting dosen mengajar per mata kuliah dan kelas.</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-primary-red" onclick="bukaModalMengajar()">Tambah</button>
+                            <button class="btn-dark" onclick="alert('Fitur Import dari pusat sedang disiapkan!')">Import dari pusat</button>
+                            <button class="btn-primary-red" onclick="alert('Fitur Upload Excel sedang disiapkan!')">Upload Excel</button>
+                            <button class="btn-dark" onclick="loadData('mengajar')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
+                            Show 
+                            <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
+                                <option>5</option>
+                                <option selected>10</option>
+                                <option>25</option>
+                            </select> 
+                            entries
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
+                            <input type="text" id="searchMengajar" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#d1d5db'">
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="3%" style="text-align: center;">#</th>
+                                <th width="18%">Mata Kuliah</th>
+                                <th width="10%" style="text-align: center;">Tahun</th>
+                                <th width="10%" style="text-align: center;">Kurikulum</th>
+                                <th width="8%" style="text-align: center;">Semester</th>
+                                <th width="10%" style="text-align: center;">Angkatan</th>
+                                <th width="20%">Dosen Koordinator dan Anggota</th>
+                                <th width="15%">Kelas</th>
+                                <th width="6%" style="text-align: center;">Opsi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyMengajar">
+                            <tr>
+                                <td style="text-align: center; vertical-align: top; padding-top: 18px;">1</td>
+                                <td style="vertical-align: top; padding-top: 18px;">
+                                    <span style="display:block; color:#6b7280; font-size:0.8rem; margin-bottom: 4px;">SI038</span>
+                                    <strong style="color: var(--text-dark); font-size: 0.9rem;">MATEMATIKA DISKRET</strong>
+                                </td>
+                                <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025/2026</option></select></td>
+                                <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025</option></select></td>
+                                <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>1</option></select></td>
+                                <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025</option></select></td>
+                                <td style="vertical-align: top; font-size: 0.85rem; color: #4338ca; padding-top: 18px; line-height: 1.6;">
+                                    Sri Mulyatun, Dra., M.M<br>
+                                    Dina Maulina, S.Kom., M.Kom.
+                                </td>
+                                <td style="vertical-align: top; font-size: 0.8rem; color: #6b7280; padding-top: 18px; line-height: 1.6;">
+                                    25S1SI01-Matemat(SI038)<br>
+                                    25S1SI02-Matemat(SI038)<br>
+                                    25S1SI03-Matemat(SI038)
+                                </td>
+                                <td style="text-align: center; vertical-align: top; padding-top: 18px;">
+                                    <button class="btn-action" style="background: var(--border-dark); color: white; width: 100%; justify-content: center; margin-bottom: 6px;">Detail</button>
+                                    <button class="btn-action btn-delete" style="width: 100%; justify-content: center;">Hapus</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="pagination-mengajar" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+                </div>
+                <div id="content-skripsi" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Skripsi</h3>
+                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data tugas akhir mahasiswa dan dosen pembimbing.</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-dark" style="background: #6b21a8; border-color: #6b21a8;" onclick="alert('Fitur Import sedang disiapkan!')">Import Dari Pusat</button>
+                            <button class="btn-dark" onclick="loadData('skripsi')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
+                            Show 
+                            <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer;">
+                                <option selected>10</option>
+                                <option>25</option>
+                            </select> entries
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
+                            <input type="text" id="searchSkripsi" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none;">
+                        </div>
+                    </div>
+                    
+                    <table>
+                        <thead>
+                            <tr>
+                                <th width="8%" style="text-align: center;">Kode MK</th>
+                                <th width="45%">Mahasiswa & Dosen</th>
+                                <th width="15%">Pendadaran</th>
+                                <th width="12%">Nilai</th>
+                                <th width="10%" style="text-align: center;">Opsi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodySkripsi">
+                            </tbody>
+                    </table>
+                    <div id="pagination-skripsi" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+                </div>
+
+                <div id="content-mapping" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Pemetaan CPL ke CPMK</h3>
+                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
+                        </div>
+                        <button class="btn-dark" onclick="loadMappingData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <table>
+                        <thead><tr><th width="15%">Kode CPMK</th><th>Deskripsi CPMK</th><th width="25%">Referensi CPL TI</th><th width="10%" style="text-align: center;">Aksi</th></tr></thead>
+                        <tbody id="bodyMapping"></tbody>
+                    </table>
+                    <div id="pagination-mapping" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+                </div>
+
+                <div id="content-mapping-mk" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800;">Mapping Mata Kuliah ke CPMK</h3>
+                            <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Menghubungkan antara Mata Kuliah dan CPMK sesuai kebutuhan</p>
+                        </div>
+                        <button class="btn-dark" onclick="simpanMappingMK()"><i class="fas fa-save"></i> Simpan Mapping</button>
+                    </div>
+
+                    <div class="custom-select-wrapper">
+                        <select id="pilihMKMapping" class="custom-select-figma" onchange="loadMappingUI()">
+                            <option value="">Pilih Mata Kuliah</option>
+                        </select>
+                        <i class="fas fa-chevron-down select-icon"></i>
+                    </div>
+
+                    <div class="mapping-content-area">
+                        <div id="mappingEmptyState" style="display: flex; flex-direction: column; justify-content: center; height: 100%; flex: 1; margin-top: 40px; max-width: 500px; margin-left: auto; margin-right: auto;">
+                            <h3 style="font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 30px;">Panduan Pemetaan Mata Kuliah</h3>
+                            <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;">
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: #111827; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+                                <div>
+                                    <h4 style="margin: 0 0 4px 0; font-size: 1rem;">Pilih Mata Kuliah</h4>
+                                    <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Gunakan kotak dropdown di atas untuk memilih mata kuliah.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;">
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: #8b0000; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+                                <div>
+                                    <h4 style="margin: 0 0 4px 0; font-size: 1rem;">Centang CPMK</h4>
+                                    <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Beri centang pada capaian pembelajaran yang dibebankan.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="loadingMapping" style="display:none; color:#6b7280; font-style: italic; text-align: center; margin-top: 50px;">
+                            <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat data mapping...
+                        </div>
+                        
+                        <div id="mappingContainer" style="display:none;">
+                            <div id="checklistArea"></div>
                         </div>
                     </div>
                 </div>
 
-                <div id="loadingMapping" style="display:none; color:#6b7280; font-style: italic; text-align: center; margin-top: 50px;">
-                    <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat data mapping...
-                </div>
-                
-                <div id="mappingContainer" style="display:none;">
-                    <div id="checklistArea"></div>
-                </div>
-            </div>
-        </div>
+                <div id="content-reset" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800;">Reset Password Dosen</h3>
+                            <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Ubah kata sandi akun dosen Teknik Informatika dengan paksa</p>
+                        </div>
+                    </div>
 
-        <div id="content-reset" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800;">Reset Password Dosen</h3>
-                    <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Ubah kata sandi akun dosen Teknik Informatika dengan paksa</p>
-                </div>
-            </div>
-
-            <div style="background: white; border: 2.5px solid #111827; border-radius: 16px; padding: 40px; max-width: 600px;">
-                <div style="margin-bottom: 24px;">
-                    <label style="display: block; font-weight: 700; margin-bottom: 10px; font-size: 0.95rem;">Cari Nama Dosen / Username</label>
-                    <div style="position: relative;">
-                        <i class="fas fa-user" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
-                        <input list="daftarDosenTI" id="targetUsername" placeholder="Ketik username atau nama..." style="width: 100%; padding: 14px 16px 14px 45px; border-radius: 8px; border: 2px solid #e5e7eb; font-size: 1rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#e5e7eb'">
-                        <datalist id="daftarDosenTI"></datalist>
+                    <div style="background: white; border: 2.5px solid #111827; border-radius: 16px; padding: 40px; max-width: 600px;">
+                        <div style="margin-bottom: 24px;">
+                            <label style="display: block; font-weight: 700; margin-bottom: 10px; font-size: 0.95rem;">Cari Nama Dosen / Username</label>
+                            <div style="position: relative;">
+                                <i class="fas fa-user" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
+                                <input list="daftarDosenTI" id="targetUsername" placeholder="Ketik username atau nama..." style="width: 100%; padding: 14px 16px 14px 45px; border-radius: 8px; border: 2px solid #e5e7eb; font-size: 1rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#e5e7eb'">
+                                <datalist id="daftarDosenTI"></datalist>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 32px;">
+                            <label style="display: block; font-weight: 700; margin-bottom: 10px; font-size: 0.95rem;">Password Baru</label>
+                            <div style="position: relative;">
+                                <i class="fas fa-lock" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
+                                <input type="password" id="newPassword" placeholder="Masukkan password baru..." style="width: 100%; padding: 14px 16px 14px 45px; border-radius: 8px; border: 2px solid #e5e7eb; font-size: 1rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#e5e7eb'">
+                            </div>
+                        </div>
+                        
+                        <button onclick="prosesResetPassword()" class="btn-dark" style="width: 100%; padding: 16px; font-size: 1.05rem; justify-content: center; background: #8b0000; border: none; border-radius: 8px;">
+                            <i class="fas fa-key"></i> Paksa Reset Password
+                        </button>
                     </div>
                 </div>
                 
-                <div style="margin-bottom: 32px;">
-                    <label style="display: block; font-weight: 700; margin-bottom: 10px; font-size: 0.95rem;">Password Baru</label>
-                    <div style="position: relative;">
-                        <i class="fas fa-lock" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
-                        <input type="password" id="newPassword" placeholder="Masukkan password baru..." style="width: 100%; padding: 14px 16px 14px 45px; border-radius: 8px; border: 2px solid #e5e7eb; font-size: 1rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#e5e7eb'">
+                <div id="content-krs" class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800;">Import KRS Mahasiswa</h3>
+                            <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Format file yang didukung: Excel (.xlsx)</p>
+                        </div>
+                    </div>
+
+                    <div style="background: #fafafa; border: 2.5px dashed #111827; border-radius: 16px; padding: 50px 40px; max-width: 550px; text-align: center; margin: 0 auto;">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 4rem; color: #8b0000; margin-bottom: 20px;"></i>
+                        <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 10px;">Upload File KRS</h4>
+                        <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.5; margin-bottom: 30px;">
+                            Sistem akan otomatis mengekstrak data dan menyinkronkan Mahasiswa, Mata Kuliah, serta Dosen ke dalam database.
+                        </p>
+                        
+                        <div style="margin-bottom: 30px; background: white; padding: 10px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                            <input type="file" id="krsFileInputTI" accept=".xlsx" style="width: 100%; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #4b5563; cursor: pointer; outline: none;">
+                        </div>
+                        
+                        <button class="btn-dark" onclick="handleKRSUpload('TI')" style="width: 100%; justify-content: center; padding: 16px; font-size: 1.05rem; background: #111827;">
+                            <i class="fas fa-magic"></i> Jalankan Otomatisasi n8n
+                        </button>
                     </div>
                 </div>
-                
-                <button onclick="prosesResetPassword()" class="btn-dark" style="width: 100%; padding: 16px; font-size: 1.05rem; justify-content: center; background: #8b0000; border: none; border-radius: 8px;">
-                    <i class="fas fa-key"></i> Paksa Reset Password
-                </button>
-            </div>
-        </div>
-        
-        <div id="content-krs" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800;">Import KRS Mahasiswa</h3>
-                    <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Format file yang didukung: Excel (.xlsx)</p>
+                <div id="modalKurikulum" class="modal-overlay">
+                    <div class="modal-box">
+                        <h3 id="modalTitle" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Tahun Kurikulum</h3>
+                        <input type="hidden" id="idKurikulum">
+                        <div class="form-group">
+                            <label>Kode Kurikulum</label>
+                            <input type="text" id="inputKode" class="form-control" placeholder="Contoh: K-21">
+                        </div>
+                        <div class="form-group">
+                            <label>Nama (Tahun)</label>
+                            <input type="number" id="inputTahun" class="form-control" placeholder="Contoh: 2021">
+                        </div>
+                        <div class="form-group">
+                            <label>Prosentase Minimal Lulus CPMK (%)</label>
+                            <input type="number" id="inputProsentase" class="form-control" placeholder="Contoh: 41">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label>Status</label>
+                            <select id="inputStatus" class="form-control" style="cursor: pointer;">
+                                <option value="aktif">Aktif</option>
+                                <option value="nonaktif">Nonaktif</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                            <button onclick="tutupModalTahun()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
+                            <button onclick="simpanTahun()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="modalRumpun" class="modal-overlay">
+                    <div class="modal-box">
+                        <h3 id="modalTitleRumpun" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Rumpun Mata Kuliah</h3>
+                        <input type="hidden" id="idRumpun">
+                        <div class="form-group">
+                            <label>Nama Rumpun</label>
+                            <input type="text" id="inputNamaRumpun" class="form-control" placeholder="Contoh: Project Management">
+                        </div>
+                        <div class="form-group">
+                            <label>Koordinator</label>
+                            <input type="text" id="inputKoordinator" class="form-control" placeholder="Nama Dosen Koordinator">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label>NIK Koordinator</label>
+                            <input type="number" id="inputNIK" class="form-control" placeholder="Nomor Induk Karyawan/Dosen">
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                            <button onclick="tutupModalRumpun()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
+                            <button onclick="simpanRumpun()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="modalJenisCPL" class="modal-overlay">
+                    <div class="modal-box">
+                        <h3 id="modalTitleJenisCPL" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Jenis CPL</h3>
+                        
+                        <input type="hidden" id="idJenisCPL">
+                        
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label>Nama Jenis CPL</label>
+                            <input type="text" id="inputNamaJenisCPL" class="form-control" placeholder="Contoh: SIKAP (S)">
+                        </div>
+                        
+                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                            <button onclick="tutupModalJenisCPL()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
+                            <button onclick="simpanJenisCPL()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="modalMahasiswa" class="modal-overlay">
+                    <div class="modal-box">
+                        <h3 id="modalTitleMahasiswa" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Mahasiswa</h3>
+                        
+                        <input type="hidden" id="idMahasiswa">
+                        
+                        <div class="form-group">
+                            <label>NIM</label>
+                            <input type="text" id="inputNIM" class="form-control" placeholder="Contoh: 22.11.1234">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Nama Lengkap</label>
+                            <input type="text" id="inputNamaMahasiswa" class="form-control" placeholder="Nama lengkap mahasiswa">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Angkatan (Tahun)</label>
+                            <input type="number" id="inputAngkatan" class="form-control" placeholder="Contoh: 2022">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label>Status</label>
+                            <select id="inputStatusMahasiswa" class="form-control" style="cursor: pointer;">
+                                <option value="aktif">Aktif</option>
+                                <option value="cuti">Cuti</option>
+                                <option value="lulus">Lulus</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                            <button onclick="tutupModalMahasiswa()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
+                            <button onclick="simpanMahasiswa()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="modalDosen" class="modal-overlay">
+                    <div class="modal-box">
+                        <h3 id="modalTitleDosen" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Edit Data Dosen</h3>
+                        
+                        <input type="hidden" id="idDosenDatabase"> <div class="form-group">
+                            <label>NIDN</label>
+                            <input type="text" id="inputNIDNDosen" class="form-control" placeholder="Nomor Induk Dosen Nasional" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
+                            <small style="color: #6b7280; font-size: 0.8rem;">*NIDN adalah kunci utama dan tidak dapat diubah.</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Nama Lengkap (Serta Gelar)</label>
+                            <input type="text" id="inputNamaDosen" class="form-control" placeholder="Contoh: Prof. Dr. Fulan, M.Kom">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Homebase</label>
+                            <input type="text" id="inputHomebaseDosen" class="form-control" placeholder="Contoh: Teknik Informatika">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label>Email Akademik</label>
+                            <input type="email" id="inputEmailDosen" class="form-control" placeholder="Contoh: dosen@univ.ac.id">
+                        </div>
+                        
+                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                            <button onclick="tutupModalDosen()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
+                            <button onclick="simpanDosen()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="modalMengajar" class="modal-overlay">
+                    <div class="modal-box" style="width: 550px;">
+                        <h3 id="modalTitleMengajar" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Data Mengajar</h3>
+                        
+                        <input type="hidden" id="idMengajar">
+                        
+                        <div class="form-group">
+                            <label>Mata Kuliah</label>
+                            <select id="inputMatkulMengajar" class="form-control">
+                                <option value="">-- Pilih Mata Kuliah --</option>
+                                <option value="SI038">SI038 - MATEMATIKA DISKRET</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Dosen Koordinator</label>
+                            <select id="inputDosenMengajar" class="form-control">
+                                <option value="">-- Pilih Dosen --</option>
+                                <option value="sri">Sri Mulyatun, Dra., M.M</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <label>Tahun Akademik</label>
+                                <input type="text" id="inputTahunMengajar" class="form-control" placeholder="Contoh: 2025/2026">
+                            </div>
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <label>Semester</label>
+                                <input type="number" id="inputSemesterMengajar" class="form-control" placeholder="Contoh: 1">
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                            <button onclick="tutupModalMengajar()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
+                            <button onclick="simpanMengajar()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div style="background: #fafafa; border: 2.5px dashed #111827; border-radius: 16px; padding: 50px 40px; max-width: 550px; text-align: center; margin: 0 auto;">
-                <i class="fas fa-cloud-upload-alt" style="font-size: 4rem; color: #8b0000; margin-bottom: 20px;"></i>
-                <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 10px;">Upload File KRS</h4>
-                <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.5; margin-bottom: 30px;">
-                    Sistem akan otomatis mengekstrak data dan menyinkronkan Mahasiswa, Mata Kuliah, serta Dosen ke dalam database.
-                </p>
-                
-                <div style="margin-bottom: 30px; background: white; padding: 10px; border-radius: 8px; border: 2px solid #e5e7eb;">
-                    <input type="file" id="krsFileInputTI" accept=".xlsx" style="width: 100%; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #4b5563; cursor: pointer; outline: none;">
-                </div>
-                
-                <button class="btn-dark" onclick="handleKRSUpload('TI')" style="width: 100%; justify-content: center; padding: 16px; font-size: 1.05rem; background: #111827;">
-                    <i class="fas fa-magic"></i> Jalankan Otomatisasi n8n
-                </button>
-            </div>
-        </div>
-
-    </div>
-
-    <div id="modalKurikulum" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="modalTitle" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Tahun Kurikulum</h3>
-            <input type="hidden" id="idKurikulum">
-            <div class="form-group">
-                <label>Kode Kurikulum</label>
-                <input type="text" id="inputKode" class="form-control" placeholder="Contoh: K-21">
-            </div>
-            <div class="form-group">
-                <label>Nama (Tahun)</label>
-                <input type="number" id="inputTahun" class="form-control" placeholder="Contoh: 2021">
-            </div>
-            <div class="form-group">
-                <label>Prosentase Minimal Lulus CPMK (%)</label>
-                <input type="number" id="inputProsentase" class="form-control" placeholder="Contoh: 41">
-            </div>
-            <div class="form-group" style="margin-bottom: 30px;">
-                <label>Status</label>
-                <select id="inputStatus" class="form-control" style="cursor: pointer;">
-                    <option value="aktif">Aktif</option>
-                    <option value="nonaktif">Nonaktif</option>
-                </select>
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button onclick="tutupModalTahun()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanTahun()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
-            </div>
         </div>
     </div>
 
-    <div id="modalRumpun" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="modalTitleRumpun" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Rumpun Mata Kuliah</h3>
-            <input type="hidden" id="idRumpun">
-            <div class="form-group">
-                <label>Nama Rumpun</label>
-                <input type="text" id="inputNamaRumpun" class="form-control" placeholder="Contoh: Project Management">
-            </div>
-            <div class="form-group">
-                <label>Koordinator</label>
-                <input type="text" id="inputKoordinator" class="form-control" placeholder="Nama Dosen Koordinator">
-            </div>
-            <div class="form-group" style="margin-bottom: 30px;">
-                <label>NIK Koordinator</label>
-                <input type="number" id="inputNIK" class="form-control" placeholder="Nomor Induk Karyawan/Dosen">
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button onclick="tutupModalRumpun()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanRumpun()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
-            </div>
-        </div>
-    </div>
+    <!-- 4. PANGGIL MESIN PERAKIT KOMPONEN (Taruh di atas script n8n Anda) -->
+    <script src="/js/template.js"></script>
 
-    <div id="modalJenisCPL" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="modalTitleJenisCPL" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Jenis CPL</h3>
-            
-            <input type="hidden" id="idJenisCPL">
-            
-            <div class="form-group" style="margin-bottom: 30px;">
-                <label>Nama Jenis CPL</label>
-                <input type="text" id="inputNamaJenisCPL" class="form-control" placeholder="Contoh: SIKAP (S)">
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button onclick="tutupModalJenisCPL()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanJenisCPL()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
-            </div>
-        </div>
-    </div>
-    <div id="modalMahasiswa" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="modalTitleMahasiswa" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Mahasiswa</h3>
-            
-            <input type="hidden" id="idMahasiswa">
-            
-            <div class="form-group">
-                <label>NIM</label>
-                <input type="text" id="inputNIM" class="form-control" placeholder="Contoh: 22.11.1234">
-            </div>
-            
-            <div class="form-group">
-                <label>Nama Lengkap</label>
-                <input type="text" id="inputNamaMahasiswa" class="form-control" placeholder="Nama lengkap mahasiswa">
-            </div>
-            
-            <div class="form-group">
-                <label>Angkatan (Tahun)</label>
-                <input type="number" id="inputAngkatan" class="form-control" placeholder="Contoh: 2022">
-            </div>
-
-            <div class="form-group" style="margin-bottom: 30px;">
-                <label>Status</label>
-                <select id="inputStatusMahasiswa" class="form-control" style="cursor: pointer;">
-                    <option value="aktif">Aktif</option>
-                    <option value="cuti">Cuti</option>
-                    <option value="lulus">Lulus</option>
-                </select>
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button onclick="tutupModalMahasiswa()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanMahasiswa()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
-            </div>
-        </div>
-    </div>
-    <div id="modalDosen" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="modalTitleDosen" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Edit Data Dosen</h3>
-            
-            <input type="hidden" id="idDosenDatabase"> <div class="form-group">
-                <label>NIDN</label>
-                <input type="text" id="inputNIDNDosen" class="form-control" placeholder="Nomor Induk Dosen Nasional" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
-                <small style="color: #6b7280; font-size: 0.8rem;">*NIDN adalah kunci utama dan tidak dapat diubah.</small>
-            </div>
-            
-            <div class="form-group">
-                <label>Nama Lengkap (Serta Gelar)</label>
-                <input type="text" id="inputNamaDosen" class="form-control" placeholder="Contoh: Prof. Dr. Fulan, M.Kom">
-            </div>
-            
-            <div class="form-group">
-                <label>Homebase</label>
-                <input type="text" id="inputHomebaseDosen" class="form-control" placeholder="Contoh: Teknik Informatika">
-            </div>
-
-            <div class="form-group" style="margin-bottom: 30px;">
-                <label>Email Akademik</label>
-                <input type="email" id="inputEmailDosen" class="form-control" placeholder="Contoh: dosen@univ.ac.id">
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button onclick="tutupModalDosen()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanDosen()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Perubahan</button>
-            </div>
-        </div>
-    </div>
-    <div id="modalMengajar" class="modal-overlay">
-        <div class="modal-box" style="width: 550px;">
-            <h3 id="modalTitleMengajar" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Data Mengajar</h3>
-            
-            <input type="hidden" id="idMengajar">
-            
-            <div class="form-group">
-                <label>Mata Kuliah</label>
-                <select id="inputMatkulMengajar" class="form-control">
-                    <option value="">-- Pilih Mata Kuliah --</option>
-                    <option value="SI038">SI038 - MATEMATIKA DISKRET</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Dosen Koordinator</label>
-                <select id="inputDosenMengajar" class="form-control">
-                    <option value="">-- Pilih Dosen --</option>
-                    <option value="sri">Sri Mulyatun, Dra., M.M</option>
-                </select>
-            </div>
-
-            <div style="display: flex; gap: 15px; margin-bottom: 25px;">
-                <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                    <label>Tahun Akademik</label>
-                    <input type="text" id="inputTahunMengajar" class="form-control" placeholder="Contoh: 2025/2026">
-                </div>
-                <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                    <label>Semester</label>
-                    <input type="number" id="inputSemesterMengajar" class="form-control" placeholder="Contoh: 1">
-                </div>
-            </div>
-            
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button onclick="tutupModalMengajar()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanMengajar()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
-            </div>
-        </div>
-    </div>
-
-<script>
-
-    // 2. Variabel API otomatis menyesuaikan Base URL di atas
-    const PRODI = 'ti'; 
-
-    const API_BASE = "https://reynolds-martial-guild-professional.trycloudflare.com/webhook"; // Ganti dengan link yang nyala
-
+    <!-- 5. SCRIPT BAWAAN ADMIN CONFIG ANDA -->
+    <script>
+        const PRODI = 'ti'; 
+    const API_BASE = "https://psychiatry-ethical-disciplinary-unified.trycloudflare.com/webhook";
     const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_INSERT = `${API_BASE}/admin-insert-master`;
     const API_MAP_MK = `${API_BASE}/admin-map-mk-cpmk`;
     const API_GET_USERS = `${API_BASE}/get-users`;
+    const API_DASHBOARD = `${API_BASE}/get-dashboard-kaprodi`;
+
     // --- SATPAM ADMIN TI ---
     const userLogin = localStorage.getItem("user_login");
     const userRole = localStorage.getItem("user_role");
@@ -954,8 +906,14 @@
 
     if (!userLogin) window.location.replace("../login/login.html");
     
-    document.getElementById("adminName").innerText = userLogin;
-    document.getElementById("sidebarAvatar").src = `https://ui-avatars.com/api/?name=${userLogin}&background=8b0000&color=fff&bold=true`;
+    setTimeout(() => {
+        const nameEl = document.getElementById("adminName");
+        const avatarEl = document.getElementById("sidebarAvatar");
+        if(nameEl && avatarEl) {
+            nameEl.innerText = userLogin;
+            avatarEl.src = `https://ui-avatars.com/api/?name=${userLogin}&background=8b0000&color=fff&bold=true`;
+        }
+    }, 500);
 
     if (userRole !== 'head_admin') {
         if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
@@ -1009,6 +967,8 @@
         document.getElementById('pageTitle').innerHTML = titles[type] || 'PANEL <span>ADMIN</span>';
 
         if(type === 'mapping-mk') loadDropdownMK();
+        if (type === 'tahun') loadDataTahun();
+        else if (type === 'dashboard') loadDashboard();
         else if(type === 'mapping') loadMappingData();
         else if(type === 'reset') loadUserList(); 
         else if(type === 'mk' || type === 'cpl' || type === 'cpmk') loadData(type);
@@ -1499,7 +1459,9 @@
     async function simpanMappingCPL(kodeCpmk) { const kodeCpl = document.getElementById(`sel-${kodeCpmk}`).value; const res = await fetch(API_UPDATE, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ tipe: 'mapping', kode: kodeCpmk, value: kodeCpl, prodi: PRODI }) }); if(res.ok) alert("✅ Mapping CPL-CPMK Tersimpan!"); }
     async function simpanMappingMK() { const mkKode = document.getElementById("pilihMKMapping").value; const listCpmk = Array.from(document.querySelectorAll('.chk-cpmk:checked')).map(cb => cb.value); const token = localStorage.getItem("api_token"); const res = await fetch(API_MAP_MK, { method: "POST", headers: {"Content-Type":"application/json", "Authorization": "Bearer " + token}, body: JSON.stringify({ kode_mk: mkKode, cpmk_list: listCpmk, prodi: PRODI }) }); if(res.ok) alert("✅ Mapping MK-CPMK TI Berhasil!"); }
 
-    window.onload = () => { switchTab('dashboard'); };
+    window.onload = () => { 
+        setTimeout(() => { switchTab('dashboard'); }, 500); 
+    };
     function logout() { localStorage.clear(); window.location.replace("login.html"); }
     
     async function handleKRSUpload(role) {
@@ -1531,6 +1493,89 @@
                 alert("Terjadi kesalahan jaringan saat menghubungi server n8n.");
             }
         }
-</script>
+
+        // --- FUNGSI DASHBOARD GRAFIK ---
+    let chartGradeInst, chartCplInst; // Penyimpan memori grafik agar tidak menumpuk
+
+    async function loadDashboard() {
+        try {
+            const res = await fetch(API_DASHBOARD);
+            if (!res.ok) return;
+            const data = await res.json();
+
+            // Memisahkan data dari API n8n
+            const dataCPL = data.filter(item => item.kategori === 'performa_cpl');
+            const dataGrade = data.filter(item => item.kategori === 'distribusi_grade');
+
+            renderGradeChart(dataGrade);
+            renderCPLChart(dataCPL);
+            calculateSummary(dataGrade);
+        } catch (error) {
+            console.error("Gagal memuat grafik Dashboard:", error);
+        }
+    }
+
+    function renderGradeChart(gradeData) {
+        const labels = gradeData.map(item => item.label);
+        const values = gradeData.map(item => item.nilai);
+        const ctx = document.getElementById('gradeChart').getContext('2d');
+        
+        if(chartGradeInst) chartGradeInst.destroy(); // Hapus kanvas lama jika di-refresh
+        
+        chartGradeInst = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6b7280'],
+                    borderWidth: 2
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    function renderCPLChart(cplData) {
+        const labels = cplData.map(item => item.label);
+        const values = cplData.map(item => parseFloat(item.nilai));
+        const ctx = document.getElementById('cplChart').getContext('2d');
+        
+        if(chartCplInst) chartCplInst.destroy();
+        
+        chartCplInst = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Persentase Capaian (%)',
+                    data: values,
+                    backgroundColor: '#8b0000', // Warna merah Unaki
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, max: 100 } },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    function calculateSummary(gradeData) {
+        let total = 0, lulus = 0, gagal = 0;
+        const lulusGrades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C'];
+
+        gradeData.forEach(item => {
+            total += item.nilai;
+            if (lulusGrades.includes(item.label)) lulus += item.nilai;
+            else gagal += item.nilai;
+        });
+
+        document.getElementById('totMhs').innerText = total;
+        document.getElementById('totLulus').innerText = lulus;
+        document.getElementById('totGagal').innerText = gagal;
+    }
+    </script>
 </body>
 </html>
