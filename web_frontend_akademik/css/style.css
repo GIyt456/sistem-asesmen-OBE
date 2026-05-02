@@ -1,0 +1,138 @@
+:root { --primary-red: #8b0000; --bg-main: #f4f7f6; --text-dark: #111827; --border-dark: #161923; }
+        body { display: flex; background: var(--bg-main); height: 100vh; margin:0; font-family: 'Inter', sans-serif; }
+        .main-content { flex: 1; overflow-y: auto; padding: 30px 50px; }
+        
+        /* Style Tabel & Tombol Standar */
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th { background: #f3f4f6; padding: 15px; text-align: left; font-size: 0.85rem; text-transform: uppercase; color: #4b5563; }
+        td { padding: 15px; border-top: 1px solid #e5e7eb; font-size: 0.95rem; color: var(--text-dark); }
+        
+        .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+        .btn-edit { background: var(--border-dark); color: white; transition: 0.2s; }
+        .btn-edit:hover { background: #000; }
+        
+        .badge-status { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .status-draft { background: #fef3c7; color: #d97706; }
+        .status-ready { background: #d1fae5; color: #065f46; }
+        
+:root { 
+            --sidebar-bg: #161923; 
+            --sidebar-text: #7b8395;
+            --sidebar-hover: #262936;
+            --sidebar-active-text: #ffffff;
+            --primary-red: #8b0000; 
+            --bg-main: #ffffff; 
+            --text-dark: #111827;
+            --border-dark: #161923;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
+        
+        /* SIDEBAR Sesuai Figma */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; }
+        
+        /* Profile Area Sidebar */
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .sidebar-profile-info { display: flex; flex-direction: column; }
+        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        
+        /* Garis Pemisah Sidebar */
+        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
+
+        /* Menu Sidebar */
+        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+
+        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
+        
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
+        .nav-item:hover { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+
+        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .nav-item.logout { color: #f87171; }
+        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+        
+        /* MAIN CONTENT */
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; background-color: var(--bg-main); }
+        
+        /* HEADER */
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        .header-title-area { display: flex; flex-direction: column; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary-red); }
+        
+        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
+
+        /* DASHBOARD CARDS */
+        .section { display: none; animation: fadeIn 0.3s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 24px; max-width: 800px; }
+        
+        .figma-card { background: white; border: 2.5px solid var(--border-dark); border-radius: 16px; padding: 30px; display: flex; flex-direction: column; align-items: flex-start; }
+        .figma-card h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; color: var(--text-dark); }
+        .figma-card p { color: #6b7280; font-size: 1rem; line-height: 1.6; margin-bottom: 24px; max-width: 90%; }
+        
+        .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .btn-dark:hover { background: #000000; transform: translateY(-2px); }
+        .btn-primary-red { background: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .btn-primary-red:hover { background: #660000; transform: translateY(-2px); }
+
+        /* Tabel Gaya Figma */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+        th { background: #f3f4f6; color: var(--text-dark); padding: 14px 16px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+        td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; }
+        tbody tr:hover { background-color: #f9fafb; }
+        
+        /* Tombol Aksi Tabel */
+        .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; }
+        .btn-edit { background: #f59e0b; }
+        .btn-edit:hover { background: #d97706; }
+        .btn-delete { background: #ef4444; }
+        .btn-delete:hover { background: #dc2626; }
+
+        /* Badge Status */
+        .badge-status { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-block; }
+        .status-aktif { background: #d1fae5; color: #065f46; }
+        .status-nonaktif { background: #fee2e2; color: #991b1b; }
+
+        /* --- MODAL POP-UP STYLES --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; animation: fadeIn 0.2s ease; }
+        .modal-box { background: white; padding: 32px; border-radius: 16px; width: 450px; max-width: 90%; border: 2.5px solid var(--border-dark); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+        .form-control { width: 100%; padding: 12px 16px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+        .form-control:focus { border-color: var(--border-dark); }
+
+        /* --- GAYA KHUSUS MAPPING --- */
+        .custom-select-wrapper { position: relative; display: inline-block; width: 300px; margin-bottom: 20px; z-index: 10; }
+        .custom-select-figma { width: 100%; padding: 12px 16px; font-size: 0.95rem; font-weight: 600; color: #111827; background-color: #ffffff; border: 2px solid #111827; border-radius: 6px; appearance: none; -webkit-appearance: none; outline: none; cursor: pointer; }
+        .select-icon { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #111827; pointer-events: none; }
+        .mapping-content-area { background-color: #ededed; border-radius: 24px; padding: 40px; min-height: 450px; display: flex; flex-direction: column; }
+        .empty-state-figma { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; flex: 1; text-align: center; margin-top: 80px; }
+        .empty-state-figma h1 { font-size: 5.5rem; font-weight: 900; color: #000000; margin: 0 0 10px 0; letter-spacing: -2px; }
+        .empty-state-figma p { font-size: 1.1rem; font-weight: 500; color: #111827; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
+       /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
+        body { 
+            animation: transitionIn 0.3s ease-in-out; 
+        }
+        
+        @keyframes transitionIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(8px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }

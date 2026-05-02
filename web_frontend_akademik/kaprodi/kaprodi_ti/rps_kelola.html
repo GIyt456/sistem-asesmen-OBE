@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola RPS - Panel Kaprodi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <!-- 1. Wadah Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <!-- 2. Wadah Navbar -->
+        <div id="navbar-container"></div>
+
+        <!-- 3. KONTEN UTAMA RPS -->
+        <div class="main-content">
+            <div style="margin-bottom: 30px;">
+                <h1 style="margin:0; font-size: 2rem; color: var(--text-dark);">Kelola <span style="color: var(--primary-red);">RPS</span></h1>
+                <p style="color: #6b7280; margin-top: 5px;">Pantau dan susun Rencana Pembelajaran Semester untuk setiap Mata Kuliah.</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <input type="text" id="searchRPS" placeholder="Cari Kode atau Nama MK..." style="padding: 10px 15px; width: 300px; border: 1px solid #d1d5db; border-radius: 6px;">
+                <button class="btn-action btn-edit" onclick="loadDataRPS()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th width="5%">No</th>
+                        <th width="15%">Kode MK</th>
+                        <th width="35%">Nama Mata Kuliah</th>
+                        <th width="20%">Koordinator</th>
+                        <th width="10%" style="text-align: center;">Status RPS</th>
+                        <th width="15%" style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBodyRPS">
+                    <tr><td colspan="6" style="text-align: center; color: #6b7280;">Memuat data dari n8n...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Panggil Mesin Pemasang Komponen -->
+    <script src="../../js/template.js"></script>
+
+    <!-- Logika Halaman RPS -->
+    <script>
+        // GANTI INI DENGAN URL CLOUDFLARE ANDA YANG AKTIF
+        const API_BASE = "https://psychiatry-ethical-disciplinary-unified.trycloudflare.com/webhook"; 
+        const API_RPS_LIST = `${API_BASE}/get-rps-list?prodi=ti`;
+
+        async function loadDataRPS() {
+            const tbody = document.getElementById('tableBodyRPS');
+            try {
+                // Di sini kita akan memanggil n8n untuk minta data daftar MK
+                const res = await fetch(API_RPS_LIST);
+                if (!res.ok) throw new Error("Gagal load");
+                
+                const data = await res.json();
+                tbody.innerHTML = "";
+                
+                data.forEach((item, index) => {
+                    // Logic warna badge status
+                    const badgeClass = item.status === 'Selesai' ? 'status-ready' : 'status-draft';
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${item.kode_mk}</strong></td>
+                            <td>${item.nama_mk}</td>
+                            <td>${item.koordinator || 'Belum Diatur'}</td>
+                            <td style="text-align: center;"><span class="badge-status ${badgeClass}">${item.status || 'Kosong'}</span></td>
+                            <td style="text-align: center;">
+                                <button class="btn-action btn-edit" onclick="bukaEditorRPS('${item.kode_mk}', '${item.nama_mk}')">
+                                    <i class="fas fa-pen"></i> Susun RPS
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `
+                    <!-- CONTOH DUMMY SEMENTARA JIKA N8N BELUM AKTIF -->
+                    <tr>
+                        <td>1</td><td><strong>SI038</strong></td><td>MATEMATIKA DISKRET</td><td>Sri Mulyatun</td>
+                        <td style="text-align: center;"><span class="badge-status status-draft">Draft</span></td>
+                        <td style="text-align: center;"><button class="btn-action btn-edit" onclick="alert('Buka halaman editor untuk SI038')"><i class="fas fa-pen"></i> Susun</button></td>
+                    </tr>
+                `;
+            }
+        }
+
+        function bukaEditorRPS(kodeMK, namaMK) {
+            // Nanti ini akan membuka modal raksasa atau memindahkan ke halaman rps_editor.html
+            alert(`Akan membuka Editor RPS 16 Pertemuan untuk: ${kodeMK} - ${namaMK}`);
+        }
+
+        window.onload = () => {
+            setTimeout(loadDataRPS, 500); // Tunggu komponen selesai
+        };
+    </script>
+</body>
+</html>
