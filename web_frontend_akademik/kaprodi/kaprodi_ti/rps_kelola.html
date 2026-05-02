@@ -97,10 +97,9 @@
                 `;
             }
         }
-
         function bukaEditorRPS(kodeMK, namaMK) {
-            // Nanti ini akan membuka modal raksasa atau memindahkan ke halaman rps_editor.html
-            alert(`Akan membuka Editor RPS 16 Pertemuan untuk: ${kodeMK} - ${namaMK}`);
+            // Membawa "koper" berisi kode_mk dan nama_mk ke halaman editor
+            window.location.href = `rps_editor.html?kode=${kodeMK}&nama=${encodeURIComponent(namaMK)}`;
         }
 
         window.onload = () => {

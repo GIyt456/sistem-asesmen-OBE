@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor RPS - Panel Kaprodi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PANGGIL CSS GLOBAL KITA -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        /* Tambahan CSS khusus agar tabel Editor RPS nyaman diketik */
+        .rps-table th { background: var(--border-dark); color: white; border: 1px solid #374151; padding: 12px 10px; text-align: center; }
+        .rps-table td { border: 1px solid #e5e7eb; padding: 8px; vertical-align: top; }
+        .rps-input { width: 100%; min-height: 40px; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 0.85rem; resize: vertical; outline: none; }
+        .rps-input:focus { border-color: var(--primary-red); box-shadow: 0 0 0 2px rgba(139,0,0,0.1); }
+        .rps-number { width: 60px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Wadah Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <!-- 2. Wadah Navbar -->
+        <div id="navbar-container"></div>
+
+        <!-- 3. KONTEN UTAMA EDITOR RPS -->
+        <div class="main-content">
+            
+            <!-- Judul & Tombol Simpan (Tanpa tombol kembali) -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px;">
+                <div>
+                    <h1 style="margin: 0; font-size: 1.8rem; color: var(--text-dark);">Penyusunan RPS</h1>
+                    <p style="margin: 5px 0 0 0; color: #6b7280; font-weight: 600;" id="identitasMK">Memuat data Mata Kuliah...</p>
+                </div>
+                <div>
+                    <button class="btn-dark" style="background: #10b981; border: none; padding: 12px 24px;" onclick="simpanRPS()">
+                        <i class="fas fa-save"></i> Simpan RPS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabel 16 Pertemuan -->
+            <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow-x: auto;">
+                <table class="rps-table" style="min-width: 1200px;">
+                    <thead>
+                        <tr>
+                            <th width="3%">Mg</th>
+                            <th width="15%">Kemampuan Akhir (CPMK)</th>
+                            <th width="22%">Bahan Kajian (Materi)</th>
+                            <th width="15%">Metode Pembelajaran</th>
+                            <th width="8%">Waktu (Menit)</th>
+                            <th width="22%">Kriteria & Indikator Penilaian</th>
+                            <th width="5%">Bobot (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyRPS">
+                        <!-- Baris akan di-generate otomatis oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Panggil Mesin Pemasang Komponen -->
+    <script src="/js/template.js"></script>
+
+    <!-- Logika Halaman Editor -->
+    <script>
+        // GANTI DENGAN URL CLOUDFLARE ANDA JIKA BERUBAH
+        const API_BASE = "https://psychiatry-ethical-disciplinary-unified.trycloudflare.com/webhook"; 
+
+        // 1. Tangkap "Koper" (URL Parameters)
+        const urlParams = new URLSearchParams(window.location.search);
+        const kodeMK = urlParams.get('kode');
+        const namaMK = urlParams.get('nama');
+
+        // 2. Pasang identitas di Header
+        if (kodeMK && namaMK) {
+            document.getElementById('identitasMK').innerHTML = `<span style="color: var(--primary-red);">${kodeMK}</span> - ${namaMK}`;
+        } else {
+            document.getElementById('identitasMK').innerHTML = "Mata Kuliah Tidak Ditemukan!";
+        }
+
+        // 3. Fungsi Menarik Data dari Database n8n
+        async function loadEditorData() {
+            let dataServer = [];
+            try {
+                // Tampilkan pesan loading di tabel
+                document.getElementById('bodyRPS').innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px;">Menarik data Bobot dan RPS dari Server... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
+                
+                const res = await fetch(`${API_BASE}/get-rps-detail?kode=${kodeMK}`);
+                if (res.ok) {
+                    dataServer = await res.json();
+                }
+            } catch (e) {
+                console.log("Server n8n belum merespon. Menampilkan template kosong.");
+            }
+            
+            // Panggil mesin pembuat tabel dengan membawa data dari server
+            generateTableRows(dataServer);
+        }
+
+        // 4. Mesin Pembuat 16 Baris Tabel Otomatis (Dengan Injeksi Data)
+        function generateTableRows(dataServer) {
+            const tbody = document.getElementById('bodyRPS');
+            let html = "";
+
+            for (let i = 1; i <= 16; i++) {
+                // Cari apakah ada data untuk pertemuan ke-i di database
+                const rowData = dataServer.find(item => item.pertemuan === i) || {};
+                
+                // Jika ada data, masukkan. Jika tidak, kosongkan.
+                const valCPMK = rowData.cpmk || "";
+                const valMateri = rowData.materi || "";
+                const valMetode = rowData.metode || "";
+                const valWaktu = rowData.waktu || "150";
+                const valKriteria = rowData.kriteria || "";
+                // Tangkap data bobot yang sudah Anda hitung di database!
+                const valBobot = rowData.bobot || "0";
+
+                // Pisahkan format UTS dan UAS
+                if (i === 8 || i === 16) {
+                    const ujian = i === 8 ? "UJIAN TENGAH SEMESTER (UTS)" : "UJIAN AKHIR SEMESTER (UAS)";
+                    html += `
+                        <tr style="background: #fef2f2;">
+                            <td style="text-align: center; font-weight: bold; color: var(--primary-red);">${i}</td>
+                            <td colspan="6" style="text-align: center; font-weight: bold; color: var(--primary-red); padding: 15px;">
+                                ${ujian}
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    html += `
+                        <tr>
+                            <td style="text-align: center; font-weight: bold; color: #4b5563; padding-top: 15px;">${i}</td>
+                            <td><textarea class="rps-input" id="cpmk_${i}" placeholder="Tulis CPMK...">${valCPMK}</textarea></td>
+                            <td><textarea class="rps-input" id="materi_${i}" placeholder="Tulis Bahan Kajian...">${valMateri}</textarea></td>
+                            <td><textarea class="rps-input" id="metode_${i}" placeholder="Ceramah, Diskusi, dll...">${valMetode}</textarea></td>
+                            <td><input type="number" class="rps-input rps-number" id="waktu_${i}" value="${valWaktu}"></td>
+                            <td><textarea class="rps-input" id="kriteria_${i}" placeholder="Tulis Kriteria...">${valKriteria}</textarea></td>
+                            <td><input type="number" class="rps-input rps-number" style="background:#f3f4f6; font-weight:bold;" id="bobot_${i}" value="${valBobot}"></td>
+                        </tr>
+                    `;
+                }
+            }
+            tbody.innerHTML = html;
+        }
+
+        // 5. Fungsi Mengirim Data ke n8n (Untuk tombol Simpan)
+        function simpanRPS() {
+            alert(`Fitur simpan RPS untuk ${kodeMK} sedang kita siapkan di n8n!`);
+        }
+
+        // Jalankan fetch API saat halaman siap
+        window.onload = () => {
+            loadEditorData();
+        };
+    </script>
+</body>
+</html>
