@@ -85,155 +85,163 @@
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mata Kuliah Program Studi</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
+                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Susunan Mata Kuliah</h3>
+                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Distribusi Mata Kuliah per Semester</p>
                 </div>
-                <button class="btn-dark" onclick="loadData('mk')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
             </div>
             
-            <table>
-                <thead>
-                    <tr>
-                        <th width="15%">Kode MK</th>
-                        <th>Nama Mata Kuliah</th>
-                        <th width="10%" style="text-align: center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyMK">
-                    <!-- Data dari n8n akan masuk ke sini -->
-                </tbody>
-            </table>
-            
-            <div id="pagination-mk" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+            <!-- Kontainer ini akan menampung tabel-tabel per semester secara otomatis -->
+            <div id="container-tabel-semester"></div>
         </div>
     </div>
 
 <script>
-    // 1. PENGATURAN API N8N (Sesuai dengan update dari teman Anda)
+    // 1. KONFIGURASI API
     const PRODI = 'ti'; 
-    const API_BASE = "https://hopkins-wise-breakdown-promptly.trycloudflare.com/webhook"; 
-    const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`;
+    const API_BASE = "https://reynolds-martial-guild-professional.trycloudflare.com/webhook"; 
+    const API_MATKUL = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
-    
-    // 2. SISTEM KEAMANAN & SATPAM AKUN
     const userLogin = localStorage.getItem("user_login");
-    const userRole = localStorage.getItem("user_role");
-    const userProdi = localStorage.getItem("prodi_aktif");
 
-    if (!userLogin) window.location.replace("../login/login.html");
-    if (userRole !== 'head_admin') {
-        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
-        else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
-    }
-
-    // 3. FUNGSI PEMANGGIL SIDEBAR OTOMATIS
+    // 2. FUNGSI LOAD SIDEBAR (DIPERBAIKI)
     async function loadSidebar() {
         try {
             const response = await fetch('components/sidebar.html');
+            if (!response.ok) throw new Error("File sidebar tidak ditemukan");
             const html = await response.text();
             
-            // Masukkan HTML Sidebar ke dalam container
-            document.getElementById('sidebar-container').outerHTML = html;
-
-            // Masukkan data profil ke Sidebar
-            document.getElementById("adminName").innerText = userLogin;
-            document.getElementById("sidebarAvatar").src = `https://ui-avatars.com/api/?name=${userLogin}&background=8b0000&color=fff&bold=true`;
-
-            // Nonaktifkan menu Home, dan Aktifkan menu Mata Kuliah agar warna menyala
-            setTimeout(() => {
-                const navDashboard = document.getElementById('nav-dashboard');
+            const container = document.getElementById('sidebar-container');
+            if (container) {
+                container.innerHTML = html; // Pakai innerHTML agar div pembungkus tidak hilang
+                
+                // Masukkan nama admin dari localStorage ke sidebar barumu
+                const nameElem = document.getElementById("adminName");
+                if (nameElem) nameElem.innerText = localStorage.getItem("user_login") || "Admin";
+                
+                // Tandai menu Mata Kuliah sedang aktif
                 const navMk = document.getElementById('nav-mk');
-                if(navDashboard) navDashboard.classList.remove('active');
-                if(navMk) navMk.classList.add('active');
-            }, 100);
-
-        } catch (error) {
-            console.error('Gagal memuat sidebar:', error);
-        }
+                if (navMk) navMk.classList.add('active');
+            }
+            } catch (error) {
+                console.error('Gagal memuat sidebar:', error);
+                // Jika Fetch gagal (CORS), sidebar tidak akan muncul.
+            }
     }
 
-    // Fungsi tambahan untuk animasi dropdown di sidebar
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex'; chevron.style.transform = 'rotate(180deg)'; 
-        } else {
-            menu.style.display = 'none'; chevron.style.transform = 'rotate(0deg)';   
-        }
-    }
-
-    function logout() { localStorage.clear(); window.location.replace("login.html"); }
-
-    // 4. LOGIKA DATA MATA KULIAH (TABEL & PAGINASI)
-    const paginationState = {
-        'mk': { data: [], page: 1, bodyId: 'bodyMK', paginationId: 'pagination-mk' }
-    };
-    const rowsPerPage = 5; 
-
-    async function loadData(tipe) { 
-        try {
-            const res = await fetch(API_URL); 
-            const data = await res.json();
-            
-            paginationState[tipe].data = data.filter(i => i.tipe === tipe);
-            paginationState[tipe].page = 1; 
-            
-            renderTablePaginated(tipe);
-        } catch(e) { console.error("Gagal menarik data dari n8n:", e); }
-    }
-
-    function renderTablePaginated(tipe) {
-        const state = paginationState[tipe];
-        const tbody = document.getElementById(state.bodyId);
-        tbody.innerHTML = "";
-
-        const startIndex = (state.page - 1) * rowsPerPage;
-        const endIndex = startIndex + rowsPerPage;
-        const dataHalamanIni = state.data.slice(startIndex, endIndex);
-
-        // Render khusus tabel Mata Kuliah
-        dataHalamanIni.forEach(item => {
-            tbody.innerHTML += `<tr>
-                <td><strong>${item.kode}</strong></td>
-                <td><input type="text" id="in-${item.kode}" value="${item.label || ''}" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; outline:none; font-family:'Inter', sans-serif;"></td>
-                <td style="text-align:center;"><button class="btn-dark" style="padding: 10px 14px;" onclick="simpanEdit('${tipe}', '${item.kode}')"><i class="fas fa-check"></i></button></td>
-            </tr>`;
-        });
-
-        renderPaginationUI(tipe);
-    }
-
-    function renderPaginationUI(tipe) {
-        const state = paginationState[tipe];
-        const container = document.getElementById(state.paginationId);
-        container.innerHTML = "";
+    // 3. FUNGSI LOAD DATA MATKUL PER SEMESTER
+    async function loadData() { 
+        const container = document.getElementById('container-tabel-semester');
+        if (!container) return;
         
-        const totalPages = Math.ceil(state.data.length / rowsPerPage);
-        if (totalPages <= 1) return; 
+        container.innerHTML = "<p style='text-align:center; padding:20px;'>Memuat data dari database...</p>";
 
-        const btnPrev = document.createElement('button');
-        btnPrev.className = 'btn-dark';
-        btnPrev.innerHTML = '<i class="fas fa-chevron-left"></i> Prev';
-        btnPrev.disabled = state.page === 1;
-        btnPrev.onclick = () => { if (state.page > 1) { state.page--; renderTablePaginated(tipe); } };
-        container.appendChild(btnPrev);
+        try {
+            const res = await fetch(API_MATKUL); 
+            const data = await res.json(); 
+            
+            container.innerHTML = "";
 
-        const info = document.createElement('span');
-        info.innerHTML = `Halaman <strong>${state.page}</strong> dari <strong>${totalPages}</strong>`;
-        info.style.fontSize = "0.95rem";
-        info.style.color = "#4b5563";
-        container.appendChild(info);
+            // Kelompokkan data berdasarkan semester[cite: 35]
+            const perSemester = data.reduce((acc, item) => {
+                if (!acc[item.semester]) acc[item.semester] = [];
+                acc[item.semester].push(item);
+                return acc;
+            }, {});
 
-        const btnNext = document.createElement('button');
-        btnNext.className = 'btn-dark';
-        btnNext.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
-        btnNext.disabled = state.page === totalPages;
-        btnNext.onclick = () => { if (state.page < totalPages) { state.page++; renderTablePaginated(tipe); } };
-        container.appendChild(btnNext);
+            // Urutkan semester dan render tabelnya
+            Object.keys(perSemester).sort().forEach(sem => {
+                let tableHTML = `
+                    <div style="margin-bottom: 40px;">
+                        <h4 style="margin-bottom: 15px; font-size: 1.1rem; color: var(--primary-red); font-weight: 700;">
+                            <i class="fas fa-graduation-cap"></i> SEMESTER ${sem}
+                        </h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="20%">Kode MK</th>
+                                    <th>Nama Mata Kuliah</th>
+                                    <th width="15%" style="text-align: center;">SKS</th>
+                                    <th width="15%" style="text-align: center;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+                perSemester[sem].forEach(mk => {
+                    tableHTML += `
+                        <tr>
+                            <td><strong>${mk.kode_mk}</strong></td>
+                            <td><input type="text" id="in-${mk.kode_mk}" value="${mk.nama_mk}" style="width:100%; padding:8px; border:1px solid #e5e7eb; border-radius:6px;"></td>
+                            <td style="text-align: center;">${mk.sks} SKS</td>
+                            <td style="text-align:center;">
+                                <button class="btn-dark" style="padding: 8px 12px;" onclick="simpanEdit('mk', '${mk.kode_mk}')">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+
+                tableHTML += `</tbody></table></div>`;
+                container.innerHTML += tableHTML;
+            });
+
+        } catch(e) { 
+            container.innerHTML = "<p style='color:red; text-align:center;'>Gagal menarik data. Cek koneksi n8n.</p>";
+        }
     }
 
-    // 5. FUNGSI SIMPAN PERUBAHAN NAMA MATA KULIAH KE N8N
+    // 4. Update SKS
+    async function updateSKS(kodeMk) {
+    const newSks = document.getElementById(`sks-${kodeMk}`).value;
+
+    // Tampilkan loading di tombol agar kamu tahu sedang proses
+    const btn = event.target;
+    const originalText = btn.innerText;
+    btn.innerText = "...";
+    btn.disabled = true;
+
+    try {
+        const response = await fetch(API_UPDATE, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Kita balikkan ke JSON
+            },
+            body: JSON.stringify({
+                kode_mk: kodeMk,
+                sks: parseInt(newSks), // Pastikan SKS terkirim sebagai angka
+                prodi: PRODI
+            })
+        });
+            if (response.ok) {
+                alert(`SKS ${kodeMk} berhasil diupdate!`);
+            } else {
+                // Jika muncul 500 lagi, kita akan tangkap di sini
+                const errorData = await response.text();
+                console.error("Detail Error dari Server:", errorData);
+                alert("Server (n8n) bermasalah. Cek 'Execution Log' di n8n kamu.");
+            }
+        } catch (error) {
+            console.error("Koneksi Error:", error);
+            alert("Gagal koneksi ke server.");
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // 5. SATU-SATUNYA WINDOW ONLOAD (PENTING!)
+    window.onload = async () => {
+        // Pastikan user sudah login
+        if (!userLogin) {
+            window.location.replace("../login/login.html");
+            return;
+        }
+        
+        await loadSidebar(); // Tunggu sidebar selesai
+        await loadData('mk');    // Baru muat data
+    };
+
+    // Fungsi simpan tetap sama
     async function simpanEdit(tipe, kode) { 
         const value = document.getElementById(`in-${kode}`).value; 
         try {
@@ -242,21 +250,9 @@
                 headers: {"Content-Type":"application/json"}, 
                 body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) 
             }); 
-            if(res.ok) {
-                alert("✅ Berhasil diperbarui!");
-            } else {
-                alert("❌ Gagal menyimpan data ke server.");
-            }
-        } catch (e) {
-            alert("Terjadi kesalahan jaringan.");
-        }
+            if(res.ok) alert("✅ Berhasil diperbarui!");
+        } catch (e) { alert("Terjadi kesalahan jaringan."); }
     }
-
-    // 6. JALANKAN SAAT WEB PERTAMA KALI DIBUKA
-    window.onload = () => { 
-        loadSidebar(); // Panggil sidebar terlebih dahulu
-        loadData('mk'); // Langsung tarik data Mata Kuliah tanpa perlu switchTab
-    };
 </script>
 </body>
 </html>
