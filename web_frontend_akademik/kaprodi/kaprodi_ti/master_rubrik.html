@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Mengajar - Sistem OBE</title>
+    <title>Data Rubrik - Sistem OBE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -73,12 +73,21 @@
         td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; }
         tbody tr:hover { background-color: #f9fafb; }
         
-        .form-control { width: 100%; padding: 12px 16px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
-        .form-control:focus { border-color: var(--border-dark); }
-        
         .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; }
+        .btn-edit { background: #f59e0b; }
+        .btn-edit:hover { background: #d97706; }
         .btn-delete { background: #ef4444; }
         .btn-delete:hover { background: #dc2626; }
+
+        .badge-kategori { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-block; background: #e0e7ff; color: #4338ca; }
+
+        /* --- MODAL POP-UP STYLES --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; animation: fadeIn 0.2s ease; }
+        .modal-box { background: white; padding: 32px; border-radius: 16px; width: 500px; max-width: 90%; border: 2.5px solid var(--border-dark); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+        .form-control { width: 100%; padding: 12px 16px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+        .form-control:focus { border-color: var(--border-dark); }
     </style>
 </head>
 <body>
@@ -89,24 +98,21 @@
     <!-- Konten Utama -->
     <div class="main-content">
         
-        <!-- Header -->
         <div class="header-container">
             <div class="header-title-area">
                 <div class="header-subtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title">DATA <span>MENGAJAR</span></h1>
+                <h1 class="header-title">DATA <span>RUBRIK</span></h1>
             </div>
             <div class="badge-prodi">Teknik Informatika</div>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <div>
-                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Data Mengajar</h3>
-                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola plotting dosen mengajar per mata kuliah dan kelas.</p>
+                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Master Rubrik</h3>
+                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola patokan pengukuran CPL untuk penilaian mata kuliah.</p>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-primary-red" onclick="alert('Fitur tambah disiapkan')">Tambah</button>
-                <button class="btn-dark" onclick="alert('Fitur Import disiapkan')">Import dari pusat</button>
-                <button class="btn-primary-red" onclick="alert('Fitur Upload disiapkan')">Upload Excel</button>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn-primary-red" onclick="bukaModalRubrik()"><i class="fas fa-plus"></i> Tambah Rubrik</button>
                 <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
         </div>
@@ -114,51 +120,86 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
                 Show 
-                <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer;">
-                    <option>5</option>
-                    <option selected>10</option>
-                    <option>25</option>
+                <select id="showEntries" style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer;">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
                 </select> entries
             </div>
             
             <div style="display: flex; align-items: center; gap: 10px;">
                 <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                <input type="text" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-size: 0.9rem;">
+                <input type="text" id="searchBox" placeholder="Cari Nama Rubrik..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-size: 0.9rem;">
             </div>
         </div>
 
-        <!-- Tabel Data Mengajar -->
+        <!-- Tabel Data -->
         <table>
             <thead>
                 <tr>
-                    <th width="3%" style="text-align: center;">#</th>
-                    <th width="18%">Mata Kuliah</th>
-                    <th width="10%" style="text-align: center;">Tahun</th>
-                    <th width="10%" style="text-align: center;">Kurikulum</th>
-                    <th width="8%" style="text-align: center;">Semester</th>
-                    <th width="10%" style="text-align: center;">Angkatan</th>
-                    <th width="20%">Dosen Koordinator dan Anggota</th>
-                    <th width="15%">Kelas</th>
-                    <th width="6%" style="text-align: center;">Opsi</th>
+                    <th width="5%" style="text-align: center;">No</th>
+                    <th width="35%">Nama Rubrik</th>
+                    <th width="15%">Kategori</th>
+                    <th width="10%" style="text-align: center;">Skala Max</th>
+                    <th width="15%">Pembuat</th>
+                    <th width="20%" style="text-align: center;">Opsi</th>
                 </tr>
             </thead>
-            <tbody id="bodyMengajar">
+            <tbody id="bodyRubrik">
                 <!-- Data API masuk ke sini -->
             </tbody>
         </table>
 
-        <div id="pagination-mengajar" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.85rem; color: #6b7280;">
+        <div id="pagination-rubrik" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.85rem; color: #6b7280;">
             <div>Loading entries...</div>
         </div>
     </div>
 
-<script>
-    // 1. PENGATURAN API N8N
-    const PRODI = 'ti'; 
-    const API_BASE = "https://reynolds-martial-guild-professional.trycloudflare.com/webhook"; 
-    const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
+    <!-- Modal Pop-Up Tambah/Edit Rubrik -->
+    <div id="modalRubrik" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="modalTitleRubrik" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Rubrik Baru</h3>
+            
+            <input type="hidden" id="idRubrik">
+            
+            <div class="form-group">
+                <label>Nama Rubrik Penilaian</label>
+                <input type="text" id="inputNamaRubrik" class="form-control" placeholder="Contoh: Rubrik Penilaian Presentasi Proyek">
+            </div>
+            
+            <div style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Kategori Penilaian</label>
+                    <select id="inputKategoriRubrik" class="form-control" style="cursor: pointer;">
+                        <option value="Proyek">Proyek</option>
+                        <option value="Tugas">Tugas</option>
+                        <option value="Kuis">Kuis</option>
+                        <option value="UTS">UTS</option>
+                        <option value="UAS">UAS</option>
+                        <option value="Sikap">Sikap</option>
+                        <option value="Praktikum">Praktikum</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Skala Maksimal</label>
+                    <input type="number" id="inputSkalaRubrik" class="form-control" placeholder="Contoh: 100" value="100">
+                </div>
+            </div>
 
-    // 2. SISTEM KEAMANAN & SATPAM AKUN
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label>Pembuat / Author</label>
+                <input type="text" id="inputPembuatRubrik" class="form-control" readonly style="background-color: #f3f4f6; color: #6b7280;">
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                <button onclick="tutupModalRubrik()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
+                <button onclick="simpanRubrik()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // 1. SISTEM KEAMANAN & SATPAM AKUN
     const userLogin = localStorage.getItem("user_login");
     const userRole = localStorage.getItem("user_role");
     const userProdi = localStorage.getItem("prodi_aktif");
@@ -169,7 +210,7 @@
         else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
     }
 
-    // 3. FUNGSI PEMANGGIL SIDEBAR OTOMATIS
+    // 2. LOAD SIDEBAR
     async function loadSidebar() {
         try {
             const response = await fetch('components/sidebar.html');
@@ -181,19 +222,18 @@
 
             setTimeout(() => {
                 const navDashboard = document.getElementById('nav-dashboard');
-                const navMengajar = document.getElementById('nav-mengajar');
+                const navRubrik = document.getElementById('nav-rubrik'); // Asumsi nanti ada ID ini di sidebar HTML Anda
                 const menuMaster = document.getElementById('menu-master');
                 const chevronMaster = document.getElementById('chevron-master');
 
                 if(navDashboard) navDashboard.classList.remove('active');
-                if(navMengajar) navMengajar.classList.add('active'); 
+                if(navRubrik) navRubrik.classList.add('active'); 
                 
                 if(menuMaster && chevronMaster) {
                     menuMaster.style.display = 'flex';
                     chevronMaster.style.transform = 'rotate(180deg)';
                 }
             }, 100);
-
         } catch (error) { console.error('Gagal memuat sidebar:', error); }
     }
 
@@ -210,90 +250,66 @@
     function logout() { localStorage.clear(); window.location.replace("login.html"); }
 
     // ==========================================
-    // 4. LOGIKA DATA, PAGINASI, & PENCARIAN
+    // 3. LOGIKA DATA RUBRIK (Menggunakan Dummy Karena Belum Ada DB)
     // ==========================================
     
-    let allDataMengajar = []; // Tempat menyimpan semua data dari n8n
+    let allDataRubrik = []; 
     let currentPage = 1;
     let rowsPerPage = 10;
     let searchQuery = "";
 
-    // Fungsi Tarik Data dari API
     async function loadData() {
-        const tbody = document.getElementById("bodyMengajar");
-        tbody.innerHTML = "<tr><td colspan='9' style='text-align:center; padding: 20px;'><i class='fas fa-spinner fa-spin'></i> Sedang memuat data dari database...</td></tr>";
+        const tbody = document.getElementById("bodyRubrik");
+        tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding: 20px;'><i class='fas fa-spinner fa-spin'></i> Sedang memuat data...</td></tr>";
 
-        try {
-            const res = await fetch(API_URL);
-            const fullData = await res.json();
+        // Menggunakan data dummy sementara sampai database Rubrik di n8n siap
+        setTimeout(() => {
+            allDataRubrik = [
+                { id: "R01", nama: "Rubrik Penilaian Laporan Proyek", kategori: "Proyek", skala: 100, pembuat: "Kaprodi TI" },
+                { id: "R02", nama: "Rubrik Presentasi Lisan", kategori: "UTS", skala: 100, pembuat: "Sri Mulyatun, Dra., M.M" },
+                { id: "R03", nama: "Rubrik Penilaian Ujian Praktikum Kode", kategori: "Praktikum", skala: 4, pembuat: "Kaprodi TI" },
+                { id: "R04", nama: "Rubrik Keaktifan Diskusi Kelas", kategori: "Sikap", skala: 100, pembuat: "Kaprodi TI" }
+            ];
             
-            // Simpan hanya yang bertipe mengajar ke variabel global
-            allDataMengajar = fullData.filter(i => i.tipe === 'mengajar');
             currentPage = 1;
-            
-            renderTablePaginated(); // Panggil fungsi render tabel
-            
-        } catch (error) {
-            console.error("Gagal menarik data:", error);
-            tbody.innerHTML = "<tr><td colspan='9' style='text-align:center; color:red; padding: 20px;'>❌ Gagal memuat data dari server n8n. Pastikan webhook aktif.</td></tr>";
-        }
+            renderTablePaginated(); 
+        }, 400);
     }
 
-    // Fungsi Menggambar Tabel Sesuai Halaman & Pencarian
     function renderTablePaginated() {
-        const tbody = document.getElementById("bodyMengajar");
+        const tbody = document.getElementById("bodyRubrik");
         tbody.innerHTML = ""; 
 
-        // Filter data berdasarkan input pencarian (mencari kode atau nama matkul)
-        const filteredData = allDataMengajar.filter(item => {
-            const labelContent = item.label ? item.label.toLowerCase() : "";
-            return labelContent.includes(searchQuery);
+        // Filter berdasarkan pencarian Nama Rubrik
+        const filteredData = allDataRubrik.filter(item => {
+            return item.nama.toLowerCase().includes(searchQuery);
         });
 
         if(filteredData.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='9' style='text-align:center; padding: 20px;'>Data tidak ditemukan.</td></tr>";
-            document.getElementById('pagination-mengajar').innerHTML = `<div>Showing 0 entries</div>`;
+            tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding: 20px;'>Data rubrik tidak ditemukan.</td></tr>";
+            document.getElementById('pagination-rubrik').innerHTML = `<div>Showing 0 entries</div>`;
             return;
         }
 
-        // Logika Paginasi (Pemotongan Data)
         const startIndex = (currentPage - 1) * rowsPerPage;
         const endIndex = startIndex + rowsPerPage;
         const dataToShow = filteredData.slice(startIndex, endIndex);
 
-        // Render Baris per Baris
+        // Render Data ke Tabel
         dataToShow.forEach((item, index) => {
             const noUrut = startIndex + index + 1;
-            const parts = item.label ? item.label.split('||') : ['-','-','-','-','-','-'];
-            const kodeMk = parts[0]; const namaMk = parts[1]; const tahun = parts[2];
-            const semester = parts[3]; const namaDosen = parts[4]; const namaKelas = parts[5];
 
             tbody.innerHTML += `
-            <tr>
-                <td style="text-align: center; vertical-align: top; padding-top: 18px;">${noUrut}</td>
-                <td style="vertical-align: top; padding-top: 18px;">
-                    <span style="display:block; color:#6b7280; font-size:0.8rem; margin-bottom: 4px;">${kodeMk}</span>
-                    <strong style="color: var(--text-dark); font-size: 0.9rem;">${namaMk}</strong>
-                </td>
-                <td style="vertical-align: top; padding-top: 18px;">
-                    <select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>${tahun}</option></select>
-                </td>
-                <td style="vertical-align: top; padding-top: 18px;">
-                    <select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025</option></select>
-                </td>
-                <td style="vertical-align: top; padding-top: 18px;">
-                    <select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>${semester}</option></select>
-                </td>
-                <td style="vertical-align: top; padding-top: 18px;">
-                    <select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025</option></select>
-                </td>
-                <td style="vertical-align: top; font-size: 0.85rem; color: #4338ca; padding-top: 18px; line-height: 1.6; font-weight: 600;">
-                    ${namaDosen !== '-' ? namaDosen : '<a href="#" style="color: #2563eb; font-weight: 600; text-decoration: none;">Belum Dinamai</a>'}
-                </td>
-                <td style="vertical-align: top; font-size: 0.8rem; color: #6b7280; padding-top: 18px; line-height: 1.6;">${namaKelas}</td>
-                <td style="text-align: center; vertical-align: top; padding-top: 18px;">
-                    <button class="btn-action" style="background: var(--border-dark); color: white; width: 100%; justify-content: center; margin-bottom: 6px;">Detail</button>
-                    <button class="btn-action btn-delete" style="width: 100%; justify-content: center;">Hapus</button>
+            <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="text-align: center;">${noUrut}</td>
+                <td style="font-weight: 600; color: #111827;">${item.nama}</td>
+                <td><span class="badge-kategori">${item.kategori}</span></td>
+                <td style="text-align: center; font-weight: 700; color: #4b5563;">${item.skala}</td>
+                <td style="color: #6b7280; font-size: 0.85rem;">${item.pembuat}</td>
+                <td style="text-align: center;">
+                    <button class="btn-action" style="background: var(--border-dark); margin-right: 4px;" onclick="alert('Masuk ke halaman Matriks Rubrik')">Detail Kriteria</button>
+                    <button class="btn-action btn-edit" onclick="bukaModalRubrik('${item.id}', '${item.nama}', '${item.kategori}', ${item.skala})"><i class="fas fa-edit"></i></button>
+                    <button class="btn-action btn-delete" onclick="alert('Fitur hapus disiapkan')"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
         });
@@ -301,57 +317,83 @@
         renderPaginationUI(filteredData.length, startIndex, endIndex);
     }
 
-    // Fungsi Render UI Tombol Paginasi
     function renderPaginationUI(totalFilteredData, startIndex, endIndex) {
         const totalPages = Math.ceil(totalFilteredData / rowsPerPage);
         const actualEndIndex = Math.min(endIndex, totalFilteredData);
-        const paginationContainer = document.getElementById('pagination-mengajar');
+        const paginationContainer = document.getElementById('pagination-rubrik');
         
         let html = `<div>Showing ${startIndex + 1} to ${actualEndIndex} of ${totalFilteredData} entries</div>`;
-        
         html += `<div style="display: flex; gap: 5px;">`;
         
-        // Tombol Prev
         const prevDisabled = currentPage === 1;
-        html += `<button class="btn" style="background: ${prevDisabled ? '#e5e7eb' : 'var(--text-dark)'}; color: ${prevDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px;" ${prevDisabled ? 'disabled' : `onclick="changePage(-1)"`}><i class="fas fa-chevron-left"></i> Prev</button>`;
+        html += `<button class="btn" style="background: ${prevDisabled ? '#e5e7eb' : 'var(--text-dark)'}; color: ${prevDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${prevDisabled ? 'not-allowed' : 'pointer'};" ${prevDisabled ? 'disabled' : `onclick="changePage(-1)"`}><i class="fas fa-chevron-left"></i> Prev</button>`;
         
-        // Tombol Next
         const nextDisabled = currentPage === totalPages || totalPages === 0;
-        html += `<button class="btn" style="background: ${nextDisabled ? '#e5e7eb' : 'var(--text-dark)'}; color: ${nextDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px;" ${nextDisabled ? 'disabled' : `onclick="changePage(1)"`}>Next <i class="fas fa-chevron-right"></i></button>`;
+        html += `<button class="btn" style="background: ${nextDisabled ? '#e5e7eb' : 'var(--text-dark)'}; color: ${nextDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${nextDisabled ? 'not-allowed' : 'pointer'};" ${nextDisabled ? 'disabled' : `onclick="changePage(1)"`}>Next <i class="fas fa-chevron-right"></i></button>`;
         
         html += `</div>`;
         paginationContainer.innerHTML = html;
     }
 
-    // Fungsi Pindah Halaman
     function changePage(direction) {
         currentPage += direction;
         renderTablePaginated();
     }
 
     // ==========================================
-    // 5. JALANKAN SAAT WEB PERTAMA KALI DIBUKA
+    // 4. FUNGSI MODAL POP-UP RUBRIK
+    // ==========================================
+    function bukaModalRubrik(id = '', nama = '', kategori = 'Proyek', skala = 100) {
+        if(id) {
+            document.getElementById('modalTitleRubrik').innerText = "Ubah Rubrik";
+            document.getElementById('idRubrik').value = id;
+            document.getElementById('inputNamaRubrik').value = nama;
+            document.getElementById('inputKategoriRubrik').value = kategori;
+            document.getElementById('inputSkalaRubrik').value = skala;
+        } else {
+            document.getElementById('modalTitleRubrik').innerText = "Tambah Rubrik Baru";
+            document.getElementById('idRubrik').value = "";
+            document.getElementById('inputNamaRubrik').value = "";
+            document.getElementById('inputKategoriRubrik').value = "Proyek";
+            document.getElementById('inputSkalaRubrik').value = 100;
+        }
+        
+        // Pembuat otomatis diisi dengan nama user yang sedang login
+        document.getElementById('inputPembuatRubrik').value = userLogin;
+        
+        document.getElementById('modalRubrik').style.display = "flex";
+    }
+
+    function tutupModalRubrik() {
+        document.getElementById('modalRubrik').style.display = "none";
+    }
+
+    function simpanRubrik() {
+        alert("Sistem pop-up siap! Nanti data nama rubrik ini akan dikirim ke tabel master_rubrik di database.");
+        tutupModalRubrik();
+    }
+
+    // ==========================================
+    // 5. EVENT LISTENER SAAT HALAMAN DIBUKA
     // ==========================================
     window.onload = () => { 
         loadSidebar(); 
         loadData(); 
         
-        // Event Listener untuk Dropdown "Show Entries"
-        const selectBox = document.querySelector('.control-area select');
+        const selectBox = document.getElementById('showEntries');
         if(selectBox) {
             selectBox.onchange = (e) => {
                 rowsPerPage = parseInt(e.target.value);
-                currentPage = 1; // Reset ke halaman 1
+                currentPage = 1; 
                 renderTablePaginated();
             }
         }
 
-        // Event Listener untuk Kolom Pencarian
-        const searchBox = document.querySelector('.search-box input');
+        const searchBox = document.getElementById('searchBox');
         if(searchBox) {
             searchBox.oninput = (e) => {
                 searchQuery = e.target.value.toLowerCase();
-                currentPage = 1; // Reset ke halaman 1
+                currentPage = 1; 
                 renderTablePaginated();
             }
         }
