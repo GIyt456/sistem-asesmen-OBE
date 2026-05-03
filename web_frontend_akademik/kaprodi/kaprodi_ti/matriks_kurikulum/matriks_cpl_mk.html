@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matriks CPL vs MK - Sistem OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS STYLING UTAMA --- */
+        :root { 
+            --sidebar-bg: #161923; 
+            --sidebar-text: #7b8395;
+            --sidebar-hover: #262936;
+            --sidebar-active-text: #ffffff;
+            --primary-red: #8b0000; 
+            --bg-main: #ffffff; 
+            --text-dark: #111827;
+            --border-dark: #161923;
+        }
+
+        /* --- GAYA SIDEBAR --- */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0; }
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .sidebar-profile-info { display: flex; flex-direction: column; }
+        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
+        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
+        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .nav-item.logout { color: #f87171; }
+        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; background-color: var(--bg-main); }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary-red); }
+        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
+        
+        /* GAYA TABEL MATRIKS */
+        .table-container { overflow-x: auto; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th { background: #f3f4f6; color: var(--text-dark); padding: 12px 10px; text-align: center; border: 1px solid #e5e7eb; font-weight: 700; font-size: 0.85rem; }
+        td { padding: 12px 10px; border: 1px solid #e5e7eb; font-size: 0.9rem; text-align: center; }
+        .text-left { text-align: left !important; }
+        .check-mark { color: #10b981; font-weight: bold; font-size: 1.1rem; }
+        tbody tr:hover { background-color: #f9fafb; }
+        
+        /* Tooltip untuk nama CPL di Header */
+        th[title] { cursor: help; text-decoration: underline dotted #9ca3af; }
+    </style>
+</head>
+<body>
+
+    <!-- TEMPAT SIDEBAR OTOMATIS MUNCUL -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <div class="header-container">
+            <div>
+                <div class="header-subtitle">MATRIKS KURIKULUM</div>
+                <h1 class="header-title">PEMETAAN <span>CPL - MK</span></h1>
+            </div>
+            <div class="badge-prodi">Teknik Informatika</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <p style="color: #6b7280; font-size: 0.95rem;">
+                Tabel di bawah ini menunjukkan sebaran Capaian Pembelajaran Lulusan (CPL) pada setiap Mata Kuliah.
+            </p>
+            <button onclick="loadDataMatriks()" style="background: var(--border-dark); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                <i class="fas fa-sync-alt"></i> Muat Ulang Data
+            </button>
+        </div>
+
+        <!-- KOTAK UNTUK MENAMPILKAN TABEL -->
+        <div class="table-container" id="areaTabel">
+            <p style="padding: 40px; text-align: center; color: #6b7280;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 10px; color: var(--primary-red);"></i><br>
+                Memuat Matriks Kurikulum dari Database...
+            </p>
+        </div>
+    </div>
+
+<script>
+    // Konfigurasi API N8N
+    const API_BASE = "https://playing-transactions-discovered-welfare.trycloudflare.com/webhook";
+    const API_METADATA = `${API_BASE}/get-metadata`;
+    const API_MATRIKS = `${API_BASE}/matriks-kurikulum`;
+    
+    // 1. Muat Sidebar
+    async function loadSidebar() {
+        try {
+            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
+            if (!response.ok) throw new Error("Sidebar gagal dimuat");
+            document.getElementById('sidebar-container').innerHTML = await response.text();
+            
+            const nameElem = document.getElementById("adminName");
+            if (nameElem) nameElem.innerText = localStorage.getItem("user_login") || "Admin";
+            
+            // Tandai menu matriks aktif di sidebar
+            const navMatriks = document.getElementById('nav-matriks-cpl-mk');
+            if (navMatriks) navMatriks.style.background = 'var(--sidebar-hover)';
+        } catch (error) {
+            console.error("Gagal memuat sidebar:", error);
+        }
+    }
+
+    // 2. Fungsi Memuat Data Master CPL dan Matriks MK
+    async function loadDataMatriks() {
+        const areaTabel = document.getElementById('areaTabel');
+        areaTabel.innerHTML = '<p style="padding: 40px; text-align: center;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</p>';
+
+        try {
+            // Kita panggil kedua API secara bersamaan agar lebih cepat
+            const [resMetadata, resMatriks] = await Promise.all([
+                fetch(API_METADATA),
+                fetch(API_MATRIKS)
+            ]);
+
+            const dataMetadata = await resMetadata.json();
+            const dataMatriks = await resMatriks.json();
+
+            // Saring hanya data CPL dari metadata
+            const daftarCPL = dataMetadata.filter(item => item.tipe === 'cpl').sort((a, b) => a.kode.localeCompare(b.kode));
+
+            if(daftarCPL.length === 0) {
+                areaTabel.innerHTML = '<p style="padding: 30px; text-align: center; color: red;">Data Master CPL kosong. Silakan isi CPL terlebih dahulu.</p>';
+                return;
+            }
+
+            renderTabel(daftarCPL, dataMatriks);
+
+        } catch (error) {
+            console.error(error);
+            areaTabel.innerHTML = `<p style="padding: 30px; text-align: center; color: red;">Gagal terhubung ke N8N. Periksa koneksi atau tunnel Cloudflare.</p>`;
+        }
+    }
+
+    // 3. Menggambar Tabel
+    function renderTabel(daftarCPL, dataMatriks) {
+        const container = document.getElementById('areaTabel');
+        
+        let html = `
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="text-left" style="min-width: 60px;">Smt</th>
+                        <th rowspan="2" class="text-left" style="min-width: 100px;">Kode MK</th>
+                        <th rowspan="2" class="text-left" style="min-width: 250px;">Nama Mata Kuliah</th>
+                        <th rowspan="2" style="min-width: 60px;">SKS</th>
+                        <th colspan="${daftarCPL.length}">Capaian Pembelajaran Lulusan (CPL)</th>
+                    </tr>
+                    <tr>
+        `;
+        
+        // Buat header CPL (CPL-01, CPL-02, dst). Aku tambahkan 'title' agar saat di-hover muncul deskripsinya!
+        daftarCPL.forEach(cpl => {
+            // Menghilangkan tulisan "CPL-" agar header tabel tidak terlalu lebar, sisa angkanya saja
+            const labelSingkat = cpl.kode.replace('CPL-', ''); 
+            html += `<th title="${cpl.label}">${labelSingkat}</th>`;
+        });
+        html += `</tr></thead><tbody>`;
+
+        // Render isi data (Baris = Mata Kuliah)
+        dataMatriks.forEach(row => {
+            // Array pemetaan CPL yang terhubung dari database
+            const cplTerkait = row.cpl_terhubung ? row.cpl_terhubung.split(', ') : []; 
+            
+            html += `
+                <tr>
+                    <td class="text-left">${row.semester || '-'}</td>
+                    <td class="text-left"><strong>${row.kode_mk}</strong></td>
+                    <td class="text-left">${row.nama_mk}</td>
+                    <td>${row.sks}</td>
+            `;
+            
+            // Lakukan pengecekan: Apakah CPL di header ini ada di dalam cplTerkait milik mata kuliah ini?
+            daftarCPL.forEach(cpl => {
+                if (cplTerkait.includes(cpl.kode)) {
+                    html += `<td><span class="check-mark">✔️</span></td>`;
+                } else {
+                    html += `<td></td>`;
+                }
+            });
+            
+            html += `</tr>`;
+        });
+
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    }
+
+    // Jalankan saat pertama kali halaman dibuka
+    window.onload = async () => {
+        if (!localStorage.getItem("user_login")) {
+            window.location.replace("/login/login.html");
+            return;
+        }
+        await loadSidebar();
+        await loadDataMatriks();
+    };
+    
+    // Fungsi Animasi Dropdown
+    function toggleDropdown(menuId, chevronId) {
+        const menu = document.getElementById(menuId);
+        const chevron = document.getElementById(chevronId);
+        
+        if (menu.style.display === 'none' || menu.style.display === '') {
+            menu.style.display = 'flex';
+            chevron.style.transform = 'rotate(180deg)';
+        } else {
+            menu.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Fungsi Logout
+    function logout() {
+        if(confirm("Apakah Anda yakin ingin keluar?")) {
+            localStorage.removeItem("user_login");
+            localStorage.removeItem("user_role");
+            window.location.replace('/login/login.html');
+        }
+    }
+</script>
+</body>
+</html>

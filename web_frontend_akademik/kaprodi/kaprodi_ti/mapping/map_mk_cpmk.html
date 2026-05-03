@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapping MK - CPMK - Sistem OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
+            --primary-red: #8b0000; --bg-main: #ffffff; --text-dark: #111827; --border-dark: #161923;
+        }
+
+        /* --- GAYA SIDEBAR --- */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0; }
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .sidebar-profile-info { display: flex; flex-direction: column; }
+        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
+        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
+        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .nav-item.logout { color: #f87171; }
+        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: #f9fafb; height: 100vh; overflow: hidden; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary-red); }
+
+        /* GAYA PANEL MAPPING */
+        .mapping-panel { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 1.05rem; }
+        .select-mk { width: 100%; padding: 14px 16px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 1rem; font-weight: 500; outline: none; background: #f9fafb; cursor: pointer; }
+        .select-mk:focus { border-color: var(--primary-red); box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1); }
+
+        .cpmk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .cpmk-card { border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; transition: 0.2s; background: white; }
+        .cpmk-card:hover { border-color: var(--primary-red); background: #fff5f5; }
+        .cpmk-card input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; margin-top: 2px; accent-color: var(--primary-red); }
+        .cpmk-info { display: flex; flex-direction: column; }
+        .cpmk-code { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
+        .cpmk-desc { font-size: 0.8rem; color: #6b7280; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .btn-save { background: var(--primary-red); color: white; border: none; padding: 14px 24px; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; width: 100%; justify-content: center; margin-top: 30px; }
+        .btn-save:hover { background: #6b0000; transform: translateY(-2px); }
+        .btn-save:disabled { background: #d1d5db; cursor: not-allowed; transform: none; }
+    </style>
+</head>
+<body>
+
+    <!-- TEMPAT SIDEBAR OTOMATIS MUNCUL -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <div class="header-container">
+            <div>
+                <div class="header-subtitle">PEMETAAN (MAPPING)</div>
+                <h1 class="header-title">MAPPING <span>MK - CPMK</span></h1>
+            </div>
+        </div>
+
+        <div class="mapping-panel">
+            <!-- 1. PILIH MATA KULIAH -->
+            <div class="form-group">
+                <label for="selectMk"><i class="fas fa-book" style="color: var(--primary-red); margin-right: 8px;"></i> Pilih Mata Kuliah</label>
+                <select id="selectMk" class="select-mk" onchange="loadMappingData()">
+                    <option value="">-- Memuat daftar Mata Kuliah... --</option>
+                </select>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+            <!-- 2. DAFTAR CHECKBOX CPMK -->
+            <div class="form-group">
+                <label><i class="fas fa-tasks" style="color: var(--primary-red); margin-right: 8px;"></i> Centang CPMK yang Relevan</label>
+                <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 15px;">Pilih mata kuliah di atas terlebih dahulu untuk melihat CPMK yang terhubung.</p>
+                
+                <div id="cpmkContainer" class="cpmk-grid">
+                    <p style="grid-column: 1 / -1; color: #9ca3af; font-style: italic;">Memuat daftar CPMK dari database...</p>
+                </div>
+            </div>
+
+            <!-- 3. TOMBOL SIMPAN -->
+            <button id="btnSave" class="btn-save" onclick="saveMapping()" disabled>
+                <i class="fas fa-save"></i> Simpan Pemetaan
+            </button>
+        </div>
+    </div>
+
+<script>
+    const PRODI = 'ti';
+    const API_BASE = "https://playing-transactions-discovered-welfare.trycloudflare.com/webhook";
+    
+    // Endpoint API dari N8N
+    const API_MATKUL = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
+    const API_METADATA = `${API_BASE}/get-metadata`;
+    const API_GET_MAPPING = `${API_BASE}/get-mapping-mk`; // Method: POST/GET tergantung N8n, kita pakai POST JSON
+    const API_SAVE_MAPPING = `${API_BASE}/admin-map-mk-cpmk`;
+
+    let isDataLoaded = false;
+
+    // 1. Inisialisasi Data Saat Halaman Dibuka
+    window.onload = async () => {
+        if (!localStorage.getItem("user_login")) { window.location.replace("/login/login.html"); return; }
+        
+        await loadSidebar();
+        await initDropdownAndCheckboxes();
+    };
+
+    // 2. Tarik Data MK dan CPMK ke layar
+    async function initDropdownAndCheckboxes() {
+        try {
+            const [resMk, resMeta] = await Promise.all([ fetch(API_MATKUL), fetch(API_METADATA) ]);
+            const dataMk = await resMk.json();
+            const dataMeta = await resMeta.json();
+
+            // Isi Dropdown MK
+            const selectMk = document.getElementById('selectMk');
+            selectMk.innerHTML = '<option value="">-- Pilih Mata Kuliah --</option>';
+            dataMk.forEach(mk => {
+                selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
+            });
+
+            // LOGIKA GROUPING CPMK
+            const container = document.getElementById('cpmkContainer');
+            container.innerHTML = '';
+            
+            // Saring dan urutkan CPMK
+            const dataCpmk = dataMeta.filter(item => item.tipe === 'cpmk').sort((a,b) => a.kode.localeCompare(b.kode));
+            
+            // Objek untuk menampung grup (misal: "TI-CPMK01": [011, 012], "TI-CPMK02": [021])
+            const groupedCpmk = {};
+
+            dataCpmk.forEach(cpmk => {
+                // Ekstrak prefix. Jika kode "TI-CPMK011", prefix-nya "TI-CPMK01"
+                // Mengambil string hingga digit sebelum terakhir
+                const prefix = cpmk.kode.substring(0, cpmk.kode.length - 1); 
+                
+                if (!groupedCpmk[prefix]) {
+                    groupedCpmk[prefix] = [];
+                }
+                groupedCpmk[prefix].push(cpmk);
+            });
+
+            // Render ke layar berdasarkan grup
+            for (const [prefix, listCpmk] of Object.entries(groupedCpmk)) {
+                // Buat Header Grup (yang membentang penuh / grid-column: 1 / -1)
+                container.innerHTML += `
+                    <div style="grid-column: 1 / -1; margin-top: 15px; margin-bottom: 5px; border-bottom: 2px solid var(--primary-red); padding-bottom: 5px;">
+                        <h4 style="color: var(--primary-red); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.5px;">RUMPUN ${prefix}x</h4>
+                    </div>
+                `;
+
+                // Render kartu checkbox di bawah header tersebut
+                listCpmk.forEach(cpmk => {
+                    container.innerHTML += `
+                        <label class="cpmk-card" for="cb-${cpmk.kode}">
+                            <input type="checkbox" id="cb-${cpmk.kode}" class="cpmk-checkbox" value="${cpmk.kode}" disabled>
+                            <div class="cpmk-info">
+                                <span class="cpmk-code">${cpmk.kode}</span>
+                                <span class="cpmk-desc" title="${cpmk.label}">${cpmk.label}</span>
+                            </div>
+                        </label>
+                    `;
+                });
+            }
+
+            isDataLoaded = true;
+
+        } catch (error) {
+            console.error(error);
+            alert("Gagal menarik data Master dari N8N.");
+        }
+    }
+
+    // 3. Tarik Mapping yang sudah ada saat Dropdown MK dipilih
+    async function loadMappingData() {
+        const kodeMk = document.getElementById('selectMk').value;
+        const checkboxes = document.querySelectorAll('.cpmk-checkbox');
+        const btnSave = document.getElementById('btnSave');
+
+        // 1. Reset semua centang ke posisi kosong dan matikan tombol
+        checkboxes.forEach(cb => { cb.checked = false; cb.disabled = true; });
+        btnSave.disabled = true;
+
+        if (!kodeMk) return; 
+
+        try {
+            // 2. Aktifkan checkbox agar bisa diedit
+            checkboxes.forEach(cb => cb.disabled = false);
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat Relasi...';
+
+            // 3. Panggil Webhook N8N (Gunakan parameter ?mk= dan &prodi=)
+            const response = await fetch(`${API_BASE}/get-mapping-mk?mk=${kodeMk}&prodi=${PRODI}`);
+            
+            if (!response.ok) throw new Error("Gagal menghubungi server");
+
+            const mappings = await response.json(); // Mappings akan berisi array hasil SELECT
+            
+            // 4. Jika ada data, berikan centang otomatis pada checkbox yang sesuai
+            if (Array.isArray(mappings) && mappings.length > 0) {
+                mappings.forEach(map => {
+                    const cb = document.getElementById(`cb-${map.kode_cpmk}`);
+                    if (cb) cb.checked = true;
+                });
+            }
+
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Pemetaan';
+
+        } catch (error) {
+            console.error("Detail Error:", error);
+            alert("Terjadi kesalahan saat menarik data. Pastikan Webhook Get Mapping sudah Active!");
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Pemetaan';
+        }
+    }
+
+    // 4. Simpan Perubahan ke MySQL melalui N8n
+    async function saveMapping() {
+        const kodeMk = document.getElementById('selectMk').value;
+        const btnSave = document.getElementById('btnSave');
+        
+        // Kumpulkan semua checkbox yang sedang dicentang
+        const checkedBoxes = Array.from(document.querySelectorAll('.cpmk-checkbox:checked')).map(cb => cb.value);
+
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btnSave.disabled = true;
+
+        try {
+            const payload = {
+                kode_mk: kodeMk,
+                prodi: PRODI,
+                cpmk_list: checkedBoxes // Ini yang di-loop di dalam node Code n8n milikmu!
+            };
+
+            const res = await fetch(API_SAVE_MAPPING, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                alert("✅ Relasi MK & CPMK berhasil disimpan!");
+            } else {
+                alert("❌ Gagal menyimpan data di server.");
+            }
+        } catch (error) {
+            alert("Terjadi kesalahan jaringan.");
+        } finally {
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Pemetaan';
+            btnSave.disabled = false;
+        }
+    }
+
+    // FUNGSI STANDAR (Sidebar & Dropdown)
+    async function loadSidebar() {
+        try {
+            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
+            document.getElementById('sidebar-container').innerHTML = await response.text();
+            document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
+            document.getElementById('nav-mapping-mk').style.background = 'var(--sidebar-hover)';
+        } catch (error) {}
+    }
+
+    function toggleDropdown(menuId, chevronId) {
+        const menu = document.getElementById(menuId);
+        const chevron = document.getElementById(chevronId);
+        if (menu.style.display === 'none' || menu.style.display === '') {
+            menu.style.display = 'flex'; chevron.style.transform = 'rotate(180deg)';
+        } else {
+            menu.style.display = 'none'; chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    function logout() {
+        if(confirm("Apakah Anda yakin ingin keluar?")) {
+            localStorage.removeItem("user_login"); window.location.replace('/login/login.html');
+        }
+    }
+</script>
+</body>
+</html>
