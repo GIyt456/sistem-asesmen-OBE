@@ -93,7 +93,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
                     <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Susunan Mata Kuliah</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Distribusi Mata Kuliah per Semester</p>
+                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Menampilkan Daftar Mata Kuliah Terstruktur</p>
                 </div>
                 <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
             </div>
@@ -106,7 +106,7 @@
 <script>
     // 1. KONFIGURASI API
     const PRODI = 'ti'; 
-    const API_BASE = "https://reynolds-martial-guild-professional.trycloudflare.com/webhook"; 
+    const API_BASE = "https://playing-transactions-discovered-welfare.trycloudflare.com/webhook"; 
     const API_MATKUL = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const userLogin = localStorage.getItem("user_login");
@@ -114,7 +114,7 @@
     // 2. FUNGSI LOAD SIDEBAR (DIPERBAIKI)
     async function loadSidebar() {
         try {
-            const response = await fetch('components/sidebar.html');
+            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
             if (!response.ok) throw new Error("File sidebar tidak ditemukan");
             const html = await response.text();
             
@@ -178,8 +178,12 @@
                     tableHTML += `
                         <tr>
                             <td><strong>${mk.kode_mk}</strong></td>
-                            <td><input type="text" id="in-${mk.kode_mk}" value="${mk.nama_mk}" style="width:100%; padding:8px; border:1px solid #e5e7eb; border-radius:6px;"></td>
-                            <td style="text-align: center;">${mk.sks} SKS</td>
+                            <td>
+                                <input type="text" id="in-${mk.kode_mk}" value="${mk.nama_mk}" style="width:100%; padding:8px; border:1px solid #e5e7eb; border-radius:6px;">
+                            </td>
+                            <td style="text-align: center;">
+                                <input type="number" id="sks-${mk.kode_mk}" value="${mk.sks}" style="width:60px; padding:8px; border:1px solid #e5e7eb; border-radius:6px; text-align:center;" min="1" max="6">
+                            </td>
                             <td style="text-align:center;">
                                 <button class="btn-dark" style="padding: 8px 12px;" onclick="simpanEdit('mk', '${mk.kode_mk}')">
                                     <i class="fas fa-save"></i>
@@ -197,46 +201,8 @@
         }
     }
 
-    // 4. Update SKS
-    async function updateSKS(kodeMk) {
-    const newSks = document.getElementById(`sks-${kodeMk}`).value;
 
-    // Tampilkan loading di tombol agar kamu tahu sedang proses
-    const btn = event.target;
-    const originalText = btn.innerText;
-    btn.innerText = "...";
-    btn.disabled = true;
-
-    try {
-        const response = await fetch(API_UPDATE, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' // Kita balikkan ke JSON
-            },
-            body: JSON.stringify({
-                kode_mk: kodeMk,
-                sks: parseInt(newSks), // Pastikan SKS terkirim sebagai angka
-                prodi: PRODI
-            })
-        });
-            if (response.ok) {
-                alert(`SKS ${kodeMk} berhasil diupdate!`);
-            } else {
-                // Jika muncul 500 lagi, kita akan tangkap di sini
-                const errorData = await response.text();
-                console.error("Detail Error dari Server:", errorData);
-                alert("Server (n8n) bermasalah. Cek 'Execution Log' di n8n kamu.");
-            }
-        } catch (error) {
-            console.error("Koneksi Error:", error);
-            alert("Gagal koneksi ke server.");
-        } finally {
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
-    }
-
-    // 5. SATU-SATUNYA WINDOW ONLOAD (PENTING!)
+    // 4. SATU-SATUNYA WINDOW ONLOAD (PENTING!)
     window.onload = async () => {
         // Pastikan user sudah login
         if (!userLogin) {
@@ -249,16 +215,44 @@
     };
 
     // Fungsi simpan tetap sama
+    // 4. FUNGSI SIMPAN EDIT (UBAH NAMA DAN SKS)
     async function simpanEdit(tipe, kode) { 
+        // Ambil nilai dari input Nama MK dan input SKS
         const value = document.getElementById(`in-${kode}`).value; 
+        const sksBaru = document.getElementById(`sks-${kode}`).value;
+        
+        // Opsional: Ubah ikon tombol jadi loading
+        const btn = event.currentTarget;
+        const oldHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+
         try {
             const res = await fetch(API_UPDATE, { 
                 method: "POST", 
                 headers: {"Content-Type":"application/json"}, 
-                body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) 
+                // Kirimkan SKS di dalam body agar ditangkap oleh webhook N8n
+                body: JSON.stringify({ 
+                    tipe: tipe, 
+                    kode: kode, 
+                    value: value, 
+                    sks: parseInt(sksBaru), 
+                    prodi: PRODI 
+                }) 
             }); 
-            if(res.ok) alert("✅ Berhasil diperbarui!");
-        } catch (e) { alert("Terjadi kesalahan jaringan."); }
+            
+            if(res.ok) {
+                alert("✅ Data Mata Kuliah & SKS Berhasil Diperbarui!");
+            } else {
+                alert("❌ Gagal menyimpan data di server.");
+            }
+        } catch (e) { 
+            alert("Terjadi kesalahan jaringan."); 
+        } finally {
+            // Kembalikan tombol ke bentuk semula
+            btn.innerHTML = oldHtml;
+            btn.disabled = false;
+        }
     }
 </script>
 </body>
