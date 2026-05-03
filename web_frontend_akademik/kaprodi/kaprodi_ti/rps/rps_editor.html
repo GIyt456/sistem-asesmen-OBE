@@ -6,9 +6,8 @@
     <title>Editor RPS - Panel Kaprodi</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- PANGGIL CSS GLOBAL KITA -->
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    <script src="../../../js/template.js"></script>
 
     <style>
         /* Tambahan CSS khusus agar tabel Editor RPS nyaman diketik */
@@ -73,7 +72,7 @@
     <!-- Logika Halaman Editor -->
     <script>
         // GANTI DENGAN URL CLOUDFLARE ANDA JIKA BERUBAH
-        const API_BASE = "https://psychiatry-ethical-disciplinary-unified.trycloudflare.com/webhook"; 
+        const API_BASE = "https://playing-transactions-discovered-welfare.trycloudflare.com/webhook"; 
 
         // 1. Tangkap "Koper" (URL Parameters)
         const urlParams = new URLSearchParams(window.location.search);
@@ -152,9 +151,63 @@
             tbody.innerHTML = html;
         }
 
-        // 5. Fungsi Mengirim Data ke n8n (Untuk tombol Simpan)
-        function simpanRPS() {
-            alert(`Fitur simpan RPS untuk ${kodeMK} sedang kita siapkan di n8n!`);
+        // 5. Fungsi Mengumpulkan Data dan Mengirim ke n8n
+        async function simpanRPS() {
+            // Ubah tampilan tombol jadi loading
+            const btnSimpan = document.querySelector('button[onclick="simpanRPS()"]');
+            const teksAsli = btnSimpan.innerHTML;
+            btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btnSimpan.disabled = true;
+
+            let dataRPS = [];
+
+            // Looping menyedot data dari 16 baris tabel
+            for (let i = 1; i <= 16; i++) {
+                // Lewati baris 8 (UTS) dan 16 (UAS) karena itu baris judul ujian
+                if (i === 8 || i === 16) continue;
+
+                // Ambil nilai dari masing-masing kotak input
+                dataRPS.push({
+                    pertemuan: i,
+                    cpmk: document.getElementById(`cpmk_${i}`).value.trim(),
+                    materi: document.getElementById(`materi_${i}`).value.trim(),
+                    metode: document.getElementById(`metode_${i}`).value.trim(),
+                    waktu: document.getElementById(`waktu_${i}`).value,
+                    kriteria: document.getElementById(`kriteria_${i}`).value.trim(),
+                    bobot: document.getElementById(`bobot_${i}`).value
+                });
+            }
+
+            // Koper data yang siap dikirim ke n8n
+            const nidnAktif = localStorage.getItem("username") || "0610029301"; 
+
+            const payloadData = {
+                kode_mk: kodeMK,
+                nidn_dosen: nidnAktif, 
+                detail_pertemuan: dataRPS
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/simpan-rps`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payloadData)
+                });
+                
+                if(res.ok) {
+                    alert("✅ RPS Berhasil Disimpan ke Database!");
+                    window.location.href = "/RPS/rps_kelola.html"; // Kembali ke daftar RPS
+                } else {
+                    alert("❌ Gagal menyimpan RPS.");
+                }
+            } catch(e) {
+                alert("❌ Terjadi kesalahan jaringan.");
+            }
+        
+
+            // Kembalikan tombol ke semula
+            btnSimpan.innerHTML = teksAsli;
+            btnSimpan.disabled = false;
         }
 
         // Jalankan fetch API saat halaman siap

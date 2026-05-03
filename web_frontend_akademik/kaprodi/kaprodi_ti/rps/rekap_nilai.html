@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Nilai Dosen - Panel Kaprodi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    <script src="../../../js/template.js"></script>
+
+    <style>
+        /* Progress Bar Sederhana */
+        .progress-bg { background: #e5e7eb; border-radius: 10px; height: 10px; width: 100%; overflow: hidden; margin-top: 5px; }
+        .progress-bar { background: #10b981; height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+        .progress-text { font-size: 0.8rem; font-weight: 600; color: #4b5563; }
+        .status-danger { color: #dc2626; background: #fee2e2; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+        .status-success { color: #059669; background: #d1fae5; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Wadah Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <!-- 2. Wadah Navbar -->
+        <div id="navbar-container"></div>
+
+        <!-- 3. KONTEN UTAMA REKAP NILAI -->
+        <div class="main-content">
+            <div style="margin-bottom: 30px;">
+                <h1 style="margin:0; font-size: 2rem; color: var(--text-dark);">Rekap Nilai <span style="color: var(--primary-red);">Dosen</span></h1>
+                <p style="color: #6b7280; margin-top: 5px;">Pantau progres input nilai OBE oleh dosen pengampu pada semester aktif.</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <input type="text" id="searchKelas" placeholder="Cari Mata Kuliah atau Nama Dosen..." style="padding: 10px 15px; width: 300px; border: 1px solid #d1d5db; border-radius: 6px;">
+                <button class="btn-action btn-edit" onclick="loadRekapNilai()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th width="5%">No</th>
+                        <th width="10%">Kelas</th>
+                        <th width="25%">Mata Kuliah</th>
+                        <th width="25%">Dosen Pengampu</th>
+                        <th width="20%">Progres Input Nilai</th>
+                        <th width="15%" style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBodyRekap">
+                    <tr><td colspan="6" style="text-align: center; color: #6b7280; padding: 20px;">Memuat data kelas aktif... <i class="fas fa-spinner fa-spin"></i></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Panggil Mesin Pemasang Komponen -->
+    <script src="/js/template.js"></script>
+
+    <!-- Logika Halaman -->
+    <script>
+        // GANTI DENGAN URL CLOUDFLARE ANDA YANG AKTIF
+        const API_BASE = "https://playing-transactions-discovered-welfare.trycloudflare.com/webhook"; 
+        
+        async function loadRekapNilai() {
+            const tbody = document.getElementById('tableBodyRekap');
+            try {
+                // Minta data dari n8n (Akan kita buat API-nya setelah ini)
+                const res = await fetch(`${API_BASE}/get-rekap-nilai`);
+                if (!res.ok) throw new Error("Gagal load dari n8n");
+                
+                const data = await res.json();
+                renderTable(data, tbody);
+
+            } catch (error) {
+                console.log("n8n belum siap, menampilkan data dummy untuk testing UI");
+                // DATA DUMMY JIKA N8N BELUM ADA
+                const dummyData = [
+                    { kelas: "TI-A", kode_mk: "2023W276", nama_mk: "AI Programming", dosen: "Harries Arizonia Ismail", persentase: 100 },
+                    { kelas: "TI-B", kode_mk: "2023P065", nama_mk: "Cyber Security", dosen: "Ibu Dosen TI", persentase: 45 },
+                    { kelas: "TI-A", kode_mk: "2023F075", nama_mk: "Metodologi Riset", dosen: "Bapak Kaprodi TI", persentase: 0 }
+                ];
+                renderTable(dummyData, tbody);
+            }
+        }
+
+        function renderTable(data, tbody) {
+            tbody.innerHTML = "";
+            data.forEach((item, index) => {
+                // Logika Warna dan Status Progress
+                let statusBadge = "";
+                let barColor = "#10b981"; // Hijau (Selesai)
+                
+                if (item.persentase === 0) {
+                    statusBadge = `<span class="status-danger"><i class="fas fa-times-circle"></i> Belum Input</span>`;
+                    barColor = "#dc2626"; // Merah
+                } else if (item.persentase < 100) {
+                    statusBadge = `<span style="color:#d97706; font-size:0.8rem; font-weight:bold;"><i class="fas fa-clock"></i> Proses Input</span>`;
+                    barColor = "#f59e0b"; // Kuning/Orange
+                } else {
+                    statusBadge = `<span class="status-success"><i class="fas fa-check-circle"></i> Selesai</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td><strong>${item.kelas}</strong></td>
+                        <td>
+                            <div style="font-weight: 600; color: var(--primary-red);">${item.kode_mk}</div>
+                            <div style="font-size: 0.85rem;">${item.nama_mk}</div>
+                        </td>
+                        <td>${item.dosen}</td>
+                        <td>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="progress-text">${item.persentase}%</span>
+                                ${statusBadge}
+                            </div>
+                            <div class="progress-bg">
+                                <div class="progress-bar" style="width: ${item.persentase}%; background: ${barColor};"></div>
+                            </div>
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="btn-action btn-edit" onclick="lihatDetail('${item.kelas}', '${item.kode_mk}')" ${item.persentase === 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                                <i class="fas fa-search"></i> Detail
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function lihatDetail(kelas, kodeMK) {
+            alert(`Fitur Detail Nilai Mahasiswa untuk Kelas ${kelas} - ${kodeMK} sedang kita kerjakan!`);
+        }
+
+        window.onload = () => {
+            setTimeout(loadRekapNilai, 500);
+        };
+    </script>
+</body>
+</html>
