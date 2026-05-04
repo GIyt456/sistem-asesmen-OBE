@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Bobot - Sistem OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
+            --primary-red: #8b0000; --bg-main: #ffffff; --text-dark: #111827; --border-dark: #161923;
+        }
+
+        /* GAYA SIDEBAR */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .sidebar-profile-info { display: flex; flex-direction: column; }
+        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
+        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
+        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .nav-item.logout { color: #f87171; }
+        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: #f9fafb; height: 100vh; overflow: hidden; color: var(--text-dark); }
+        
+        .main-content { flex: 1; overflow-y: auto; padding: 30px 40px; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary-red); }
+
+        /* GAYA TABEL BOBOT */
+        .table-container { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow-x: auto; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .select-filter { padding: 10px 15px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 0.95rem; font-weight: 600; outline: none; background: #f9fafb; }
+        
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th { background: var(--sidebar-bg); color: white; text-align: center; padding: 12px 10px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; border: 1px solid #374151; position: sticky; top: 0; z-index: 10; }
+        td { padding: 10px; border: 1px solid #e5e7eb; font-size: 0.85rem; text-align: center; vertical-align: middle; }
+        
+        /* Kolom Teks (Kiri) */
+        td.text-left { text-align: left; font-weight: 500; }
+        .col-cpl { color: var(--primary-red); font-weight: 700; }
+        .col-mk { font-weight: 700; }
+        .col-cpmk { background: #f3f4f6; font-weight: 600; }
+
+        /* Input Angka */
+        .input-bobot { width: 60px; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; text-align: center; font-size: 0.85rem; transition: 0.2s; }
+        .input-bobot:focus { border-color: var(--primary-red); outline: none; box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1); }
+        
+        /* Highlight Total */
+        .col-total { font-weight: 800; font-size: 1rem; }
+        .total-ok { color: #059669; } /* Hijau 100% */
+        .total-warn { color: #dc2626; } /* Merah != 100% */
+
+        .btn-save { background: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .btn-save:hover { background: #6b0000; }
+    </style>
+</head>
+<body>
+
+    <!-- CONTAINER SIDEBAR -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <div class="header-container">
+            <div>
+                <div class="header-subtitle">MEKANISME ASSESMEN</div>
+                <h1 class="header-title">MASTER <span>BOBOT</span></h1>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="toolbar">
+                <select class="select-filter" id="filterTahun">
+                    <option value="2024">Kurikulum 2024</option>
+                    <option value="2023">Kurikulum 2023</option>
+                </select>
+                <button class="btn-save" onclick="saveSemuaBobot()">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </div>
+
+            <table id="bobotTable">
+                <thead>
+                    <tr>
+                        <th rowspan="2">CPL</th>
+                        <th rowspan="2">KODE MK</th>
+                        <th rowspan="2">NAMA MK</th>
+                        <th rowspan="2">CPMK</th>
+                        <!-- colspan diubah jadi 4 -->
+                        <th colspan="4" style="background: #2d3748; border-bottom: 1px solid #4a5568;">KOMPONEN PENILAIAN (%)</th>
+                        <th rowspan="2" style="background: var(--primary-red);">TOTAL</th>
+                    </tr>
+                    <tr>
+                        <!-- Sub-header dirampingkan -->
+                        <th>Tugas</th>
+                        <th>UTS</th>
+                        <th>Presentasi</th>
+                        <th>UAS</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Data dummy dihapus, diganti pesan loading -->
+                    <tr><td colspan="9" style="text-align: center; padding: 20px;">Memuat data dari database...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    // WAJIB GANTI: Masukkan URL Webhook GET n8n kamu di sini!
+    const API_GET_BOBOT = "https://ohio-linked-firewall-school.trycloudflare.com/webhook/get-master-bobot";
+
+    window.onload = async () => {
+        try {
+            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
+            document.getElementById('sidebar-container').innerHTML = await response.text();
+            document.getElementById('nav-master-bobot').classList.add('active');
+            
+            const menu = document.getElementById('menu-assesmen');
+            const chev = document.getElementById('chevron-assesmen');
+            if(menu && chev) {
+                menu.style.display = 'flex'; chev.style.transform = 'rotate(180deg)';
+            }
+        } catch (error) {}
+        
+        // Panggil fungsi tarik data saat halaman dimuat
+        await loadDataBobot();
+    };
+
+    async function loadDataBobot() {
+        const tbody = document.getElementById('tableBody');
+        try {
+            const res = await fetch(API_GET_BOBOT);
+            const data = await res.json();
+            
+            tbody.innerHTML = ''; // Kosongkan tabel dari tulisan 'Memuat data...'
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Belum ada pemetaan MK-CPMK di database.</td></tr>';
+                return;
+            }
+
+            data.forEach((row, index) => {
+                // Kalkulasi total awal berdasarkan 4 kolom
+                const total = parseInt(row.tugas) + parseInt(row.uts) + parseInt(row.presentasi) + parseInt(row.uas);
+                const totalClass = total === 100 ? 'total-ok' : 'total-warn';
+
+                tbody.innerHTML += `
+                    <tr data-rowid="${index}">
+                        <td class="text-left col-cpl">${row.cpl}</td>
+                        <td class="text-left col-mk">${row.kode_mk}</td>
+                        <td class="text-left">${row.nama_mk}</td>
+                        <td class="col-cpmk">${row.cpmk}</td>
+                        <!-- Input dirampingkan jadi 4 sesuai database -->
+                        <td><input type="number" class="input-bobot" data-field="tugas" value="${row.tugas}" oninput="hitungTotal(${index})"></td>
+                        <td><input type="number" class="input-bobot" data-field="uts" value="${row.uts}" oninput="hitungTotal(${index})"></td>
+                        <td><input type="number" class="input-bobot" data-field="presentasi" value="${row.presentasi}" oninput="hitungTotal(${index})"></td>
+                        <td><input type="number" class="input-bobot" data-field="uas" value="${row.uas}" oninput="hitungTotal(${index})"></td>
+                        <td class="col-total ${totalClass}" id="total-${index}">${total}</td>
+                    </tr>
+                `;
+            });
+        } catch (error) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Gagal memuat data dari API. Pastikan n8n menyala!</td></tr>';
+        }
+    }
+
+    function hitungTotal(rowId) {
+        const row = document.querySelector(`tr[data-rowid="${rowId}"]`);
+        const inputs = row.querySelectorAll('.input-bobot');
+        let sum = 0;
+        
+        inputs.forEach(input => sum += (parseInt(input.value) || 0));
+
+        const totalCell = document.getElementById(`total-${rowId}`);
+        totalCell.innerText = sum;
+        totalCell.className = `col-total ${sum === 100 ? 'total-ok' : 'total-warn'}`;
+    }
+
+    function saveSemuaBobot() {
+        alert("Sabar, fitur simpan menyusul! Cek dulu apakah datanya sudah tampil semua?");
+    }
+
+    // Sidebar
+    async function loadSidebar() {
+        try {
+            // Menambahkan timestamp agar browser selalu mengambil versi paling fresh!
+            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html?v=' + new Date().getTime());
+            document.getElementById('sidebar-container').innerHTML = await response.text();
+            document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
+            // Tandai menu aktif
+            const navStruktur = document.getElementById('nav-matriks-struktur');
+            if (navStruktur) navStruktur.style.background = 'var(--sidebar-hover)';
+        } catch (error) {}
+    }
+
+    // Fungsi Animasi Dropdown
+    function toggleDropdown(menuId, chevronId) {
+        const menu = document.getElementById(menuId);
+        const chevron = document.getElementById(chevronId);
+        
+        if (menu.style.display === 'none' || menu.style.display === '') {
+            menu.style.display = 'flex';
+            chevron.style.transform = 'rotate(180deg)';
+        } else {
+            menu.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Fungsi Logout
+    function logout() {
+        if(confirm("Apakah Anda yakin ingin keluar?")) {
+            localStorage.removeItem("user_login");
+            localStorage.removeItem("user_role");
+            window.location.replace('/login/login.html');
+        }
+    }
+</script>
+</script>
+</body>
+</html>

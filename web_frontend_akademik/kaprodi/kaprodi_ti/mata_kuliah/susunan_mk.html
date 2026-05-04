@@ -40,7 +40,7 @@
         }
         
         /* GAYA SIDEBAR */
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; }
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
         .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
         .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
         .sidebar-profile-info { display: flex; flex-direction: column; }
@@ -106,7 +106,7 @@
 <script>
     // 1. KONFIGURASI API
     const PRODI = 'ti'; 
-    const API_BASE = "https://playing-transactions-discovered-welfare.trycloudflare.com/webhook"; 
+    const API_BASE = "https://ohio-linked-firewall-school.trycloudflare.com/webhook"; 
     const API_MATKUL = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const userLogin = localStorage.getItem("user_login");
@@ -214,7 +214,6 @@
         await loadData('mk');    // Baru muat data
     };
 
-    // Fungsi simpan tetap sama
     // 4. FUNGSI SIMPAN EDIT (UBAH NAMA DAN SKS)
     async function simpanEdit(tipe, kode) { 
         // Ambil nilai dari input Nama MK dan input SKS
@@ -252,6 +251,29 @@
             // Kembalikan tombol ke bentuk semula
             btn.innerHTML = oldHtml;
             btn.disabled = false;
+        }
+    }
+
+    // Fungsi Animasi Dropdown
+    function toggleDropdown(menuId, chevronId) {
+        const menu = document.getElementById(menuId);
+        const chevron = document.getElementById(chevronId);
+        
+        if (menu.style.display === 'none' || menu.style.display === '') {
+            menu.style.display = 'flex';
+            chevron.style.transform = 'rotate(180deg)';
+        } else {
+            menu.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Fungsi Logout
+    function logout() {
+        if(confirm("Apakah Anda yakin ingin keluar?")) {
+            localStorage.removeItem("user_login");
+            localStorage.removeItem("user_role");
+            window.location.replace('/login/login.html');
         }
     }
 </script>

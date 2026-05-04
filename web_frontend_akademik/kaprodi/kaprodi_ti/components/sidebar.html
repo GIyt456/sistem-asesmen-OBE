@@ -40,6 +40,17 @@
             <div class="nav-item" id="nav-dsn" onclick="window.location.href='/kaprodi/kaprodi_ti/master_dosen.html'"><i class="fas fa-chalkboard-teacher"></i> Dosen</div>
         </div>
 
+        <!-- MEKANISME ASSESMEN -->
+        <div class="nav-item" onclick="toggleDropdown('menu-assesmen', 'chevron-assesmen')">
+            <i class="fas fa-balance-scale"></i> Mekanisme Assesmen
+            <i id="chevron-assesmen" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        <div id="menu-assesmen" style="display: none; flex-direction: column; padding-left: 30px; margin-bottom: 5px;">
+            <a href="/kaprodi/kaprodi_ti/mekanisme_assesmen/master_bobot.html" class="nav-item" id="nav-master-bobot" style="text-decoration: none; color: inherit;">
+                <i class="fas fa-weight-hanging" style="font-size: 0.9rem;"></i> Master Bobot
+            </a>
+        </div>
+
         <!-- MAPPING(PEMETAAN) -->
         <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')">
             <i class="fas fa-sitemap"></i> Pemetaan (Mapping)

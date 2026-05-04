@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Struktur Kurikulum - Sistem OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
+            --primary-red: #8b0000; --bg-main: #ffffff; --text-dark: #111827; --border-dark: #161923;
+        }
+
+        /* --- GAYA SIDEBAR --- */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .sidebar-profile-info { display: flex; flex-direction: column; }
+        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
+        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
+        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .nav-item.logout { color: #f87171; }
+        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: #f9fafb; height: 100vh; overflow: hidden; color: var(--text-dark); }
+        
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary-red); }
+
+        /* GRID SEMESTER */
+        .semester-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); gap: 25px; margin-top: 20px; }
+        .semester-card { background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .semester-header { background: var(--sidebar-bg); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .semester-header h3 { font-size: 1.1rem; font-weight: 700; }
+        .total-sks-badge { background: var(--primary-red); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f3f4f6; text-align: left; padding: 10px 15px; font-size: 0.75rem; color: #6b7280; text-transform: uppercase; border-bottom: 1px solid #e5e7eb; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f3f4f6; font-size: 0.85rem; }
+        .col-kode { width: 100px; font-weight: 700; color: var(--primary-red); }
+        .col-sks { width: 50px; text-align: center; font-weight: 600; }
+
+        .summary-box { margin-top: 40px; padding: 25px; background: var(--sidebar-bg); border-radius: 12px; color: white; display: flex; justify-content: space-around; text-align: center; }
+        .summary-item h2 { font-size: 2.5rem; color: #ffffff; }
+        .summary-item p { font-size: 0.9rem; opacity: 0.8; }
+
+        /* GAYA SIDEBAR (WAJIB ADA) */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; flex-shrink: 0; }
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; border-radius: 8px; font-size: 0.85rem; }
+        .nav-item:hover { background: var(--sidebar-hover); color: white; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <div class="header-container">
+            <div>
+                <div class="header-subtitle">MATRIKS KURIKULUM</div>
+                <h1 class="header-title">STRUKTUR <span>KURIKULUM</span></h1>
+            </div>
+            <div style="text-align: right;">
+                <p style="font-size: 0.85rem; font-weight: 700; color: #6b7280;">TOTAL BEBAN KURIKULUM</p>
+                <h2 id="grandTotalSks" style="color: var(--primary-red); font-size: 2rem; font-weight: 800;">0 SKS</h2>
+            </div>
+        </div>
+
+        <div id="loadingStatus" style="text-align: center; padding: 50px;">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-red);"></i>
+            <p style="margin-top: 10px;">Menyusun struktur kurikulum...</p>
+        </div>
+
+        <div class="semester-container" id="semesterGrid">
+            <!-- Data Semester akan muncul di sini -->
+        </div>
+
+        <div class="summary-box" id="summaryBox" style="display: none;">
+            <div class="summary-item">
+                <h2 id="totalMatkul">0</h2>
+                <p>Mata Kuliah</p>
+            </div>
+            <div class="summary-item">
+                <h2 id="totalSksWajib">0</h2>
+                <p>SKS Wajib</p>
+            </div>
+            <div class="summary-item">
+                <h2>144</h2>
+                <p>Target Lulus</p>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const API_MATKUL = "https://ohio-linked-firewall-school.trycloudflare.com/webhook/get-susunan-matkul?prodi=ti";
+
+    window.onload = async () => {
+        if (!localStorage.getItem("user_login")) { window.location.replace("/login/login.html"); return; }
+        await loadSidebar();
+        await renderStruktur();
+    };
+
+    async function renderStruktur() {
+        try {
+            const res = await fetch(API_MATKUL);
+            const data = await res.json();
+            
+            const container = document.getElementById('semesterGrid');
+            container.innerHTML = '';
+
+            // 1. Kelompokkan data per semester (1-8)
+            const perSemester = {};
+            let totalSks = 0;
+
+            data.forEach(mk => {
+                const smt = mk.semester || 0;
+                if (!perSemester[smt]) perSemester[smt] = [];
+                perSemester[smt].push(mk);
+                totalSks += parseInt(mk.sks || 0);
+            });
+
+            // 2. Loop Semester 1 sampai 8
+            for (let i = 1; i <= 8; i++) {
+                const listMk = perSemester[i] || [];
+                const totalSksSemester = listMk.reduce((sum, mk) => sum + parseInt(mk.sks || 0), 0);
+
+                let tableRows = listMk.length > 0 
+                    ? listMk.map(mk => `
+                        <tr>
+                            <td class="col-kode">${mk.kode_mk}</td>
+                            <td>${mk.nama_mk}</td>
+                            <td class="col-sks">${mk.sks}</td>
+                        </tr>
+                    `).join('')
+                    : '<tr><td colspan="3" style="text-align:center; padding: 20px; color: #9ca3af;">Belum ada data</td></tr>';
+
+                container.innerHTML += `
+                    <div class="semester-card">
+                        <div class="semester-header">
+                            <h3>SEMESTER ${i}</h3>
+                            <span class="total-sks-badge">${totalSksSemester} SKS</span>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Mata Kuliah</th>
+                                    <th style="text-align:center;">SKS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            // Update Summary
+            document.getElementById('grandTotalSks').innerText = `${totalSks} SKS`;
+            document.getElementById('totalMatkul').innerText = data.length;
+            document.getElementById('totalSksWajib').innerText = totalSks;
+            document.getElementById('loadingStatus').style.display = 'none';
+            document.getElementById('summaryBox').style.display = 'flex';
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('loadingStatus').innerHTML = '<p style="color:red;">Gagal memuat struktur kurikulum.</p>';
+        }
+    }
+
+    async function loadSidebar() {
+        try {
+            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
+            document.getElementById('sidebar-container').innerHTML = await response.text();
+            document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
+            // Tandai menu aktif
+            const navStruktur = document.getElementById('nav-matriks-struktur');
+            if (navStruktur) navStruktur.style.background = 'var(--sidebar-hover)';
+        } catch (error) {}
+    }
+
+    function toggleDropdown(m, c) {
+        const menu = document.getElementById(m), chev = document.getElementById(c);
+        menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'flex' : 'none';
+        chev.style.transform = menu.style.display === 'flex' ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+</script>
+</body>
+</html>
