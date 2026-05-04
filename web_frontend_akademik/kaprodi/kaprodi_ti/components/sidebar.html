@@ -111,6 +111,41 @@
         <div class="nav-item" id="nav-rekap-nilai" onclick="window.location.href='/kaprodi/kaprodi_ti/rps/rekap_nilai.html'"><i class="fas fa-clipboard-list"></i> Rekap Nilai Dosen</div>
         <div class="nav-item" id="nav-portofolio" onclick="window.location.href='/kaprodi/kaprodi_ti/rps/portofolio_admin.html'"><i class="fas fa-chart-pie"></i> Laporan CPL & CPMK</div>
 
+        <!-- MENU 2: PEMENUHAN CPMK & CPL -->
+        <div class="menu-item has-dropdown" onclick="toggleDropdown(this)">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-chart-pie"></i> Pemenuhan CPMK & CPL
+            </div>
+            <i class="fas fa-chevron-down arrow-icon"></i>
+        </div>
+        <div class="dropdown-container">
+            <a href="cpmk_kelas.html" class="dropdown-item">Nilai CPMK per Kelas</a>
+            <a href="cpl_angkatan.html" class="dropdown-item">Nilai CPL per Angkatan</a>
+            <a href="eval_cpmk.html" class="dropdown-item">Evaluasi CPMK Angkatan</a>
+            <a href="eval_cpl.html" class="dropdown-item">Evaluasi CPL Angkatan</a>
+            <a href="grafik_cpmk.html" class="dropdown-item">Grafik Rerata CPMK</a>
+            <a href="grafik_cpl.html" class="dropdown-item">Grafik Rerata CPL</a>
+            <a href="portofolio_mk.html" class="dropdown-item">Portofolio Mata Kuliah</a>
+            <a href="skpi.html" class="dropdown-item">Cetak SKPI</a>
+        </div>
+
+        <!-- MENU 3: KELOLA RPS -->
+        <div class="menu-item has-dropdown" onclick="toggleDropdown(this)">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-book"></i> Manajemen RPS
+            </div>
+            <i class="fas fa-chevron-down arrow-icon"></i>
+        </div>
+        <div class="dropdown-container">
+            <a href="rps_bentuk.html" class="dropdown-item">Master Bentuk</a>
+            <a href="rps_metode.html" class="dropdown-item">Master Metode</a>
+            <a href="rps_kriteria.html" class="dropdown-item">Master Kriteria</a>
+            <a href="rps_komponen.html" class="dropdown-item">Master Komponen</a>
+            <a href="rps_kelola.html" class="dropdown-item">Kelola RPS</a>
+            <a href="rps_pengecekan.html" class="dropdown-item">Pengecekan RPS</a>
+            <a href="rps_serap.html" class="dropdown-item">Serap RPS</a>
+        </div>
+
         <!-- Akses Dosen -->
         <div class="menu-category" style="margin-top: 20px;">AKSES DOSEN</div>
         <div class="nav-item" onclick="window.location.href='/dosen/input_nilai.html'" style="background: #10b981; color: white;">
