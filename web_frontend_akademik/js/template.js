@@ -17,16 +17,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Tambahkan fungsi ini agar dropdown bisa diklik
 window.toggleDropdown = function(element) {
-    // Tutup dropdown lain yang sedang terbuka (opsional, agar rapi)
+    // 1. Ambil elemen tepat di bawah menu yang diklik
+    var dropdownContent = element.nextElementSibling;
+
+    // 2. PENGAMAN: Cek apakah elemen itu benar-benar dropdown-container
+    if (!dropdownContent || !dropdownContent.classList.contains('dropdown-container')) {
+        return; // Jika bukan, hentikan proses agar tidak error
+    }
+
+    // 3. Tutup dropdown lain yang sedang terbuka
     let allDropdowns = document.querySelectorAll('.dropdown-container');
     allDropdowns.forEach(dropdown => {
-        if(dropdown !== element.nextElementSibling) {
+        if(dropdown !== dropdownContent) {
             dropdown.style.display = 'none';
         }
     });
 
-    // Buka/Tutup dropdown yang diklik
-    var dropdownContent = element.nextElementSibling;
+    // 4. Buka atau Tutup dropdown yang diklik
     if (dropdownContent.style.display === "block") {
         dropdownContent.style.display = "none";
     } else {
