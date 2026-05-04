@@ -31,13 +31,29 @@
             <i id="chevron-master" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
         </div>
         
+        <!-- ✨ SUB-MENU MASTER DATA (Sudah Rapih & Terarah ke folder /master_data/) ✨ -->
         <div id="menu-master" style="display: none; flex-direction: column; padding-left: 20px; margin-top: 4px;">
-            <div class="nav-item" id="nav-tahun" onclick="window.location.href='/kaprodi/kaprodi_ti/master_tahun.html'"><i class="fas fa-calendar-alt"></i> Tahun Kurikulum</div>
-            <div class="nav-item" id="nav-rumpun" onclick="window.location.href='/kaprodi/kaprodi_ti/master_rumpun.html'"><i class="fas fa-layer-group"></i> Rumpun MK</div>
-            <div class="nav-item" id="nav-mengajar" onclick="window.location.href='/kaprodi/kaprodi_ti/master_mengajar.html'"><i class="fas fa-chalkboard"></i> Mengajar</div>
-            <div class="nav-item" id="nav-jenis-cpl" onclick="window.location.href='/kaprodi/kaprodi_ti/master_jenis_cpl.html'"><i class="fas fa-tags"></i> Jenis CPL</div>
-            <div class="nav-item" id="nav-mhs" onclick="window.location.href='/kaprodi/kaprodi_ti/master_mahasiswa.html'"><i class="fas fa-users"></i> Mahasiswa</div>
-            <div class="nav-item" id="nav-dsn" onclick="window.location.href='/kaprodi/kaprodi_ti/master_dosen.html'"><i class="fas fa-chalkboard-teacher"></i> Dosen</div>
+            <div class="nav-item" id="nav-tahun" onclick="window.location.href='/kaprodi/kaprodi_ti/master_data/master_tahun.html'"><i class="fas fa-calendar-alt" style="width: 20px;"></i> Tahun Kurikulum</div>
+            <div class="nav-item" id="nav-rumpun" onclick="window.location.href='/kaprodi/kaprodi_ti/master_data/master_rumpun.html'"><i class="fas fa-layer-group" style="width: 20px;"></i> Rumpun MK</div>
+            <div class="nav-item" id="nav-jenis-cpl" onclick="window.location.href='/kaprodi/kaprodi_ti/master_data/master_jenis_cpl.html'"><i class="fas fa-tags" style="width: 20px;"></i> Jenis CPL</div>
+            <div class="nav-item" id="nav-rubrik" onclick="window.location.href='/kaprodi/kaprodi_ti/master_data/master_rubrik.html'"><i class="fas fa-table" style="width: 20px;"></i> Rubrik</div>
+            <div class="nav-item" id="nav-mahasiswa" onclick="window.location.href='/kaprodi/kaprodi_ti/master_data/master_mahasiswa.html'"><i class="fas fa-users" style="width: 20px;"></i> Mahasiswa</div>
+            <div class="nav-item" id="nav-dosen" onclick="window.location.href='/kaprodi/kaprodi_ti/master_data/master_dosen.html'"><i class="fas fa-chalkboard-teacher" style="width: 20px;"></i> Dosen</div>
+            <div class="nav-item" id="nav-mengajar" onclick="window.location.href='/kaprodi/kaprodi_ti/master_data/master_mengajar.html'"><i class="fas fa-chalkboard" style="width: 20px;"></i> Mengajar</div>
+            <div class="nav-item" id="nav-skripsi" onclick="window.location.href='/kaprodi/kaprodi_ti/master_data/master_skripsi.html'"><i class="fas fa-book-reader" style="width: 20px;"></i> Skripsi</div>
+        </div>
+        <!-- PERIKSA DATA (VALIDASI) -->
+        <div class="nav-item" onclick="toggleDropdown('menu-periksa', 'chevron-periksa')">
+            <i class="fas fa-shield-alt"></i> Periksa Data
+            <i id="chevron-periksa" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        
+        <div id="menu-periksa" style="display: none; flex-direction: column; padding-left: 20px; margin-top: 4px;">
+            <div class="nav-item" id="nav-cek-live" onclick="window.location.href='/kaprodi/kaprodi_ti/periksa_data/cek_live_data.html'"><i class="fas fa-cloud-download-alt" style="width: 20px;"></i> Cek Live Data Pusat</div>
+            <div class="nav-item" id="nav-rps-duplikat" onclick="window.location.href='/kaprodi/kaprodi_ti/periksa_data/rps_duplikat.html'"><i class="fas fa-copy" style="width: 20px;"></i> RPS Duplikat</div>
+            <div class="nav-item" id="nav-makul-duplikat" onclick="window.location.href='/kaprodi/kaprodi_ti/periksa_data/makul_duplikat.html'"><i class="fas fa-clone" style="width: 20px;"></i> Makul Duplikat</div>
+            <div class="nav-item" id="nav-mengajar-salah" onclick="window.location.href='/kaprodi/kaprodi_ti/periksa_data/mengajar_salah.html'"><i class="fas fa-exclamation-triangle" style="width: 20px;"></i> Mengajar Salah</div>
+            <div class="nav-item" id="nav-mengajar-duplikat" onclick="window.location.href='/kaprodi/kaprodi_ti/periksa_data/mengajar_duplikat.html'"><i class="fas fa-users-slash" style="width: 20px;"></i> Mengajar Duplikat</div>
         </div>
 
         <!-- MAPPING(PEMETAAN) -->

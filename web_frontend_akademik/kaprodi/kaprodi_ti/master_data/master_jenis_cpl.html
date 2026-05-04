@@ -187,7 +187,7 @@
     const userRole = localStorage.getItem("user_role");
     const userProdi = localStorage.getItem("prodi_aktif");
 
-    if (!userLogin) window.location.replace("../login/login.html");
+    if (!userLogin) window.location.replace('/login/login.html');
     if (userRole !== 'head_admin') {
         if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
         else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
@@ -196,7 +196,7 @@
     // 2. LOAD SIDEBAR
     async function loadSidebar() {
         try {
-            const response = await fetch('components/sidebar.html');
+            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
             const html = await response.text();
             
             document.getElementById('sidebar-container').outerHTML = html;
