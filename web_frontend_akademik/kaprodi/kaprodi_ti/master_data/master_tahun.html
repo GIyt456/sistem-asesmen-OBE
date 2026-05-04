@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Rumpun MK - Sistem OBE</title>
+    <title>Master Tahun Kurikulum - Sistem OBE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -33,7 +33,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* GAYA SIDEBAR (Tetap sama) */
+        /* GAYA SIDEBAR */
         .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; }
         .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
         .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
@@ -76,7 +76,7 @@
         <div class="header-container">
             <div class="header-title-area">
                 <div class="header-subtitle">MASTER DATA</div>
-                <h1 class="header-title">RUMPUN <span>MATA KULIAH</span></h1>
+                <h1 class="header-title">TAHUN <span>KURIKULUM</span></h1>
             </div>
             <div class="badge-prodi">Teknik Informatika</div>
         </div>
@@ -84,33 +84,33 @@
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Rumpun MK</h3>
+                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Tahun Kurikulum</h3>
                     <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
                 </div>
-                <button class="btn-dark" onclick="loadData('rumpun')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <button class="btn-dark" onclick="loadData('tahun')"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
             
             <table>
                 <thead>
                     <tr>
-                        <th width="15%">Kode Rumpun</th>
-                        <th>Nama Rumpun</th>
+                        <th width="15%">Kode Tahun</th>
+                        <th>Deskripsi / Label</th>
                         <th width="10%" style="text-align: center;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="bodyRumpun">
+                <tbody id="bodyTahun">
                     <!-- Data dari n8n akan masuk ke sini -->
                 </tbody>
             </table>
             
-            <div id="pagination-rumpun" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+            <div id="pagination-tahun" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
         </div>
     </div>
 
 <script>
     // 1. PENGATURAN API N8N 
     const PRODI = 'ti'; 
-    const API_BASE = "https://reynolds-martial-guild-professional.trycloudflare.com/webhook"; 
+    const API_BASE = "https://ohio-linked-firewall-school.trycloudflare.com/webhook"; 
     const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     
@@ -119,7 +119,7 @@
     const userRole = localStorage.getItem("user_role");
     const userProdi = localStorage.getItem("prodi_aktif");
 
-    if (!userLogin) window.location.replace("../login/login.html");
+    if (!userLogin) window.location.replace('/login/login.html');
     if (userRole !== 'head_admin') {
         if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
         else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
@@ -128,7 +128,7 @@
     // 3. FUNGSI PEMANGGIL SIDEBAR OTOMATIS
     async function loadSidebar() {
         try {
-            const response = await fetch('components/sidebar.html');
+            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
             const html = await response.text();
             
             document.getElementById('sidebar-container').outerHTML = html;
@@ -139,12 +139,12 @@
             // Logika UI Sidebar Khusus Halaman Dropdown
             setTimeout(() => {
                 const navDashboard = document.getElementById('nav-dashboard');
-                const navRumpun = document.getElementById('nav-rumpun');
+                const navTahun = document.getElementById('nav-tahun');
                 const menuMaster = document.getElementById('menu-master');
                 const chevronMaster = document.getElementById('chevron-master');
 
                 if(navDashboard) navDashboard.classList.remove('active');
-                if(navRumpun) navRumpun.classList.add('active'); // Nyalakan menu Rumpun
+                if(navTahun) navTahun.classList.add('active'); // Nyalakan menu Tahun
                 
                 // Buka otomatis dropdown Master Data
                 if(menuMaster && chevronMaster) {
@@ -170,9 +170,9 @@
 
     function logout() { localStorage.clear(); window.location.replace("login.html"); }
 
-    // 4. LOGIKA DATA RUMPUN (TABEL & PAGINASI)
+    // 4. LOGIKA DATA TAHUN (TABEL & PAGINASI)
     const paginationState = {
-        'rumpun': { data: [], page: 1, bodyId: 'bodyRumpun', paginationId: 'pagination-rumpun' }
+        'tahun': { data: [], page: 1, bodyId: 'bodyTahun', paginationId: 'pagination-tahun' }
     };
     const rowsPerPage = 5; 
 
@@ -181,7 +181,6 @@
             const res = await fetch(API_URL); 
             const data = await res.json();
             
-            // Filter berdasarkan tipe 'rumpun'
             paginationState[tipe].data = data.filter(i => i.tipe === tipe);
             paginationState[tipe].page = 1; 
             
@@ -248,7 +247,7 @@
                 body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) 
             }); 
             if(res.ok) {
-                alert("✅ Rumpun MK berhasil diperbarui!");
+                alert("✅ Tahun Kurikulum berhasil diperbarui!");
             } else {
                 alert("❌ Gagal menyimpan data ke server.");
             }
@@ -260,7 +259,7 @@
     // 6. JALANKAN SAAT WEB PERTAMA KALI DIBUKA
     window.onload = () => { 
         loadSidebar(); 
-        loadData('rumpun'); 
+        loadData('tahun'); 
     };
 </script>
 </body>

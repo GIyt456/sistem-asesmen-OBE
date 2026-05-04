@@ -155,7 +155,7 @@
 <script>
     // 1. PENGATURAN API N8N
     const PRODI = 'ti'; 
-    const API_BASE = "https://reynolds-martial-guild-professional.trycloudflare.com/webhook"; 
+    const API_BASE = "https://ohio-linked-firewall-school.trycloudflare.com/webhook"; 
     const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
 
     // 2. SISTEM KEAMANAN & SATPAM AKUN
@@ -163,7 +163,7 @@
     const userRole = localStorage.getItem("user_role");
     const userProdi = localStorage.getItem("prodi_aktif");
 
-    if (!userLogin) window.location.replace("../login/login.html");
+    if (!userLogin) window.location.replace('/login/login.html');
     if (userRole !== 'head_admin') {
         if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
         else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
@@ -172,7 +172,7 @@
     // 3. FUNGSI PEMANGGIL SIDEBAR OTOMATIS
     async function loadSidebar() {
         try {
-            const response = await fetch('components/sidebar.html');
+            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
             const html = await response.text();
             
             document.getElementById('sidebar-container').outerHTML = html;
