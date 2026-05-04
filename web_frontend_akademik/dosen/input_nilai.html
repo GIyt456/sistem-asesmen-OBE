@@ -160,10 +160,9 @@
     <nav class="navbar">
         <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 45px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);">
         <div class="nav-links">
-            <a href="#" class="active">Home</a>
-            <a href="dashboard_dosen.html">Dashboard</a>
-            <a href="#">Upload Nilai</a>
-            <a href="../kaprodi/laporan.html">Laporan</a>
+            <a href="input_nilai.html" class="active">Home / Input Nilai</a>
+            <a href="rps_dosen.html">Penyusunan RPS</a>
+            <a href="../kaprodi/laporan.html">Laporan OBE</a>
         </div>
         <div class="nav-user">
             <div class="user-chip">
@@ -213,6 +212,27 @@
                 <div style="display: flex; justify-content: center; gap: 15px; margin-top: 30px;">
                     <button onclick="prevStep()" class="slider-btn"><i class="fas fa-chevron-left"></i></button>
                     <button onclick="nextStep()" class="slider-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr; margin-bottom: 40px;">
+            <div style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); border-radius: 16px; padding: 25px 30px; color: white; display: flex; align-items: center; gap: 25px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);" 
+                 onclick="window.location.href='rps_dosen.html'" 
+                 onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 20px 25px -5px rgba(30, 58, 138, 0.3)';" 
+                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1)';">
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; backdrop-filter: blur(5px);">
+                    <i class="fas fa-book-open" style="font-size: 2.5rem; color: #ffc561;"></i>
+                </div>
+                <div style="flex: 1;">
+                    <h3 style="font-size: 1.5rem; font-weight: 800; margin: 0 0 8px 0; color: white;">Penyusunan RPS & Materi</h3>
+                    <p style="color: #cbd5e1; font-size: 0.95rem; margin: 0; line-height: 1.5;">Susun Rencana Pembelajaran Semester, target CPMK, dan bahan kajian untuk kelas yang Anda ampu sebelum menginput nilai.</p>
+                </div>
+                <div>
+                    <button style="background: #ffc561; color: #0f172a; border: none; padding: 10px 20px; border-radius: 50px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                        Mulai Menyusun <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
             </div>
         </div>

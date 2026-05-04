@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penyusunan RPS - Panel Dosen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-navy: #0f172a;
+            --primary-blue: #1e3a8a;
+            --primary-red: #8b0000;
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #f8fafc; color: var(--text-dark); }
+
+        /* NAVBAR DOSEN (Identik dengan input_nilai.html) */
+        .navbar {
+            background-color: var(--primary-navy); padding: 15px 40px; 
+            display: flex; justify-content: space-between; align-items: center; color: white;
+        }
+        .nav-links { display: flex; gap: 30px; font-weight: 500; font-size: 0.95rem; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; transition: 0.3s; padding-bottom: 4px; opacity: 0.8; }
+        .nav-links a:hover, .nav-links a.active { opacity: 1; font-weight: 800; border-bottom: 2px solid #ffc561; }
+        .nav-user { display: flex; align-items: center; gap: 16px; font-weight: 600; }
+        .user-chip { background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; color: #ffffff; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* KONTEN UTAMA */
+        .container { max-width: 1400px; margin: 40px auto; padding: 0 20px; }
+        .figma-card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e5e7eb; }
+        
+        .btn-action { background: #10b981; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-action:hover { background: #059669; transform: translateY(-2px); }
+
+        /* TABEL RPS */
+        .table-rps { width: 100%; border-collapse: collapse; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid #cbd5e1; }
+        .table-rps th { background: #002878; color: white; padding: 15px; font-size: 0.85rem; font-weight: 700; text-align: center; border: 1px solid rgba(255,255,255,0.15); }
+        .table-rps td { padding: 10px; border: 1px solid #cbd5e1; vertical-align: top; }
+        
+        /* INPUT DALAM TABEL */
+        .input-rps { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Inter'; font-size: 0.9rem; resize: vertical; min-height: 80px; background: #f8fafc; transition: 0.2s; }
+        .input-rps:focus { border-color: #3b82f6; outline: none; background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .input-number { width: 100%; padding: 10px; text-align: center; border: 1px solid #cbd5e1; border-radius: 8px; font-weight: bold; background: white; }
+        
+        .row-ujian { background: #fee2e2 !important; color: #991b1b; font-weight: 900; text-align: center; padding: 15px !important; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR KHUSUS DOSEN -->
+    <nav class="navbar">
+        <div style="font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-book" style="color: #ffc561;"></i> OBE Panel Dosen
+        </div>
+        <div class="nav-links">
+            <a href="input_nilai.html">Home / Input Nilai</a>
+            <a href="#" class="active">Penyusunan RPS</a>
+        </div>
+        <div class="nav-user">
+            <div class="user-chip">
+                <i class="fas fa-user-circle" style="color: #ffc561;"></i> 
+                <span id="dosenName">Dosen Pengampu</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
+            <div>
+                <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a; font-weight: 800;">Penyusunan <span style="color: var(--primary-red);">RPS</span></h1>
+                <p style="margin: 0; color: #64748b;">Lengkapi Rencana Pembelajaran Semester untuk mata kuliah yang Anda ampu.</p>
+            </div>
+            <button class="btn-action" onclick="simpanRPSDosen()" id="btnSimpanRPS">
+                <i class="fas fa-save"></i> Simpan Dokumen RPS
+            </button>
+        </div>
+
+        <!-- Notifikasi Error N8N (Disembunyikan secara default) -->
+        <div id="errorBox" style="display: none; background: #fee2e2; border-left: 5px solid #ef4444; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+            <h4 style="margin: 0 0 5px 0; color: #991b1b;"><i class="fas fa-exclamation-triangle"></i> Gagal Menarik Data RPS dari Database</h4>
+            <p style="margin: 0; color: #7f1d1d; font-size: 0.95rem;">Workflow "get-detail-rps" di n8n mengalami Internal Server Error (500). Silakan cek tab Executions di n8n Anda. (Form kosong ditampilkan di bawah).</p>
+        </div>
+
+        <div class="figma-card">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                <label style="font-weight: 700; color: #334155;">Pilih Mata Kuliah:</label>
+                <select id="selectMK" style="width: 400px; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; font-family: 'Inter';" onchange="loadDataRPS()">
+                    <option value="" disabled selected>-- Memuat Mata Kuliah Anda... --</option>
+                </select>
+            </div>
+
+            <table class="table-rps">
+                <thead>
+                    <tr>
+                        <th width="5%">MG</th>
+                        <th width="20%">KEMAMPUAN AKHIR (CPMK)</th>
+                        <th width="25%">BAHAN KAJIAN (MATERI)</th>
+                        <th width="15%">METODE PEMBELAJARAN</th>
+                        <th width="8%">WAKTU (MNT)</th>
+                        <th width="19%">KRITERIA & INDIKATOR</th>
+                        <th width="8%">BOBOT (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyRPS">
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #94a3b8; font-style: italic;">
+                            Silakan pilih mata kuliah di atas untuk mulai menyusun RPS.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = "https://ohio-linked-firewall-school.trycloudflare.com/webhook";
+        const API_METADATA = `${API_BASE}/get-metadata`;
+        const API_GET_RPS = `${API_BASE}/get-rps-detail`; 
+        const API_SIMPAN_RPS = `${API_BASE}/simpan-rps`;
+        
+        const userNidn = localStorage.getItem("user_nidn");
+        const userProdi = localStorage.getItem("prodi_aktif") || "ti";
+        
+        // Pasang nama dosen di pojok kanan atas
+        document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
+
+        async function loadMataKuliahDosen() {
+            const selectMK = document.getElementById("selectMK");
+            try {
+                const res = await fetch(`${API_METADATA}?prodi=${userProdi}&context=dosen&nidn=${userNidn}`);
+                let textData = await res.text();
+                if (textData.startsWith('=')) textData = textData.substring(1);
+                
+                let data = JSON.parse(textData);
+                const daftarMK = data.filter(item => item.tipe === 'mk');
+
+                selectMK.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah --</option>';
+                
+                if(daftarMK.length === 0) {
+                    selectMK.innerHTML = '<option value="" disabled selected>Belum ada jadwal MK untuk Anda.</option>';
+                    return;
+                }
+
+                daftarMK.forEach(mk => {
+                    selectMK.innerHTML += `<option value="${mk.kode}">[${mk.kode}] ${mk.label}</option>`;
+                });
+            } catch(e) {
+                selectMK.innerHTML = '<option value="" disabled selected>Gagal memuat data Mata Kuliah dari N8N</option>';
+            }
+        }
+
+        async function loadDataRPS() {
+            const kodeMK = document.getElementById("selectMK").value;
+            const tbody = document.getElementById("bodyRPS");
+            const errorBox = document.getElementById("errorBox");
+            errorBox.style.display = "none";
+            
+            if(!kodeMK) return;
+
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">Menarik data RPS dari Database... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
+
+            try {
+                const res = await fetch(`${API_GET_RPS}?kode_mk=${kodeMK}`);
+                
+                // Menangkap Error 500 n8n
+                if (!res.ok) { throw new Error(`HTTP Error: ${res.status}`); }
+                
+                let rpsData = await res.json();
+                generateTabelRPS(rpsData);
+
+            } catch(e) {
+                console.log("Error Fetch N8N:", e);
+                // Munculkan notifikasi merah di atas agar dosen/Anda tahu n8n sedang bermasalah
+                errorBox.style.display = "block";
+                // Tetap cetak form kosong agar dosen bisa mengisi
+                generateTabelRPS([]); 
+            }
+        }
+
+        function generateTabelRPS(existingData = []) {
+            const tbody = document.getElementById("bodyRPS");
+            tbody.innerHTML = "";
+
+            if(!Array.isArray(existingData)) existingData = [];
+
+            for(let i = 1; i <= 16; i++) {
+                if(i === 8) {
+                    tbody.innerHTML += `<tr><td colspan="7" class="row-ujian">UJIAN TENGAH SEMESTER (UTS)</td></tr>`;
+                    continue;
+                }
+                if(i === 16) {
+                    tbody.innerHTML += `<tr><td colspan="7" class="row-ujian">UJIAN AKHIR SEMESTER (UAS)</td></tr>`;
+                    continue;
+                }
+
+                // Cocokkan dengan pertemuan_ke dari N8N
+                const barisData = existingData.find(item => parseInt(item.pertemuan_ke) === i) || {};
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align: center; font-weight: bold; padding-top: 20px;">${i}</td>
+                        <td><textarea class="input-rps cpmk-input" data-minggu="${i}" placeholder="Kemampuan Akhir...">${barisData.kemampuan_akhir || ''}</textarea></td>
+                        <td><textarea class="input-rps materi-input" data-minggu="${i}" placeholder="Bahan Kajian...">${barisData.materi_pembelajaran || ''}</textarea></td>
+                        <td><textarea class="input-rps metode-input" data-minggu="${i}" placeholder="Metode...">${barisData.metode_pembelajaran || ''}</textarea></td>
+                        <td><input type="number" class="input-number waktu-input" data-minggu="${i}" value="${barisData.estimasi_waktu || 150}"></td>
+                        <td><textarea class="input-rps kriteria-input" data-minggu="${i}" placeholder="Kriteria Penilaian...">${barisData.indikator_pencapaian || ''}</textarea></td>
+                        <td><input type="number" class="input-number bobot-input" data-minggu="${i}" value="${barisData.bobot_persen || 0}" step="0.1"></td>
+                    </tr>
+                `;
+            }
+        }
+
+        async function simpanRPSDosen() {
+            const kodeMK = document.getElementById("selectMK").value;
+            if(!kodeMK) { alert("Pilih Mata Kuliah dulu!"); return; }
+
+            const btn = document.getElementById("btnSimpanRPS");
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            let dataPertemuan = [];
+            for(let i = 1; i <= 16; i++) {
+                if(i === 8 || i === 16) continue;
+                
+                const cpmk = document.querySelector(`.cpmk-input[data-minggu="${i}"]`).value;
+                const materi = document.querySelector(`.materi-input[data-minggu="${i}"]`).value;
+                const metode = document.querySelector(`.metode-input[data-minggu="${i}"]`).value;
+                const waktu = document.querySelector(`.waktu-input[data-minggu="${i}"]`).value;
+                const kriteria = document.querySelector(`.kriteria-input[data-minggu="${i}"]`).value;
+                const bobot = document.querySelector(`.bobot-input[data-minggu="${i}"]`).value;
+
+                if(cpmk || materi) { 
+                    dataPertemuan.push({
+                        pertemuan_ke: i,
+                        kemampuan_akhir: cpmk,
+                        materi_pembelajaran: materi,
+                        metode_pembelajaran: metode,
+                        estimasi_waktu: waktu,
+                        indikator_pencapaian: kriteria,
+                        bobot_penilaian: bobot
+                    });
+                }
+            }
+
+            const payload = {
+                kode_mk: kodeMK,
+                nidn_dosen: userNidn,
+                detail_pertemuan: dataPertemuan
+            };
+
+            try {
+                const res = await fetch(API_SIMPAN_RPS, { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if(res.ok) {
+                    alert("✅ RPS Berhasil Disimpan! Kaprodi sekarang dapat melihat draf Anda.");
+                } else {
+                    alert("❌ Gagal menyimpan RPS. Pastikan Workflow simpan-rps di n8n sudah aktif.");
+                }
+            } catch(e) {
+                alert("⚠️ Error jaringan. Pastikan URL Webhook Cloudflare benar dan n8n aktif.");
+            }
+
+            btn.innerHTML = '<i class="fas fa-save"></i> Simpan Dokumen RPS';
+            btn.disabled = false;
+        }
+
+        window.onload = () => {
+            loadMataKuliahDosen();
+        };
+    </script>
+</body>
+</html>
