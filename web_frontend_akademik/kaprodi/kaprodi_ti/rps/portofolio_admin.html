@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan CPL & CPMK - Panel Kaprodi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PANGGIL CSS GLOBAL -->
+    <link rel="stylesheet" href="../../../css/style.css">
+
+    <!-- Panggil Chart.js dari CDN untuk Grafik OBE -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
+        .chart-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+        .stat-card { background: var(--primary-red); color: white; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .stat-value { font-size: 2.5rem; font-weight: 800; margin: 10px 0; }
+        .stat-label { font-size: 0.9rem; font-weight: 500; opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Wadah Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <!-- 2. Wadah Navbar -->
+        <div id="navbar-container"></div>
+
+        <!-- 3. KONTEN UTAMA LAPORAN OBE -->
+        <div class="main-content">
+            <div style="margin-bottom: 20px;">
+                <h1 style="margin:0; font-size: 2rem; color: var(--text-dark);">Laporan <span style="color: var(--primary-red);">CPL & CPMK</span></h1>
+                <p style="color: #6b7280; margin-top: 5px;">Analisis Ketercapaian Pembelajaran Lulusan (CPL) Program Studi Teknik Informatika.</p>
+            </div>
+
+            <!-- Filter Laporan -->
+            <div style="background: white; padding: 15px 20px; border-radius: 10px; border: 1px solid #e5e7eb; display: flex; gap: 15px; margin-bottom: 20px;">
+                <select id="filterAngkatan" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; width: 200px;">
+                    <option value="2023">Angkatan 2023</option>
+                    <option value="2022">Angkatan 2022</option>
+                </select>
+                <button class="btn-action btn-edit" onclick="loadDataLaporan()"><i class="fas fa-search"></i> Tampilkan Analisis</button>
+            </div>
+
+            <!-- Area Grafik & Statistik -->
+            <div class="dashboard-grid">
+                <!-- Grafik Bar CPL -->
+                <div class="chart-card">
+                    <h3 style="margin-top: 0; color: #374151;">Rata-rata Ketercapaian CPL Mahasiswa</h3>
+                    <canvas id="cplBarChart" height="100"></canvas>
+                </div>
+
+                <!-- Kolom Status Singkat -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="stat-card">
+                        <i class="fas fa-trophy fa-2x"></i>
+                        <div class="stat-value" id="cplTertinggi">-</div>
+                        <div class="stat-label">Capaian Tertinggi</div>
+                    </div>
+                    <div class="stat-card" style="background: #f59e0b;">
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        <div class="stat-value" id="cplTerendah">-</div>
+                        <div class="stat-label">Perlu Evaluasi</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Detail -->
+            <div style="margin-top: 30px;">
+                <h3 style="color: #374151; margin-bottom: 15px;">Detail Skor CPL Angkatan <span id="labelAngkatan">2023</span></h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="10%">Kode CPL</th>
+                            <th width="60%">Deskripsi Capaian Pembelajaran</th>
+                            <th width="15%">Kategori</th>
+                            <th width="15%" style="text-align: center;">Skor (Skala 100)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyCPL">
+                        <!-- Teks loading default -->
+                        <tr><td colspan="4" style="text-align: center;">Mengambil data dari n8n... <i class="fas fa-spinner fa-spin"></i></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panggil Mesin Pemasang Komponen -->
+    <script src="../../../js/template.js"></script>
+
+    <!-- Logika Laporan OBE -->
+    <script>
+        // URL N8N Anda yang terlihat di Tab Browser (Pastikan ini sesuai)
+        const API_BASE = "https://ohio-linked-firewall-school.trycloudflare.com/webhook"; 
+        
+        let cplChartInstance = null; 
+
+        async function loadDataLaporan() {
+            const angkatan = document.getElementById('filterAngkatan').value;
+            document.getElementById('labelAngkatan').innerText = angkatan;
+            const tbody = document.getElementById('tableBodyCPL');
+            
+            // Ubah teks saat mulai mengambil data
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Menarik 11 Data CPL dari Server... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
+
+            try {
+                // Eksekusi API n8n
+                const res = await fetch(`${API_BASE}/get-laporan-cpl?angkatan=${angkatan}`);
+                if (!res.ok) throw new Error("Gagal load API N8N");
+                
+                const dataCPL = await res.json();
+                
+                // Bersihkan tabel
+                tbody.innerHTML = "";
+                
+                // Isi tabel dengan data asli
+                dataCPL.forEach(item => {
+                    const warnaSkor = item.skor < 70 ? 'color: #dc2626; font-weight: bold;' : 'color: #059669; font-weight: bold;';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${item.kode}</strong></td>
+                            <td>${item.deskripsi || 'Deskripsi belum diatur'}</td>
+                            <td><span style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${item.kategori}</span></td>
+                            <td style="text-align: center; ${warnaSkor}">${item.skor}</td>
+                        </tr>
+                    `;
+                });
+
+                // Tampilkan Grafik
+                renderChart(dataCPL);
+
+                // Update Status Kanan (Tertinggi & Terendah)
+                if(dataCPL.length > 0) {
+                    // Duplikat array agar tidak merusak urutan tabel, lalu urutkan berdasarkan skor
+                    const sortedData = [...dataCPL].sort((a, b) => b.skor - a.skor);
+                    document.getElementById('cplTertinggi').innerText = sortedData[0].kode;
+                    document.getElementById('cplTerendah').innerText = sortedData[sortedData.length - 1].kode;
+                }
+
+            } catch (error) {
+                // Munculkan pesan merah jika N8N mati/URL salah
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">❌ Gagal terhubung ke N8N. Pastikan Workflow aktif dan URL Cloudflare benar!</td></tr>`;
+                console.error(error);
+            }
+        }
+
+        function renderChart(dataCPL) {
+            const ctx = document.getElementById('cplBarChart').getContext('2d');
+            
+            if (cplChartInstance) {
+                cplChartInstance.destroy();
+            }
+
+            const labels = dataCPL.map(item => item.kode);
+            const skorData = dataCPL.map(item => item.skor);
+
+            // Warna merah jika di bawah 70, hijau jika di atas
+            const bgColors = skorData.map(skor => skor < 70 ? 'rgba(220, 38, 38, 0.7)' : 'rgba(139, 0, 0, 0.7)');
+
+            cplChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Skor CPL Rata-rata',
+                        data: skorData,
+                        backgroundColor: bgColors,
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100 
+                        }
+                    }
+                }
+            });
+        }
+
+        // Jalankan saat web pertama kali direfresh
+        window.onload = () => {
+            setTimeout(loadDataLaporan, 500);
+        };
+    </script>
+</body>
+</html>
