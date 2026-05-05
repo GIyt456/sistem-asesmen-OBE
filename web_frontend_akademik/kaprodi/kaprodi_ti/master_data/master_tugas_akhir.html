@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Skripsi - Sistem OBE</title>
+    <title>Kelola Tugas Akhir - Sistem OBE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -50,7 +50,6 @@
         .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
         .nav-item.logout { color: #f87171; }
         .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
-        #menu-master .nav-item { padding-left: 20px; font-size: 0.75rem; }
 
         /* --- GAYA KONTEN UTAMA --- */
         .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
@@ -64,8 +63,6 @@
         /* --- TOMBOL --- */
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
         .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        .btn-primary-red { background: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .btn-primary-red:hover { background: #660000; transform: translateY(-2px); }
 
         /* --- GAYA TABEL --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
@@ -73,7 +70,8 @@
         td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; }
         tbody tr:hover { background-color: #f9fafb; }
         
-        .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; }
+        .badge-skripsi { background: #e0e7ff; color: #4338ca; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+        .badge-publikasi { background: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -87,18 +85,18 @@
         <div class="header-container">
             <div class="header-title-area">
                 <div class="header-subtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title">DATA <span>SKRIPSI</span></h1>
+                <h1 class="header-title">DATA <span>TUGAS AKHIR</span></h1>
             </div>
             <div class="badge-prodi">Teknik Informatika</div>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <div>
-                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Skripsi</h3>
-                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data tugas akhir/proyek mahasiswa dan dosen pembimbing.</p>
+                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Tugas Akhir Mahasiswa</h3>
+                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data jalur kelulusan mahasiswa (Skripsi / Publikasi).</p>
             </div>
             <div style="display: flex; gap: 10px;">
-                <button class="btn-dark" style="background: #6b21a8; border-color: #6b21a8;" onclick="alert('Fitur Import sedang disiapkan!')"><i class="fas fa-download"></i> Import Dari Pusat</button>
+                <button class="btn-dark" style="background: #6b21a8;" onclick="alert('Fitur Import sedang disiapkan!')"><i class="fas fa-download"></i> Import Dari Pusat</button>
                 <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
         </div>
@@ -122,39 +120,33 @@
         <table>
             <thead>
                 <tr>
-                    <th width="8%" style="text-align: center;">Kode MK</th>
-                    <th width="45%">Mahasiswa & Dosen</th>
-                    <th width="15%">Pendadaran</th>
-                    <th width="12%">Nilai</th>
-                    <th width="10%" style="text-align: center;">Opsi</th>
+                    <th width="5%" style="text-align: center;">No</th>
+                    <th width="15%">NIM</th>
+                    <th width="25%">Nama Mahasiswa</th>
+                    <th width="15%">Jenis TA</th> 
+                    <th width="30%">Judul</th>
+                    <th width="10%" style="text-align: center;">Aksi</th>
                 </tr>
             </thead>
-            <tbody id="bodySkripsi">
-                <!-- Data Skripsi masuk ke sini -->
+            <tbody id="bodyTugasAkhir">
+                <!-- Data akan di-render oleh Javascript -->
             </tbody>
         </table>
 
-        <div id="pagination-skripsi" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.85rem; color: #6b7280;">
+        <div id="pagination-ta" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.85rem; color: #6b7280;">
             <div>Loading entries...</div>
         </div>
     </div>
 
 <script>
-    // 1. PENGATURAN API N8N
+    // 1. PENGATURAN API MANUAL (KEMBALI SEPERTI AWAL)
     const PRODI = 'ti'; 
-    const API_BASE = "https://ohio-linked-firewall-school.trycloudflare.com/webhook"; 
+    const API_BASE = "https://willing-robot-ministry-reported.trycloudflare.com/webhook"; 
     const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
 
-    // 2. SISTEM KEAMANAN & SATPAM AKUN
+    // 2. SISTEM KEAMANAN
     const userLogin = localStorage.getItem("user_login");
-    const userRole = localStorage.getItem("user_role");
-    const userProdi = localStorage.getItem("prodi_aktif");
-
     if (!userLogin) window.location.replace('/login/login.html');
-    if (userRole !== 'head_admin') {
-        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
-        else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
-    }
 
     // 3. LOAD SIDEBAR
     async function loadSidebar() {
@@ -164,18 +156,16 @@
             
             document.getElementById('sidebar-container').outerHTML = html;
             document.getElementById("adminName").innerText = userLogin;
-            document.getElementById("sidebarAvatar").src = `https://ui-avatars.com/api/?name=${userLogin}&background=8b0000&color=fff&bold=true`;
 
             setTimeout(() => {
                 const navDashboard = document.getElementById('nav-dashboard');
-                const navSkripsi = document.getElementById('nav-skripsi'); // ID Menu Skripsi
+                const navTugasAkhir = document.getElementById('nav-tugas-akhir'); 
                 const menuMaster = document.getElementById('menu-master');
                 const chevronMaster = document.getElementById('chevron-master');
 
                 if(navDashboard) navDashboard.classList.remove('active');
-                if(navSkripsi) navSkripsi.classList.add('active'); 
+                if(navTugasAkhir) navTugasAkhir.classList.add('active'); 
                 
-                // Buka otomatis dropdown Master Data
                 if(menuMaster && chevronMaster) {
                     menuMaster.style.display = 'flex';
                     chevronMaster.style.transform = 'rotate(180deg)';
@@ -194,37 +184,35 @@
         }
     }
 
-    function logout() { localStorage.clear(); window.location.replace("login.html"); }
+    function logout() { localStorage.clear(); window.location.replace("/login/login.html"); }
 
     // ==========================================
-    // 4. LOGIKA DATA SKRIPSI (Menggunakan Dummy Sesuai Desain Awal)
+    // 4. LOGIKA DATA TUGAS AKHIR
     // ==========================================
     
-    let allDataSkripsi = []; 
+    let allDataTA = []; 
     let currentPage = 1;
     let rowsPerPage = 10;
     let searchQuery = "";
 
     async function loadData() {
-        const tbody = document.getElementById("bodySkripsi");
-        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px;'><i class='fas fa-spinner fa-spin'></i> Sedang memuat data...</td></tr>";
+        const tbody = document.getElementById("bodyTugasAkhir");
+        tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding: 20px;'><i class='fas fa-spinner fa-spin'></i> Sedang memuat data...</td></tr>";
 
-        // Simulasi penarikan data (Karena di admin_config sebelumnya skripsi menggunakan dummy array)[cite: 2]
+        // Simulasi penarikan data dari n8n (Dummy Data)
         setTimeout(() => {
-            allDataSkripsi = [
+            allDataTA = [
                 {
-                    kode: "SI049",
-                    judul: "DESAIN INTERFACE SISTEM ASESMEN CAPAIAN PEMBELAJARAN LULUSAN (CPL) PROGRAM STUDI SISTEM INFORMASI DENGAN PLATFORM OTOMATISASI N8N",
-                    namaMhs: "Georgius Krisna",
                     nim: "223220042",
-                    kelas: "22S1SI03-Skripsi(SI049)",
-                    namaDosen: "mr.Tung Tung Tung Sahur",
-                    nidn: "0601067503",
-                    tanggal: "2026-02-27",
-                    tipe: "REGULER",
-                    tahun: "2025/2026",
-                    semester: "Ganjil",
-                    nilai: "= 0.00"
+                    namaMhs: "GEORGIUS KRISNA RIZKIE WIDYATAMA",
+                    jenis: "Skripsi",
+                    judul: "DESAIN INTERFACE SISTEM ASESMEN CAPAIAN PEMBELAJARAN LULUSAN (CPL) PROGRAM STUDI SISTEM INFORMASI DENGAN PLATFORM OTOMATISASI N8N"
+                },
+                {
+                    nim: "223220044",
+                    namaMhs: "FERNANDA YOGI PRASETYA",
+                    jenis: "Publikasi",
+                    judul: "ANALISIS SENTIMEN PERMAINAN WORLD OF AIRPORT MENGGUNAKAN ALGORITMA SUPPORT VECTOR MACHINE"
                 }
             ];
             
@@ -234,18 +222,17 @@
     }
 
     function renderTablePaginated() {
-        const tbody = document.getElementById("bodySkripsi");
+        const tbody = document.getElementById("bodyTugasAkhir");
         tbody.innerHTML = ""; 
 
-        // Filter berdasarkan pencarian (Judul, Nama, atau NIM)
-        const filteredData = allDataSkripsi.filter(item => {
-            const searchStr = `${item.judul} ${item.namaMhs} ${item.nim}`.toLowerCase();
+        const filteredData = allDataTA.filter(item => {
+            const searchStr = `${item.judul} ${item.namaMhs} ${item.nim} ${item.jenis}`.toLowerCase();
             return searchStr.includes(searchQuery);
         });
 
         if(filteredData.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px;'>Data skripsi tidak ditemukan.</td></tr>";
-            document.getElementById('pagination-skripsi').innerHTML = `<div>Showing 0 entries</div>`;
+            tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding: 20px;'>Data tugas akhir tidak ditemukan.</td></tr>";
+            document.getElementById('pagination-ta').innerHTML = `<div>Showing 0 entries</div>`;
             return;
         }
 
@@ -253,32 +240,19 @@
         const endIndex = startIndex + rowsPerPage;
         const dataToShow = filteredData.slice(startIndex, endIndex);
 
-        // Render Data ke Tabel[cite: 2]
-        dataToShow.forEach((item) => {
+        // Cetak Baris Tabel Sesuai Format Baru
+        dataToShow.forEach((item, index) => {
+            const badgeClass = item.jenis === "Skripsi" ? "badge-skripsi" : "badge-publikasi";
+
             tbody.innerHTML += `
             <tr style="border-bottom: 1px solid #e5e7eb;">
-                <td style="text-align: center; vertical-align: top; padding-top: 16px; color: #6b7280; font-size: 0.9rem;">${item.kode}</td>
-                <td style="vertical-align: top; padding-top: 16px;">
-                    <div style="font-weight: 600; font-size: 0.85rem; color: #4b5563; margin-bottom: 4px; line-height: 1.4; text-transform: uppercase;">${item.judul}</div>
-                    <div style="color: #6b7280; font-size: 0.8rem; line-height: 1.5;">
-                        <strong>${item.namaMhs}</strong><br>
-                        ${item.nim}<br>
-                        ${item.kelas}<br>
-                        <span style="color: #4338ca; font-weight: 500;">${item.namaDosen}</span><br>
-                        NIDN: ${item.nidn}
-                    </div>
-                </td>
-                <td style="vertical-align: top; padding-top: 16px; color: #6b7280; font-size: 0.8rem; line-height: 1.5;">
-                    ${item.tanggal}<br>
-                    ${item.tipe}<br>
-                    ${item.tahun}<br>
-                    ${item.semester}
-                </td>
-                <td style="vertical-align: top; padding-top: 16px; color: #6b7280; font-size: 0.85rem; font-weight: 600;">
-                    ${item.nilai}
-                </td>
-                <td style="text-align: center; vertical-align: top; padding-top: 16px;">
-                    <button class="btn-action" style="background: white; color: #8b0000; border: 1.5px solid #8b0000; font-weight: 700; width: 100%; margin-bottom: 6px;" onclick="alert('Masuk mode Input Nilai untuk ${item.namaMhs}')">Input Nilai</button>
+                <td style="text-align: center; font-weight: 600;">${startIndex + index + 1}</td>
+                <td>${item.nim}</td>
+                <td style="font-weight: 600; color: #111827;">${item.namaMhs}</td>
+                <td><span class="${badgeClass}">${item.jenis}</span></td>
+                <td style="font-size: 0.85rem; color: #4b5563; line-height: 1.4;">${item.judul}</td>
+                <td style="text-align: center;">
+                    <button class="btn-dark" style="padding: 8px 12px;" onclick="alert('Membuka edit data TA untuk ${item.namaMhs}')"><i class="fas fa-edit"></i></button>
                 </td>
             </tr>`;
         });
@@ -289,16 +263,16 @@
     function renderPaginationUI(totalFilteredData, startIndex, endIndex) {
         const totalPages = Math.ceil(totalFilteredData / rowsPerPage);
         const actualEndIndex = Math.min(endIndex, totalFilteredData);
-        const paginationContainer = document.getElementById('pagination-skripsi');
+        const paginationContainer = document.getElementById('pagination-ta');
         
         let html = `<div>Showing ${startIndex + 1} to ${actualEndIndex} of ${totalFilteredData} entries</div>`;
         html += `<div style="display: flex; gap: 5px;">`;
         
         const prevDisabled = currentPage === 1;
-        html += `<button class="btn" style="background: ${prevDisabled ? '#e5e7eb' : 'var(--text-dark)'}; color: ${prevDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${prevDisabled ? 'not-allowed' : 'pointer'};" ${prevDisabled ? 'disabled' : `onclick="changePage(-1)"`}><i class="fas fa-chevron-left"></i> Prev</button>`;
+        html += `<button class="btn" style="background: ${prevDisabled ? '#e5e7eb' : 'var(--border-dark)'}; color: ${prevDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${prevDisabled ? 'not-allowed' : 'pointer'};" ${prevDisabled ? 'disabled' : `onclick="changePage(-1)"`}><i class="fas fa-chevron-left"></i> Prev</button>`;
         
         const nextDisabled = currentPage === totalPages || totalPages === 0;
-        html += `<button class="btn" style="background: ${nextDisabled ? '#e5e7eb' : 'var(--text-dark)'}; color: ${nextDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${nextDisabled ? 'not-allowed' : 'pointer'};" ${nextDisabled ? 'disabled' : `onclick="changePage(1)"`}>Next <i class="fas fa-chevron-right"></i></button>`;
+        html += `<button class="btn" style="background: ${nextDisabled ? '#e5e7eb' : 'var(--border-dark)'}; color: ${nextDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${nextDisabled ? 'not-allowed' : 'pointer'};" ${nextDisabled ? 'disabled' : `onclick="changePage(1)"`}>Next <i class="fas fa-chevron-right"></i></button>`;
         
         html += `</div>`;
         paginationContainer.innerHTML = html;
@@ -309,7 +283,7 @@
         renderTablePaginated();
     }
 
-    // JALANKAN SAAT WEB PERTAMA KALI DIBUKA
+    // Eksekusi Saat Halaman Dimuat
     window.onload = () => { 
         loadSidebar(); 
         loadData(); 

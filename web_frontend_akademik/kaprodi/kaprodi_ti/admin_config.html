@@ -424,63 +424,7 @@
                     </table>
                     <div id="pagination-mengajar" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
                 </div>
-                <div id="content-skripsi" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Skripsi</h3>
-                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data tugas akhir mahasiswa dan dosen pembimbing.</p>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn-dark" style="background: #6b21a8; border-color: #6b21a8;" onclick="alert('Fitur Import sedang disiapkan!')">Import Dari Pusat</button>
-                            <button class="btn-dark" onclick="loadData('skripsi')"><i class="fas fa-sync-alt"></i> Refresh</button>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                            Show 
-                            <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer;">
-                                <option selected>10</option>
-                                <option>25</option>
-                            </select> entries
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                            <input type="text" id="searchSkripsi" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none;">
-                        </div>
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th width="8%" style="text-align: center;">Kode MK</th>
-                                <th width="45%">Mahasiswa & Dosen</th>
-                                <th width="15%">Pendadaran</th>
-                                <th width="12%">Nilai</th>
-                                <th width="10%" style="text-align: center;">Opsi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodySkripsi">
-                            </tbody>
-                    </table>
-                    <div id="pagination-skripsi" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-                </div>
-
-                <div id="content-mapping" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Pemetaan CPL ke CPMK</h3>
-                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Teknik Informatika</p>
-                        </div>
-                        <button class="btn-dark" onclick="loadMappingData()"><i class="fas fa-sync-alt"></i> Refresh</button>
-                    </div>
-                    <table>
-                        <thead><tr><th width="15%">Kode CPMK</th><th>Deskripsi CPMK</th><th width="25%">Referensi CPL TI</th><th width="10%" style="text-align: center;">Aksi</th></tr></thead>
-                        <tbody id="bodyMapping"></tbody>
-                    </table>
-                    <div id="pagination-mapping" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-                </div>
-
+                
                 <div id="content-mapping-mk" class="section">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
                         <div>
@@ -768,7 +712,7 @@
     <!-- 5. SCRIPT BAWAAN ADMIN CONFIG ANDA -->
     <script>
         const PRODI = 'ti'; 
-    const API_BASE = "https://ohio-linked-firewall-school.trycloudflare.com/webhook";
+    const API_BASE = "https://willing-robot-ministry-reported.trycloudflare.com/webhook";
     const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_INSERT = `${API_BASE}/admin-insert-master`;
@@ -863,7 +807,7 @@
         'mahasiswa': { data: [], page: 1, bodyId: 'bodyMahasiswa', paginationId: 'pagination-mahasiswa' },
         'dosen':     { data: [], page: 1, bodyId: 'bodyDosen',     paginationId: 'pagination-dosen' },
         'mengajar': { data: [], page: 1, bodyId: 'bodyMengajar', paginationId: 'pagination-mengajar' },
-        'skripsi':  { data: [], page: 1, bodyId: 'bodySkripsi',  paginationId: 'pagination-skripsi' }
+        
     };
     const rowsPerPage = 5; 
     let globalCPL = []; 

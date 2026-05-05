@@ -167,7 +167,7 @@
             
             <div class="form-group">
                 <label>NIM</label>
-                <input type="text" id="inputNIM" class="form-control" placeholder="Contoh: 22.11.1234">
+                <input type="text" id="inputNIM" class="form-control" placeholder="Contoh: 223220042">
             </div>
             
             <div class="form-group">
@@ -175,9 +175,11 @@
                 <input type="text" id="inputNamaMahasiswa" class="form-control" placeholder="Nama lengkap mahasiswa">
             </div>
             
+            <!-- Karena Angkatan sudah otomatis, input ini bisa kita jadikan opsi opsional atau kita biarkan sebagai override manual -->
             <div class="form-group">
                 <label>Angkatan (Tahun)</label>
-                <input type="number" id="inputAngkatan" class="form-control" placeholder="Contoh: 2022">
+                <input type="number" id="inputAngkatan" class="form-control" placeholder="Otomatis dari NIM" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
+                <small style="color: #6b7280; font-size: 0.75rem;">Terisi otomatis berdasarkan digit NIM saat disimpan.</small>
             </div>
 
             <div class="form-group" style="margin-bottom: 30px;">
@@ -199,7 +201,7 @@
 <script>
     // 1. PENGATURAN API N8N
     const PRODI = 'ti'; 
-    const API_BASE = "https://ohio-linked-firewall-school.trycloudflare.com/webhook"; 
+    const API_BASE = "https://willing-robot-ministry-reported.trycloudflare.com/webhook"; 
     const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
 
     // 2. SISTEM KEAMANAN
@@ -225,7 +227,7 @@
 
             setTimeout(() => {
                 const navDashboard = document.getElementById('nav-dashboard');
-                const navMahasiswa = document.getElementById('nav-mahasiswa'); // ID Menu Mahasiswa
+                const navMahasiswa = document.getElementById('nav-mahasiswa'); 
                 const menuMaster = document.getElementById('menu-master');
                 const chevronMaster = document.getElementById('chevron-master');
 
@@ -269,7 +271,6 @@
             const res = await fetch(API_URL);
             const fullData = await res.json();
             
-            // Simpan hanya data tipe mahasiswa[cite: 2]
             allDataMahasiswa = fullData.filter(i => i.tipe === 'mahasiswa');
             currentPage = 1;
             
@@ -285,7 +286,6 @@
         const tbody = document.getElementById("bodyMahasiswa");
         tbody.innerHTML = ""; 
 
-        // Filter berdasarkan pencarian (NIM atau Nama)
         const filteredData = allDataMahasiswa.filter(item => {
             const nimContent = item.kode ? item.kode.toLowerCase() : "";
             const nameContent = item.label ? item.label.toLowerCase() : "";
@@ -302,19 +302,30 @@
         const endIndex = startIndex + rowsPerPage;
         const dataToShow = filteredData.slice(startIndex, endIndex);
 
-        // Render Data Mahasiswa[cite: 2]
+        // ✨ EKSEKUSI RUMUS EKSTRAK ANGKATAN DARI NIM ✨
         dataToShow.forEach((item, index) => {
             const noUrut = startIndex + index + 1;
+            
+            // Ambil nama dari database (biasanya dipisah || oleh n8n)
             const parts = item.label ? item.label.split('||') : ['Tidak Diketahui', '-'];
             const namaMhs = parts[0];
-            const angkatan = parts[1] || '-';
+            
+            // LOGIKA OTOMATISASI ANGKATAN
+            let angkatanOtomatis = '-';
+            const nim = item.kode;
+            // Pastikan NIM valid dan panjangnya minimal 5 karakter (agar aman di-substring)
+            if (nim && nim.length >= 5) {
+                // Potong digit ke-4 dan ke-5 (index 3 dan 4) dari NIM
+                const kodeTahun = nim.substring(3, 5);
+                angkatanOtomatis = "20" + kodeTahun; // Tambahkan "20" di depan
+            }
 
             tbody.innerHTML += `
             <tr>
                 <td style="text-align: center;">${noUrut}</td>
                 <td><strong>${item.kode}</strong></td>
                 <td style="font-weight: 600;">${namaMhs}</td>
-                <td style="text-align: center;">${angkatan}</td>
+                <td style="text-align: center;"><span style="background:#f3f4f6; padding: 4px 10px; border-radius:6px; font-weight:600; color:#4b5563;">${angkatanOtomatis}</span></td>
                 <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
                 <td style="text-align: center;">
                     <button class="btn-action btn-edit" onclick="bukaModalMahasiswa('${item.kode}')"><i class="fas fa-edit"></i> Ubah</button>
@@ -350,7 +361,7 @@
     }
 
     // ==========================================
-    // 5. FUNGSI MODAL POP-UP MAHASISWA[cite: 2]
+    // 5. FUNGSI MODAL POP-UP MAHASISWA
     // ==========================================
     function bukaModalMahasiswa(nim = '') {
         if(nim) {
@@ -365,6 +376,7 @@
         
         document.getElementById('idMahasiswa').value = "";
         document.getElementById('inputNamaMahasiswa').value = "";
+        // Kosongkan karena otomatis
         document.getElementById('inputAngkatan').value = "";
         document.getElementById('modalMahasiswa').style.display = "flex";
     }
