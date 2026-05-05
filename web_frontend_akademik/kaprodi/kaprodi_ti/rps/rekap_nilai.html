@@ -63,7 +63,7 @@
     <!-- Logika Halaman -->
     <script>
         // GANTI DENGAN URL CLOUDFLARE ANDA YANG AKTIF
-        const API_BASE = "https://ohio-linked-firewall-school.trycloudflare.com/webhook"; 
+        const API_BASE = "https://beliefs-textiles-owners-massachusetts.trycloudflare.com/webhook"; 
         
         async function loadRekapNilai() {
             const tbody = document.getElementById('tableBodyRekap');
@@ -122,8 +122,8 @@
                                 <div class="progress-bar" style="width: ${item.persentase}%; background: ${barColor};"></div>
                             </div>
                         </td>
-                        <td style="text-align: center;">
-                            <button class="btn-action btn-edit" onclick="lihatDetail('${item.kelas}', '${item.kode_mk}')" ${item.persentase === 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                        <td>
+                            <button class="btn-action btn-edit" onclick="window.location.href='rekap_detail.html?kode_mk=${item.kode_mk}&nama_mk=${encodeURIComponent(item.nama_mk)}&dosen=${encodeURIComponent(item.dosen)}'">
                                 <i class="fas fa-search"></i> Detail
                             </button>
                         </td>

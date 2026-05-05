@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemenuhan CPMK per Kelas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    <script src="../../../js/template.js"></script>
+    <style>
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; overflow-x: auto;}
+        .table-cpmk { width: 100%; border-collapse: collapse; min-width: 800px; }
+        .table-cpmk th, .table-cpmk td { padding: 12px; border: 1px solid #e5e7eb; text-align: center; font-size: 0.9rem; }
+        .table-cpmk th { background: #002878; color: white; font-weight: 700; }
+        .table-cpmk td.text-left { text-align: left; }
+        .badge-score { padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <div id="navbar-container"></div>
+
+        <div class="main-content">
+            <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a;">Pemenuhan Nilai <span style="color: #8b0000;">CPMK</span></h1>
+            <p style="margin: 0; color: #64748b;">Pantau persentase pencapaian Capaian Pembelajaran Mata Kuliah (CPMK) mahasiswa per kelas.</p>
+
+            <div class="card-container" style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="font-weight: 700;">Pilih Kelas / Mata Kuliah:</label>
+                    <select id="selectMK" style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; width: 300px;">
+                        <option value="2023W276">TI Pagi - AI Programming [2023W276]</option>
+                        <option value="2023P045">TI Pagi - Mobile Programming [2023P045]</option>
+                    </select>
+                    <button class="btn-action" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="loadDataCPMK()">
+                        <i class="fas fa-search"></i> Tampilkan Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-container">
+                <table class="table-cpmk">
+                    <thead id="headerTable">
+                        <tr>
+                            <th>NO</th>
+                            <th class="text-left">NIM & NAMA MAHASISWA</th>
+                            <th>MENGHITUNG DATA...</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTable">
+                        <tr><td colspan="10" style="padding: 40px; color: #64748b;">Silakan pilih mata kuliah dan klik Tampilkan Data.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_GET_CPMK = "https://beliefs-textiles-owners-massachusetts.trycloudflare.com/webhook/get-cpmk-kelas";
+
+        async function loadDataCPMK() {
+            const kodeMK = document.getElementById("selectMK").value;
+            const bodyTbl = document.getElementById("bodyTable");
+            const headTbl = document.getElementById("headerTable");
+            
+            bodyTbl.innerHTML = `<tr><td colspan="10"><i class="fas fa-spinner fa-spin"></i> Memproses kalkulasi CPMK dari server...</td></tr>`;
+
+            try {
+                const res = await fetch(`${API_GET_CPMK}?kode_mk=${kodeMK}`);
+                const data = await res.json();
+
+                if(!data || data.length === 0) {
+                    bodyTbl.innerHTML = `<tr><td colspan="10" style="color: red;">Belum ada data nilai/mapping CPMK untuk kelas ini.</td></tr>`;
+                    return;
+                }
+
+                // 1. Ekstrak semua kode CPMK unik untuk dijadikan Header Tabel
+                let cpmkSet = new Set();
+                data.forEach(item => cpmkSet.add(item.kode_cpmk));
+                let cpmkList = Array.from(cpmkSet).sort();
+
+                // Buat Header Dinamis
+                let headHtml = `<tr><th width="5%">NO</th><th width="30%" class="text-left">NIM & NAMA MAHASISWA</th>`;
+                cpmkList.forEach(cpmk => { headHtml += `<th>${cpmk}</th>`; });
+                headHtml += `</tr>`;
+                headTbl.innerHTML = headHtml;
+
+                // 2. Kelompokkan data berdasarkan Mahasiswa
+                let mhsData = {};
+                data.forEach(item => {
+                    if(!mhsData[item.nim]) {
+                        mhsData[item.nim] = { nama: item.nama_mahasiswa, nilai_cpmk: {} };
+                    }
+                    // Menghitung persentase CPMK = (Total Nilai Tertimbang / Total Bobot CPMK tersebut) * 100
+                    let skorAsli = (item.total_nilai_tertimbang / item.total_bobot_cpmk) * 100;
+                    mhsData[item.nim].nilai_cpmk[item.kode_cpmk] = skorAsli.toFixed(2);
+                });
+
+                // 3. Cetak ke Tabel
+                bodyTbl.innerHTML = "";
+                let no = 1;
+                for (let nim in mhsData) {
+                    let mhs = mhsData[nim];
+                    let rowHtml = `<tr>
+                        <td>${no++}</td>
+                        <td class="text-left"><b>${nim}</b><br><span style="font-size:0.85rem;">${mhs.nama}</span></td>`;
+                    
+                    cpmkList.forEach(cpmk => {
+                        let skor = mhs.nilai_cpmk[cpmk] || 0;
+                        let color = skor >= 50 ? 'background: #dcfce7; color: #166534;' : 'background: #fee2e2; color: #991b1b;';
+                        rowHtml += `<td><span class="badge-score" style="${color}">${skor}</span></td>`;
+                    });
+                    
+                    rowHtml += `</tr>`;
+                    bodyTbl.innerHTML += rowHtml;
+                }
+
+            } catch (e) {
+                bodyTbl.innerHTML = `<tr><td colspan="10" style="color: red;">Error: Gagal terhubung ke N8N.</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -56,6 +56,17 @@
             <div class="nav-item" id="nav-mengajar-duplikat" onclick="window.location.href='/kaprodi/kaprodi_ti/periksa_data/mengajar_duplikat.html'"><i class="fas fa-users-slash" style="width: 20px;"></i> Mengajar Duplikat</div>
         </div>
 
+        <!-- MEKANISME ASSESMEN -->
+        <div class="nav-item" onclick="toggleDropdown('menu-assesmen', 'chevron-assesmen')">
+            <i class="fas fa-balance-scale"></i> Mekanisme Assesmen
+            <i id="chevron-assesmen" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        <div id="menu-assesmen" style="display: none; flex-direction: column; margin-top: 2px;">
+            <div class="nav-item" id="nav-master-bobot" onclick="window.location.href='/kaprodi/kaprodi_ti/mekanisme_assesmen/master_bobot.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                Master Bobot
+            </div>
+        </div>
+
         <!-- MAPPING(PEMETAAN) -->
         <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')">
             <i class="fas fa-sitemap"></i> Pemetaan (Mapping)
@@ -99,6 +110,41 @@
         <div class="nav-item" id="nav-rps" onclick="window.location.href='/kaprodi/kaprodi_ti/rps/rps_kelola.html'"><i class="fas fa-book-open"></i> Kelola RPS</div>
         <div class="nav-item" id="nav-rekap-nilai" onclick="window.location.href='/kaprodi/kaprodi_ti/rps/rekap_nilai.html'"><i class="fas fa-clipboard-list"></i> Rekap Nilai Dosen</div>
         <div class="nav-item" id="nav-portofolio" onclick="window.location.href='/kaprodi/kaprodi_ti/rps/portofolio_admin.html'"><i class="fas fa-chart-pie"></i> Laporan CPL & CPMK</div>
+
+        <!-- MENU 2: PEMENUHAN CPMK & CPL -->
+        <div class="menu-item has-dropdown" onclick="toggleDropdown(this)">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-chart-pie"></i> Pemenuhan CPMK & CPL
+            </div>
+            <i class="fas fa-chevron-down arrow-icon"></i>
+        </div>
+        <div class="dropdown-container">
+            <a href="../cpl_cpmk/cpmk_kelas.html" class="dropdown-item">Nilai CPMK per Kelas</a>
+            <a href="../cpl_cpmk/cpl_angkatan.html" class="dropdown-item">Nilai CPL per Angkatan</a>
+            <a href="../cpl_cpmk/eval_cpmk.html" class="dropdown-item">Evaluasi CPMK Angkatan</a>
+            <a href="../cpl_cpmk/eval_cpl.html" class="dropdown-item">Evaluasi CPL Angkatan</a>
+            <a href="../cpl_cpmk/grafik_cpmk.html" class="dropdown-item">Grafik Rerata CPMK</a>
+            <a href="../cpl_cpmk/grafik_cpl.html" class="dropdown-item">Grafik Rerata CPL</a>
+            <a href="../cpl_cpmk/portofolio_mk.html" class="dropdown-item">Portofolio Mata Kuliah</a>
+            <a href="../cpl_cpmk/skpi.html" class="dropdown-item">Cetak SKPI</a>
+        </div>
+
+        <!-- MENU 3: KELOLA RPS -->
+        <div class="menu-item has-dropdown" onclick="toggleDropdown(this)">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-book"></i> Manajemen RPS
+            </div>
+            <i class="fas fa-chevron-down arrow-icon"></i>
+        </div>
+        <div class="dropdown-container">
+            <a href="rps_bentuk.html" class="dropdown-item">Master Bentuk</a>
+            <a href="rps_metode.html" class="dropdown-item">Master Metode</a>
+            <a href="rps_kriteria.html" class="dropdown-item">Master Kriteria</a>
+            <a href="rps_komponen.html" class="dropdown-item">Master Komponen</a>
+            <a href="rps_kelola.html" class="dropdown-item">Kelola RPS</a>
+            <a href="rps_pengecekan.html" class="dropdown-item">Pengecekan RPS</a>
+            <a href="rps_serap.html" class="dropdown-item">Serap RPS</a>
+        </div>
 
         <!-- Akses Dosen -->
         <div class="menu-category" style="margin-top: 20px;">AKSES DOSEN</div>

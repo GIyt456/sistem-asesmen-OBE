@@ -742,17 +742,29 @@
     }
 
     // --- FUNGSI ANIMASI DROPDOWN SIDEBAR ---
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex';
-            chevron.style.transform = 'rotate(180deg)'; 
-        } else {
-            menu.style.display = 'none';
-            chevron.style.transform = 'rotate(0deg)';   
+    window.toggleDropdown = function(element) {
+        var dropdownContent = element.nextElementSibling;
+
+        // PENGAMAN: Jika di bawah menu tidak ada kotak dropdown, hentikan! (Ini yang mencegah error 'null')
+        if (!dropdownContent || !dropdownContent.classList.contains('dropdown-container')) {
+            return; 
         }
-    }
+
+        // Tutup dropdown lain
+        let allDropdowns = document.querySelectorAll('.dropdown-container');
+        allDropdowns.forEach(dropdown => {
+            if(dropdown !== dropdownContent) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Buka/Tutup dropdown ini
+        if (dropdownContent.style.display === "block") {
+            dropdownContent.style.display = "none";
+        } else {
+            dropdownContent.style.display = "block";
+        }
+    };
 
     // --- LOGIKA SIDEBAR & SECTION ---
     function switchTab(type) {
