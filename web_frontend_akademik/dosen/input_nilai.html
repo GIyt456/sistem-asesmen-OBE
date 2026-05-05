@@ -216,6 +216,45 @@
             </div>
         </div>
 
+        <!-- Master Bobot -->
+        <div id="card-master-bobot" style="display: none; margin-bottom: 50px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
+                <div>
+                    <h2 style="font-size: 2rem; font-weight: 800; color: #111827; margin-bottom: 4px;">Master Bobot Kaprodi</h2>
+                    <p style="color: #6b7280; font-size: 0.95rem; margin: 0;">Acuan persentase penilaian sesuai ketetapan program studi.</p>
+                </div>
+                <div style="background: #e0f2fe; color: #0369a1; padding: 8px 16px; border-radius: 50px; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-info-circle"></i> Hanya Baca (Read-Only)
+                </div>
+            </div>
+            
+            <div style="overflow-x: auto; border-radius: 12px; border: 1px solid #e5e7eb; background: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                    <thead style="background: #f8fafc; color: var(--text-dark); border-bottom: 2px solid #e5e7eb;">
+                        <tr>
+                            <th style="padding: 18px 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">CPL</th>
+                            <th style="padding: 18px 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">MATA KULIAH</th>
+                            <th style="padding: 18px 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">CPMK</th>
+                            <th style="padding: 18px 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">TUGAS</th>
+                            <th style="padding: 18px 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">TES TULIS (UTS)</th>
+                            <th style="padding: 18px 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">PRESENTASI</th>
+                            <th style="padding: 18px 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">TES TULIS (UAS)</th>
+                            <th style="padding: 18px 15px; font-size: 0.85rem; font-weight: 800; background: #e0f2fe; color: #0369a1;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyMasterBobot" style="font-size: 0.95rem;">
+                        <!-- Data ditarik dari JavaScript -->
+                    </tbody>
+                    <tfoot>
+                        <tr style="background: #f1f5f9; font-weight: 800; border-top: 2px solid #e5e7eb;">
+                            <td colspan="7" style="text-align: right; padding: 18px 15px; border-right: 1px solid #e5e7eb; color: #334155;">TOTAL KESELURUHAN:</td>
+                            <td id="grandTotalMaster" style="padding: 18px 15px; font-size: 1.1rem;">0%</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
         <div style="display: grid; grid-template-columns: 1fr; margin-bottom: 40px;">
             <div style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); border-radius: 16px; padding: 25px 30px; color: white; display: flex; align-items: center; gap: 25px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);" 
                  onclick="window.location.href='rps_dosen.html'" 
@@ -379,13 +418,14 @@
     </div>
 
     <script>
-        const API_BASE = "https://ohio-linked-firewall-school.trycloudflare.com/webhook";
+        const API_BASE = "https://willing-robot-ministry-reported.trycloudflare.com/webhook";
         const API_SIMPAN = `${API_BASE}/simpan-konfigurasi`; 
         const API_GET_MAPPING = `${API_BASE}/get-mapping-mk`;
         const API_GET_SETTINGS = `${API_BASE}/get-settings`;
         const API_UPDATE_SETTINGS = `${API_BASE}/update-settings`;
         const API_METADATA = `${API_BASE}/get-metadata`;
         const API_GET_STUDENTS = `${API_BASE}/get-mahasiswa-mk`;
+        const API_GET_MASTER_BOBOT = `${API_BASE}/get-master-bobot`;
 
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
         const userNidn = localStorage.getItem("user_nidn");
@@ -462,6 +502,79 @@
         }
         function nextStep() { if (currentStepIndex < tutorialData.length - 1) { currentStepIndex++; updateTutorialUI(); } }
         function prevStep() { if (currentStepIndex > 0) { currentStepIndex--; updateTutorialUI(); } }
+
+        async function fetchMasterBobotDosen(mkKode) {
+            const tableCard = document.getElementById("card-master-bobot");
+            const tbody = document.getElementById("bodyMasterBobot");
+            const gTotal = document.getElementById("grandTotalMaster");
+
+            tableCard.style.display = 'block'; // Tampilkan kartu tabel
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Menarik Ketetapan Kaprodi...</td></tr>';
+
+            try {
+                const res = await fetch(API_GET_MASTER_BOBOT);
+                const allData = await res.json();
+
+                // Filter data HANYA untuk Mata Kuliah yang dipilih Dosen
+                const dataMk = allData.filter(d => d.kode_mk === mkKode);
+
+                if (dataMk.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color: #ef4444; font-weight: bold;"><i class="fas fa-exclamation-circle"></i> Kaprodi belum mengatur Master Bobot untuk Mata Kuliah ini.</td></tr>';
+                    gTotal.innerText = "0%";
+                    gTotal.className = "status-err";
+                    return;
+                }
+
+                let html = '';
+                let totalSeluruh = 0;
+                let cplCount = {};
+                let renderedCpl = {};
+                let namaMk = dataMk[0].nama_mk;
+
+                // Hitung CPL untuk efek Rowspan (menggabungkan sel)
+                dataMk.forEach(row => {
+                    if(!cplCount[row.cpl]) cplCount[row.cpl] = 0;
+                    cplCount[row.cpl]++;
+                });
+
+                dataMk.forEach((row, index) => {
+                    let totalBaris = parseInt(row.tugas) + parseInt(row.uts) + parseInt(row.presentasi) + parseInt(row.uas);
+                    totalSeluruh += totalBaris;
+
+                    let tr = `<tr>`;
+
+                    // Sel CPL (Digabung)
+                    if (!renderedCpl[row.cpl]) {
+                        tr += `<td rowspan="${cplCount[row.cpl]}" style="border: 1px solid #e5e7eb; padding: 18px 15px; vertical-align: middle; font-weight: 800; color: var(--primary-red);">${row.cpl}</td>`;
+                        renderedCpl[row.cpl] = true;
+                    }
+
+                    // Sel Nama MK (Selalu digabung dari atas ke bawah)
+                    if (index === 0) {
+                        tr += `<td rowspan="${dataMk.length}" style="border: 1px solid #e5e7eb; padding: 18px 15px; vertical-align: middle; font-weight: 700; color: #1e3a8a;">${namaMk}</td>`;
+                    }
+
+                    // Sel Sisa Data (CPMK dan Bobot)
+                    tr += `
+                        <td style="border: 1px solid #e5e7eb; padding: 18px 15px; font-weight: 600; color: #334155;">${row.cpmk}</td>
+                        <td style="border: 1px solid #e5e7eb; padding: 18px 15px;">${row.tugas}%</td>
+                        <td style="border: 1px solid #e5e7eb; padding: 18px 15px;">${row.uts}%</td>
+                        <td style="border: 1px solid #e5e7eb; padding: 18px 15px;">${row.presentasi}%</td>
+                        <td style="border: 1px solid #e5e7eb; padding: 18px 15px;">${row.uas}%</td>
+                        <td style="border: 1px solid #e5e7eb; padding: 18px 15px; font-weight: 800; background: #f8fafc;">${totalBaris}%</td>
+                    </tr>`;
+
+                    html += tr;
+                });
+
+                tbody.innerHTML = html;
+                gTotal.innerText = totalSeluruh + "%";
+                gTotal.style.color = totalSeluruh === 100 ? "#16a34a" : "#dc2626";
+
+            } catch(e) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color: #ef4444;">Gagal memuat data dari Database.</td></tr>';
+            }
+        }
 
         async function inputManual() {
             const mkKode = document.getElementById("pilihMK").value;
@@ -561,12 +674,15 @@
 
             if (!mkKode) { 
                 btnTambah.disabled = true; 
+                document.getElementById("card-master-bobot").style.display = "none"; // Sembunyikan tabel jika kosong
                 renderTableAsesmen();
                 return; 
             }
 
             localStorage.setItem("draft_mk_terpilih", mkKode);
             btnTambah.disabled = false; 
+
+            await fetchMasterBobotDosen(mkKode);
 
             // 1. Coba ambil mapping asli (jika ada)
             try {
