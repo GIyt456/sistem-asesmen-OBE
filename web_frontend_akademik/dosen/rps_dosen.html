@@ -118,7 +118,7 @@
     </main>
 
     <script>
-        const API_BASE = "https://willing-robot-ministry-reported.trycloudflare.com/webhook";
+        const API_BASE = "https://regulated-yorkshire-shared-aids.trycloudflare.com/webhook";
         const API_METADATA = `${API_BASE}/get-metadata`;
         const API_GET_RPS = `${API_BASE}/get-rps-detail`; 
         const API_SIMPAN_RPS = `${API_BASE}/simpan-rps`;
@@ -126,7 +126,6 @@
         const userNidn = localStorage.getItem("user_nidn");
         const userProdi = localStorage.getItem("prodi_aktif") || "ti";
         
-        // Pasang nama dosen di pojok kanan atas
         document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
 
         async function loadMataKuliahDosen() {

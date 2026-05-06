@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemenuhan CPL per Angkatan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    <style>
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; overflow-x: auto;}
+        .table-cpl { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        .table-cpl th, .table-cpl td { padding: 12px; border: 1px solid #e5e7eb; text-align: center; font-size: 0.9rem; }
+        .table-cpl th { background: #002878; color: white; font-weight: 700; position: sticky; top: 0; }
+        .table-cpl td.text-left { text-align: left; }
+        .table-cpl td.sticky-col, .table-cpl th.sticky-col { position: sticky; left: 0; background: #f8fafc; z-index: 1; border-right: 2px solid #cbd5e1; }
+        .table-cpl th.sticky-col { background: #002878; color: white; z-index: 2; }
+        .badge-score { padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <div id="navbar-container"></div>
+
+        <div class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a;">Pemenuhan Nilai <span style="color: #8b0000;">CPL</span></h1>
+                    <p style="margin: 0; color: #64748b;">Pantau persentase pencapaian Capaian Pembelajaran Lulusan (CPL) dari akumulasi seluruh mata kuliah per angkatan.</p>
+                </div>
+                <button class="btn-action" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                    <i class="fas fa-download"></i> Unduh Laporan
+                </button>
+            </div>
+
+            <div class="card-container" style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="font-weight: 700;">Pilih Angkatan Mahasiswa:</label>
+                    <select id="selectAngkatan" style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; width: 200px;">
+                        <option value="2022">Angkatan 2022</option>
+                        <option value="2023">Angkatan 2023</option>
+                        <option value="2024">Angkatan 2024</option>
+                        <option value="2025">Angkatan 2025</option>
+                    </select>
+                    <button class="btn-action" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="loadDataCPL()">
+                        <i class="fas fa-search"></i> Tampilkan Data
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-container">
+                <table class="table-cpl">
+                    <thead id="headerTable">
+                        <tr>
+                            <th class="sticky-col" width="5%">NO</th>
+                            <th class="sticky-col text-left" width="25%">NIM & NAMA MAHASISWA</th>
+                            <th>MENGHITUNG DATA...</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTable">
+                        <tr><td colspan="15" style="padding: 40px; color: #64748b;">Silakan pilih angkatan dan klik Tampilkan Data.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../js/template.js"></script>
+    <script>
+        // GANTI DOMAIN CLOUDFLARE INI DENGAN YANG AKTIF SAAT INI
+        const API_GET_CPL = "https://regulated-yorkshire-shared-aids.trycloudflare.com/webhook/get-cpl-angkatan";
+
+        async function loadDataCPL() {
+            const angkatan = document.getElementById("selectAngkatan").value;
+            const bodyTbl = document.getElementById("bodyTable");
+            const headTbl = document.getElementById("headerTable");
+            
+            bodyTbl.innerHTML = `<tr><td colspan="15"><i class="fas fa-spinner fa-spin"></i> Menghimpun data CPL dari seluruh mata kuliah...</td></tr>`;
+
+            try {
+                const res = await fetch(`${API_GET_CPL}?angkatan=${angkatan}`);
+                const data = await res.json();
+
+                if(!data || data.length === 0) {
+                    bodyTbl.innerHTML = `<tr><td colspan="15" style="color: red;">Belum ada data nilai/mapping CPL untuk angkatan ${angkatan}.</td></tr>`;
+                    return;
+                }
+
+                // 1. Ekstrak semua kode CPL unik untuk Header (CPL-01 s/d CPL-11)
+                let cplSet = new Set();
+                data.forEach(item => cplSet.add(item.kode_cpl));
+                // Urutkan agar tampilannya rapi (CPL01, CPL02, dst)
+                let cplList = Array.from(cplSet).sort();
+
+                // 2. Buat Header Dinamis
+                let headHtml = `<tr>
+                                    <th class="sticky-col" width="5%">NO</th>
+                                    <th class="sticky-col text-left" width="25%">NIM & NAMA MAHASISWA</th>`;
+                cplList.forEach(cpl => { headHtml += `<th>${cpl}</th>`; });
+                headHtml += `</tr>`;
+                headTbl.innerHTML = headHtml;
+
+                // 3. Kelompokkan data berdasarkan Mahasiswa
+                let mhsData = {};
+                data.forEach(item => {
+                    if(!mhsData[item.nim]) {
+                        mhsData[item.nim] = { nama: item.nama_mahasiswa, nilai_cpl: {} };
+                    }
+                    // Rumus: (Total Nilai Tertimbang dari semua MK / Total Bobot CPL dari semua MK) * 100
+                    let skorAsli = (item.total_nilai_tertimbang / item.total_bobot_cpl) * 100;
+                    mhsData[item.nim].nilai_cpl[item.kode_cpl] = skorAsli.toFixed(2);
+                });
+
+                // 4. Cetak ke Tabel
+                bodyTbl.innerHTML = "";
+                let no = 1;
+                for (let nim in mhsData) {
+                    let mhs = mhsData[nim];
+                    let rowHtml = `<tr>
+                        <td class="sticky-col">${no++}</td>
+                        <td class="sticky-col text-left">
+                            <b style="color: var(--primary-red);">${nim}</b><br>
+                            <span style="font-size:0.85rem;">${mhs.nama}</span>
+                        </td>`;
+                    
+                    cplList.forEach(cpl => {
+                        let skor = mhs.nilai_cpl[cpl] || 0;
+                        // Warna berdasarkan ketercapaian (Misal standar lulus CPL adalah 60)
+                        let color = skor >= 60 ? 'background: #dcfce7; color: #166534;' : (skor > 0 ? 'background: #fef08a; color: #854d0e;' : 'background: #f1f5f9; color: #94a3b8;');
+                        let skorTampil = skor > 0 ? skor : '-';
+                        rowHtml += `<td><span class="${skor > 0 ? 'badge-score' : ''}" style="${color}">${skorTampil}</span></td>`;
+                    });
+                    
+                    rowHtml += `</tr>`;
+                    bodyTbl.innerHTML += rowHtml;
+                }
+
+            } catch (e) {
+                bodyTbl.innerHTML = `<tr><td colspan="15" style="color: red;">Error: Gagal terhubung ke server N8N.</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
