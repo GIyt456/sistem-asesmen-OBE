@@ -13,11 +13,24 @@
 
     <div class="nav-menu">
         <div class="menu-category">MAIN</div>
+
         <!-- Home -->
         <div class="nav-item" id="nav-home" onclick="window.location.href='/kaprodi/kaprodi_ti/admin_config.html'"><i class="fas fa-home"></i> Home</div>
 
         <!-- Mata Kuliah -->
-        <div class="nav-item" id="nav-mk" onclick="window.location.href='/kaprodi/kaprodi_ti/mata_kuliah/susunan_mk.html'"><i class="fas fa-book"></i> Mata Kuliah</div>
+        <div class="nav-item" onclick="toggleDropdown('submenu-mk', 'chevron-mk')">
+            <i class="fas fa-book"></i> Mata Kuliah
+            <i id="chevron-mk" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        
+        <div id="submenu-mk" style="display: none; flex-direction: column; margin-top: 2px;">
+            <div class="nav-item" id="nav-daftar-mk" onclick="window.location.href='/kaprodi/kaprodi_ti/mata_kuliah/susunan_mk.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                Susunan Mata Kuliah
+            </div>
+            <div class="nav-item" id="nav-map-cpl-bk-mk" onclick="window.location.href='/kaprodi/kaprodi_ti/mata_kuliah/pemetaan_cpl_mk_bk.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                Pemetaan CPL - BK - MK
+            </div>
+        </div>
 
         <!-- CPL -->
         <div class="nav-item" id="nav-cpl" onclick="window.location.href='/kaprodi/kaprodi_ti/cpl.html'"><i class="fas fa-graduation-cap"></i> CPL</div>
