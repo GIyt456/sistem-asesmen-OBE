@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafik Rerata CPMK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    
+    <!-- Memanggil Library Chart.js dari CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; }
+        .chart-wrapper { position: relative; height: 500px; width: 100%; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <div id="navbar-container"></div>
+
+        <div class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a;">Grafik Rerata <span style="color: #8b0000;">CPMK</span></h1>
+                    <p style="margin: 0; color: #64748b;">Visualisasi rata-rata Capaian Pembelajaran Mata Kuliah dalam bentuk grafik batang.</p>
+                </div>
+                <button class="btn-action" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="window.print()">
+                    <i class="fas fa-print"></i> Cetak Grafik
+                </button>
+            </div>
+
+            <div class="card-container" style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="font-weight: 700;">Pilih Mata Kuliah:</label>
+                    <select id="selectMK" style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; width: 300px;">
+                        <option value="2023W276">TI Pagi - AI Programming [2023W276]</option>
+                        <option value="2023P045">TI Pagi - Mobile Programming [2023P045]</option>
+                    </select>
+                    
+                    <button class="btn-action" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="loadGrafikCPMK()">
+                        <i class="fas fa-chart-bar"></i> Tampilkan Grafik
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-container">
+                <div id="loadingMsg" style="text-align: center; color: #64748b; padding: 40px; display: none;">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Memproses visualisasi data...
+                </div>
+                <div id="errorMsg" style="text-align: center; color: red; padding: 40px; display: none;"></div>
+                
+                <!-- Kanvas tempat Chart.js akan menggambar grafik -->
+                <div class="chart-wrapper">
+                    <canvas id="cpmkChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../js/template.js"></script>
+    <script>
+        const API_GRAFIK_CPMK = "https://regulated-yorkshire-shared-aids.trycloudflare.com/webhook/get-grafik-cpmk";
+        let myChart = null; // Variabel global untuk menyimpan instance grafik
+
+        async function loadGrafikCPMK() {
+            const kodeMK = document.getElementById("selectMK").value;
+            const loadingMsg = document.getElementById("loadingMsg");
+            const errorMsg = document.getElementById("errorMsg");
+            const canvas = document.getElementById("cpmkChart");
+            
+            // Tampilkan loading, sembunyikan canvas & error
+            loadingMsg.style.display = "block";
+            errorMsg.style.display = "none";
+            canvas.style.display = "none";
+
+            try {
+                const res = await fetch(`${API_EVAL_CPMK}?kode_mk=${kodeMK}`);
+                const data = await res.json();
+
+                loadingMsg.style.display = "none";
+
+                if(!data || data.length === 0) {
+                    errorMsg.innerText = "Belum ada data nilai/mapping CPMK untuk kelas ini.";
+                    errorMsg.style.display = "block";
+                    return;
+                }
+
+                // 1. Olah Data Mentah -> Rata-rata per CPMK
+                let cpmkData = {};
+                data.forEach(item => {
+                    let cpmk = item.kode_cpmk;
+                    if (!cpmkData[cpmk]) {
+                        cpmkData[cpmk] = { totalSkor: 0, countMhs: 0 };
+                    }
+                    // Hitung nilai per mahasiswa
+                    let skorMhs = (item.total_nilai_tertimbang / item.total_bobot_cpmk) * 100;
+                    cpmkData[cpmk].totalSkor += skorMhs;
+                    cpmkData[cpmk].countMhs += 1;
+                });
+
+                // 2. Siapkan Array untuk Label (Sumbu X) dan Data (Sumbu Y)
+                let labels = [];
+                let averages = [];
+                let backgroundColors = [];
+
+                // Sortir berurutan (CPMK01, CPMK02, dst)
+                Object.keys(cpmkData).sort().forEach(cpmk => {
+                    let avg = (cpmkData[cpmk].totalSkor / cpmkData[cpmk].countMhs).toFixed(2);
+                    labels.push(cpmk);
+                    averages.push(avg);
+
+                    // Warna batang: Hijau jika >= 60, Merah jika < 60
+                    if (avg >= 60) {
+                        backgroundColors.push('rgba(16, 185, 129, 0.7)'); // Hijau
+                    } else {
+                        backgroundColors.push('rgba(239, 68, 68, 0.7)'); // Merah
+                    }
+                });
+
+                canvas.style.display = "block";
+                renderChart(labels, averages, backgroundColors);
+
+            } catch (e) {
+                loadingMsg.style.display = "none";
+                errorMsg.innerText = "Error: Gagal terhubung ke N8N.";
+                errorMsg.style.display = "block";
+            }
+        }
+
+        function renderChart(labels, dataAvg, bgColors) {
+            const ctx = document.getElementById('cpmkChart').getContext('2d');
+            
+            // Hancurkan grafik sebelumnya jika sudah ada (agar tidak tumpang tindih saat pilih MK lain)
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Rata-Rata Nilai CPMK Kelas',
+                        data: dataAvg,
+                        backgroundColor: bgColors,
+                        borderColor: bgColors.map(color => color.replace('0.7', '1')), // Bikin border lebih solid
+                        borderWidth: 1,
+                        borderRadius: 6 // Ujung atas batang melengkung elegan
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100, // Skala nilai maksimal 100
+                            title: {
+                                display: true,
+                                text: 'Nilai Skala 100',
+                                font: { weight: 'bold' }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Kode CPMK',
+                                font: { weight: 'bold' }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ' Rata-rata: ' + context.parsed.y + ' Poin';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

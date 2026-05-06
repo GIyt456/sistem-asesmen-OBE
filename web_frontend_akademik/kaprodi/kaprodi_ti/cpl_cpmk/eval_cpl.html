@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluasi CPL Angkatan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    <style>
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; overflow-x: auto;}
+        .table-eval { width: 100%; border-collapse: collapse; }
+        .table-eval th, .table-eval td { padding: 15px; border-bottom: 1px solid #e5e7eb; text-align: center; }
+        .table-eval th { background: #002878; color: white; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; }
+        .text-left { text-align: left !important; }
+        
+        /* Styling Progress Bar & Badge */
+        .progress-bar-container { width: 100%; background-color: #e2e8f0; border-radius: 999px; height: 10px; margin-bottom: 5px; overflow: hidden; }
+        .progress-bar { height: 100%; border-radius: 999px; transition: 0.5s ease; }
+        .bg-success { background-color: #10b981; }
+        .bg-warning { background-color: #f59e0b; }
+        .bg-danger { background-color: #ef4444; }
+        
+        .badge-status { padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 5px; }
+        .badge-status.success { background: #dcfce7; color: #166534; }
+        .badge-status.warning { background: #fef08a; color: #854d0e; }
+        .badge-status.danger { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <div id="navbar-container"></div>
+
+        <div class="main-content">
+            <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a;">Evaluasi <span style="color: #8b0000;">CPL Angkatan</span></h1>
+            <p style="margin: 0; color: #64748b;">Potret makro pencapaian profil lulusan program studi berdasarkan akumulasi seluruh mata kuliah.</p>
+
+            <div class="card-container" style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="font-weight: 700;">Pilih Angkatan:</label>
+                    <select id="selectAngkatan" style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; width: 200px;">
+                        <option value="2022">Angkatan 2022</option>
+                        <option value="2023">Angkatan 2023</option>
+                        <option value="2024">Angkatan 2024</option>
+                    </select>
+                    
+                    <label style="font-weight: 700; margin-left: 20px;">Standar Kelulusan CPL:</label>
+                    <input type="number" id="standarLulus" value="60" style="padding: 10px; width: 80px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                    
+                    <button class="btn-action" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="loadEvalCPL()">
+                        <i class="fas fa-search-chart"></i> Analisis CPL
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-container">
+                <table class="table-eval">
+                    <thead>
+                        <tr>
+                            <th width="5%">NO</th>
+                            <th width="15%" class="text-left">KODE CPL</th>
+                            <th width="15%">JUMLAH MHS</th>
+                            <th width="15%">RATA-RATA KETERAIHAN</th>
+                            <th width="30%">PERSENTASE KELULUSAN (LULUS vs GAGAL)</th>
+                            <th width="20%">STATUS CPL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTable">
+                        <tr><td colspan="6" style="padding: 40px; color: #64748b;">Silakan pilih angkatan dan klik Analisis CPL.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../js/template.js"></script>
+    <script>
+        // GANTI DOMAIN CLOUDFLARE INI DENGAN YANG AKTIF SAAT INI
+        const API_EVAL_CPL = "https://regulated-yorkshire-shared-aids.trycloudflare.com/webhook/get-eval-cpl";
+
+        async function loadEvalCPL() {
+            const angkatan = document.getElementById("selectAngkatan").value;
+            const standar = parseFloat(document.getElementById("standarLulus").value) || 60;
+            const bodyTbl = document.getElementById("bodyTable");
+            
+            bodyTbl.innerHTML = `<tr><td colspan="6"><i class="fas fa-spinner fa-spin"></i> Mengekstrak data agregat CPL...</td></tr>`;
+
+            try {
+                const res = await fetch(`${API_EVAL_CPL}?angkatan=${angkatan}`);
+                const data = await res.json();
+
+                if(!data || data.length === 0) {
+                    bodyTbl.innerHTML = `<tr><td colspan="6" style="color: red;">Belum ada data nilai/CPL untuk angkatan ${angkatan}.</td></tr>`;
+                    return;
+                }
+
+                // 1. Grouping data mentah mhs menjadi per CPL
+                let evalData = {}; 
+                data.forEach(item => {
+                    let key = item.kode_cpl;
+                    if (!evalData[key]) {
+                        evalData[key] = { kode_cpl: key, list_nilai: [] };
+                    }
+                    // Hitung nilai akhir CPL per mahasiswa (skala 100)
+                    let skorMhs = (item.total_nilai_tertimbang / item.total_bobot_cpl) * 100;
+                    evalData[key].list_nilai.push(skorMhs);
+                });
+
+                // 2. Render ke Tabel
+                bodyTbl.innerHTML = "";
+                let no = 1;
+
+                // Sortir CPL (CPL01, CPL02, dst)
+                let sortedKeys = Object.keys(evalData).sort();
+
+                sortedKeys.forEach(key => {
+                    let row = evalData[key];
+                    let totalMhs = row.list_nilai.length;
+                    
+                    // Hitung Rata-Rata Angkatan
+                    let totalNilai = row.list_nilai.reduce((a, b) => a + b, 0);
+                    let rataRata = (totalNilai / totalMhs).toFixed(2);
+                    
+                    // Hitung Persentase Kelulusan
+                    let lulusCount = row.list_nilai.filter(n => n >= standar).length;
+                    let persenLulus = ((lulusCount / totalMhs) * 100).toFixed(1);
+
+                    // Penentuan Warna & Status
+                    let barColor = persenLulus >= 70 ? 'bg-success' : (persenLulus >= 50 ? 'bg-warning' : 'bg-danger');
+                    let statusBadge = rataRata >= standar 
+                        ? `<span class="badge-status success"><i class="fas fa-check-circle"></i> Memenuhi Target</span>`
+                        : `<span class="badge-status danger"><i class="fas fa-exclamation-triangle"></i> Tindakan Korektif Diperlukan</span>`;
+
+                    bodyTbl.innerHTML += `
+                        <tr>
+                            <td>${no++}</td>
+                            <td class="text-left" style="font-weight: 800; color: #002878; font-size: 1.1rem;">${row.kode_cpl}</td>
+                            <td>${totalMhs} Mhs</td>
+                            <td style="font-size: 1.1rem; font-weight: bold; color: ${rataRata >= standar ? '#166534' : '#991b1b'};">${rataRata}</td>
+                            <td>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar ${barColor}" style="width: ${persenLulus}%;"></div>
+                                </div>
+                                <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">${persenLulus}% Mhs Lulus (≥ ${standar})</span>
+                            </td>
+                            <td>${statusBadge}</td>
+                        </tr>
+                    `;
+                });
+
+            } catch (e) {
+                bodyTbl.innerHTML = `<tr><td colspan="6" style="color: red;">Error: Gagal terhubung ke N8N. Pastikan webhook aktif.</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
