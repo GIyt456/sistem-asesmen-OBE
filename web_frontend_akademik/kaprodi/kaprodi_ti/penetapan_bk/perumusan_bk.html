@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perumusan BK - Sistem OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            /* Warna Sidebar */
+            --sidebar-bg: #161923; 
+            --sidebar-text: #7b8395; 
+            --sidebar-hover: #262936; 
+            --sidebar-active-text: #ffffff;
+            
+            /* Warna Utama */
+            --primary-blue: #1e3a8a; 
+            --primary-red: #8b0000; 
+            --bg-main: #f9fafb; 
+            --text-dark: #111827; 
+            --border-color: #e5e7eb;
+        }
+
+        /* GAYA SIDEBAR */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .sidebar-profile-info { display: flex; flex-direction: column; }
+        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
+        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
+        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .nav-item.logout { color: #f87171; }
+        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; animation: transitionIn 0.3s ease-in-out;}
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 50px; }
+        .header-container { margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
+        .header-title span { color: var(--primary-red); }
+
+        /* TABLE STYLING */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: #f8fafc; padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); }
+        td { padding: 18px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #1e293b; }
+        tr:last-child td { border-bottom: none; }
+        
+        .btn-edit { background: #f1f5f9; color: var(--primary-blue); border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        .btn-edit:hover { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+
+        /* MODAL STYLING */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal-header { font-weight: 800; font-size: 1.2rem; margin-bottom: 20px; color: var(--text-dark); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #64748b; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
+        .btn-cancel { padding: 10px 18px; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 6px; cursor: pointer; }
+        .btn-save { padding: 10px 18px; background: var(--primary-red); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <div class="header-container">
+            <h1 class="header-title">Perumusan <span>Bahan Kajian</span></h1>
+            <p style="color: #64748b; margin-top: 5px;">Kelola nama dan koordinator untuk setiap Bahan Kajian (BK).</p>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 150px;">KODE BK</th>
+                        <th>NAMA BAHAN KAJIAN</th>
+                        <th>KOORDINATOR BK</th>
+                        <th style="width: 100px; text-align: center;">OPSI</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="4" style="text-align: center; padding: 40px;">Memuat data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">Edit Perumusan BK</div>
+            <input type="hidden" id="editKode">
+            <div class="form-group">
+                <label>Kode BK</label>
+                <input type="text" id="displayKode" disabled style="background: #f1f5f9;">
+            </div>
+            <div class="form-group">
+                <label>Nama Bahan Kajian</label>
+                <input type="text" id="editNama" placeholder="Masukkan nama BK...">
+            </div>
+            <div class="form-group">
+                <label>Koordinator BK</label>
+                <input type="text" id="editKoordinator" placeholder="Masukkan nama koordinator (Dosen)...">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">Batal</button>
+                <button class="btn-save" onclick="updateBK()">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "https://computing-epson-profits-script.trycloudflare.com/webhook";
+        const API_GET_BK = `${API_BASE}/get-master-bk`;
+        const API_UPDATE_BK = `${API_BASE}/update-master-bk`;
+        const PRODI = localStorage.getItem("prodi_aktif") || "ti";
+
+        window.onload = async () => {
+            await loadSidebar();
+            await loadDataBK();
+        };
+
+        async function loadDataBK() {
+            const tbody = document.getElementById('tableBody');
+            try {
+                const res = await fetch(API_GET_BK);
+                const data = await res.json();
+                
+                tbody.innerHTML = '';
+                data.forEach(bk => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-weight: 800; color: var(--primary-red);">${bk.kode_bk}</td>
+                        <td style="font-weight: 600;">${bk.nama_bk}</td>
+                        <td style="color: #64748b;">${bk.koordinator_bk || '<span style="font-style:italic; opacity:0.5;">Belum ditentukan</span>'}</td>
+                        <td style="text-align: center;">
+                            <button class="btn-edit" onclick="openModal('${bk.kode_bk}', '${bk.nama_bk}', '${bk.koordinator_bk || ''}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        function openModal(kode, nama, koordinator) {
+            document.getElementById('editKode').value = kode;
+            document.getElementById('displayKode').value = kode;
+            document.getElementById('editNama').value = nama;
+            document.getElementById('editKoordinator').value = koordinator;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        async function updateBK() {
+            const kode = document.getElementById('editKode').value;
+            const nama = document.getElementById('editNama').value;
+            const koordinator = document.getElementById('editKoordinator').value;
+
+            try {
+                const res = await fetch(API_UPDATE_BK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ kode_bk: kode, nama_bk: nama, koordinator_bk: koordinator, prodi: PRODI })
+                });
+
+                if (res.ok) {
+                    alert("✅ Berhasil memperbarui data BK!");
+                    closeModal();
+                    loadDataBK(); // Refresh tabel
+                }
+            } catch (e) {
+                alert("❌ Gagal menyimpan perubahan.");
+            }
+        }
+
+        async function loadSidebar() {
+        try {
+            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
+            if (!response.ok) throw new Error("Sidebar gagal dimuat");
+            document.getElementById('sidebar-container').innerHTML = await response.text();
+            
+            const nameElem = document.getElementById("adminName");
+            if (nameElem) nameElem.innerText = localStorage.getItem("user_login") || "Admin";
+            
+            const navMatriks = document.getElementById('nav-matriks-cpl-mk');
+            if (navMatriks) navMatriks.style.background = 'var(--sidebar-hover)';
+        } catch (error) {
+            console.error("Gagal memuat sidebar:", error);
+        }
+    }
+
+        function toggleDropdown(m, c) {
+            const menu = document.getElementById(m), chev = document.getElementById(c);
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'flex' : 'none';
+            chev.style.transform = menu.style.display === 'flex' ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+    </script>
+</body>
+</html>

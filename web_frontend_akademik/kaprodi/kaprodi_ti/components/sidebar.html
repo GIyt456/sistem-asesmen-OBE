@@ -37,7 +37,41 @@
 
         <!-- CPMK -->
         <div class="nav-item" id="nav-cpmk" onclick="window.location.href='/kaprodi/kaprodi_ti/cpmk.html'"><i class="fas fa-file-alt"></i> CPMK</div>
-        
+                
+        <!-- Rumusan SKL -->
+        <div class="nav-item" onclick="toggleDropdown('submenu-skl', 'chevron-skl')">
+            <i class="fas fa-user-graduate"></i> Rumusan SKL
+            <i id="chevron-skl" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        <div id="submenu-skl" style="display: none; flex-direction: column; margin-top: 2px;">
+            <div class="nav-item" id="nav-profil-lulusan" onclick="window.location.href='/kaprodi/kaprodi_ti/rumusan_skl/profil_lulusan.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                Profil Lulusan
+            </div>
+            <div class="nav-item" id="nav-profesi" onclick="window.location.href='/kaprodi/kaprodi_ti/rumusan_skl/profesi.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                Profesi
+            </div>
+            <div class="nav-item" id="nav-matriks-cpl-pl" onclick="window.location.href='/kaprodi/kaprodi_ti/rumusan_skl/pemetaan_cpl_pl.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                Pemetaan CPL - PL
+            </div>
+        </div>
+
+        <!--Penetapan BK-->
+        <div class="nav-item" onclick="toggleDropdown('submenu-bk', 'chevron-bk')">
+                <i class="fas fa-layer-group"></i> Bahan Kajian (BK)
+                <i id="chevron-bk" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        <div id="submenu-bk" style="display: none; flex-direction: column; margin-top: 2px;">
+            <div class="nav-item" id="nav-matriks-cpl-bk" onclick="window.location.href='/kaprodi/kaprodi_ti/penetapan_bk/pemetaan_cpl_bk.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                Pemetaan CPL - BK
+            </div>
+            <div class="nav-item" id="nav-perumusan-bk" onclick="window.location.href='/kaprodi/kaprodi_ti/penetapan_bk/perumusan_bk.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                Perumusan BK
+            </div>
+            <div class="nav-item" id="nav-matriks-bk-mk" onclick="window.location.href='/kaprodi/kaprodi_ti/matriks_kurikulum/pemetaan_bk_mk.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                Pemetaan BK - MK
+            </div>
+        </div>
+
         <!-- MASTER DATA -->
         <div class="nav-item" onclick="toggleDropdown('menu-master', 'chevron-master')">
             <i class="fas fa-database"></i> Master Data 
@@ -103,10 +137,7 @@
         
         <div id="submenu-matriks" style="display: none; flex-direction: column; margin-top: 2px;">
             <div class="nav-item" id="nav-matriks-cpl-mk" onclick="window.location.href='../matriks_kurikulum/matriks_cpl_mk.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                Pemetaan CPL - MK
-            </div>
-            <div class="nav-item" id="nav-matriks-cpl-bk" onclick="window.location.href='../matriks_kurikulum/matriks_cpl_bk.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
-                Pemetaan CPL - BK
+                Pemetaan MK - CPL
             </div>
             <div class="nav-item" id="nav-matriks-struktur" onclick="window.location.href='../matriks_kurikulum/matriks_struktur.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
                 Struktur Kurikulum
