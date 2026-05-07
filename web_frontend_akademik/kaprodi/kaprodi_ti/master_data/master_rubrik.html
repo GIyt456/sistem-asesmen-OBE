@@ -88,14 +88,15 @@
         .rubric-table td:first-child { font-weight: 700; color: #111827; }
         .rubric-table td:nth-child(2) { text-align: center; font-weight: 700; color: var(--primary-red); }
         .rubric-section-header { background: #f3f4f6; font-weight: 800; color: #111827; padding: 10px 16px; margin-top: 20px; border-left: 4px solid var(--primary-red); }
+        
+        /* LOADING ROW STYLES */
+        .loading-row { text-align: center; padding: 40px; color: #6b7280; font-style: italic; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <!-- Wadah Sidebar -->
     <div id="sidebar-container"></div>
 
-    <!-- Konten Utama -->
     <div class="main-content">
         
         <div class="header-container">
@@ -112,11 +113,10 @@
                 <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Daftar parameter dan kriteria penilaian dari semua RPS aktif.</p>
             </div>
             <div style="display: flex; gap: 12px;">
-                <button class="btn-dark" onclick="alert('Sinkronisasi Rubrik dari RPS...')"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                <button class="btn-dark" onclick="loadMasterRubrik()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
             </div>
         </div>
 
-        <!-- Tabel Data Master Rubrik -->
         <table>
             <thead>
                 <tr>
@@ -124,72 +124,43 @@
                     <th width="30%">Nama Rubrik & Tugas</th>
                     <th width="25%">Mata Kuliah</th>
                     <th width="15%" style="text-align: center;">CPMK Terkait</th>
-                    <th width="10%" style="text-align: center;">Total Bobot</th>
                     <th width="15%" style="text-align: center;">Aksi</th>
                 </tr>
             </thead>
             <tbody id="bodyMasterRubrik">
-                <!-- Dummy Data 1 -->
                 <tr>
-                    <td style="text-align: center; vertical-align: top; padding-top: 18px;">1</td>
-                    <td style="vertical-align: top; padding-top: 18px;">
-                        <strong style="color: #111827; font-size: 0.95rem;">Tugas 1: Resume Model Jaringan</strong><br>
-                        <span style="font-size: 0.85rem; color: #6b7280;">Bentuk: Penugasan Terstruktur</span>
-                    </td>
-                    <td style="vertical-align: top; padding-top: 18px; font-weight: 600; color: #4338ca; font-size: 0.9rem;">
-                        Jaringan Komputer<br>
-                        <span style="font-size: 0.8rem; font-weight: normal; color: #6b7280;">2522W103</span>
-                    </td>
-                    <td style="text-align: center; vertical-align: top; padding-top: 18px; font-size: 0.85rem; font-weight: 600;">CPMK041</td>
-                    <td style="text-align: center; vertical-align: top; padding-top: 18px;"><span class="badge-status status-aktif">10%</span></td>
-                    <td style="text-align: center; vertical-align: top; padding-top: 18px;">
-                        <button class="btn-action" style="background: #111827;" onclick="alert('Fitur edit Rubrik 1')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action" onclick="bukaModalDetailRubrik('Tugas 1')"><i class="fas fa-eye"></i> Detail</button>
-                    </td>
-                </tr>
-                <!-- Dummy Data 2 -->
-                <tr>
-                    <td style="text-align: center; vertical-align: top; padding-top: 18px;">2</td>
-                    <td style="vertical-align: top; padding-top: 18px;">
-                        <strong style="color: #111827; font-size: 0.95rem;">Tugas 3: Proyek Desain & Presentasi</strong><br>
-                        <span style="font-size: 0.85rem; color: #6b7280;">Bentuk: Proyek Kelompok</span>
-                    </td>
-                    <td style="vertical-align: top; padding-top: 18px; font-weight: 600; color: #4338ca; font-size: 0.9rem;">
-                        Jaringan Komputer<br>
-                        <span style="font-size: 0.8rem; font-weight: normal; color: #6b7280;">2522W103</span>
-                    </td>
-                    <td style="text-align: center; vertical-align: top; padding-top: 18px; font-size: 0.85rem; font-weight: 600;">CPMK042</td>
-                    <td style="text-align: center; vertical-align: top; padding-top: 18px;"><span class="badge-status status-aktif">25%</span></td>
-                    <td style="text-align: center; vertical-align: top; padding-top: 18px;">
-                        <button class="btn-action" style="background: #111827;" onclick="alert('Fitur edit Rubrik 3')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action" onclick="bukaModalDetailRubrik('Tugas 3')"><i class="fas fa-eye"></i> Detail</button>
+                    <td colspan="5" class="loading-row">
+                        <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Mengambil data dari database...
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-    <!-- MODAL POP-UP DETAIL RUBRIK -->
     <div id="modalDetailRubrik" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
                 <div>
-                    <h3 id="modalRubrikJudul" style="margin: 0 0 4px 0; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Rubrik Penilaian Tugas 3</h3>
-                    <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Mata Kuliah: Jaringan Komputer | CPMK042</p>
+                    <h3 id="modalRubrikJudul" style="margin: 0 0 4px 0; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Detail Rubrik Penilaian</h3>
+                    <p id="modalRubrikSubtitle" style="margin: 0; color: #6b7280; font-size: 0.9rem;">Mata Kuliah: -</p>
                 </div>
                 <button onclick="tutupModalDetailRubrik()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280;"><i class="fas fa-times"></i></button>
             </div>
             
             <div class="modal-body" id="modalRubrikKonten">
-                <!-- Data matriks rubrik akan di-inject ke sini via Javascript -->
-            </div>
+                </div>
         </div>
     </div>
 
 <script>
     // 1. SISTEM KEAMANAN & PENGATURAN API
     const userLogin = localStorage.getItem("user_login");
-    if (!userLogin) window.location.replace('/login/login.html');
+    // Jika perlu cek session login, aktifkan baris di bawah:
+    // if (!userLogin) window.location.replace('/login/login.html');
+
+    // MENGGUNAKAN WEBHOOK N8N UNTUK GET DATA MASTER RUBRIK
+    // (JANGAN LUPA UBAH INI JIKA ANDA MENGGUNAKAN URL PRODUCTION BARU DI N8N)
+    const API_GET_MASTER_RUBRIK = 'https://computing-epson-profits-script.trycloudflare.com/webhook/get-master-rubrik';
 
     // 2. LOAD SIDEBAR
     async function loadSidebar() {
@@ -198,18 +169,17 @@
             const html = await response.text();
             
             document.getElementById('sidebar-container').outerHTML = html;
-            document.getElementById("adminName").innerText = userLogin;
+            document.getElementById("adminName").innerText = userLogin || "Kaprodi TI";
 
             setTimeout(() => {
                 const navDashboard = document.getElementById('nav-home');
-                const navRubrik = document.getElementById('nav-rubrik'); // Pastikan ID ini ada di sidebar.html Anda
+                const navRubrik = document.getElementById('nav-rubrik');
                 const menuMaster = document.getElementById('menu-master');
                 const chevronMaster = document.getElementById('chevron-master');
 
                 if(navDashboard) navDashboard.classList.remove('active');
                 if(navRubrik) navRubrik.classList.add('active'); 
                 
-                // Buka otomatis dropdown Master Data
                 if(menuMaster && chevronMaster) {
                     menuMaster.style.display = 'flex';
                     chevronMaster.style.transform = 'rotate(180deg)';
@@ -232,135 +202,71 @@
     function logout() { localStorage.clear(); window.location.replace("/login/login.html"); }
 
     // ==========================================
-    // 3. FUNGSI MENAMPILKAN DETAIL RUBRIK
+    // 3. FUNGSI MENARIK DATA DARI DATABASE (N8N)
     // ==========================================
-    function bukaModalDetailRubrik(jenisTugas) {
-        const konten = document.getElementById('modalRubrikKonten');
-        const judul = document.getElementById('modalRubrikJudul');
+    async function loadMasterRubrik() {
+        const tbody = document.getElementById('bodyMasterRubrik');
+        tbody.innerHTML = `<tr><td colspan="5" class="loading-row"><i class="fas fa-spinner fa-spin"></i> Menghubungkan ke database n8n...</td></tr>`;
         
-        if(jenisTugas === 'Tugas 3') {
-            judul.innerText = "Rubrik Tugas 3: Proyek Desain Arsitektur Jaringan & Presentasi";
+        try {
+            const response = await fetch(API_GET_MASTER_RUBRIK);
+            if (!response.ok) throw new Error("Network response was not ok");
             
-            // Render Tabel HTML berdasarkan format Word Tugas 3
-            konten.innerHTML = `
-                <div class="rubric-section-header">A. Kualitas Makalah/Dokumen Desain (70% dari Total Tugas)</div>
-                <table class="rubric-table" style="margin-bottom: 30px;">
-                    <thead>
-                        <tr>
-                            <th width="15%">Kriteria Penilaian</th>
-                            <th width="5%">Bobot</th>
-                            <th width="20%">0 (Kurang)</th>
-                            <th width="20%">1 (Cukup)</th>
-                            <th width="20%">2 (Baik)</th>
-                            <th width="20%">3 (Sangat Baik)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Analisis Kebutuhan & Konsep</td>
-                            <td>25%</td>
-                            <td>Analisis tidak relevan atau salah dalam mengidentifikasi kebutuhan teknis.</td>
-                            <td>Mampu mengidentifikasi kebutuhan, namun konsep yang digunakan (VPC/VLAN/Subnet) kurang tepat.</td>
-                            <td>Analisis kebutuhan detail, konsep dan protokol yang dipilih sudah sesuai dan dibenarkan (Justifikasi).</td>
-                            <td>Menganalisis (C4) kebutuhan secara kritis, dan semua konsep yang dipilih dibenarkan dengan teori jaringan yang kuat.</td>
-                        </tr>
-                        <tr>
-                            <td>Perancangan Arsitektur Logis</td>
-                            <td>30%</td>
-                            <td>Skema IP salah/tidak ada, tidak ada diagram logis.</td>
-                            <td>Skema IP ada namun tidak efisien (tidak VLSM), diagram kurang jelas.</td>
-                            <td>Skema IP menggunakan VLSM/IPv6, diagram logis jelas, dan mencakup perancangan VLAN/ Routing.</td>
-                            <td>Mampu merancang (C6) arsitektur berlapis, skema pengalamatan optimal, dan memasukkan pertimbangan keamanan (ACL logis).</td>
-                        </tr>
-                        <tr>
-                            <td>Sistematika Penulisan</td>
-                            <td>15%</td>
-                            <td>Penulisan tidak terstruktur, banyak salah ketik.</td>
-                            <td>Penulisan terstruktur namun kurang formal dan kurang referensi.</td>
-                            <td>Penulisan terstruktur, formal, menggunakan referensi yang relevan, dan diagram rapi.</td>
-                            <td>Penulisan sangat profesional, referensi textbook/journal terintegrasi, dan mampu menghasilkan dokumen desain yang valid.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            const data = await response.json();
 
-                <div class="rubric-section-header">B. Kualitas Presentasi (30% dari Total Tugas)</div>
-                <table class="rubric-table">
-                    <thead>
-                        <tr>
-                            <th width="15%">Kriteria Penilaian</th>
-                            <th width="5%">Bobot</th>
-                            <th width="20%">0 (Kurang)</th>
-                            <th width="20%">1 (Cukup)</th>
-                            <th width="20%">2 (Baik)</th>
-                            <th width="20%">3 (Sangat Baik)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Penguasaan Materi</td>
-                            <td>15%</td>
-                            <td>Tidak menguasai materi, bergantung penuh pada teks.</td>
-                            <td>Menguasai sebagian materi, namun ragu-ragu saat menjawab pertanyaan.</td>
-                            <td>Menguasai semua aspek desain, mampu menjelaskan konsep dengan lancar.</td>
-                            <td>Mampu mempertahankan (C5) desain di bawah tekanan, menjawab pertanyaan kritis dengan argumen teknis yang solid.</td>
-                        </tr>
-                        <tr>
-                            <td>Metode Penyampaian</td>
-                            <td>15%</td>
-                            <td>Monoton, komunikasi satu arah.</td>
-                            <td>Penyampaian cukup jelas, namun kurang menarik dan visual (slide) kurang baik.</td>
-                            <td>Penyampaian jelas, komunikatif, dan mampu menjelaskan diagram arsitektur secara efektif.</td>
-                            <td>Penyampaian sangat persuasif, mampu menyajikan data dan justifikasi desain secara ringkas dan meyakinkan.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            `;
-        } else if (jenisTugas === 'Tugas 1') {
-            judul.innerText = "Rubrik Tugas 1: Resume Model Jaringan";
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="loading-row">Belum ada data rubrik yang dikirim oleh dosen.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = ''; // Bersihkan tulisan loading
             
-            // Render Tabel HTML berdasarkan format Word Tugas 1[cite: 10]
-            konten.innerHTML = `
-                <div class="rubric-section-header">Komponen Evaluasi Resume (Bobot Total: 10%)</div>
-                <table class="rubric-table">
-                    <thead>
-                        <tr>
-                            <th width="15%">Kriteria Penilaian</th>
-                            <th width="5%">Bobot</th>
-                            <th width="20%">0 (Kurang)</th>
-                            <th width="20%">1 (Cukup)</th>
-                            <th width="20%">2 (Baik)</th>
-                            <th width="20%">3 (Sangat Baik)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Kelengkapan Konsep (OSI & TCP/IP)</td>
-                            <td>40%</td>
-                            <td>Hanya menyebutkan model tanpa detail layer.</td>
-                            <td>Menyebutkan layer namun salah dalam menjelaskan fungsi utamanya.</td>
-                            <td>Menjelaskan fungsi layer dengan tepat, namun kurang lengkap.</td>
-                            <td>Semua layer dijelaskan secara lengkap dan akurat beserta fungsi dasarnya.</td>
-                        </tr>
-                        <tr>
-                            <td>Analisis Perbandingan</td>
-                            <td>30%</td>
-                            <td>Tidak ada perbandingan atau perbandingan tidak relevan.</td>
-                            <td>Mampu membandingkan jumlah layer secara dangkal.</td>
-                            <td>Mampu membandingkan perbedaan layer (misal: Application pada TCP/IP vs 3 layer pada OSI).</td>
-                            <td>Mampu menganalisis dan membandingkan prinsip kerja dan konteks penggunaan kedua model.</td>
-                        </tr>
-                        <tr>
-                            <td>Struktur dan Bahasa</td>
-                            <td>30%</td>
-                            <td>Tidak terstruktur, banyak salah ketik/bahasa.</td>
-                            <td>Struktur resume ada, namun kurang jelas dan banyak kesalahan minor.</td>
-                            <td>Struktur jelas, bahasa formal, dan mudah dipahami.</td>
-                            <td>Struktur sangat logis, argumentasi kuat, dan menggunakan terminologi teknis yang tepat.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            `;
+            // Looping dan cetak baris untuk setiap data yang didapat dari Database
+            data.forEach((item, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align: center; vertical-align: top; padding-top: 18px;">${index + 1}</td>
+                        <td style="vertical-align: top; padding-top: 18px;">
+                            <strong style="color: #111827; font-size: 0.95rem;">${item.judul_tugas || '-'}</strong><br>
+                            <span style="font-size: 0.85rem; color: #6b7280;">Bentuk: ${item.metode || '-'}</span>
+                        </td>
+                        <td style="vertical-align: top; padding-top: 18px; font-weight: 600; color: #4338ca; font-size: 0.9rem;">
+                            ${item.nama_mk || 'Nama Mata Kuliah'}<br>
+                            <span style="font-size: 0.8rem; font-weight: normal; color: #6b7280;">${item.kode_mk || '-'}</span>
+                        </td>
+                        <td style="text-align: center; vertical-align: top; padding-top: 18px; font-size: 0.85rem; font-weight: 600;">
+                            <span style="background: #f1f5f9; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">${item.kode_cpmk || '-'}</span>
+                        </td>
+                        <td style="text-align: center; vertical-align: top; padding-top: 18px;">
+                            <button class="btn-action" style="background: #111827;" onclick="alert('Fitur edit akan disesuaikan')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-action" onclick="bukaModalDetailRubrik('${item.id_tugas}', '${item.judul_tugas}', '${item.kode_mk}', '${item.kode_cpmk}')"><i class="fas fa-eye"></i> Detail</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        } catch (error) {
+            tbody.innerHTML = `<tr><td colspan="5" class="loading-row" style="color: #ef4444;"><i class="fas fa-exclamation-circle"></i> Gagal mengambil data. Pastikan URL Webhook di n8n aktif.</td></tr>`;
+            console.error("Fetch Error:", error);
         }
+    }
+
+    // ==========================================
+    // 4. FUNGSI MENAMPILKAN DETAIL RUBRIK 
+    // ==========================================
+    function bukaModalDetailRubrik(idTugas, judulTugas, kodeMk, kodeCpmk) {
+        document.getElementById('modalRubrikJudul').innerText = judulTugas;
+        document.getElementById('modalRubrikSubtitle').innerText = `Mata Kuliah: ${kodeMk} | ${kodeCpmk}`;
+        
+        const konten = document.getElementById('modalRubrikKonten');
+        
+        // Menampilkan pesan sementara saat Kaprodi menekan tombol Detail
+        konten.innerHTML = `
+            <div style="text-align: center; padding: 30px; color: #4b5563;">
+                <i class="fas fa-cogs fa-2x" style="color: #9ca3af; margin-bottom: 15px;"></i>
+                <h4>Menarik Matriks Detail...</h4>
+                <p>Fitur ini akan segera dihubungkan ke tabel <strong>tugas_rubrik</strong> di database untuk ID Tugas: <strong>${idTugas}</strong>.</p>
+            </div>
+        `;
 
         document.getElementById('modalDetailRubrik').style.display = "flex";
     }
@@ -371,6 +277,7 @@
 
     window.onload = () => {
         loadSidebar();
+        loadMasterRubrik(); // Memanggil data otomatis saat halaman selesai di-load
     };
 </script>
 </body>

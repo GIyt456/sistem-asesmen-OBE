@@ -19,7 +19,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: #f8fafc; color: var(--text-dark); }
 
-        /* NAVBAR DOSEN (Identik dengan input_nilai.html) */
+        /* NAVBAR DOSEN */
         .navbar {
             background-color: var(--primary-navy); padding: 15px 40px; 
             display: flex; justify-content: space-between; align-items: center; color: white;
@@ -36,6 +36,11 @@
         
         .btn-action { background: #10b981; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-action:hover { background: #059669; transform: translateY(-2px); }
+        
+        /* Tombol Lanjut ke Tugas & Rubrik */
+        .btn-next { background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-next:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+        .btn-next:hover:not(:disabled) { background: #2563eb; transform: translateY(-2px); }
 
         /* TABEL RPS */
         .table-rps { width: 100%; border-collapse: collapse; margin-top: 20px; border-radius: 12px; overflow: hidden; border: 1px solid #cbd5e1; }
@@ -52,7 +57,6 @@
 </head>
 <body>
 
-    <!-- NAVBAR KHUSUS DOSEN -->
     <nav class="navbar">
         <div style="font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-book" style="color: #ffc561;"></i> OBE Panel Dosen
@@ -73,17 +77,21 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
             <div>
                 <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a; font-weight: 800;">Penyusunan <span style="color: var(--primary-red);">RPS</span></h1>
-                <p style="margin: 0; color: #64748b;">Lengkapi Rencana Pembelajaran Semester untuk mata kuliah yang Anda ampu.</p>
+                <p style="margin: 0; color: #64748b;">Lengkapi rencana 16 pertemuan sebelum menyusun Rencana Tugas dan Rubrik.</p>
             </div>
-            <button class="btn-action" onclick="simpanRPSDosen()" id="btnSimpanRPS">
-                <i class="fas fa-save"></i> Simpan Dokumen RPS
-            </button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-action" onclick="simpanRPSDosen()" id="btnSimpanRPS">
+                    <i class="fas fa-save"></i> Simpan Dokumen RPS
+                </button>
+                <button class="btn-next" onclick="keHalamanTugas()" id="btnNext" disabled title="Simpan RPS terlebih dahulu untuk menyusun tugas">
+                    Lanjut: Susun Tugas & Rubrik <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- Notifikasi Error N8N (Disembunyikan secara default) -->
         <div id="errorBox" style="display: none; background: #fee2e2; border-left: 5px solid #ef4444; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
             <h4 style="margin: 0 0 5px 0; color: #991b1b;"><i class="fas fa-exclamation-triangle"></i> Gagal Menarik Data RPS dari Database</h4>
-            <p style="margin: 0; color: #7f1d1d; font-size: 0.95rem;">Workflow "get-detail-rps" di n8n mengalami Internal Server Error (500). Silakan cek tab Executions di n8n Anda. (Form kosong ditampilkan di bawah).</p>
+            <p style="margin: 0; color: #7f1d1d; font-size: 0.95rem;">Workflow "get-rps-detail" di n8n mengalami kendala. Silakan cek koneksi atau draf kosong akan ditampilkan.</p>
         </div>
 
         <div class="figma-card">
@@ -118,7 +126,7 @@
     </main>
 
     <script>
-        const API_BASE = "https://regulated-yorkshire-shared-aids.trycloudflare.com/webhook";
+        const API_BASE = "https://computing-epson-profits-script.trycloudflare.com/webhook";
         const API_METADATA = `${API_BASE}/get-metadata`;
         const API_GET_RPS = `${API_BASE}/get-rps-detail`; 
         const API_SIMPAN_RPS = `${API_BASE}/simpan-rps`;
@@ -128,6 +136,7 @@
         
         document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
 
+        // 1. FUNGSI LOAD MATA KULIAH (MEMPERBAIKI YANG HILANG)
         async function loadMataKuliahDosen() {
             const selectMK = document.getElementById("selectMK");
             try {
@@ -149,10 +158,12 @@
                     selectMK.innerHTML += `<option value="${mk.kode}">[${mk.kode}] ${mk.label}</option>`;
                 });
             } catch(e) {
-                selectMK.innerHTML = '<option value="" disabled selected>Gagal memuat data Mata Kuliah dari N8N</option>';
+                console.error(e);
+                selectMK.innerHTML = '<option value="" disabled selected>Gagal memuat data dari server.</option>';
             }
         }
 
+        // 2. FUNGSI LOAD DATA RPS BERDASARKAN MK
         async function loadDataRPS() {
             const kodeMK = document.getElementById("selectMK").value;
             const tbody = document.getElementById("bodyRPS");
@@ -161,26 +172,22 @@
             
             if(!kodeMK) return;
 
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">Menarik data RPS dari Database... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">Menarik data RPS... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
 
             try {
                 const res = await fetch(`${API_GET_RPS}?kode_mk=${kodeMK}`);
-                
-                // Menangkap Error 500 n8n
                 if (!res.ok) { throw new Error(`HTTP Error: ${res.status}`); }
                 
                 let rpsData = await res.json();
                 generateTabelRPS(rpsData);
-
             } catch(e) {
                 console.log("Error Fetch N8N:", e);
-                // Munculkan notifikasi merah di atas agar dosen/Anda tahu n8n sedang bermasalah
                 errorBox.style.display = "block";
-                // Tetap cetak form kosong agar dosen bisa mengisi
                 generateTabelRPS([]); 
             }
         }
 
+        // 3. GENERATE BARIS TABEL (MENGHAPUS TOMBOL RUBRIK DARI SINI)
         function generateTabelRPS(existingData = []) {
             const tbody = document.getElementById("bodyRPS");
             tbody.innerHTML = "";
@@ -197,28 +204,29 @@
                     continue;
                 }
 
-                // Cocokkan dengan pertemuan_ke dari N8N
                 const barisData = existingData.find(item => parseInt(item.pertemuan_ke) === i) || {};
 
                 tbody.innerHTML += `
                     <tr>
                         <td style="text-align: center; font-weight: bold; padding-top: 20px;">${i}</td>
-                        <td><textarea class="input-rps cpmk-input" data-minggu="${i}" placeholder="Kemampuan Akhir...">${barisData.kemampuan_akhir || ''}</textarea></td>
-                        <td><textarea class="input-rps materi-input" data-minggu="${i}" placeholder="Bahan Kajian...">${barisData.materi_pembelajaran || ''}</textarea></td>
-                        <td><textarea class="input-rps metode-input" data-minggu="${i}" placeholder="Metode...">${barisData.metode_pembelajaran || ''}</textarea></td>
+                        <td><textarea class="input-rps cpmk-input" data-minggu="${i}">${barisData.kemampuan_akhir || ''}</textarea></td>
+                        <td><textarea class="input-rps materi-input" data-minggu="${i}">${barisData.materi_pembelajaran || ''}</textarea></td>
+                        <td><textarea class="input-rps metode-input" data-minggu="${i}">${barisData.metode_pembelajaran || ''}</textarea></td>
                         <td><input type="number" class="input-number waktu-input" data-minggu="${i}" value="${barisData.estimasi_waktu || 150}"></td>
-                        <td><textarea class="input-rps kriteria-input" data-minggu="${i}" placeholder="Kriteria Penilaian...">${barisData.indikator_pencapaian || ''}</textarea></td>
+                        <td><textarea class="input-rps kriteria-input" data-minggu="${i}">${barisData.indikator_pencapaian || ''}</textarea></td>
                         <td><input type="number" class="input-number bobot-input" data-minggu="${i}" value="${barisData.bobot_persen || 0}" step="0.1"></td>
                     </tr>
                 `;
             }
         }
 
+        // 4. FUNGSI SIMPAN & AKTIFKAN TOMBOL LANJUT
         async function simpanRPSDosen() {
             const kodeMK = document.getElementById("selectMK").value;
             if(!kodeMK) { alert("Pilih Mata Kuliah dulu!"); return; }
 
             const btn = document.getElementById("btnSimpanRPS");
+            const btnNext = document.getElementById("btnNext");
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             btn.disabled = true;
 
@@ -246,11 +254,7 @@
                 }
             }
 
-            const payload = {
-                kode_mk: kodeMK,
-                nidn_dosen: userNidn,
-                detail_pertemuan: dataPertemuan
-            };
+            const payload = { kode_mk: kodeMK, nidn_dosen: userNidn, detail_pertemuan: dataPertemuan };
 
             try {
                 const res = await fetch(API_SIMPAN_RPS, { 
@@ -260,16 +264,23 @@
                 });
 
                 if(res.ok) {
-                    alert("✅ RPS Berhasil Disimpan! Kaprodi sekarang dapat melihat draf Anda.");
+                    alert("✅ RPS Berhasil Disimpan! Anda sekarang bisa menyusun Tugas & Rubrik.");
+                    btnNext.disabled = false; // AKTIFKAN TOMBOL LANJUT
                 } else {
-                    alert("❌ Gagal menyimpan RPS. Pastikan Workflow simpan-rps di n8n sudah aktif.");
+                    alert("❌ Gagal menyimpan. Periksa koneksi ke n8n.");
                 }
             } catch(e) {
-                alert("⚠️ Error jaringan. Pastikan URL Webhook Cloudflare benar dan n8n aktif.");
+                alert("⚠️ Error jaringan saat menghubungi server.");
             }
 
             btn.innerHTML = '<i class="fas fa-save"></i> Simpan Dokumen RPS';
             btn.disabled = false;
+        }
+
+        // 5. NAVIGASI KE HALAMAN TUGAS
+        function keHalamanTugas() {
+            const kodeMK = document.getElementById("selectMK").value;
+            window.location.href = `rencana_tugas_rubrik.html?kode_mk=${kodeMK}`;
         }
 
         window.onload = () => {

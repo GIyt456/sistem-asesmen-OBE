@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rencana Tugas & Rubrik - Panel Dosen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-navy: #0f172a;
+            --primary-blue: #1e3a8a;
+            --primary-red: #8b0000;
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #f8fafc; color: var(--text-dark); }
+
+        /* NAVBAR DOSEN */
+        .navbar {
+            background-color: var(--primary-navy); padding: 15px 40px; 
+            display: flex; justify-content: space-between; align-items: center; color: white;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-links { display: flex; gap: 30px; font-weight: 500; font-size: 0.95rem; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; transition: 0.3s; padding-bottom: 4px; opacity: 0.8; }
+        .nav-links a:hover, .nav-links a.active { opacity: 1; font-weight: 800; border-bottom: 2px solid #ffc561; }
+        .nav-user { display: flex; align-items: center; gap: 16px; font-weight: 600; }
+        .user-chip { background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; color: #ffffff; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* KONTEN UTAMA */
+        .container { max-width: 1400px; margin: 40px auto; padding: 0 20px; }
+        .figma-card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e5e7eb; margin-bottom: 30px; }
+        
+        .header-title { font-size: 2.2rem; font-weight: 800; color: #0f172a; margin-bottom: 5px; }
+        .header-title span { color: var(--primary-red); }
+
+        /* BUTTONS */
+        .btn-action { background: #10b981; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-action:hover { background: #059669; transform: translateY(-2px); }
+        .btn-outline { background: transparent; color: var(--text-gray); border: 1.5px solid #cbd5e1; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-outline:hover { background: #f1f5f9; color: var(--text-dark); }
+
+        /* FORM CONTROLS */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-weight: 700; font-size: 0.85rem; color: #334155; margin-bottom: 8px; text-transform: uppercase; }
+        .input-field { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; background: #f8fafc; transition: 0.2s; outline: none; }
+        .input-field:focus { border-color: #3b82f6; background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        /* RUBRIK GRID */
+        .rubric-grid { display: grid; grid-template-columns: 200px 85px 1fr 1fr 1fr 1fr 45px; gap: 12px; margin-bottom: 15px; padding: 15px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; position: relative; }
+        .grid-header-row { display: grid; grid-template-columns: 200px 85px 1fr 1fr 1fr 1fr 45px; gap: 12px; padding: 10px 15px; background: var(--primary-navy); color: white; border-radius: 8px; margin-bottom: 10px; }
+        .grid-label { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .weight-badge { background: #fef3c7; color: #92400e; padding: 8px 16px; border-radius: 8px; font-weight: 800; font-size: 0.9rem; border: 1px solid #fcd34d; display: inline-flex; align-items: center; gap: 8px; }
+        .weight-error { color: #ef4444; font-size: 0.85rem; font-weight: 600; margin-top: 5px; display: none; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div style="font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-book" style="color: #ffc561;"></i> OBE Panel Dosen
+        </div>
+        <div class="nav-links">
+            <a href="input_nilai.html">Home / Input Nilai</a>
+            <a href="rps_dosen.html">Penyusunan RPS</a>
+            <a href="#" class="active">Tugas & Rubrik</a>
+        </div>
+        <div class="nav-user">
+            <div class="user-chip">
+                <i class="fas fa-user-circle" style="color: #ffc561;"></i> 
+                <span id="dosenName">Dosen Pengampu</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+            <div>
+                <h1 class="header-title">Rencana Tugas & <span>Rubrik</span></h1>
+                <p style="color: var(--text-gray);">Susun instruksi tugas dan kriteria penilaian objektif sesuai standar OBE UNAKI.</p>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn-outline" onclick="window.location.href='rps_dosen.html'"><i class="fas fa-arrow-left"></i> Kembali ke RPS</button>
+                <button class="btn-action" onclick="simpanTugasRubrik()" id="btnSimpanTop"><i class="fas fa-check-double"></i> Simpan Data Tugas</button>
+            </div>
+        </div>
+
+        <div class="figma-card">
+            <h2 style="margin-bottom: 25px; color: var(--primary-navy); border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; font-weight: 800; display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-file-alt" style="color: var(--primary-red);"></i> 1. Rencana Tugas Mahasiswa (RTM)
+            </h2>
+            
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+                <div class="form-group">
+                    <label class="form-label">Judul Tugas / Nama Evaluasi</label>
+                    <input type="text" id="judulTugas" class="input-field" placeholder="Contoh: Proyek Desain Arsitektur Jaringan (Tugas 3)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sub-CPMK Terkait</label>
+                    <select id="selectCPMK" class="input-field" style="font-weight: 600;">
+                        <option value="">-- Pilih CPMK --</option>
+                        <option value="CPMK042">CPMK042 - Merancang Arsitektur Jaringan</option>
+                        <option value="CPMK041">CPMK041 - Resume Model Jaringan</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label class="form-label">Metode / Bentuk Tugas</label>
+                    <input type="text" id="inputMetode" class="input-field" placeholder="Contoh: Proyek Kelompok">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Waktu Pengerjaan</label>
+                    <input type="text" id="inputWaktu" class="input-field" placeholder="Contoh: 2 Minggu (Pertemuan 11-13)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Luaran Tugas (Output)</label>
+                    <input type="text" id="inputLuaran" class="input-field" placeholder="Contoh: Dokumen PDF & File Cisco Packet Tracer">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Deskripsi Tugas (Instruksi Lengkap)</label>
+                <textarea id="inputDeskripsi" class="input-field" rows="6" placeholder="Jelaskan secara detail apa yang harus dilakukan mahasiswa, batasan teknis, dan tahapan pengerjaan..."></textarea>
+            </div>
+        </div>
+
+        <div class="figma-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
+                <h2 style="color: var(--primary-navy); font-weight: 800; display: flex; align-items: center; gap: 12px; margin: 0;">
+                    <i class="fas fa-tasks" style="color: var(--primary-red);"></i> 2. Matriks Rubrik Penilaian
+                </h2>
+                <div style="text-align: right;">
+                    <div class="weight-badge">
+                        <i class="fas fa-balance-scale"></i> Total Bobot: <span id="totalBobot">0</span>%
+                    </div>
+                    <div id="weightError" class="weight-error">Total bobot kriteria rubrik harus tepat 100%!</div>
+                </div>
+            </div>
+
+            <div class="grid-header-row">
+                <div class="grid-label">Kriteria Penilaian</div>
+                <div class="grid-label">Bobot (%)</div>
+                <div class="grid-label">Skala 0 (Kurang)</div>
+                <div class="grid-label">Skala 1 (Cukup)</div>
+                <div class="grid-label">Skala 2 (Baik)</div>
+                <div class="grid-label">Skala 3 (Sangat Baik)</div>
+                <div></div>
+            </div>
+
+            <div id="rubricContainer">
+                </div>
+
+            <button onclick="tambahKriteria()" style="margin-top: 10px; width: 100%; padding: 15px; border: 2px dashed #cbd5e1; border-radius: 12px; background: #f8fafc; cursor: pointer; color: var(--primary-blue); font-weight: 800; transition: 0.2s;">
+                <i class="fas fa-plus-circle"></i> Tambah Kriteria Penilaian Baru
+            </button>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
+
+        // Fungsi Kalkulator Bobot
+        function updateSum() {
+            const bobotInputs = document.querySelectorAll('.input-bobot');
+            let total = 0;
+            bobotInputs.forEach(input => {
+                total += parseFloat(input.value || 0);
+            });
+            document.getElementById('totalBobot').innerText = total;
+            
+            const errorBox = document.getElementById('weightError');
+            if (total !== 100 && total > 0) {
+                errorBox.style.display = "block";
+            } else {
+                errorBox.style.display = "none";
+            }
+        }
+
+        // Fungsi Tambah Baris Kriteria
+        function tambahKriteria(data = {}) {
+            const container = document.getElementById('rubricContainer');
+            const row = document.createElement('div');
+            row.className = 'rubric-grid';
+            row.innerHTML = `
+                <div><input type="text" class="input-field r-nama" placeholder="Kriteria" value="${data.kriteria || ''}" style="font-weight: 700;"></div>
+                <div><input type="number" class="input-field input-bobot r-bobot" placeholder="%" value="${data.bobot || ''}" oninput="updateSum()"></div>
+                <div><textarea class="input-field r-s0" rows="3" placeholder="Deskripsi..."></textarea></div>
+                <div><textarea class="input-field r-s1" rows="3" placeholder="Deskripsi..."></textarea></div>
+                <div><textarea class="input-field r-s2" rows="3" placeholder="Deskripsi..."></textarea></div>
+                <div><textarea class="input-field r-s3" rows="3" placeholder="Deskripsi..."></textarea></div>
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <button onclick="this.parentElement.parentElement.remove(); updateSum();" style="color: #ef4444; border: none; background: none; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-trash-alt"></i></button>
+                </div>
+            `;
+            container.appendChild(row);
+            updateSum();
+        }
+
+        // FUNGSI SIMPAN UTAMA
+        async function simpanTugasRubrik() {
+            const btn = document.getElementById('btnSimpanTop');
+            const total = parseInt(document.getElementById('totalBobot').innerText);
+
+            // Validasi Bobot harus 100%
+            if(total !== 100) {
+                alert("⚠️ Total bobot kriteria rubrik harus 100%!");
+                return;
+            }
+
+            // Ubah tombol jadi status loading
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            // Membentuk Payload JSON (Mengambil data dari ID yang sudah kita buat)
+            const payload = {
+                kode_mk: new URLSearchParams(window.location.search).get('kode_mk') || 'DEFAULT_MK',
+                judul_tugas: document.getElementById('judulTugas').value,
+                sub_cpmk: document.getElementById('selectCPMK').value,
+                metode: document.getElementById('inputMetode').value,
+                waktu: document.getElementById('inputWaktu').value,
+                luaran: document.getElementById('inputLuaran').value,
+                deskripsi: document.getElementById('inputDeskripsi').value,
+                rubrik: [] 
+            };
+
+            // Mengambil isi baris rubrik
+            document.querySelectorAll('.rubric-grid').forEach(row => {
+                const nama = row.querySelector('.r-nama')?.value;
+                if(nama) {
+                    payload.rubrik.push({
+                        kriteria: nama,
+                        bobot_persen: row.querySelector('.r-bobot').value,
+                        skala_0: row.querySelector('.r-s0').value,
+                        skala_1: row.querySelector('.r-s1').value,
+                        skala_2: row.querySelector('.r-s2').value,
+                        skala_3: row.querySelector('.r-s3').value
+                    });
+                }
+            });
+
+            console.log("Data yang akan dikirim:", payload);
+
+            // Mengirim ke N8N
+            try {
+                // JANGAN LUPA GANTI URL INI DENGAN URL WEBHOOK N8N BARU ANDA
+                const response = await fetch('https://computing-epson-profits-script.trycloudflare.com/webhook/simpan-tugas-rubrik', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload) 
+                });
+
+                if(response.ok) {
+                    alert("✅ Rencana Tugas dan Rubrik Berhasil Disimpan ke Database!");
+                    window.location.href = 'rps_dosen.html'; // Kembali ke halaman RPS
+                } else {
+                    alert("❌ Gagal merespon, pastikan URL Webhook benar.");
+                }
+            } catch (error) {
+                // Jika URL Webhook belum diganti, biasanya akan masuk ke error catch ini
+                console.error("Fetch Error:", error);
+                alert("❌ Gagal mengirim data. Pastikan Workflow n8n aktif dan URL Webhook sudah diganti di dalam file HTML.");
+            } finally {
+                // Kembalikan tombol seperti semula
+                btn.innerHTML = '<i class="fas fa-check-double"></i> Simpan Data Tugas';
+                btn.disabled = false;
+            }
+        }
+
+        // Load 1 baris awal
+        window.onload = () => { tambahKriteria(); };
+    </script>
+</body>
+</html>
