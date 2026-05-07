@@ -125,16 +125,12 @@
         <div class="nav-item" id="nav-portofolio" onclick="window.location.href='/kaprodi/kaprodi_ti/rps/portofolio_admin.html'"><i class="fas fa-chart-pie"></i> Laporan CPL & CPMK</div>
 
         <!-- MENU 2: PEMENUHAN CPMK & CPL -->
-       <!-- Perhatikan bagian onclick dan ID yang saya tandai "pemenuhan" -->
-        <div class="nav-item" onclick="toggleDropdown('submenu-pemenuhan', 'chevron-pemenuhan')">
-            <i class="fas fa-chart-pie"></i> Pemenuhan CPL & CPMK
-            <i id="chevron-pemenuhan" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-
-        <!-- ID di div ini harus SAMA PERSIS dengan parameter pertama di onclick atas -->
-        <div id="submenu-pemenuhan" style="display: none; flex-direction: column; margin-top: 2px;">
-            <!-- Isi sub-menunya di sini -->
-            <div class="nav-item" style="padding-left: 48px; font-size: 0.85rem;">Menu 1</div>
+        <div class="nav-item has-dropdown" onclick="toggleDropdown(this)" style="display: flex; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-chart-pie"></i>
+                <span>Pemenuhan CPMK & CPL</span>
+            </div>
+            <i class="fas fa-chevron-down arrow-icon" style="font-size: 0.8rem; opacity: 0.7;"></i>
         </div>
         <div class="dropdown-container">
             <a href="../cpl_cpmk/cpmk_kelas.html" class="dropdown-item">Nilai CPMK per Kelas</a>
@@ -148,16 +144,12 @@
         </div>
 
         <!-- MENU 3: KELOLA RPS -->
-        <!-- Perhatikan bagian onclick dan ID yang saya tandai "rps" -->
-        <div class="nav-item" onclick="toggleDropdown('submenu-rps', 'chevron-rps')">
-            <i class="fas fa-book-open"></i> Manajemen RPS
-            <i id="chevron-rps" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-
-        <!-- ID di div ini harus SAMA PERSIS dengan parameter pertama di onclick atas -->
-        <div id="submenu-rps" style="display: none; flex-direction: column; margin-top: 2px;">
-            <!-- Isi sub-menunya di sini -->
-            <div class="nav-item" style="padding-left: 48px; font-size: 0.85rem;">Menu 1</div>
+        <div class="nav-item has-dropdown" onclick="toggleDropdown(this)" style="display: flex; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-book-open"></i>
+                <span>Manajemen RPS</span>
+            </div>
+            <i class="fas fa-chevron-down arrow-icon" style="font-size: 0.8rem; opacity: 0.7;"></i>
         </div>
         <div class="dropdown-container">
             <a href="rps_bentuk.html" class="dropdown-item">Master Bentuk</a>
