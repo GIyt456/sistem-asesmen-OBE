@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Nilai MBKM - Panel Kaprodi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-red: #8b0000;
+            --text-dark: #1f2937;
+            --bg-light: #f9fafb;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            color: #000;
+            letter-spacing: -0.5px;
+        }
+
+        .page-title span {
+            color: var(--primary-red);
+        }
+
+        /* --- STYLING DROPDOWN PENCARIAN MAHASISWA --- */
+        .selection-card {
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #1f2937;
+        }
+
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            cursor: pointer;
+        }
+
+        .custom-dropdown input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1f2937;
+            outline: none;
+            transition: 0.2s;
+            box-sizing: border-box;
+            cursor: pointer;
+            background-color: #f9fafb;
+        }
+
+        .custom-dropdown input:focus,
+        .custom-dropdown.active input {
+            border-color: var(--primary-red);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+        }
+
+        .dropdown-toggle-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            border-radius: 0 8px 8px 0;
+            transition: 0.2s;
+        }
+
+        .custom-dropdown.active .dropdown-toggle-btn {
+            transform: rotate(180deg);
+            color: var(--primary-red);
+        }
+
+        .dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-top: 5px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 50;
+            display: none;
+        }
+
+        .dropdown-list.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: 0.15s;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background-color: #fef2f2;
+        }
+
+        .dropdown-item strong {
+            color: var(--primary-red);
+            font-size: 0.95rem;
+        }
+
+        .dropdown-item span {
+            font-size: 0.8rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        /* --- STYLING KARTU PROFIL MAHASISWA --- */
+        .student-profile {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary-red);
+            padding: 18px 24px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid var(--primary-red);
+            transition: 0.3s;
+        }
+
+        .profile-item span {
+            display: block;
+            color: #6b7280;
+            font-size: 0.75rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .profile-item strong {
+            color: #111827;
+            font-size: 1rem;
+        }
+
+        /* --- STYLING TABEL MATKUL --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            table-layout: fixed;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+
+        th {
+            background-color: #f3f4f6;
+            padding: 14px 16px;
+            border-bottom: 2px solid #e5e7eb;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-dark);
+            text-align: left;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            vertical-align: middle;
+            word-wrap: break-word;
+        }
+
+        .comp-wrapper {
+            position: relative;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-comp {
+            width: 100%;
+            padding: 8px 35px 8px 12px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+
+        .input-comp:focus {
+            border-color: var(--primary-red);
+        }
+
+        .btn-remove {
+            position: absolute;
+            right: 10px;
+            color: #9ca3af;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 0.9rem;
+            padding: 0;
+        }
+
+        .btn-remove:hover {
+            color: #ef4444;
+        }
+
+        .input-num {
+            width: 70px;
+            padding: 8px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 700;
+            outline: none;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            transition: 0.2s;
+        }
+
+        .input-num:focus {
+            border-color: var(--primary-red);
+        }
+
+        .grade-box {
+            font-weight: 800;
+            color: var(--primary-red);
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .btn-add {
+            background: #f3f4f6;
+            border: 1.5px dashed #d1d5db;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 2px;
+            transition: 0.2s;
+            color: #4b5563;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-add:hover {
+            background: #e5e7eb;
+            color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+
+        .btn-preview {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .btn-preview:hover {
+            background: #bae6fd;
+        }
+
+        .action-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .btn-save {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .btn-save:hover:not(:disabled) {
+            background: #6b0000;
+            transform: translateY(-2px);
+        }
+
+        .btn-save:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .total-row {
+            background-color: #f9fafb;
+            font-weight: 800;
+        }
+
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: #9ca3af;
+            font-style: italic;
+            border: 1.5px dashed #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        /* --- STYLING CUSTOM DROPDOWN STATUS --- */
+        .custom-status-dropdown {
+            position: relative;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .custom-status-dropdown .status-input {
+            width: 100%;
+            padding: 8px 30px 8px 12px;
+            border-radius: 8px;
+            border: 1.5px solid #d1d5db;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: #1f2937;
+            outline: none;
+            cursor: pointer;
+            background-color: #f9fafb;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+
+        .custom-status-dropdown.active .status-input {
+            border-color: var(--primary-red);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+        }
+
+        .custom-status-dropdown .fa-chevron-down {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            pointer-events: none;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+
+        .custom-status-dropdown.active .fa-chevron-down {
+            transform: translateY(-50%) rotate(180deg);
+            color: var(--primary-red);
+        }
+
+        .status-list {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+            overflow: hidden;
+        }
+
+        .custom-status-dropdown.active .status-list {
+            display: block;
+        }
+
+        .status-item {
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1f2937;
+            transition: 0.2s;
+        }
+
+        .status-item:not(:last-child) {
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .status-item:hover {
+            background-color: #fef2f2;
+            color: var(--primary-red);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 class="page-title">REKAP NILAI <span>MBKM</span></h1>
+
+        <div class="selection-card">
+            <div class="input-group">
+                <label>Pilih Peserta MBKM Aktif</label>
+                <div class="custom-dropdown" id="dropdownWrapper">
+                    <input type="text" id="mhsSearch" placeholder="Menghubungkan ke database MBKM..." autocomplete="off"
+                        disabled>
+                    <div class="dropdown-toggle-btn" id="dropdownToggleBtn">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="dropdown-list" id="mhsList"></div>
+                </div>
+                <span id="loadingDb"
+                    style="display:none; font-size: 0.85rem; color: #0369a1; font-weight: 600; margin-top: 5px;">
+                    <i class="fas fa-spinner fa-spin"></i> Sedang memuat peserta...
+                </span>
+            </div>
+        </div>
+
+        <div class="student-profile" id="profileCard" style="display: none;">
+            <div class="profile-item"><span>NIM</span><strong id="lblNim">-</strong></div>
+            <div class="profile-item"><span>Nama Mahasiswa</span><strong id="lblNama">-</strong></div>
+            <div class="profile-item"><span>Program MBKM</span><strong id="lblProgram">-</strong></div>
+            <div class="profile-item">
+                <span>Mitra & Bukti</span>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <strong id="lblMitra">-</strong>
+                    <button class="btn-preview" id="btnPreviewBukti" style="display: none;" onclick="bukaPDF()"><i
+                            class="fas fa-file-pdf"></i> Bukti</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tableContainer" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
+                <h3 style="margin: 0; font-size: 1.1rem; color: var(--text-dark);">Daftar Mata Kuliah Konversi</h3>
+                <span id="dataStatusLabel"
+                    style="background: #eef2ff; color: #4338ca; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">Data
+                    Siap</span>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%; text-align: left;">Mata Kuliah Konversi</th>
+                        <th style="width: 5%; text-align: center;">SKS</th>
+                        <th style="width: 40%; text-align: left;">Kompetensi / Modul MBKM (Sumber Nilai)</th>
+                        <th style="width: 12%; text-align: center;">Nilai Angka</th>
+                        <th style="width: 10%; text-align: center;">Nilai Huruf</th>
+                        <th style="width: 13%; text-align: center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="mkTableBody"></tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td style="text-align: right;">Total SKS Diakui:</td>
+                        <td style="text-align: center; color: var(--primary-red); font-size: 1.1rem;"
+                            id="totalSksLabel">0</td>
+                        <td colspan="4"></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="action-footer">
+                <button class="btn-save" id="btnSimpanRekap" onclick="simpanRekap()">
+                    <i class="fas fa-save"></i> Simpan Hasil Konversi
+                </button>
+            </div>
+        </div>
+
+        <div id="noSelectionState" class="empty-state">
+            <i class="fas fa-user-graduate" style="font-size: 2.5rem; margin-bottom: 15px; display: block;"></i>
+            Silakan pilih mahasiswa pada menu di atas untuk menampilkan daftar konversi nilai.
+        </div>
+    </div>
+
+    <script>
+        const BASE_N8N_URL = "https://fixtures-wildlife-while-senators.trycloudflare.com/webhook";
+        const API_MBKM_LIST = `${BASE_N8N_URL}/get-mbkm-data`;
+        const API_MK_MASTER = `${BASE_N8N_URL}/get-mk-mbkm`;
+        const API_CHECK_NILAI = `${BASE_N8N_URL}/get-nilai-mhs`;
+        const API_SAVE_REKAP = `${BASE_N8N_URL}/save-nilai-mbkm`;
+
+        let dataPendaftarMBKM = [];
+        let allDataMK = [];
+        let selectedBase64PDF = "";
+
+        // ==========================================
+        // 1. LOAD DAFTAR MAHASISWA & MASTER MATKUL
+        // ==========================================
+        async function initData() {
+            const inputSearch = document.getElementById("mhsSearch");
+            try {
+                const resMhs = await fetch(API_MBKM_LIST);
+                const jsonMhs = await resMhs.json();
+                dataPendaftarMBKM = jsonMhs.data || jsonMhs;
+
+                const resMk = await fetch(API_MK_MASTER);
+                const jsonMk = await resMk.json();
+                allDataMK = jsonMk.data || jsonMk;
+
+                inputSearch.disabled = false;
+                inputSearch.placeholder = "Pilih / Ketik NIM atau Nama Peserta...";
+                renderDropdown(dataPendaftarMBKM);
+            } catch (e) { console.error("Init Error:", e); }
+        }
+
+        // ==========================================
+        // 2. LOGIKA KETIKA MAHASISWA DIPILIH
+        // ==========================================
+        async function onStudentSelected(mhs) {
+            document.getElementById("noSelectionState").style.display = "none";
+            document.getElementById("profileCard").style.display = "grid";
+            document.getElementById("tableContainer").style.display = "block";
+
+            document.getElementById("lblNim").innerText = mhs.nim;
+            document.getElementById("lblNama").innerText = mhs.nama;
+            document.getElementById("lblProgram").innerText = mhs.program;
+            document.getElementById("lblMitra").innerText = mhs.mitra;
+
+            selectedBase64PDF = mhs.file_base64 || "";
+            document.getElementById("btnPreviewBukti").style.display = selectedBase64PDF ? "inline-flex" : "none";
+
+            document.getElementById("mkTableBody").innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Menyelaraskan data nilai...</td></tr>';
+
+            try {
+                const resNilai = await fetch(`${API_CHECK_NILAI}?nim=${mhs.nim}`);
+                const jsonNilai = await resNilai.json();
+                const existingGrades = jsonNilai.data || [];
+
+                if (existingGrades.length > 0) {
+                    document.getElementById("dataStatusLabel").innerText = "Mode Edit: Data Tersimpan Ditemukan";
+                    document.getElementById("dataStatusLabel").style.background = "#fef3c7";
+                    document.getElementById("dataStatusLabel").style.color = "#92400e";
+                } else {
+                    document.getElementById("dataStatusLabel").innerText = "Mode Input Baru";
+                    document.getElementById("dataStatusLabel").style.background = "#eef2ff";
+                    document.getElementById("dataStatusLabel").style.color = "#4338ca";
+                }
+
+                renderTableMatkul(existingGrades);
+            } catch (e) {
+                console.error("Gagal cek nilai:", e);
+                renderTableMatkul([]);
+            }
+        }
+
+        function renderTableMatkul(existingGrades) {
+            const tbody = document.getElementById("mkTableBody");
+            tbody.innerHTML = "";
+            let totalSks = 0;
+
+            allDataMK.forEach(mk => {
+                const kodeMK = mk.kode || mk.kode_mk || "-";
+                const namaMK = mk.nama || mk.nama_mk || "-";
+                const sksNum = parseInt(mk.sks) || 0;
+                totalSks += sksNum;
+
+                const saved = existingGrades.find(g => g.kode_mk === kodeMK);
+                const currentStatus = saved && saved.status === 'Ditolak' ? 'Ditolak' : 'Diakui';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="vertical-align: top;"><strong>${kodeMK}</strong><br><span style="color:#6b7280; font-size: 0.8rem;">${namaMK}</span></td>
+                    <td style="text-align: center; font-weight: 600; vertical-align: top;">${sksNum}</td>
+                    <td style="vertical-align: top;">
+                        <div class="comp-list">
+                            ${generateCompInputs(saved ? saved.kompetensi : "")}
+                        </div>
+                        <button class="btn-add" onclick="addNewComp(this)">+ Tambah Kompetensi</button>
+                    </td>
+                    <td style="text-align: center; vertical-align: top;">
+                        <input type="number" class="input-num" value="${saved ? saved.nilai_angka : ''}" placeholder="0-100" oninput="autoGrade(this)">
+                    </td>
+                    <td class="grade-box" style="vertical-align: top;">${saved ? saved.nilai_huruf : '-'}</td>
+                    <td style="vertical-align: top;">
+                        <div class="custom-status-dropdown" onclick="toggleStatusDropdown(this, event)">
+                            <input type="text" class="status-input" value="${currentStatus}" readonly tabindex="-1">
+                            <i class="fas fa-chevron-down"></i>
+                            <div class="status-list">
+                                <div class="status-item" onclick="selectStatus(this, 'Diakui', event)">Diakui</div>
+                                <div class="status-item" onclick="selectStatus(this, 'Ditolak', event)">Ditolak</div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            document.getElementById("totalSksLabel").innerText = totalSks;
+        }
+
+        function generateCompInputs(compStr) {
+            if (!compStr) return `<div class="comp-wrapper"><input type="text" class="input-comp" placeholder="Cth: Analisis Sistem..."><button class="btn-remove" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button></div>`;
+
+            return compStr.split(" || ").map(text => `
+                <div class="comp-wrapper">
+                    <input type="text" class="input-comp" value="${text}">
+                    <button class="btn-remove" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+                </div>
+            `).join("");
+        }
+
+        // ==========================================
+        // 3. LOGIKA CUSTOM STATUS DROPDOWN
+        // ==========================================
+        function toggleStatusDropdown(wrapper, event) {
+            event.stopPropagation();
+
+            // Tutup semua dropdown status yang sedang terbuka
+            document.querySelectorAll('.custom-status-dropdown').forEach(d => {
+                if (d !== wrapper) d.classList.remove('active');
+            });
+
+            wrapper.classList.toggle('active');
+        }
+
+        function selectStatus(item, value, event) {
+            event.stopPropagation();
+            const wrapper = item.closest('.custom-status-dropdown');
+            const input = wrapper.querySelector('.status-input');
+            input.value = value;
+            wrapper.classList.remove('active');
+        }
+
+        // ==========================================
+        // 4. LOGIKA DROPDOWN PENCARIAN MAHASISWA
+        // ==========================================
+        const searchInput = document.getElementById("mhsSearch");
+        const dropdownList = document.getElementById("mhsList");
+        const dropdownWrapper = document.getElementById("dropdownWrapper");
+        const toggleBtn = document.getElementById("dropdownToggleBtn");
+
+        function renderDropdown(dataFiltered) {
+            dropdownList.innerHTML = "";
+            if (dataFiltered.length === 0) {
+                dropdownList.innerHTML = '<div class="dropdown-item" style="color:#9ca3af; font-style:italic; cursor:default;">Tidak ditemukan</div>';
+                return;
+            }
+
+            dataFiltered.forEach(mhs => {
+                const div = document.createElement("div");
+                div.className = "dropdown-item";
+                div.innerHTML = `<strong>${mhs.nim}</strong> <span>${mhs.nama} - ${mhs.program}</span>`;
+
+                div.onclick = function (e) {
+                    e.stopPropagation();
+                    searchInput.value = `${mhs.nim} - ${mhs.nama}`;
+                    tutupDropdown();
+                    onStudentSelected(mhs);
+                };
+
+                dropdownList.appendChild(div);
+            });
+        }
+
+        function bukaDropdown() {
+            dropdownList.classList.add("show");
+            dropdownWrapper.classList.add("active");
+            renderDropdown(dataPendaftarMBKM);
+        }
+
+        function tutupDropdown() {
+            dropdownList.classList.remove("show");
+            dropdownWrapper.classList.remove("active");
+        }
+
+        function toggleDropdown(e) {
+            e.stopPropagation();
+            if (searchInput.disabled) return;
+
+            if (dropdownList.classList.contains("show")) {
+                tutupDropdown();
+            } else {
+                bukaDropdown();
+                searchInput.focus();
+            }
+        }
+
+        searchInput.addEventListener("click", toggleDropdown);
+        toggleBtn.addEventListener("click", toggleDropdown);
+
+        searchInput.addEventListener("input", function (e) {
+            dropdownList.classList.add("show");
+            dropdownWrapper.classList.add("active");
+            const val = e.target.value.toLowerCase();
+
+            const filtered = dataPendaftarMBKM.filter(m =>
+                m.nim.toLowerCase().includes(val) ||
+                m.nama.toLowerCase().includes(val)
+            );
+            renderDropdown(filtered);
+
+            if (val === "") {
+                document.getElementById("profileCard").style.display = "none";
+                document.getElementById("tableContainer").style.display = "none";
+                document.getElementById("noSelectionState").style.display = "block";
+            }
+        });
+
+        // Menutup semua dropdown jika klik di area kosong
+        document.addEventListener("click", function (event) {
+            // Tutup pencarian mahasiswa
+            if (!dropdownWrapper.contains(event.target)) {
+                tutupDropdown();
+            }
+            // Tutup status Diakui/Ditolak
+            document.querySelectorAll('.custom-status-dropdown').forEach(d => {
+                if (!d.contains(event.target)) {
+                    d.classList.remove('active');
+                }
+            });
+        });
+
+
+        // ==========================================
+        // 5. LOGIKA UI & SIMPAN
+        // ==========================================
+        function addNewComp(btn) {
+            const list = btn.previousElementSibling;
+            const div = document.createElement('div');
+            div.className = 'comp-wrapper';
+            div.innerHTML = `<input type="text" class="input-comp" placeholder="Ketik kompetensi..."><button class="btn-remove" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>`;
+            list.appendChild(div);
+        }
+
+        function autoGrade(input) {
+            const score = parseFloat(input.value) || 0;
+            const gradeCell = input.parentElement.nextElementSibling;
+            let grade = "-";
+            if (score >= 85) grade = "A"; else if (score >= 75) grade = "B"; else if (score >= 65) grade = "C"; else if (score >= 55) grade = "D"; else if (score > 0) grade = "E";
+            gradeCell.innerText = grade;
+        }
+
+        async function simpanRekap() {
+            const btnSave = document.getElementById("btnSimpanRekap");
+            const nimMhs = document.getElementById("lblNim").innerText;
+            const rows = document.querySelectorAll("#mkTableBody tr");
+            let dataNilai = [];
+
+            btnSave.disabled = true;
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+            rows.forEach(row => {
+                const kodeMk = row.querySelector("strong").innerText;
+                const comps = Array.from(row.querySelectorAll(".input-comp")).map(i => i.value.trim()).filter(v => v !== "");
+                dataNilai.push({
+                    kode_mk: kodeMk,
+                    kompetensi: comps.join(" || "),
+                    nilai_angka: parseFloat(row.querySelector(".input-num").value) || 0,
+                    nilai_huruf: row.querySelector(".grade-box").innerText,
+                    status: row.querySelector(".status-input").value // Mengambil dari custom dropdown
+                });
+            });
+
+            try {
+                const response = await fetch(API_SAVE_REKAP, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nim: nimMhs, data_nilai: dataNilai })
+                });
+                if (response.ok) {
+                    alert("Data berhasil disinkronkan ke Database!");
+                    document.getElementById("dataStatusLabel").innerText = "Mode Edit: Data Tersimpan Ditemukan";
+                    document.getElementById("dataStatusLabel").style.background = "#fef3c7";
+                    document.getElementById("dataStatusLabel").style.color = "#92400e";
+                } else alert("Gagal simpan.");
+            } catch (e) { alert("Error koneksi."); }
+            finally { btnSave.disabled = false; btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Hasil Konversi'; }
+        }
+
+        function bukaPDF() {
+            if (selectedBase64PDF) {
+                const win = window.open();
+                win.document.write(`<iframe src="${selectedBase64PDF}" frameborder="0" style="border:0; width:100%; height:100%;" allowfullscreen></iframe>`);
+            }
+        }
+
+        window.onload = initData;
+    </script>
+</body>
+
+</html>
