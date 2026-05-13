@@ -250,10 +250,10 @@
             alert(`🔍 DEBUG: Siap mengirim ${payload.rubrik.length} baris kriteria ke n8n!`);
             console.log("ISI PAYLOAD FINAL:", payload);
 
-           try {
-                const URL_N8N_ANDA = 'https://arising-consoles-space-sharp.trycloudflare.com/webhook/simpan-tugas-rubrik';
-                
-                const response = await fetch(URL_N8N_ANDA, {
+            // Mengirim ke N8N
+            try {
+                // JANGAN LUPA GANTI URL INI DENGAN URL WEBHOOK N8N BARU ANDA
+                const response = await fetch('https://fixtures-wildlife-while-senators.trycloudflare.com/webhook/simpan-tugas-rubrik', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload) 
