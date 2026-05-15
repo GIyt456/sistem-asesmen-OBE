@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Cetak RPS & RTM - Sistem OBE UNAKI</title>
+    <style>
+        /* Pengaturan Dasar Kertas */
+        body { 
+            font-family: 'Times New Roman', Times, serif; 
+            font-size: 11pt; 
+            line-height: 1.5; 
+            color: black; 
+            background: #e5e7eb; /* Background abu-abu saat di web */
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .kertas-a4 { 
+            width: 210mm; 
+            min-height: 297mm; 
+            background: white; 
+            margin: auto; 
+            padding: 20mm; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        /* Header UNAKI Style */
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 2px solid black; }
+        .header-table td { border: 1px solid black; padding: 10px; text-align: center; vertical-align: middle; }
+        .logo-placeholder { font-weight: bold; font-size: 14pt; }
+
+        /* General Table Style */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        table, th, td { border: 1px solid black; }
+        th { background-color: #f2f2f2; padding: 8px; font-weight: bold; text-align: center; }
+        td { padding: 8px; vertical-align: top; }
+
+        .title-section { background: #eee; font-weight: bold; text-transform: uppercase; text-align: center; }
+        
+        /* Tombol Aksi */
+        .no-print { 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        .btn-print { 
+            background: #8b0000; color: white; border: none; 
+            padding: 12px 24px; border-radius: 5px; 
+            cursor: pointer; font-weight: bold; font-size: 16px;
+        }
+        .btn-back {
+            background: #4b5563; color: white; border: none; 
+            padding: 12px 24px; border-radius: 5px; 
+            cursor: pointer; font-weight: bold; font-size: 16px; margin-left: 10px;
+        }
+
+        /* 🪄 SULAP CSS: Sembunyikan Tombol Saat Dicetak */
+        @media print { 
+            body { background: white; padding: 0; }
+            .kertas-a4 { box-shadow: none; padding: 0; width: 100%; min-height: auto; margin: 0; }
+            .no-print { display: none !important; } 
+            @page { size: A4 portrait; margin: 20mm; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print">
+        <button class="btn-print" onclick="window.print()">🖨️ Cetak / Simpan sebagai PDF</button>
+        <button class="btn-back" onclick="window.close()">❌ Tutup Tab</button>
+    </div>
+
+    <div class="kertas-a4">
+        <table class="header-table">
+            <tr>
+                <td width="20%"><div class="logo-placeholder">LOGO<br>UNAKI</div></td>
+                <td width="60%">
+                    <h2 style="margin:0; font-size: 14pt;">RENCANA PEMBELAJARAN SEMESTER</h2>
+                    <p style="margin:0;">PROGRAM STUDI S1 SISTEM INFORMASI</p>
+                    <p style="margin:0; font-weight: bold;">FAKULTAS TEKNIK DAN INFORMATIKA - UNIVERSITAS AKI</p>
+                </td>
+                <td width="20%">Form: <br> FSOP-UNAKI-03-01</td>
+            </tr>
+        </table>
+
+        <table>
+            <tr class="title-section"><td colspan="4">IDENTITAS MATA KULIAH</td></tr>
+            <tr>
+                <td width="25%">Nama MK</td><td id="nama_mk">Jaringan Komputer</td>
+                <td width="20%">Kode MK</td><td id="kode_mk">2522W103</td>
+            </tr>
+        </table>
+
+        <table>
+            <tr class="title-section"><td colspan="3">OTORITAS / PENGESAHAN</td></tr>
+            <tr style="text-align: center; font-weight: bold;">
+                <td width="33%">Pengembang RPS</td>
+                <td width="33%">Ketua Kelompok Keahlian</td>
+                <td width="34%">Ka PRODI</td>
+            </tr>
+            <tr style="height: 60px;"><td></td><td></td><td></td></tr>
+            <tr style="text-align: center;">
+                <td>(Nama Dosen)</td>
+                <td>(Nama Ketua KK)</td>
+                <td>(Nama Ka PRODI)</td>
+            </tr>
+        </table>
+
+        <table>
+            <tr class="title-section"><td>DESKRIPSI SINGKAT MATA KULIAH</td></tr>
+            <tr><td id="deskripsi" style="text-align: justify;">Memuat data deskripsi...</td></tr>
+        </table>
+
+        <h3 style="text-align: center; text-decoration: underline; margin-top: 30px;">RENCANA TUGAS MAHASISWA (RTM)</h3>
+        
+        <table>
+            <tr><td width="30%">Judul Tugas</td><td id="rtm_judul">-</td></tr>
+            <tr><td>Metode Pengerjaan</td><td id="rtm_metode">-</td></tr>
+            <tr><td>Bentuk Luaran</td><td id="rtm_luaran">-</td></tr>
+        </table>
+
+        <h4 style="margin-top: 20px;">MATRIKS RUBRIK PENILAIAN</h4>
+        <table id="tabel_rubrik">
+            <thead>
+                <tr>
+                    <th>Kriteria</th>
+                    <th>Bobot (%)</th>
+                    <th>S1 (< 55)</th>
+                    <th>S2 (56-69)</th>
+                    <th>S3 (70-84)</th>
+                    <th>S4 (85-100)</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+       async function loadDataCetak() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idTugas = urlParams.get('id_tugas');
+
+            if(!idTugas) {
+                alert("⚠️ Parameter ID Tugas tidak ditemukan di URL.");
+                return;
+            }
+
+            try {
+                // ⚠️ PENTING: Ganti URL di bawah ini dengan link Cloudflare Tunnel Anda yang AKTIF HARI INI
+                const URL_API = `https://chose-colleges-dependent-philips.trycloudflare.com/webhook/get-detail-rubrik?id_tugas=${idTugas}`;
+                
+                const res = await fetch(URL_API);
+                
+                // BACA SEBAGAI TEKS DULU (Mencegah error jika data kosong)
+                const textData = await res.text();
+
+                if (!textData || textData.trim() === '') {
+                    alert("⚠️ Data kriteria rubrik belum diinput oleh dosen (Tabel kosong).");
+                    document.getElementById('deskripsi').innerText = "Belum ada data...";
+                    return;
+                }
+
+                // Jika ada isinya, baru jadikan JSON
+                const rubrikData = JSON.parse(textData);
+
+                if(rubrikData.length > 0) {
+                    // Isi Identitas Mata Kuliah (Otomatis dari Database)
+                    document.getElementById('nama_mk').innerText = rubrikData[0].nama_mk || 'Nama MK Belum Terdaftar';
+                    document.getElementById('kode_mk').innerText = rubrikData[0].kode_mk || '-';
+                    
+                    // Isi identitas RTM
+                    document.getElementById('rtm_judul').innerText = rubrikData[0].judul_tugas || '-';
+                    document.getElementById('rtm_metode').innerText = rubrikData[0].metode || '-';
+                    document.getElementById('rtm_luaran').innerText = rubrikData[0].luaran_tugas || '-';
+                    document.getElementById('deskripsi').innerText = rubrikData[0].deskripsi || '-';
+                    
+                    // Isi tabel matriks
+                    const tbody = document.querySelector('#tabel_rubrik tbody');
+                    tbody.innerHTML = ''; // Kosongkan sebelum diisi
+                    
+                    rubrikData.forEach(item => {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="font-weight:bold;">${item.kriteria}</td>
+                                <td style="text-align:center;">${item.bobot_persen}%</td>
+                                <td>${item.skala_1 || '-'}</td>
+                                <td>${item.skala_2 || '-'}</td>
+                                <td>${item.skala_3 || '-'}</td>
+                                <td>${item.skala_4 || '-'}</td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error("Gagal ambil data:", error);
+                alert("❌ Gagal menarik data dari server. Pastikan URL Cloudflare Tunnel sudah benar!");
+            }
+        }
+
+        window.onload = loadDataCetak;
+    </script>
+</body>
+</html>

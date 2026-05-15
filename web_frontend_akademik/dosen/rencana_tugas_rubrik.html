@@ -203,13 +203,13 @@
             updateSum();
         }
 
-        // FUNGSI SIMPAN UTAMA
+        // FUNGSI SIMPAN ULTIMATE (ANTI-GAGAL)
         async function simpanTugasRubrik() {
             const btn = document.getElementById('btnSimpanTop');
             const total = parseInt(document.getElementById('totalBobot').innerText);
 
             if(total !== 100) {
-                alert("⚠️ Total bobot kriteria rubrik harus 100%!");
+                alert("⚠️ Total bobot kriteria rubrik harus tepat 100%!");
                 return;
             }
 
@@ -218,51 +218,58 @@
 
             const payload = {
                 kode_mk: new URLSearchParams(window.location.search).get('kode_mk') || 'DEFAULT_MK',
-                judul_tugas: document.getElementById('judulTugas').value,
-                sub_cpmk: document.getElementById('selectCPMK').value,
-                metode: document.getElementById('inputMetode').value,
-                waktu: document.getElementById('inputWaktu').value,
-                luaran: document.getElementById('inputLuaran').value,
-                deskripsi: document.getElementById('inputDeskripsi').value,
+                judul_tugas: document.getElementById('judulTugas').value || 'Tanpa Judul',
+                sub_cpmk: document.getElementById('selectCPMK').value || 'CPMK000',
+                metode: document.getElementById('inputMetode').value || '-',
+                waktu: document.getElementById('inputWaktu').value || '-',
+                luaran: document.getElementById('inputLuaran').value || '-',
+                deskripsi: document.getElementById('inputDeskripsi').value || '-',
                 rubrik: [] 
             };
 
-            // Mengambil isi baris rubrik berdasarkan class
-            document.querySelectorAll('.rubric-grid').forEach(row => {
-                const inputNama = row.querySelector('.r-nama');
+            // PAKSA AMBIL SEMUA BARIS (Tanpa Syarat)
+            const semuaBaris = document.querySelectorAll('.rubric-grid');
+            
+            semuaBaris.forEach((row, index) => {
+                const namaKriteria = row.querySelector('.r-nama').value;
                 
-                // Jika input nama ditemukan dan tidak kosong, masukkan ke payload
-                if(inputNama && inputNama.value.trim() !== '') {
-                    payload.rubrik.push({
-                        kriteria: inputNama.value,
-                        bobot_persen: row.querySelector('.r-bobot').value,
-                        skala_1: row.querySelector('.r-s1').value,
-                        skala_2: row.querySelector('.r-s2').value,
-                        skala_3: row.querySelector('.r-s3').value,
-                        skala_4: row.querySelector('.r-s4').value
-                    });
-                }
+                // Jika kosong, beri nama otomatis agar tidak error di database
+                const kriteriaFinal = namaKriteria.trim() === '' ? `Kriteria ${index + 1}` : namaKriteria;
+                
+                payload.rubrik.push({
+                    kriteria: kriteriaFinal,
+                    bobot_persen: row.querySelector('.r-bobot').value || '0',
+                    skala_1: row.querySelector('.r-s1').value || '-',
+                    skala_2: row.querySelector('.r-s2').value || '-',
+                    skala_3: row.querySelector('.r-s3').value || '-',
+                    skala_4: row.querySelector('.r-s4').value || '-'
+                });
             });
 
-            console.log("Data yang akan dikirim:", payload);
+            // ALERT PELACAK: Memastikan data sudah tertangkap sebelum dikirim
+            alert(`🔍 DEBUG: Siap mengirim ${payload.rubrik.length} baris kriteria ke n8n!`);
+            console.log("ISI PAYLOAD FINAL:", payload);
 
             try {
-                // JANGAN LUPA PASTIKAN URL N8N INI BENAR
-                const response = await fetch('https://understood-filename-baseline-presented.trycloudflare.com/webhook/simpan-tugas-rubrik', {
+                // ⚠️ PENTING: Ganti URL ini dengan link Tunnel Cloudflare Anda yang sedang AKTIF HARI INI
+                const URL_N8N_ANDA = 'https://chose-colleges-dependent-philips.trycloudflare.com/webhook/simpan-tugas-rubrik';
+                
+                const response = await fetch(URL_N8N_ANDA, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload) 
                 });
 
                 if(response.ok) {
-                    alert("✅ Rencana Tugas dan Rubrik Berhasil Disimpan ke Database!");
+                    alert("✅ SUKSES BESAR! Data Master dan Rubrik Berhasil Disimpan!");
                     window.location.href = 'rps_dosen.html'; 
                 } else {
-                    alert("❌ Gagal merespon, pastikan URL Webhook benar.");
+                    const errText = await response.text();
+                    alert("❌ n8n menolak data. Cek error di n8n: " + errText);
                 }
             } catch (error) {
                 console.error("Fetch Error:", error);
-                alert("❌ Gagal mengirim data. Pastikan Workflow n8n aktif.");
+                alert("❌ Gagal terhubung ke n8n! Pastikan Cloudflare Tunnel menyala dan URL-nya benar.");
             } finally {
                 btn.innerHTML = '<i class="fas fa-check-double"></i> Simpan Data Tugas';
                 btn.disabled = false;
@@ -270,6 +277,14 @@
         }
         // Load 1 baris awal
         window.onload = () => { tambahKriteria(); };
+        function cetakRpsDosen() {
+    const idTugas = new URLSearchParams(window.location.search).get('id_tugas');
+    if(idTugas) {
+        window.location.href = `cetak_rps.html?id_tugas=${idTugas}`;
+    } else {
+        alert("⚠️ ID Tugas tidak ditemukan. Simpan data tugas terlebih dahulu!");
+    }
+}
     </script>
 </body>
 </html>
