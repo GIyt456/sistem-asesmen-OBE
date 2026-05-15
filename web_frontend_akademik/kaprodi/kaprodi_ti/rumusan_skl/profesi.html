@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profesi / Profil Lulusan - Sistem OBE</title>
+    <title>Daftar Profesi - Sistem OBE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { 
-            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
-            --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
+            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; 
+            --primary-blue: #1e3a8a; --bg-main: #f9fafb; --border-color: #e5e7eb;
         }
 
         /* --- GAYA SIDEBAR --- */
@@ -32,51 +32,47 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); }}
+
         .main-content { flex: 1; overflow-y: auto; padding: 40px 50px; }
         .header-container { margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: #111827; }
         .header-title span { color: var(--primary-blue); }
 
-        /* Tabel Styling Minimalis */
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #f8fafc; padding: 18px 25px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; letter-spacing: 0.5px; }
-        td { padding: 20px 25px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; vertical-align: top; line-height: 1.6; color: #1e293b; }
-        tr:last-child td { border-bottom: none; }
-        
-        .btn-edit { background: #f1f5f9; color: var(--primary-blue); border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; gap: 8px; justify-content: center; width: 100%; }
-        .btn-edit:hover { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+        th { background: #f8fafc; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; }
+        td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #1e293b; }
 
-        /* Modal Styling */
+        .btn-edit { background: #f1f5f9; color: var(--primary-blue); border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        .btn-edit:hover { background: var(--primary-blue); color: white; }
+        
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 35px; border-radius: 16px; width: 550px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; color: #475569; }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; transition: 0.2s; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; }
     </style>
 </head>
 <body>
     <div id="sidebar-container"></div>
-
     <div class="main-content">
         <div class="header-container">
-            <h1 class="header-title">Data <span>Profesi</span></h1>
-            <p style="color: #64748b; margin-top: 5px;">Rumusan Profesi dan Profil Lulusan Program Studi.</p>
+            <h1 class="header-title">Daftar <span>Profesi</span></h1>
+            <p style="color: #64748b; margin-top: 5px;">Peluang karir yang terhubung dengan Profil Lulusan.</p>
         </div>
-
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 35%;">Profil Lulusan</th>
-                        <th>Rumusan Deskripsi Profil Lulusan</th>
-                        <th style="width: 120px; text-align: center;">Opsi</th>
+                        <th style="width: 60px; text-align: center;">NO</th>
+                        <th>JENIS PROFESI / PEKERJAAN</th>
+                        <th>PROFIL LULUSAN TERKAIT</th>
+                        <th style="width: 100px; text-align: center;">OPSI</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="3" style="text-align: center; padding: 50px;">Memuat data...</td></tr>
+                    <tr><td colspan="4" style="text-align: center; padding: 40px;">Memuat data...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -84,26 +80,25 @@
 
     <div class="modal" id="editModal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 25px; font-weight: 800;">Edit Profesi / Profil Lulusan</h2>
+            <h2 style="margin-bottom: 25px; font-weight: 800;">Edit Profesi</h2>
             <input type="hidden" id="editKode">
-            
-            <div class="form-group">
-                <label>PROFIL LULUSAN (Profesi)</label>
-                <input type="text" id="editProfesi" placeholder="Contoh: Software Engineer">
+            <input type="hidden" id="editDeskripsi"> <div class="form-group">
+                <label>Nama Profil Lulusan</label>
+                <input type="text" id="editNamaProfil" disabled style="background: #f8fafc;">
             </div>
             <div class="form-group">
-                <label>DESKRIPSI PROFIL LULUSAN</label>
-                <textarea id="editDeskripsi" rows="6" placeholder="Tuliskan rumusan kompetensi di sini..."></textarea>
+                <label>Daftar Profesi (Pisahkan dengan koma)</label>
+                <textarea id="editProfesi" rows="5" placeholder="Contoh: IT Auditor, IT Governance, Analyst"></textarea>
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
-                <button onclick="closeModal()" style="padding: 12px 20px; border: 1px solid #cbd5e1; background: #fff; border-radius: 8px; cursor: pointer; font-weight: 600;">Batal</button>
+                <button onclick="closeModal()" style="padding: 12px 20px; border: 1px solid #cbd5e1; background: #fff; border-radius: 8px; cursor: pointer;">Batal</button>
                 <button onclick="updateProfesi()" style="padding: 12px 20px; background: var(--primary-blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">Simpan Perubahan</button>
             </div>
         </div>
     </div>
 
     <script>
-        const API_BASE = "https://computing-epson-profits-script.trycloudflare.com/webhook";
+        const API_BASE = "https://chose-colleges-dependent-philips.trycloudflare.com/webhook";
         const PRODI = localStorage.getItem("prodi_aktif") || "ti";
 
         window.onload = async () => {
@@ -117,29 +112,40 @@
                 const res = await fetch(`${API_BASE}/get-master-pl`);
                 const data = await res.json();
                 tbody.innerHTML = '';
-                
+                let no = 1;
+
+                const aman = (str) => {
+                    if (!str) return '';
+                    return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n').replace(/\r/g, '');
+                };
+
                 data.forEach(pl => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td style="font-weight: 700; color: #1e293b;">${pl.profil_lulusan || '-'}</td>
-                        <td>${pl.deskripsi_pl || '-'}</td>
-                        <td>
-                            <button class="btn-edit" onclick="openModal('${pl.kode_pl}', '${(pl.profil_lulusan || '').replace(/'/g, "\\'")}', '${(pl.deskripsi_pl || '').replace(/'/g, "\\'")}')">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
+                    if (pl.profesi) {
+                        const list = pl.profesi.split(',');
+                        list.forEach(prof => {
+                            if(prof.trim() !== "") {
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `
+                                    <td style="text-align: center; font-weight: 600;">${no++}</td>
+                                    <td style="font-weight: 700; color: var(--primary-blue);">${prof.trim()}</td>
+                                    <td><span style="font-weight: 800;">${pl.kode_pl}</span> - ${pl.nama_profil || '-'}</td>
+                                    <td style="text-align: center;">
+                                        <button class="btn-edit" onclick="openModal('${pl.kode_pl}', '${aman(pl.nama_profil)}', '${aman(pl.deskripsi)}', '${aman(pl.profesi)}')">Edit</button>
+                                    </td>
+                                `;
+                                tbody.appendChild(tr);
+                            }
+                        });
+                    }
                 });
-            } catch (e) { 
-                tbody.innerHTML = '<tr><td colspan=\"3\" style=\"text-align: center; color: #ef4444; padding: 40px;\">Gagal memuat data.</td></tr>'; 
-            }
+            } catch (e) { tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px;">Gagal memuat data.</td></tr>'; }
         }
 
-        function openModal(kode, profesi, deskripsi) {
+        function openModal(kode, nama, desk, prof) {
             document.getElementById('editKode').value = kode;
-            document.getElementById('editProfesi').value = profesi;
-            document.getElementById('editDeskripsi').value = deskripsi;
+            document.getElementById('editNamaProfil').value = nama;
+            document.getElementById('editDeskripsi').value = desk;
+            document.getElementById('editProfesi').value = prof;
             document.getElementById('editModal').style.display = 'flex';
         }
 
@@ -148,8 +154,9 @@
         async function updateProfesi() {
             const payload = {
                 kode_pl: document.getElementById('editKode').value,
-                profil_lulusan: document.getElementById('editProfesi').value,
-                deskripsi_pl: document.getElementById('editDeskripsi').value,
+                nama_profil: document.getElementById('editNamaProfil').value,
+                deskripsi: document.getElementById('editDeskripsi').value,
+                profesi: document.getElementById('editProfesi').value,
                 prodi: PRODI
             };
             try {
@@ -163,7 +170,7 @@
                     closeModal(); 
                     loadDataProfesi(); 
                 }
-            } catch (e) { alert("❌ Gagal menyimpan perubahan."); }
+            } catch (e) { alert("❌ Gagal menyimpan."); }
         }
 
         async function loadSidebar() {

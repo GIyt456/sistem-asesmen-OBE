@@ -8,20 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { 
-            /* Warna Sidebar */
-            --sidebar-bg: #161923; 
-            --sidebar-text: #7b8395; 
-            --sidebar-hover: #262936; 
-            --sidebar-active-text: #ffffff;
-            
-            /* Warna Utama */
-            --primary-blue: #1e3a8a; 
-            --primary-red: #8b0000; 
-            --bg-main: #f9fafb; 
-            --text-dark: #111827; 
-            --border-color: #e5e7eb;
+            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
+            --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
+            --success-green: #10b981;
         }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
         /* GAYA SIDEBAR */
         .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
         .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
@@ -39,37 +33,43 @@
         .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
         .nav-item.logout { color: #f87171; }
         .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; animation: transitionIn 0.3s ease-in-out;}
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
         
         .main-content { flex: 1; overflow-y: auto; padding: 40px 50px; }
-        .header-container { margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
         .header-title span { color: var(--primary-red); }
 
-        /* TABLE STYLING */
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #f8fafc; padding: 18px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); }
-        td { padding: 18px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #1e293b; }
-        tr:last-child td { border-bottom: none; }
+        .action-buttons { display: flex; gap: 10px; }
+        .btn-action { color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; font-size: 0.85rem; }
+        .btn-add { background: var(--primary-blue); }
+        .btn-add:hover { background: #172554; transform: translateY(-2px); }
+        .btn-download { background: #475569; }
+        .btn-download:hover { background: #334155; transform: translateY(-2px); }
+        .btn-upload { background: var(--success-green); }
+        .btn-upload:hover { background: #059669; transform: translateY(-2px); }
+
+        /* Tabel Styling */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-y: auto; max-height: 70vh; }
+        table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: left; }
+        th { background: #f8fafc; padding: 15px 12px; font-size: 0.75rem; font-weight: 800; color: #475569; border-bottom: 2px solid var(--border-color); position: sticky; top: 0; z-index: 10; text-transform: uppercase; }
         
-        .btn-edit { background: #f1f5f9; color: var(--primary-blue); border: 1px solid #cbd5e1; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        th:nth-child(1) { width: 7%; } th:nth-child(2) { width: 15%; } th:nth-child(3) { width: 26%; } 
+        th:nth-child(4) { width: 24%; } th:nth-child(5) { width: 12%; } th:nth-child(6) { width: 10%; } 
+        th:nth-child(7) { width: 6%; text-align: center; }
+
+        td { padding: 15px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+        
+        .btn-edit { background: #f1f5f9; color: var(--primary-blue); border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; width: 100%; transition: 0.2s; }
         .btn-edit:hover { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
 
-        /* MODAL STYLING */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 30px; border-radius: 12px; width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-        .modal-header { font-weight: 800; font-size: 1.2rem; margin-bottom: 20px; color: var(--text-dark); }
+        /* Modal Styling */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 16px; width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .modal-header { font-weight: 800; font-size: 1.4rem; margin-bottom: 20px; color: var(--text-dark); border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #64748b; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; }
-        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
-        .btn-cancel { padding: 10px 18px; border: 1px solid #cbd5e1; background: #f8fafc; border-radius: 6px; cursor: pointer; }
-        .btn-save { padding: 10px 18px; background: var(--primary-red); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 800; margin-bottom: 5px; color: #64748b; text-transform: uppercase; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; }
+        .form-group input:disabled { background: #f8fafc; color: #94a3b8; }
     </style>
 </head>
 <body>
@@ -77,54 +77,93 @@
 
     <div class="main-content">
         <div class="header-container">
-            <h1 class="header-title">Perumusan <span>Bahan Kajian</span></h1>
-            <p style="color: #64748b; margin-top: 5px;">Kelola nama dan koordinator untuk setiap Bahan Kajian (BK).</p>
+            <div>
+                <h1 class="header-title">Perumusan <span>Bahan Kajian</span></h1>
+                <p style="color: #64748b; margin-top: 5px;">Kelola detail rumusan atau Impor massal melalui Excel.</p>
+            </div>
+            <div class="action-buttons">
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+                <button class="btn-action btn-download" onclick="exportKeExcel()">
+                    <i class="fas fa-file-download"></i> Template
+                </button>
+                
+                <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;" onchange="uploadExcel()">
+                
+                <button class="btn-action btn-upload" onclick="document.getElementById('fileExcel').click()">
+                    <i class="fas fa-file-upload"></i> Impor Excel
+                </button>
+                
+                <button class="btn-action btn-add" onclick="openModalAdd()">
+                    <i class="fas fa-plus"></i> Tambah BK
+                </button>
+            </div>
         </div>
 
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 150px;">KODE BK</th>
-                        <th>NAMA BAHAN KAJIAN</th>
-                        <th>KOORDINATOR BK</th>
-                        <th style="width: 100px; text-align: center;">OPSI</th>
+                        <th>Kode</th>
+                        <th>Bahan Kajian</th>
+                        <th>Deskripsi</th>
+                        <th>Kompetensi</th>
+                        <th>Koordinator</th>
+                        <th>Referensi</th>
+                        <th style="text-align: center;">Opsi</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="4" style="text-align: center; padding: 40px;">Memuat data...</td></tr>
+                    <tr><td colspan="7" style="text-align: center; padding: 40px;">Memuat data...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div class="modal" id="editModal">
+    <div class="modal" id="inputModal">
         <div class="modal-content">
-            <div class="modal-header">Edit Perumusan BK</div>
-            <input type="hidden" id="editKode">
+            <div class="modal-header" id="modalTitle">Tambah Bahan Kajian</div>
+            <input type="hidden" id="modalMode" value="add">
+            
             <div class="form-group">
-                <label>Kode BK</label>
-                <input type="text" id="displayKode" disabled style="background: #f1f5f9;">
+                <label>Kode BK (Contoh: BK01)</label>
+                <input type="text" id="inpKode" placeholder="Masukkan kode unik BK...">
             </div>
             <div class="form-group">
                 <label>Nama Bahan Kajian</label>
-                <input type="text" id="editNama" placeholder="Masukkan nama BK...">
+                <input type="text" id="inpNama" placeholder="Contoh: Foundation of IS">
+            </div>
+            <div class="form-group">
+                <label>Deskripsi</label>
+                <textarea id="inpDeskripsi" rows="4" placeholder="Jelaskan cakupan materi BK ini..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>Kompetensi</label>
+                <textarea id="inpKompetensi" rows="4" placeholder="Target kemampuan yang ingin dicapai..."></textarea>
             </div>
             <div class="form-group">
                 <label>Koordinator BK</label>
-                <input type="text" id="editKoordinator" placeholder="Masukkan nama koordinator (Dosen)...">
+                <input type="text" id="inpKoordinator" placeholder="Nama dosen pengampu utama...">
             </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeModal()">Batal</button>
-                <button class="btn-save" onclick="updateBK()">Simpan Perubahan</button>
+            <div class="form-group">
+                <label>Referensi</label>
+                <textarea id="inpReferensi" rows="3" placeholder="Daftar buku atau sumber pustaka..."></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
+                <button onclick="closeModal()" style="padding: 12px 20px; border: 1px solid #cbd5e1; background: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Batal</button>
+                <button onclick="saveData()" style="padding: 12px 20px; background: var(--primary-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">Simpan Data</button>
             </div>
         </div>
     </div>
 
     <script>
+<<<<<<< HEAD
         const API_BASE = "https://yen-title-indicators-thursday.trycloudflare.com/webhook";
         const API_GET_BK = `${API_BASE}/get-master-bk`;
         const API_UPDATE_BK = `${API_BASE}/update-master-bk`;
+=======
+        const API_BASE = "https://fixtures-wildlife-while-senators.trycloudflare.com/webhook";
+>>>>>>> e1dd140100681e3ef933a266492e84de6f494747
         const PRODI = localStorage.getItem("prodi_aktif") || "ti";
 
         window.onload = async () => {
@@ -132,86 +171,227 @@
             await loadDataBK();
         };
 
+        // FUNGSI UPLOAD EXCEL KE N8N
+        async function uploadExcel() {
+            const fileInput = document.getElementById('fileExcel');
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('data', file); // Nama field harus sama dengan di n8n ('data')
+            formData.append('prodi', PRODI);
+
+            // Ganti tombol upload jadi mode loading
+            const btnUpload = document.querySelector('.btn-upload');
+            const oriText = btnUpload.innerHTML;
+            btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
+            btnUpload.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/upload-master-bk`, {
+                    method: 'POST',
+                    body: formData // Jangan set Content-Type manual agar browser bisa set boundary otomatis
+                });
+
+                if (res.ok) {
+                    alert("✅ Data Excel berhasil diimpor!");
+                    await loadDataBK(); // Langsung perbarui tabel
+                } else {
+                    alert("❌ Gagal memproses file Excel.");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("❌ Terjadi kesalahan koneksi.");
+            } finally {
+                btnUpload.innerHTML = oriText;
+                btnUpload.disabled = false;
+                fileInput.value = ''; // Reset input agar bisa upload file yang sama lagi
+            }
+        }
+
         async function loadDataBK() {
             const tbody = document.getElementById('tableBody');
             try {
-                const res = await fetch(API_GET_BK);
+                const res = await fetch(`${API_BASE}/get-master-bk`);
                 const data = await res.json();
                 
                 tbody.innerHTML = '';
+
+                const aman = (str) => {
+                    if (!str) return '';
+                    return String(str).replace(/\\/g, '\\\\')
+                              .replace(/'/g, "\\'")
+                              .replace(/"/g, '&quot;')
+                              .replace(/\n/g, '\\n')
+                              .replace(/\r/g, '');
+                };
+
                 data.forEach(bk => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td style="font-weight: 800; color: var(--primary-red);">${bk.kode_bk}</td>
-                        <td style="font-weight: 600;">${bk.nama_bk}</td>
-                        <td style="color: #64748b;">${bk.koordinator_bk || '<span style="font-style:italic; opacity:0.5;">Belum ditentukan</span>'}</td>
-                        <td style="text-align: center;">
-                            <button class="btn-edit" onclick="openModal('${bk.kode_bk}', '${bk.nama_bk}', '${bk.koordinator_bk || ''}')">
+                        <td style="font-weight: 700; color: #1e293b;">${bk.nama_bk}</td>
+                        <td style="color: #64748b; white-space: pre-wrap;">${bk.deskripsi || '-'}</td>
+                        <td style="color: #64748b; white-space: pre-wrap;">${bk.kompetensi || '-'}</td>
+                        <td style="font-weight: 600; color: #475569;">${bk.koordinator_bk || '-'}</td>
+                        <td style="font-size: 0.8rem; font-style: italic; color: #64748b; white-space: pre-wrap;">${bk.referensi || '-'}</td>
+                        <td>
+                            <button class="btn-edit" onclick="openModalEdit('${bk.kode_bk}', '${aman(bk.nama_bk)}', '${aman(bk.deskripsi)}', '${aman(bk.kompetensi)}', '${aman(bk.koordinator_bk)}', '${aman(bk.referensi)}')">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
-            } catch (e) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: red;">Gagal memuat data.</td></tr>';
+            } catch (e) { 
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 40px;">Gagal memuat data.</td></tr>'; 
             }
         }
 
-        function openModal(kode, nama, koordinator) {
-            document.getElementById('editKode').value = kode;
-            document.getElementById('displayKode').value = kode;
-            document.getElementById('editNama').value = nama;
-            document.getElementById('editKoordinator').value = koordinator;
-            document.getElementById('editModal').style.display = 'flex';
+        function openModalAdd() {
+            document.getElementById('modalTitle').innerText = "Tambah Bahan Kajian";
+            document.getElementById('modalMode').value = "add";
+            document.getElementById('inpKode').disabled = false;
+            resetForm();
+            document.getElementById('inputModal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('editModal').style.display = 'none';
+        function openModalEdit(kode, nama, desk, komp, koor, ref) {
+            document.getElementById('modalTitle').innerText = "Edit Perumusan BK";
+            document.getElementById('modalMode').value = "edit";
+            document.getElementById('inpKode').value = kode;
+            document.getElementById('inpKode').disabled = true; 
+            document.getElementById('inpNama').value = nama;
+            document.getElementById('inpDeskripsi').value = desk;
+            document.getElementById('inpKompetensi').value = komp;
+            document.getElementById('inpKoordinator').value = koor;
+            document.getElementById('inpReferensi').value = ref;
+            document.getElementById('inputModal').style.display = 'flex';
         }
 
-        async function updateBK() {
-            const kode = document.getElementById('editKode').value;
-            const nama = document.getElementById('editNama').value;
-            const koordinator = document.getElementById('editKoordinator').value;
+        function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
+        
+        function resetForm() { 
+            document.getElementById('inpKode').value = ''; 
+            document.getElementById('inpNama').value = ''; 
+            document.getElementById('inpDeskripsi').value = ''; 
+            document.getElementById('inpKompetensi').value = ''; 
+            document.getElementById('inpKoordinator').value = ''; 
+            document.getElementById('inpReferensi').value = ''; 
+        }
+
+        async function saveData() {
+            const mode = document.getElementById('modalMode').value;
+            const endpoint = mode === 'add' ? 'add-master-bk' : 'update-master-bk';
+            
+            const payload = {
+                kode_bk: document.getElementById('inpKode').value,
+                nama_bk: document.getElementById('inpNama').value,
+                deskripsi: document.getElementById('inpDeskripsi').value,
+                kompetensi: document.getElementById('inpKompetensi').value,
+                koordinator_bk: document.getElementById('inpKoordinator').value,
+                referensi: document.getElementById('inpReferensi').value,
+                prodi: PRODI
+            };
+
+            if(!payload.kode_bk || !payload.nama_bk) return alert("Kode dan Nama BK wajib diisi!");
 
             try {
-                const res = await fetch(API_UPDATE_BK, {
+                const res = await fetch(`${API_BASE}/${endpoint}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ kode_bk: kode, nama_bk: nama, koordinator_bk: koordinator, prodi: PRODI })
+                    body: JSON.stringify(payload)
                 });
-
-                if (res.ok) {
-                    alert("✅ Berhasil memperbarui data BK!");
-                    closeModal();
-                    loadDataBK(); // Refresh tabel
+                if (res.ok) { 
+                    alert("✅ Data berhasil disimpan!"); 
+                    closeModal(); 
+                    loadDataBK(); 
                 }
+            } catch (e) { alert("❌ Terjadi kesalahan koneksi."); }
+        }
+
+        async function exportKeExcel() {
+            const btn = document.querySelector('.btn-download');
+            const oriText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
+
+            try {
+                // 1. Ambil data terbaru dari Database via n8n
+                const res = await fetch(`${API_BASE}/get-master-bk`);
+                const data = await res.json();
+
+                if (!data || data.length === 0) {
+                    alert("Belum ada data untuk di-export. Silakan tambah BK manual dulu satu kali.");
+                    return;
+                }
+
+                // 2. Rapikan format datanya agar sesuai dengan kolom Excel
+                const dataMapping = data.map(bk => ({
+                    'kode_bk': bk.kode_bk,
+                    'nama_bk': bk.nama_bk,
+                    'deskripsi': bk.deskripsi || '',
+                    'kompetensi': bk.kompetensi || '',
+                    'koordinator_bk': bk.koordinator_bk || '',
+                    'referensi': bk.referensi || ''
+                }));
+
+                // 3. Proses pembuatan File Excel oleh SheetJS
+                const worksheet = XLSX.utils.json_to_sheet(dataMapping);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Master_BK");
+
+                // 4. Download otomatis ke komputer Kaprodi
+                XLSX.writeFile(workbook, `Data_Master_BK_${PRODI}.xlsx`);
+
             } catch (e) {
-                alert("❌ Gagal menyimpan perubahan.");
+                console.error(e);
+                alert("Gagal mengambil data untuk export.");
+            } finally {
+                btn.innerHTML = oriText;
             }
         }
 
+        // --- FUNGSI STANDAR SIDEBAR ---
         async function loadSidebar() {
-        try {
-            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
-            if (!response.ok) throw new Error("Sidebar gagal dimuat");
-            document.getElementById('sidebar-container').innerHTML = await response.text();
-            
-            const nameElem = document.getElementById("adminName");
-            if (nameElem) nameElem.innerText = localStorage.getItem("user_login") || "Admin";
-            
-            const navMatriks = document.getElementById('nav-matriks-cpl-mk');
-            if (navMatriks) navMatriks.style.background = 'var(--sidebar-hover)';
-        } catch (error) {
-            console.error("Gagal memuat sidebar:", error);
+            try {
+                const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
+                if (!response.ok) throw new Error("Sidebar gagal dimuat");
+                document.getElementById('sidebar-container').innerHTML = await response.text();
+                
+                const nameElem = document.getElementById("adminName");
+                if (nameElem) nameElem.innerText = localStorage.getItem("user_login") || "Admin";
+                
+                // Tandai menu matriks aktif di sidebar
+                const navMatriks = document.getElementById('nav-matriks-cpl-mk');
+                if (navMatriks) navMatriks.style.background = 'var(--sidebar-hover)';
+            } catch (error) {
+                console.error("Gagal memuat sidebar:", error);
+            }
         }
-    }
 
-        function toggleDropdown(m, c) {
-            const menu = document.getElementById(m), chev = document.getElementById(c);
-            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'flex' : 'none';
-            chev.style.transform = menu.style.display === 'flex' ? 'rotate(180deg)' : 'rotate(0deg)';
+        // Fungsi Animasi Dropdown
+        function toggleDropdown(menuId, chevronId) {
+            const menu = document.getElementById(menuId);
+            const chevron = document.getElementById(chevronId);
+            
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'flex';
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                menu.style.display = 'none';
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Fungsi Logout
+        function logout() {
+            if(confirm("Apakah Anda yakin ingin keluar?")) {
+                localStorage.removeItem("user_login");
+                localStorage.removeItem("user_role");
+                window.location.replace('/login/login.html');
+            }
         }
     </script>
 </body>
