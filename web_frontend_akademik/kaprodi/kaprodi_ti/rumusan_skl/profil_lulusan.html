@@ -11,6 +11,9 @@
             --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
             --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); }}
 
         /* --- GAYA SIDEBAR --- */
         .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
@@ -29,27 +32,20 @@
         .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
         .nav-item.logout { color: #f87171; }
         .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         
         .main-content { flex: 1; overflow-y: auto; padding: 40px 50px; }
         .header-container { margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
         .header-title span { color: var(--primary-blue); }
 
-        /* Tabel Styling Minimalis */
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: #f8fafc; padding: 18px 25px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; letter-spacing: 0.5px; }
-        td { padding: 20px 25px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; line-height: 1.6; color: #1e293b; }
-        tr:last-child td { border-bottom: none; }
+        th { background: #f8fafc; padding: 18px 25px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; }
+        td { padding: 20px 25px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; line-height: 1.6; color: #1e293b; vertical-align: top; }
         
-        .btn-edit { background: #f1f5f9; color: var(--primary-blue); border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
-        .btn-edit:hover { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+        .btn-edit { background: #f1f5f9; color: var(--primary-blue); border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        .btn-edit:hover { background: var(--primary-blue); color: white; }
 
-        /* Modal */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 35px; border-radius: 16px; width: 550px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 20px; }
@@ -63,20 +59,21 @@
     <div class="main-content">
         <div class="header-container">
             <h1 class="header-title">Profil <span>Lulusan</span></h1>
-            <p style="color: #64748b; margin-top: 5px;">Rumusan deskripsi standar kompetensi bagi lulusan Program Studi.</p>
+            <p style="color: #64748b; margin-top: 5px;">Rumusan standar kompetensi lulusan Program Studi.</p>
         </div>
 
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 120px;">Kode</th>
-                        <th>Rumusan Deskripsi</th>
-                        <th style="width: 120px; text-align: center;">Opsi</th>
+                        <th style="width: 100px;">KODE</th>
+                        <th style="width: 250px;">PROFIL LULUSAN</th>
+                        <th>RUMUSAN DESKRIPSI KOMPETENSI</th>
+                        <th style="width: 120px; text-align: center;">OPSI</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="3" style="text-align: center; padding: 50px;">Memuat rumusan...</td></tr>
+                    <tr><td colspan="4" style="text-align: center; padding: 50px;">Memuat data...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -84,29 +81,30 @@
 
     <div class="modal" id="editModal">
         <div class="modal-content">
-            <h2 style="margin-bottom: 25px; font-weight: 800;">Edit Rumusan PL</h2>
-            <input type="hidden" id="editId">
-            <div class="form-group">
+            <h2 style="margin-bottom: 25px; font-weight: 800;">Edit Profil Lulusan</h2>
+            <input type="hidden" id="editKode">
+            <input type="hidden" id="editProfesi"> <div class="form-group">
                 <label>KODE PL</label>
-                <input type="text" id="editKode" disabled style="background: #f8fafc; font-weight: 700;">
+                <input type="text" id="inpKodeShow" disabled style="background: #f8fafc; font-weight: 700;">
             </div>
             <div class="form-group">
-                <label>NAMA PROFIL (Label)</label>
-                <input type="text" id="editProfil">
+                <label>NAMA PROFIL LULUSAN</label>
+                <input type="text" id="editNamaProfil">
             </div>
             <div class="form-group">
                 <label>RUMUSAN DESKRIPSI</label>
-                <textarea id="editDeskripsi" rows="6" placeholder="Tuliskan rumusan kompetensi di sini..."></textarea>
+                <textarea id="editDeskripsi" rows="6"></textarea>
             </div>
+            
             <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
-                <button onclick="closeModal()" style="padding: 12px 20px; border: 1px solid #cbd5e1; background: #fff; border-radius: 8px; cursor: pointer; font-weight: 600;">Batal</button>
+                <button onclick="closeModal()" style="padding: 12px 20px; border: 1px solid #cbd5e1; background: #fff; border-radius: 8px; cursor: pointer;">Batal</button>
                 <button onclick="updatePL()" style="padding: 12px 20px; background: var(--primary-blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">Simpan Perubahan</button>
             </div>
         </div>
     </div>
 
     <script>
-        const API_BASE = "https://yen-title-indicators-thursday.trycloudflare.com/webhook";
+        const API_BASE = "https://chose-colleges-dependent-philips.trycloudflare.com/webhook";
         const PRODI = localStorage.getItem("prodi_aktif") || "ti";
 
         window.onload = async () => {
@@ -121,13 +119,19 @@
                 const data = await res.json();
                 tbody.innerHTML = '';
                 
+                const aman = (str) => {
+                    if (!str) return '';
+                    return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n').replace(/\r/g, '');
+                };
+
                 data.forEach(pl => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td style="font-weight: 800; color: var(--primary-blue);">${pl.kode_pl}</td>
-                        <td>${pl.deskripsi_pl || '<span style="font-style:italic; opacity:0.5;">Belum ada deskripsi</span>'}</td>
-                        <td style="display: flex; justify-content: center;">
-                            <button class="btn-edit" onclick="openModal('${pl.kode_pl}', '${pl.profil_lulusan || ''}', '${pl.deskripsi_pl || ''}')">
+                        <td style="font-weight: 700;">${pl.nama_profil || '-'}</td>
+                        <td style="font-size: 0.9rem;">${pl.deskripsi || '-'}</td>
+                        <td style="text-align: center;">
+                            <button class="btn-edit" onclick="openModal('${pl.kode_pl}', '${aman(pl.nama_profil)}', '${aman(pl.deskripsi)}', '${aman(pl.profesi)}')">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                         </td>
@@ -135,14 +139,16 @@
                     tbody.appendChild(tr);
                 });
             } catch (e) { 
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #ef4444; padding: 40px;">Gagal memuat data.</td></tr>'; 
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px;">Gagal memuat data.</td></tr>'; 
             }
         }
 
-        function openModal(kode, profil, deskripsi) {
+        function openModal(kode, nama, desk, prof) {
             document.getElementById('editKode').value = kode;
-            document.getElementById('editProfil').value = profil;
-            document.getElementById('editDeskripsi').value = deskripsi;
+            document.getElementById('inpKodeShow').value = kode;
+            document.getElementById('editNamaProfil').value = nama;
+            document.getElementById('editDeskripsi').value = desk;
+            document.getElementById('editProfesi').value = prof;
             document.getElementById('editModal').style.display = 'flex';
         }
 
@@ -151,8 +157,9 @@
         async function updatePL() {
             const payload = {
                 kode_pl: document.getElementById('editKode').value,
-                profil_lulusan: document.getElementById('editProfil').value,
-                deskripsi_pl: document.getElementById('editDeskripsi').value,
+                nama_profil: document.getElementById('editNamaProfil').value,
+                deskripsi: document.getElementById('editDeskripsi').value,
+                profesi: document.getElementById('editProfesi').value,
                 prodi: PRODI
             };
             try {
@@ -162,7 +169,7 @@
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) { 
-                    alert("✅ Rumusan berhasil diperbarui!"); 
+                    alert("✅ Profil Lulusan berhasil diperbarui!"); 
                     closeModal(); 
                     loadDataPL(); 
                 }
