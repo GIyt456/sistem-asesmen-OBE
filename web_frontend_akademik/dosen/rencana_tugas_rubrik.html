@@ -250,9 +250,8 @@
             alert(`🔍 DEBUG: Siap mengirim ${payload.rubrik.length} baris kriteria ke n8n!`);
             console.log("ISI PAYLOAD FINAL:", payload);
 
-            try {
-                // ⚠️ PENTING: Ganti URL ini dengan link Tunnel Cloudflare Anda yang sedang AKTIF HARI INI
-                const URL_N8N_ANDA = 'https://chose-colleges-dependent-philips.trycloudflare.com/webhook/simpan-tugas-rubrik';
+           try {
+                const URL_N8N_ANDA = 'https://arising-consoles-space-sharp.trycloudflare.com/webhook/simpan-tugas-rubrik';
                 
                 const response = await fetch(URL_N8N_ANDA, {
                     method: 'POST',
@@ -261,11 +260,47 @@
                 });
 
                 if(response.ok) {
-                    alert("✅ SUKSES BESAR! Data Master dan Rubrik Berhasil Disimpan!");
-                    window.location.href = 'rps_dosen.html'; 
+                    // ✨ UBAH DI BAGIAN INI: BERIKAN PILIHAN JALUR KEPADA DOSEN ✨
+                    const pengenInputLagi = confirm(
+                        "✅ DATA BERHASIL DISIMPAN!\n\n" +
+                        "Apakah Anda ingin menginput TUGAS BERIKUTNYA (Tugas 2, Tugas 3, dst.) untuk mata kuliah ini?\n\n" +
+                        "- Klik 'OK' jika ingin langsung input tugas baru.\n" +
+                        "- Klik 'Cancel' jika sudah selesai dan ingin kembali ke halaman utama."
+                    );
+
+                    if (pengenInputLagi) {
+                        // 1. Kosongkan semua form input tugas agar bersih kembali
+                        document.getElementById('judulTugas').value = '';
+                        document.getElementById('selectCPMK').value = '';
+                        document.getElementById('inputMetode').value = '';
+                        document.getElementById('inputWaktu').value = '';
+                        document.getElementById('inputLuaran').value = '';
+                        document.getElementById('inputDeskripsi').value = '';
+                        
+                        // 2. Bersihkan baris kriteria rubrik lamanya
+                        const container = document.getElementById('rubricContainer');
+                        if (container) {
+                            container.innerHTML = '';
+                            // 3. Panggil fungsi bawaanmu untuk memunculkan 1 baris kosong baru
+                            if (typeof tambahBarisRubrik === "function") {
+                                tambahBarisRubrik();
+                            }
+                        }
+                        
+                        // 4. Reset total bobot menjadi 0% kembali
+                        const totalElem = document.getElementById('totalBobot');
+                        if (totalElem) totalElem.innerText = '0';
+                        
+                        // Halaman tidak akan pindah, dosen bisa langsung ngetik tugas selanjutnya!
+                        alert("Silakan masukkan data tugas berikutnya.");
+                    } else {
+                        // Jika klik cancel, baru tendang ke halaman daftar utama
+                        window.location.href = 'rps_dosen.html'; 
+                    }
+
                 } else {
                     const errText = await response.text();
-                    alert("❌ n8n menolak data. Cek error di n8n: " + errText);
+                    alert("❌ n8n menolak data: " + errText);
                 }
             } catch (error) {
                 console.error("Fetch Error:", error);

@@ -90,18 +90,25 @@
                 <button class="btn-dark" onclick="loadData('rumpun')"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
             
+            <div class="table-card">
             <table>
                 <thead>
                     <tr>
-                        <th width="15%">Kode Rumpun</th>
-                        <th>Nama Rumpun</th>
-                        <th width="10%" style="text-align: center;">Aksi</th>
+                        <th width="15%">Kode BK</th>
+                        <th width="30%">Nama Bahan Kajian</th>
+                        <th width="45%">Deskripsi (Rumpun Mata Kuliah)</th>
+                        <th width="10%">Prodi</th>
                     </tr>
                 </thead>
-                <tbody id="bodyRumpun">
-                    <!-- Data dari n8n akan masuk ke sini -->
+                <tbody id="tableBodyRumpun">
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 30px;">
+                            <i class="fas fa-spinner fa-spin"></i> Menghubungkan ke database Bahan Kajian...
+                        </td>
+                    </tr>
                 </tbody>
             </table>
+        </div>
             
             <div id="pagination-rumpun" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
         </div>
@@ -109,21 +116,57 @@
 
 <script>
     // 1. PENGATURAN API N8N 
-    const PRODI = 'ti'; 
-    const API_BASE = "https://regulated-yorkshire-shared-aids.trycloudflare.com/webhook"; 
-    const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`;
-    const API_UPDATE = `${API_BASE}/admin-update-master`;
-    
-    // 2. SISTEM KEAMANAN & SATPAM AKUN
-    const userLogin = localStorage.getItem("user_login");
-    const userRole = localStorage.getItem("user_role");
-    const userProdi = localStorage.getItem("prodi_aktif");
+    async function fetchDataRumpunBK() {
+        const tableBody = document.getElementById('tableBodyRumpun');
+        
+        try {
+            // Gunakan URL Tunnel n8n yang sedang aktif
+            const API_URL = 'https://chose-colleges-dependent-philips.trycloudflare.com/webhook/get-master-bk';
+            
+            const response = await fetch(API_URL);
+            const data = await response.json();
 
-    if (!userLogin) window.location.replace('/login/login.html');
-    if (userRole !== 'head_admin') {
-        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
-        else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
+            if (!data || data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Data Bahan Kajian belum tersedia di database.</td></tr>';
+                return;
+            }
+
+            tableBody.innerHTML = ''; // Hapus pesan loading
+            
+            data.forEach(item => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td style="font-weight: 800; color: var(--primary-red);">${item.kode_bk}</td>
+                        <td style="font-weight: 600;">${item.nama_bk}</td>
+                        <td style="font-size: 13px; color: #4b5563; line-height: 1.6;">${item.deskripsi || 'Tidak ada deskripsi rumpun.'}</td>
+                        <td>
+                            <span style="background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+                                ${item.prodi}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+        } catch (error) {
+            console.error("Gagal memuat data BK:", error);
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align:center; padding:20px; color: #ef4444;">
+                        <i class="fas fa-exclamation-triangle"></i> Gagal terhubung ke database. Pastikan n8n & Tunnel aktif.
+                    </td>
+                </tr>
+            `;
+        }
     }
+
+    // Jalankan fungsi saat halaman dibuka
+    window.onload = function() {
+        fetchDataRumpunBK();
+        loadSidebar(); 
+        loadData('rumpun'); 
+        // Fungsi load sidebar Anda yang lama tetap diletakkan di sini
+    };
 
     // 3. FUNGSI PEMANGGIL SIDEBAR OTOMATIS
     async function loadSidebar() {
@@ -176,92 +219,9 @@
     };
     const rowsPerPage = 5; 
 
-    async function loadData(tipe) { 
-        try {
-            const res = await fetch(API_URL); 
-            const data = await res.json();
-            
-            // Filter berdasarkan tipe 'rumpun'
-            paginationState[tipe].data = data.filter(i => i.tipe === tipe);
-            paginationState[tipe].page = 1; 
-            
-            renderTablePaginated(tipe);
-        } catch(e) { console.error("Gagal menarik data dari n8n:", e); }
-    }
-
-    function renderTablePaginated(tipe) {
-        const state = paginationState[tipe];
-        const tbody = document.getElementById(state.bodyId);
-        tbody.innerHTML = "";
-
-        const startIndex = (state.page - 1) * rowsPerPage;
-        const endIndex = startIndex + rowsPerPage;
-        const dataHalamanIni = state.data.slice(startIndex, endIndex);
-
-        dataHalamanIni.forEach(item => {
-            tbody.innerHTML += `<tr>
-                <td><strong>${item.kode}</strong></td>
-                <td><input type="text" id="in-${item.kode}" value="${item.label || ''}" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; outline:none; font-family:'Inter', sans-serif;"></td>
-                <td style="text-align:center;"><button class="btn-dark" style="padding: 10px 14px;" onclick="simpanEdit('${tipe}', '${item.kode}')"><i class="fas fa-check"></i></button></td>
-            </tr>`;
-        });
-
-        renderPaginationUI(tipe);
-    }
-
-    function renderPaginationUI(tipe) {
-        const state = paginationState[tipe];
-        const container = document.getElementById(state.paginationId);
-        container.innerHTML = "";
-        
-        const totalPages = Math.ceil(state.data.length / rowsPerPage);
-        if (totalPages <= 1) return; 
-
-        const btnPrev = document.createElement('button');
-        btnPrev.className = 'btn-dark';
-        btnPrev.innerHTML = '<i class="fas fa-chevron-left"></i> Prev';
-        btnPrev.disabled = state.page === 1;
-        btnPrev.onclick = () => { if (state.page > 1) { state.page--; renderTablePaginated(tipe); } };
-        container.appendChild(btnPrev);
-
-        const info = document.createElement('span');
-        info.innerHTML = `Halaman <strong>${state.page}</strong> dari <strong>${totalPages}</strong>`;
-        info.style.fontSize = "0.95rem";
-        info.style.color = "#4b5563";
-        container.appendChild(info);
-
-        const btnNext = document.createElement('button');
-        btnNext.className = 'btn-dark';
-        btnNext.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
-        btnNext.disabled = state.page === totalPages;
-        btnNext.onclick = () => { if (state.page < totalPages) { state.page++; renderTablePaginated(tipe); } };
-        container.appendChild(btnNext);
-    }
-
-    // 5. FUNGSI SIMPAN PERUBAHAN
-    async function simpanEdit(tipe, kode) { 
-        const value = document.getElementById(`in-${kode}`).value; 
-        try {
-            const res = await fetch(API_UPDATE, { 
-                method: "POST", 
-                headers: {"Content-Type":"application/json"}, 
-                body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) 
-            }); 
-            if(res.ok) {
-                alert("✅ Rumpun MK berhasil diperbarui!");
-            } else {
-                alert("❌ Gagal menyimpan data ke server.");
-            }
-        } catch (e) {
-            alert("Terjadi kesalahan jaringan.");
-        }
-    }
 
     // 6. JALANKAN SAAT WEB PERTAMA KALI DIBUKA
-    window.onload = () => { 
-        loadSidebar(); 
-        loadData('rumpun'); 
-    };
+    
 </script>
 </body>
 </html>

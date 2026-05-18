@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Cetak Semua Tugas Mata Kuliah - Sistem OBE UNAKI</title>
+    <style>
+        body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.5; color: black; background: #e5e7eb; margin: 0; padding: 20px; }
+        .no-print { text-align: center; margin-bottom: 20px; }
+        .btn-print { background: #8b0000; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        .btn-back { background: #4b5563; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; margin-left: 10px; }
+        
+        .kertas-a4 { width: 210mm; min-height: 297mm; background: white; margin: auto; padding: 20mm; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        
+        /* Layout Tabel Word Style */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        table, th, td { border: 1px solid black; }
+        th { background-color: #f2f2f2; padding: 8px; font-weight: bold; text-align: center; }
+        td { padding: 8px; vertical-align: top; }
+        .header-table { border: 2px solid black; }
+        .header-table td { padding: 10px; text-align: center; vertical-align: middle; }
+        .title-section { background: #eee; font-weight: bold; text-transform: uppercase; text-align: center; }
+
+        /* ✨ PANDUAN POTONG KERTAS: Setiap Tugas Pindah ke Halaman Baru Saat Diprint ✨ */
+        @media print { 
+            body { background: white; padding: 0; }
+            .kertas-a4 { box-shadow: none; padding: 0; width: 100%; margin: 0; page-break-after: always; }
+            .no-print { display: none !important; } 
+            @page { size: A4 portrait; margin: 20mm; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print">
+        <button class="btn-print" onclick="window.print()">🖨️ Cetak / Simpan Semua ke PDF</button>
+        <button class="btn-back" onclick="window.close()">❌ Tutup Tab</button>
+    </div>
+
+    <div id="megaRenderContainer"></div>
+
+    <script>
+        async function loadSemuaTugasMatkul() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const kodeMk = urlParams.get('kode_mk');
+            const container = document.getElementById('megaRenderContainer');
+
+            if(!kodeMk) {
+                alert("⚠️ Parameter Kode MK tidak ditemukan!");
+                return;
+            }
+
+            try {
+                // ⚠️ PENTING: Gunakan URL webhook n8n baru (Langkah 3)
+                const URL_API = `https://arising-consoles-space-sharp.trycloudflare.com/webhook/get-rubrik-by-matkul?kode_mk=${kodeMk}`;
+                
+                const response = await fetch(URL_API);
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="kertas-a4"><h3 style="text-align:center;">Belum ada rencana tugas untuk mata kuliah ini.</h3></div>';
+                    return;
+                }
+
+                // 🗂️ KELOMPOKKAN KEMBALI BERDASARKAN ID_TUGAS
+                const tugasGrouped = {};
+                data.forEach(row => {
+                    if(!tugasGrouped[row.id_tugas]) {
+                        tugasGrouped[row.id_tugas] = {
+                            judul: row.judul_tugas,
+                            metode: row.metode,
+                            luaran: row.luaran_tugas,
+                            deskripsi: row.deskripsi,
+                            nama_mk: row.nama_mk,
+                            kode_mk: row.kode_mk,
+                            cpmk: row.kode_cpmk,
+                            kriteriaList: []
+                        };
+                    }
+                    if(row.kriteria) {
+                        tugasGrouped[row.id_tugas].kriteriaList.push(row);
+                    }
+                });
+
+                container.innerHTML = ''; // Hapus loading
+                
+                // 📊 CETAK LEMBARAN KERTAS PER TUGAS
+                Object.keys(tugasGrouped).forEach((idTugas, index) => {
+                    const t = tugasGrouped[idTugas];
+                    
+                    let kriteriaRows = '';
+                    if(t.kriteriaList.length === 0) {
+                        kriteriaRows = `<tr><td colspan="6" style="text-align:center; color:red;">Kriteria rubrik belum diisi oleh dosen.</td></tr>`;
+                    } else {
+                        t.kriteriaList.forEach(k => {
+                            kriteriaRows += `
+                                <tr>
+                                    <td style="font-weight:bold;">${k.kriteria}</td>
+                                    <td style="text-align:center;">${k.bobot_persen}%</td>
+                                    <td>${k.skala_1 || '-'}</td>
+                                    <td>${k.skala_2 || '-'}</td>
+                                    <td>${k.skala_3 || '-'}</td>
+                                    <td>${k.skala_4 || '-'}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+
+                    // Tambahkan susunan satu halaman penuh dokumen FTI UNAKI
+                    container.innerHTML += `
+                        <div class="kertas-a4">
+                            <table class="header-table">
+                                <tr>
+                                    <td width="20%"><div style="font-weight:bold; font-size:12pt;">LOGO<br>UNAKI</div></td>
+                                    <td width="60%">
+                                        <h2 style="margin:0; font-size: 13pt;">RENCANA TUGAS MAHASISWA</h2>
+                                        <p style="margin:0; font-size: 11pt;">PROGRAM STUDI S1 SISTEM INFORMASI</p>
+                                        <p style="margin:0; font-weight: bold; font-size: 11pt;">FAKULTAS TEKNIK DAN INFORMATIKA - UNIVERSITAS AKI</p>
+                                    </td>
+                                    <td width="20%">Form: <br> FSOP-UNAKI-03-01</td>
+                                </tr>
+                            </table>
+
+                            <table>
+                                <tr class="title-section"><td colspan="4">IDENTITAS RENCANA TUGAS</td></tr>
+                                <tr>
+                                    <td width="25%">Mata Kuliah</td><td><strong>${t.nama_mk}</strong></td>
+                                    <td width="20%">Kode MK</td><td>${t.kode_mk}</td>
+                                </tr>
+                                <tr>
+                                    <td>Sub-CPMK Target</td><td><span style="font-weight:bold;">${t.cpmk}</span></td>
+                                    <td>Urutan Dokumen</td><td><strong>TUGAS KE-${index + 1}</strong></td>
+                                </tr>
+                            </table>
+
+                            <table>
+                                <tr><td width="25%" style="font-weight:bold;">Judul Tugas</td><td>${t.judul}</td></tr>
+                                <tr><td style="font-weight:bold;">Metode Pengerjaan</td><td>${t.metode || '-'}</td></tr>
+                                <tr><td style="font-weight:bold;">Bentuk Luaran</td><td>${t.luaran || '-'}</td></tr>
+                                <tr><td style="font-weight:bold;">Deskripsi Singkat</td><td style="text-align:justify;">${t.deskripsi || '-'}</td></tr>
+                            </table>
+
+                            <h4 style="margin: 15px 0 5px 0;">MATRIKS RUBRIK PENILAIAN (TUGAS KE-${index + 1})</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th width="20%">Kriteria</th>
+                                        <th width="10%">Bobot</th>
+                                        <th width="17%">S1 (< 55)</th>
+                                        <th width="17%">S2 (56-69)</th>
+                                        <th width="17%">S3 (70-84)</th>
+                                        <th width="17%">S4 (85-100)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${kriteriaRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                });
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<div class="kertas-a4"><h3 style="text-align:center; color:red;">Gagal menarik seluruh data tugas matkul.</h3></div>';
+            }
+        }
+
+        window.onload = loadSemuaTugasMatkul;
+    </script>
+</body>
+</html>

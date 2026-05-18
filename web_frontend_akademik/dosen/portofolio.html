@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Portofolio Mata Kuliah - Sistem OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --sidebar-bg: #161923; 
+            --primary-red: #8b0000; 
+            --bg-main: #f8fafc; 
+            --text-dark: #111827;
+            --border-light: #e5e7eb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background-color: var(--bg-main); min-height: 100vh; }
+
+        #sidebar-container { width: 260px; flex-shrink: 0; }
+        .main-content { flex: 1; padding: 40px; }
+
+        .header-container {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; border-bottom: 2px solid var(--border-light); padding-bottom: 20px;
+        }
+        .header-title h1 { font-size: 24px; font-weight: 800; color: var(--text-dark); }
+        .header-title span { color: var(--primary-red); }
+
+        .table-card {
+            background: white; border-radius: 12px; border: 1px solid var(--border-light);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow: hidden;
+        }
+
+        .table-header-box { padding: 20px; border-bottom: 1px solid var(--border-light); background: #f8fafc; }
+        .table-header-box h2 { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f9fafb; padding: 15px; text-align: left; font-size: 12px; font-weight: 700; color: #4b5563; text-transform: uppercase; border-bottom: 1px solid var(--border-light); }
+        td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 14px; color: #1f2937; }
+
+        .btn-detail {
+            background: var(--sidebar-bg); color: white; border: none; padding: 8px 16px;
+            border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;
+            display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+        }
+        .btn-detail:hover { background: #262936; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <div class="header-container">
+            <div class="header-title">
+                <p style="color: #64748b; font-weight: 600; font-size: 12px; margin-bottom: 4px;">MONITORING & EVALUASI</p>
+                <h1>PORTOFOLIO <span>MATA KULIAH</span></h1>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header-box">
+                <h2>Mata Kuliah Yang Diampu Semester Ini</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="20%">Kode MK</th>
+                        <th width="50%">Nama Mata Kuliah</th>
+                        <th width="15%">Semester</th>
+                        <th width="15%" style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelMatkulDosen">
+                    <tr>
+                        <td style="font-weight: 700; color: var(--primary-red);">2522W103</td>
+                        <td style="font-weight: 600;">Jaringan Komputer</td>
+                        <td>Semester Ganjil</td>
+                        <td style="text-align: center;">
+                            <a href="portofolio_detail.html?kode_mk=2522W103&nama_mk=Jaringan%20Komputer" class="btn-detail">
+                                <i class="fas fa-folder-open"></i> Detail Portofolio
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; color: var(--primary-red);">2522W104</td>
+                        <td style="font-weight: 600;">Sistem Basis Data</td>
+                        <td>Semester Ganjil</td>
+                        <td style="text-align: center;">
+                            <a href="portofolio_detail.html?kode_mk=2522W104&nama_mk=Sistem%20Basis%20Data" class="btn-detail">
+                                <i class="fas fa-folder-open"></i> Detail Portofolio
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 1. Muat Komponen Sidebar
+        fetch('../components/sidebar.html')
+            .then(res => res.text())
+            .then(html => { document.getElementById('sidebar-container').innerHTML = html; });
+
+        // 2. Fungsi Ambil Daftar Mata Kuliah Real dari Database
+        async function loadDaftarMatkulPortofolio() {
+            const tableBody = document.getElementById('tabelMatkulDosen');
+            tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Menarik data mata kuliah dari database...</td></tr>';
+
+            try {
+                // ⚠️ PASTIKAN URL TUNNEL DI BAWAH INI SESUAI DENGAN TUNNEL AKTIF ANDA HARI INI
+                const URL_API = 'https://arising-consoles-space-sharp.trycloudflare.com/webhook/get-matkul-portofolio';
+                
+                const response = await fetch(URL_API);
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px;">Tidak ada mata kuliah aktif di database.</td></tr>';
+                    return;
+                }
+
+                tableBody.innerHTML = ''; // Bersihkan loading
+                
+                data.forEach(item => {
+                    // Encode nama mata kuliah agar aman saat dikirim lewat URL browser
+                    const namaMkEncoded = encodeURIComponent(item.nama_mk);
+                    
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td style="font-weight: 700; color: var(--primary-red);">${item.kode_mk}</td>
+                            <td style="font-weight: 600;">${item.nama_mk}</td>
+                            <td>Semester Ganjil</td>
+                            <td style="text-align: center;">
+                                <a href="portofolio_detail.html?kode_mk=${item.kode_mk}&nama_mk=${namaMkEncoded}" class="btn-detail">
+                                    <i class="fas fa-folder-open"></i> Detail Portofolio
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+            } catch (error) {
+                console.error("Error:", error);
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red; padding:30px;">⚠️ Gagal terhubung ke n8n. Pastikan Tunnel Anda aktif!</td></tr>';
+            }
+        }
+
+        // Jalankan fungsi otomatis saat halaman di-load
+        window.onload = loadDaftarMatkulPortofolio;
+
+        function toggleDropdown(menuId, chevronId) {
+            const menu = document.getElementById(menuId);
+            const chevron = document.getElementById(chevronId);
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'flex';
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                menu.style.display = 'none';
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+</body>
+</html>
