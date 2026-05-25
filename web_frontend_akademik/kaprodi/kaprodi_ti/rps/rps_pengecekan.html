@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengecekan RPS - OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    <style>
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; }
+        .table-master { width: 100%; border-collapse: collapse; }
+        .table-master th, .table-master td { padding: 15px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+        .table-master th { background: #002878; color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+        
+        /* Badge Status Khusus RPS */
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+        .bg-warning { background: #fef08a; color: #854d0e; } /* Menunggu Validasi */
+        .bg-success { background: #bbf7d0; color: #166534; } /* Disetujui */
+        .bg-danger { background: #fecaca; color: #991b1b; }  /* Revisi */
+        .bg-secondary { background: #e2e8f0; color: #475569;} /* Draft */
+        
+        .text-center { text-align: center !important; }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <div id="navbar-container"></div>
+
+        <div class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a;">Pengecekan <span style="color: #8b0000;">RPS</span></h1>
+                    <p style="margin: 0; color: #64748b;">Validasi Rencana Pembelajaran Semester yang telah disubmit oleh dosen pengampu.</p>
+                </div>
+            </div>
+
+            <div class="card-container">
+                <table class="table-master">
+                    <thead>
+                        <tr>
+                            <th width="5%" class="text-center">NO</th>
+                            <th width="25%">MATA KULIAH</th>
+                            <th width="25%">DOSEN PENGAMPU</th>
+                            <th width="15%" class="text-center">TGL SUBMIT</th>
+                            <th width="15%" class="text-center">STATUS</th>
+                            <th width="15%" class="text-center">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTable">
+                        <tr><td colspan="6" class="text-center" style="padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Memuat data RPS...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalReview" class="modal-overlay">
+        <div class="modal-box" style="width: 500px;">
+            <h3 style="margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; color: #0f172a;">
+                <i class="fas fa-search"></i> Tindakan Validasi RPS
+            </h3>
+            <p id="reviewInfo" style="font-weight: 600; color: #475569; margin-bottom: 15px;"></p>
+            
+            <div class="form-group">
+                <label>Catatan / Pesan untuk Dosen (Opsional):</label>
+                <textarea id="inputCatatan" class="form-control" rows="3" placeholder="Tuliskan revisi jika ada..."></textarea>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
+                <button class="btn-action" style="background: #94a3b8; color: white;" onclick="closeModal()">Batal</button>
+                <button class="btn-action" style="background: #ef4444; color: white;" onclick="prosesRPS('Revisi')"><i class="fas fa-times-circle"></i> Minta Revisi</button>
+                <button class="btn-action" style="background: #10b981; color: white;" onclick="prosesRPS('Disetujui')"><i class="fas fa-check-circle"></i> Setujui RPS</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../js/template.js"></script>
+    <script>
+        // Gunakan URL Webhook N8N Anda
+        const API_GET_RPS = "https://arm-semester-inflation-vintage.trycloudflare.com/webhook/get-rps-pengecekan";
+        let rpsTerpilih = null;
+
+        async function loadData() {
+            const bodyTbl = document.getElementById("bodyTable");
+            try {
+                const res = await fetch(API_GET_RPS);
+                const data = await res.json();
+
+                if (!data || data.length === 0) {
+                    bodyTbl.innerHTML = `<tr><td colspan="6" class="text-center">Belum ada RPS yang disubmit.</td></tr>`;
+                    return;
+                }
+
+                let html = "";
+                data.forEach((item, index) => {
+                    // Penentuan Warna Badge
+                    let badgeClass = "bg-secondary";
+                    if(item.status === 'Menunggu Validasi') badgeClass = "bg-warning";
+                    if(item.status === 'Disetujui') badgeClass = "bg-success";
+                    if(item.status === 'Revisi') badgeClass = "bg-danger";
+
+                    // Tanggal Format Indonesia
+                    let tgl = item.tanggal_submit ? new Date(item.tanggal_submit).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) : '-';
+
+                    html += `
+                        <tr>
+                            <td class="text-center" style="font-weight: bold; color: #475569;">${index + 1}</td>
+                            <td>
+                                <div style="font-weight: 700; color: #0f172a;">${item.nama_mk}</div>
+                                <div style="font-size: 0.75rem; color: #64748b;">${item.kode_mk}</div>
+                            </td>
+                            <td style="font-weight: 600;">${item.nama_dosen}</td>
+                            <td class="text-center">${tgl}</td>
+                            <td class="text-center">
+                                <span class="status-badge ${badgeClass}">${item.status}</span>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn-action" style="background: #3b82f6; color: white;" onclick="openModal('${item.kode_mk}', '${item.nama_mk}', '${item.nama_dosen}')">
+                                    <i class="fas fa-clipboard-check"></i> Periksa
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                bodyTbl.innerHTML = html;
+            } catch (e) {
+                bodyTbl.innerHTML = `<tr><td colspan="6" class="text-center" style="color: red;">Gagal terhubung ke N8N.</td></tr>`;
+            }
+        }
+
+        function openModal(kode, mk, dosen) {
+            rpsTerpilih = kode;
+            document.getElementById("reviewInfo").innerHTML = `Mata Kuliah: <b>${mk}</b><br>Dosen: <b>${dosen}</b>`;
+            document.getElementById("inputCatatan").value = "";
+            document.getElementById("modalReview").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("modalReview").style.display = "none";
+        }
+
+        function prosesRPS(keputusan) {
+            alert(`RPS Mata Kuliah ${rpsTerpilih} berhasil diubah statusnya menjadi: ${keputusan}!`);
+            closeModal();
+            // Nanti bisa panggil API POST N8N untuk update status di database
+        }
+
+        window.onload = loadData;
+    </script>
+</body>
+</html>
