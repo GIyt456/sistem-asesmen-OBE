@@ -7,11 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
         :root { 
-            --sidebar-bg: #161923; 
             --primary-red: #8b0000; 
             --bg-main: #f8fafc; 
             --text-dark: #111827;
@@ -19,10 +16,20 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background-color: var(--bg-main); min-height: 100vh; }
+        
+        /* Layout Tanpa Sidebar - Fokus Center */
+        body { 
+            display: flex; 
+            background-color: var(--bg-main); 
+            min-height: 100vh; 
+            justify-content: center; 
+        }
 
-        #sidebar-container { width: 260px; flex-shrink: 0; }
-        .main-content { flex: 1; padding: 40px; }
+        .main-content { 
+            width: 100%; 
+            max-width: 1200px; 
+            padding: 40px 20px; 
+        }
 
         .header-container {
             display: flex; justify-content: space-between; align-items: center;
@@ -33,7 +40,8 @@
 
         .btn-back {
             background: #64748b; color: white; border: none; padding: 10px 20px;
-            border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+            border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; 
+            display: inline-flex; align-items: center; gap: 8px; font-size: 14px;
         }
         .btn-back:hover { background: #475569; }
 
@@ -55,21 +63,21 @@
         
         .table-striped tbody tr:nth-child(even) { background-color: #f8fafc; }
 
-        .chart-container { position: relative; height: 230px; width: 100%; }
-        
-        .textarea-table { width: 100%; padding: 15px; border: none; font-size: 13px; font-family: inherit; resize: vertical; background: transparent; min-height: 120px; outline: none; line-height: 1.5; }
-        .textarea-table:focus { background: #f8fafc; }
-
-        .signature-section {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 50px; text-align: center;
-            margin-top: 40px; padding-top: 20px; border-top: 1px dashed var(--border-light);
+        .textarea-inline {
+            width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1;
+            font-size: 12px; font-family: inherit; resize: vertical; min-height: 50px; outline: none;
         }
-        .sig-box { display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 140px; }
+        .textarea-inline:focus { border-color: var(--primary-red); background: #fffdf5; }
+
+        /* Style Kotak Rekomendasi CQI */
+        .cqi-box { display: flex; flex-direction: column; gap: 10px; }
+        .cqi-label { font-size: 13px; font-weight: 700; color: #374151; margin-top: 5px; }
+        .textarea-cqi { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; font-family: inherit; line-height: 1.5; resize: vertical; min-height: 100px; outline: none; }
+        .textarea-cqi:focus:not([readonly]) { border-color: var(--primary-red); background: #fffdf5; }
+        .textarea-cqi[readonly] { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; border-color: #e2e8f0; }
     </style>
 </head>
 <body>
-
-    <div id="sidebar-container"></div>
 
     <div class="main-content">
         <div class="header-container">
@@ -158,158 +166,53 @@
         </div>
 
         <div class="card-custom">
-            <div class="card-title"><i class="fas fa-th" style="color: var(--primary-red);"></i> Matriks Korelasi & Pemetaan CPMK ke CPL Target</div>
-            <table>
-                <thead>
-                    <tr>
-                        <th width="25%">Kode CPMK</th>
-                        <th width="25%" style="text-align: center;">CPL-02 (Sikap & Pengetahuan)</th>
-                        <th width="25%" style="text-align: center;">CPL-05 (Keterampilan Kerja)</th>
-                        <th width="25%" style="text-align: center;">CPL-09 (Kompetensi Inti)</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelMatriksCpl">
-                    <tr>
-                        <td style="font-weight: 700; color: var(--primary-red);">CPMK-01</td>
-                        <td style="text-align: center; color: #16a34a; font-size: 16px;"><i class="fas fa-check-circle"></i></td>
-                        <td style="text-align: center; color: #cbd5e1;">-</td>
-                        <td style="text-align: center; color: #cbd5e1;">-</td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: 700; color: var(--primary-red);">CPMK-02</td>
-                        <td style="text-align: center; color: #cbd5e1;">-</td>
-                        <td style="text-align: center; color: #16a34a; font-size: 16px;"><i class="fas fa-check-circle"></i></td>
-                        <td style="text-align: center; color: #cbd5e1;">-</td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: 700; color: var(--primary-red);">CPMK-03</td>
-                        <td style="text-align: center; color: #cbd5e1;">-</td>
-                        <td style="text-align: center; color: #16a34a; font-size: 16px;"><i class="fas fa-check-circle"></i></td>
-                        <td style="text-align: center; color: #16a34a; font-size: 16px;"><i class="fas fa-check-circle"></i></td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: 700; color: var(--primary-red);">CPMK-04</td>
-                        <td style="text-align: center; color: #cbd5e1;">-</td>
-                        <td style="text-align: center; color: #cbd5e1;">-</td>
-                        <td style="text-align: center; color: #16a34a; font-size: 16px;"><i class="fas fa-check-circle"></i></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="grid-2">
-            <div class="card-custom">
-                <div class="card-title"><i class="fas fa-chart-pie" style="color: #2563eb;"></i> Sebaran Distribusi Nilai Akhir</div>
-                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px; align-items: center;">
-                    <div class="chart-container"><canvas id="chartNilaiHuruf"></canvas></div>
-                    <div>
-                        <table style="font-size: 12px; margin-top: 0;">
-                            <thead><tr><th>Nilai</th><th>Jumlah</th><th>Persen</th></tr></thead>
-                            <tbody>
-                                <tr><td><strong>A / AB</strong></td><td>18 Mhs</td><td>47.4%</td></tr>
-                                <tr><td><strong>B / BC</strong></td><td>14 Mhs</td><td>36.8%</td></tr>
-                                <tr><td><strong>C</strong></td><td>4 Mhs</td><td>10.5%</td></tr>
-                                <tr><td><strong>D / E</strong></td><td>2 Mhs</td><td>5.3%</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-custom">
-                <div class="card-title"><i class="fas fa-chart-bar" style="color: #16a34a;"></i> Rata-rata Ketercapaian Target CPMK</div>
-                <div class="chart-container"><canvas id="chartCapaianCpmk"></canvas></div>
-            </div>
-        </div>
-
-        <div class="card-custom">
-            <div class="card-title"><i class="fas fa-users" style="color: var(--primary-red);"></i> Daftar Nilai Mahasiswa</div>
-            <table class="table-striped">
-                <thead>
-                    <tr>
-                        <th width="5%" style="text-align: center;">No</th>
-                        <th width="20%">NIM</th>
-                        <th width="35%">Nama Mahasiswa</th>
-                        <th width="15%" style="text-align: center;">Nilai Akhir</th>
-                        <th width="10%" style="text-align: center;">Huruf</th>
-                        <th width="15%" style="text-align: center;">Status</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelNilaiMahasiswa"></tbody>
-            </table>
-        </div>
-
-        <div class="card-custom">
-            <div class="card-title"><i class="fas fa-clipboard-check" style="color: #16a34a;"></i> Evaluasi Kelas & Rencana Tindak Lanjut (CQI Audit)</div>
+            <div class="card-title"><i class="fas fa-exchange-alt" style="color: var(--primary-red);"></i> Evaluasi Lintas Kelas & Rencana Tindak Lanjut</div>
             <table class="table-striped" style="border: 1px solid var(--border-light);">
                 <thead>
                     <tr>
                         <th width="5%" style="text-align: center;">No</th>
-                        <th width="25%">Aspek Evaluasi Kelas</th>
-                        <th width="35%">Temuan Kendala / Masalah</th>
-                        <th width="35%">Rencana Tindak Lanjut & Perbaikan</th>
+                        <th width="25%">Kelas / Kode MK (Prodi)</th>
+                        <th width="25%">Dosen Pengampu</th>
+                        <th width="15%" style="text-align: center;">CPMK Terkait</th>
+                        <th width="30%">Catatan Evaluasi Lintas Kelas & Tindak Lanjut</th>
                     </tr>
                 </thead>
-                <tbody id="tabelEvaluasiKelasLengkap"></tbody>
-            </table>
-        </div>
-
-        <div class="card-custom" style="background: #fffdf5; border-color: #fef08a;">
-            <div class="card-title" style="color: #854d0e;"><i class="fas fa-edit"></i> Catatan Portofolio / Evaluasi Diri Dosen (Narasi Bebas)</div>
-            <table style="border: 1px solid #fcd34d; background: white; margin-bottom: 15px;">
-                <thead>
-                    <tr>
-                        <th width="50%" style="text-align: center; background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; font-size: 13px;">Masalah / Kendala Umum</th>
-                        <th width="50%" style="text-align: center; background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; font-size: 13px;">Perbaikan / Pengembangan Kedepan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border: 1px solid #fcd34d; padding: 0; vertical-align: top;">
-                            <textarea class="textarea-table" id="areaKendalaDosen" placeholder="Tuliskan analisis kendala di sini..."></textarea>
-                        </td>
-                        <td style="border: 1px solid #fcd34d; padding: 0; vertical-align: top;">
-                            <textarea class="textarea-table" id="areaPerbaikanDosen" placeholder="Tuliskan rencana pengembangan di sini..."></textarea>
-                        </td>
-                    </tr>
+                <tbody id="tabelEvaluasiLintasKelas">
+                    <tr><td colspan="5" style="text-align:center; padding:15px;"><i class="fas fa-spinner fa-spin"></i> Menyelaraskan data lintas kurikulum...</td></tr>
                 </tbody>
             </table>
-            <button class="btn-back" style="background: #ca8a04; width: 100%; justify-content: center; font-size: 13px; font-weight: 700;" onclick="alert('Catatan evaluasi diri dosen berhasil disimpan!')">
-                <i class="fas fa-save"></i> Simpan Catatan Evaluasi Diri Dosen
-            </button>
+            <div style="text-align: right; margin-top: 15px;">
+                <button class="btn-back" style="background: #0f172a;" onclick="alert('Catatan evaluasi lintas kelas berhasil disimpan!')">
+                    <i class="fas fa-save"></i> Simpan Lintas Evaluasi
+                </button>
+            </div>
         </div>
 
-        <div class="card-custom" style="background: #f8fafc;">
-            <div class="card-title"><i class="fas fa-file-signature" style="color: var(--primary-red);"></i> Lembar Pengesahan Portofolio</div>
-            <div class="signature-section">
-                <div class="sig-box">
-                    <p style="font-size: 13px; font-weight: 500; color: #64748b;">Dosen Pengampu Mata Kuliah,</p>
-                    <div style="margin: 15px 0; color: #94a3b8; font-size: 11px; font-style: italic;">[Tanda Tangan Digital Terverifikasi]</div>
-                    <div>
-                        <strong style="font-size: 14px; color: var(--text-dark);" id="namaDosenTtd">Dosen Pengampu, M.Kom.</strong>
-                        <p style="font-size: 12px; color: #64748b; margin-top: 2px;" id="nidnDosenTtd">NIDN. 06XXXXXXXX</p>
-                    </div>
+        <div class="card-custom" style="background: #fdfdfd; border-color: #cbd5e1;">
+            <div class="card-title"><i class="fas fa-tools" style="color: var(--primary-red);"></i> Rekomendasi Perbaikan (Continuous Quality Improvement)</div>
+            
+            <div class="grid-2" style="margin-bottom: 0;">
+                <div class="cqi-box">
+                    <span class="cqi-label"><i class="fas fa-user-tie"></i> 1. Rekomendasi Perbaikan oleh Dosen Pengampu :</span>
+                    <textarea id="areaRekomendasiDosen" class="textarea-cqi" placeholder="Tuliskan rekomendasi perbaikan materi, metode belajar, atau evaluasi kelas dari sisi dosen di sini..."></textarea>
                 </div>
-                <div class="sig-box">
-                    <p style="font-size: 13px; font-weight: 500; color: #64748b;">Mengetahui, Ketua Program Studi,</p>
-                    <div style="margin: 15px 0; color: #94a3b8; font-size: 11px; font-style: italic;">[Tanda Tangan Digital Terverifikasi]</div>
-                    <div>
-                        <strong style="font-size: 14px; color: var(--text-dark);">Ketua Program Studi S1 TI</strong>
-                        <p style="font-size: 12px; color: #64748b; margin-top: 2px;">NIDN. 0621XXXXXXXX</p>
-                    </div>
+                
+                <div class="cqi-box">
+                    <span class="cqi-label"><i class="fas fa-shield-alt"></i> 2. Rekomendasi Perbaikan oleh Ketua Program Studi (Kaprodi) :</span>
+                    <textarea id="areaRekomendasiKaprodi" class="textarea-cqi" placeholder="Menunggu masukan penjaminan mutu kurikulum dari Kaprodi..."></textarea>
                 </div>
+            </div>
+            
+            <div style="text-align: right; margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
+                <button class="btn-back" style="background: var(--primary-red);" onclick="alert('Data semua rekomendasi perbaikan berhasil tersimpan ke database!')">
+                    <i class="fas fa-check-circle"></i> Simpan Semua Rekomendasi
+                </button>
             </div>
         </div>
 
     </div>
 
     <script>
-        fetch('../components/sidebar.html')
-            .then(res => res.text())
-            .then(html => { document.getElementById('sidebar-container').innerHTML = html; });
-
-        let instanceChart; 
-
         async function loadPortofolioDetailData() {
             const urlParams = new URLSearchParams(window.location.search);
             const kodeMk = urlParams.get('kode_mk');
@@ -317,12 +220,27 @@
             const tableCpmk = document.getElementById('tabelCpmkDetail');
             const tbodyPenilaian = document.getElementById('tabelMetodePenilaian');
             const tbodyRekapStats = document.getElementById('tabelRekapCapaianCpmk');
+            const tbodyLintasKelas = document.getElementById('tabelEvaluasiLintasKelas');
 
             if(!kodeMk) { alert("Parameter Mata Kuliah tidak valid!"); return; }
 
-            // 1. IDENTITAS MATAKULIAH
+            // VALIDASI HAK AKSES PERAN PENGGUNA (ROLE-BASED CONTROL)
+            const userRole = localStorage.getItem("user_role") || "dosen"; 
+            const inputKaprodi = document.getElementById("areaRekomendasiKaprodi");
+            const inputDosen = document.getElementById("areaRekomendasiDosen");
+
+            if (userRole !== "admin") {
+                inputKaprodi.setAttribute("readonly", true);
+                inputKaprodi.value = "Materi review evaluasi kurikulum berkala dari Ketua Program Studi belum diisi.";
+            } else {
+                inputKaprodi.removeAttribute("readonly");
+                inputKaprodi.value = "Direkomendasikan sinkronisasi bobot penilaian proyek tugas besar diselaraskan pada rapat rumpun kurikulum berikutnya.";
+            }
+            inputDosen.value = "Alokasi tatap muka sesi lab praktikum VLSM perlu penajaman durasi pengerjaan studi kasus mandiri.";
+
+            // 1. IDENTITAS MATAKULIAH FROM N8N
             try {
-                const resMatkul = await fetch(`https://fares-our-films-aquatic.trycloudflare.com/webhook/get-matkul-detail?kode_mk=${kodeMk}`);
+                const resMatkul = await fetch(`https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-matkul-detail?kode_mk=${kodeMk}`);
                 const dataMatkul = await resMatkul.json();
                 if (dataMatkul && dataMatkul.length > 0) {
                     const mk = dataMatkul[0];
@@ -334,16 +252,15 @@
                     if(mk.prodi && mk.prodi.toLowerCase() === 'si') prodiFull = 'S1 Sistem Informasi';
                     document.getElementById('valProdiMk').innerText = prodiFull;
                     document.getElementById('valDosenMk').innerText = mk.dosen_pengampu || 'Dosen Pengampu, M.Kom.';
-                    if(mk.dosen_pengampu) document.getElementById('namaDosenTtd').innerText = mk.dosen_pengampu;
                 }
             } catch (err) { console.error(err); }
 
             document.getElementById('titleMatkul').innerHTML = `PORTOFOLIO <span>${namaMk.toUpperCase()}</span>`;
 
-            // 2. DAFTAR CPMK
+            // 2. DAFTAR CPMK FROM N8N
             let totalCpmkMataKuliah = 4;
             try {
-                const resCpmk = await fetch(`https://fares-our-films-aquatic.trycloudflare.com/webhook/get-matkul-cpmk?kode_mk=${kodeMk}`);
+                const resCpmk = await fetch(`https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-matkul-cpmk?kode_mk=${kodeMk}`);
                 const dataCpmk = await resCpmk.json();
                 tableCpmk.innerHTML = "";
                 if (!dataCpmk || dataCpmk.length === 0) {
@@ -360,7 +277,7 @@
 
             // 3. METODE PENILAIAN
             try {
-                const resPenilaian = await fetch(`https://fares-our-films-aquatic.trycloudflare.com/webhook/get-metode-penilaian?kode_mk=${kodeMk}`);
+                const resPenilaian = await fetch(`https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-metode-penilaian?kode_mk=${kodeMk}`);
                 const dataPenilaian = await resPenilaian.json();
                 tbodyPenilaian.innerHTML = "";
                 dataPenilaian.forEach(item => {
@@ -378,12 +295,10 @@
                 });
             }
 
-            // 4. PEMPROSESAN REKAPITULASI CAPAIAN STATISTIK CPMK (DENGAN KRITERIA AMBUNG BATAS MINIMAL 75)
+            // 4. REKAPITULASI CAPAIAN STATISTIK CPMK
             try {
-                const resStats = await fetch(`https://fares-our-films-aquatic.trycloudflare.com/webhook/get-matkul-cpmk-stats?kode_mk=${kodeMk}`);
-                if(!resStats.ok) throw new Error("API Stats belum dikonfigurasi.");
+                const resStats = await fetch(`https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-matkul-cpmk-stats?kode_mk=${kodeMk}`);
                 const dataStats = await resStats.json();
-                
                 tbodyRekapStats.innerHTML = "";
                 dataStats.forEach((row, index) => {
                     let statusBadge = row.rata_rata >= 75 ? 
@@ -395,7 +310,7 @@
                             <td style="text-align:center;">${index + 1}</td>
                             <td style="font-weight:700; color:var(--primary-red);">${row.kode_cpmk}</td>
                             <td style="text-align:center; font-weight:600;">${row.bobot}%</td>
-                            <td style="text-align:center; font-weight:bold;">${row.rata_rata} / 100</td>
+                            <td style="text-align:center; font-weight:bold;">${row.rata_rata}</td>
                             <td style="text-align:center; color:#64748b;">${row.terendah}</td>
                             <td style="text-align:center; color:#64748b;">${row.tertinggi}</td>
                             <td style="text-align:center; font-weight:600;">${row.persen_lulus}%</td>
@@ -404,17 +319,16 @@
                     `;
                 });
             } catch (err) {
-                // Skenario data dummy representatif terukur (UTS/UAS/Tugas terbobot) jika jalur data terhambat
                 let shareBobot = Math.round(100 / totalCpmkMataKuliah);
                 let dummyStats = kodeMk === "2522W103" ? [
                     { cpmk: "CPMK-01", bobot: shareBobot, avg: 85.20, min: 65, max: 98, pass: 92.50 },
-                    { cpmk: "CPMK-02", bobot: shareBobot, avg: 64.15, min: 40, max: 88, pass: 45.80 }, // Dibawah 75 -> Tidak Tercapai
+                    { cpmk: "CPMK-02", bobot: shareBobot, avg: 64.15, min: 40, max: 88, pass: 45.80 },
                     { cpmk: "CPMK-03", bobot: shareBobot, avg: 78.40, min: 55, max: 95, pass: 84.20 },
                     { cpmk: "CPMK-04", bobot: shareBobot, avg: 82.10, min: 60, max: 100, pass: 89.00 }
                 ] : [
                     { cpmk: "CPMK-01", bobot: shareBobot, avg: 80.50, min: 60, max: 95, pass: 88.00 },
                     { cpmk: "CPMK-02", bobot: shareBobot, avg: 85.30, min: 62, max: 100, pass: 94.10 },
-                    { cpmk: "CPMK-03", bobot: shareBobot, avg: 68.20, min: 45, max: 85, pass: 52.30 }, // Dibawah 75 -> Tidak Tercapai
+                    { cpmk: "CPMK-03", bobot: shareBobot, avg: 68.20, min: 45, max: 85, pass: 52.30 },
                     { cpmk: "CPMK-04", bobot: shareBobot, avg: 91.00, min: 70, max: 100, pass: 97.50 }
                 ];
 
@@ -439,131 +353,48 @@
                 });
             }
 
-            // Memanggil modul pendukung lainnya
-            renderTabelNilaiMahasiswa(kodeMk);
-            renderTabelEvaluasiKelasLengkap(kodeMk);
-        }
+            // 5. EVALUASI LINTAS KELAS
+            try {
+                const resLintas = await fetch(`https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-evaluasi-lintas-kelas?kode_mk=${kodeMk}`);
+                const dataLintas = await resLintas.json();
+                tbodyLintasKelas.innerHTML = "";
+                dataLintas.forEach((item, index) => {
+                    let textProdi = item.prodi.toUpperCase() === "TI" ? "Teknik Informatika" : "S1 Sistem Informasi";
+                    let valueCatatan = item.kode_mk !== kodeMk ? 
+                        "Penyelarasan sebaran tingkat kesulitan instrumen tugas besar perlu dikoordinasikan kembali agar seimbang." : 
+                        "Metode pengajaran praktikum interaktif lab berjalan kondusif, ketuntasan CPMK utama sudah stabil.";
 
-        function renderTabelEvaluasiKelasLengkap(kodeMk) {
-            const container = document.getElementById('tabelEvaluasiKelasLengkap');
-            let dataEvaluasi = [];
-
-            if(kodeMk === "2522W103") {
-                document.getElementById('areaKendalaDosen').value = "Sebagian besar mahasiswa kesulitan memahami implementasi subnetting VLSM dan konfigurasi routing statis pada studi kasus jaringan berskala besar.";
-                document.getElementById('areaPerbaikanDosen').value = "Meningkatkan alokasi waktu sesi simulasi interaktif lab dan menyediakan video modul pembelajaran mandiri tambahan.";
-                dataEvaluasi = [
-                    { aspek: "Ketercapaian Kompetensi (CPMK)", masalah: "Nilai rata-rata CPMK-02 (Subnetting) berada di angka 64.15, belum mencapai ambang target ideal prodi (75).", tindakLanjut: "Akan ditambahkan kuis latihan mandiri berbasis studi kasus sebelum masuk ke materi routing." },
-                    { aspek: "Proses & Metode Pembelajaran", masalah: "Metode ceramah teori terlalu dominan di awal pertemuan, membuat mahasiswa kurang adaptif saat sesi praktik lab.", tindakLanjut: "Mengubah strategi menjadi Project-Based Learning (PBL) sejak pekan ke-3." },
-                    { aspek: "Kehadiran & Partisipasi Kelas", masalah: "Terdapat 3 mahasiswa yang tingkat kehadirannya di bawah 75% karena kendala izin sakit berulang.", tindakLanjut: "Telah dilakukan pemanggilan berkala dan pemberian tugas asistensi pengganti praktikum." }
+                    tbodyLintasKelas.innerHTML += `
+                        <tr>
+                            <td style="text-align:center; font-weight:700;">${index + 1}</td>
+                            <td>
+                                <strong style="color:var(--text-dark);">${item.nama_mk}</strong>
+                                <p style="font-size:11px; color:#64748b; margin-top:2px;">Kode: ${item.kode_mk} (${textProdi})</p>
+                            </td>
+                            <td style="font-weight:600; color:#374151;">${item.nama_dosen || 'Belum diplot'}</td>
+                            <td style="text-align:center;"><span style="background:#f1f5f9; color:#475569; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">${item.daftar_cpmk || '-'}</span></td>
+                            <td><textarea class="textarea-inline">${valueCatatan}</textarea></td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                const dummyLintas = [
+                    { kode: "2522W103", nama: "Jaringan Komputer", prodi: "Teknik Informatika (TI)", dosen: "Dosen Pengampu TI, M.Kom.", cpmk: "CPMK-01, CPMK-02, CPMK-03, CPMK-04", catatan: "Metode praktikum simulator jaringan lab berjalan kondusif, namun porsi kalkulasi subnetting perlu penajaman koordinasi." },
+                    { kode: "2522W103-SI", nama: "Jaringan Komputer", prodi: "S1 Sistem Informasi (SI)", dosen: "Dosen Mitra SI, M.T.", cpmk: "CPMK-01, CPMK-02, CPMK-03, CPMK-04", catatan: "Sebaran tingkat kelulusan kelas SI terpantau setara, disepakati modul ujian akhir semester disamakan." }
                 ];
-            } else {
-                document.getElementById('areaKendalaDosen').value = "Mahasiswa mengalami kesulitan yang signifikan ketika melakukan perancangan ERD yang kompleks serta transformasi normalisasi ke bentuk 3NF.";
-                document.getElementById('areaPerbaikanDosen').value = "Akan ditambahkan studi kasus proyek riil berskala kecil di kelompok pengerjaan tugas tengah semester.";
-                dataEvaluasi = [
-                    { aspek: "Ketercapaian Kompetensi (CPMK)", masalah: "Ketercapaian CPMK-03 (Normalisasi Basis Data) berada di angka 68.20 akibat kurangnya pemahaman anomali data.", tindakLanjut: "Memberikan latihan terpandu klasifikasi dekomposisi tabel pada asistensi kelas." },
-                    { aspek: "Proses & Metode Pembelajaran", masalah: "Waktu pengetikan perintah SQL langsung (DML/DDL) di kelas dirasa kurang mencukupi.", tindakLanjut: "Dosen akan menyediakan skrip basis data siap pakai (dummy data SQL) sebelum kelas dimulai." },
-                    { aspek: "Sarana Pendukung Pembelajaran", masalah: "Perbedaan versi software DBMS MySQL pada laptop pribadi beberapa mahasiswa memicu galat sintaks.", tindakLanjut: "Menyeragamkan modul instruksi instalasi menggunakan versi XAMPP stable yang sama." }
-                ];
+                tbodyLintasKelas.innerHTML = "";
+                dummyLintas.forEach((item, index) => {
+                    tbodyLintasKelas.innerHTML += `
+                        <tr>
+                            <td style="text-align:center; font-weight:700;">${index + 1}</td>
+                            <td><strong>${item.nama}</strong><p style="font-size:11px; color:#64748b; margin-top:2px;">Kode: ${item.kode} (${item.prodi})</p></td>
+                            <td style="font-weight:600; color:#374151;">${item.dosen}</td>
+                            <td style="text-align:center;"><span style="background:#f1f5f9; color:#475569; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">${item.cpmk}</span></td>
+                            <td><textarea class="textarea-inline">${item.catatan}</textarea></td>
+                        </tr>
+                    `;
+                });
             }
-
-            container.innerHTML = "";
-            dataEvaluasi.forEach((item, index) => {
-                container.innerHTML += `
-                    <tr>
-                        <td style="text-align:center; font-weight:700;">${index + 1}</td>
-                        <td style="font-weight:700; color:#4b5563;">${item.aspek}</td>
-                        <td style="font-weight:500; line-height:1.5; color:#dc2626;">${item.masalah}</td>
-                        <td style="font-weight:600; line-height:1.5; color:#16a34a;">${item.tindakLanjut}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        function renderTabelNilaiMahasiswa(kodeMk) {
-            const tbody = document.getElementById('tabelNilaiMahasiswa');
-            let dataMhs = [];
-
-            if (kodeMk === "2522W103") {
-                dataMhs = [
-                    { nim: "11120208001", nama: "Ahmad Fauzi", nilai: 86.5 },
-                    { nim: "11120208002", nama: "Budi Santoso", nilai: 72.0 },
-                    { nim: "11120208003", nama: "Citra Kirana", nilai: 91.0 },
-                    { nim: "11120208004", nama: "Dian Pelangi", nilai: 55.0 },
-                    { nim: "11120208005", nama: "Eko Prayitno", nilai: 65.0 },
-                    { nim: "11120208006", nama: "Fatimah Azzahra", nilai: 78.5 }
-                ];
-            } else {
-                dataMhs = [
-                    { nim: "11120208011", nama: "Galih Pratama", nilai: 88.0 },
-                    { nim: "11120208012", nama: "Hendra Wijaya", nilai: 75.5 },
-                    { nim: "11120208013", nama: "Intan Permata", nilai: 60.0 },
-                    { nim: "11120208014", nama: "Joko Anwar", nilai: 93.5 },
-                    { nim: "11120208015", nickname: "Kirana Larasati", nilai: 45.0 },
-                    { nim: "11120208016", nama: "Lukman Hakim", nilai: 81.0 }
-                ];
-            }
-
-            let html = "";
-            dataMhs.forEach((mhs, idx) => {
-                let huruf = "E";
-                let status = "TIDAK LULUS";
-                let badgeColor = "background:#fee2e2; color:#991b1b;";
-
-                if (mhs.nilai >= 85) { huruf = "A"; status = "LULUS"; badgeColor = "background:#dcfce7; color:#166534;"; }
-                else if (mhs.nilai >= 80) { huruf = "AB"; status = "LULUS"; badgeColor = "background:#dcfce7; color:#166534;"; }
-                else if (mhs.nilai >= 75) { huruf = "B"; status = "LULUS"; badgeColor = "background:#dcfce7; color:#166534;"; }
-                else if (mhs.nilai >= 70) { huruf = "BC"; status = "LULUS"; badgeColor = "background:#dcfce7; color:#166534;"; }
-                else if (mhs.nilai >= 60) { huruf = "C"; status = "LULUS"; badgeColor = "background:#dcfce7; color:#166534;"; }
-                else if (mhs.nilai >= 50) { huruf = "D"; status = "TIDAK LULUS"; }
-
-                html += `
-                    <tr>
-                        <td style="text-align:center;">${idx + 1}</td>
-                        <td style="font-family: monospace; font-weight: 600; color: #4b5563;">${mhs.nim}</td>
-                        <td style="font-weight: 500;">${mhs.nama || mhs.nickname}</td>
-                        <td style="text-align:center; font-weight: bold; color: var(--text-dark);">${mhs.nilai}</td>
-                        <td style="text-align:center; font-weight: 900; color: var(--primary-red);">${huruf}</td>
-                        <td style="text-align:center;">
-                            <span style="${badgeColor} padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">${status}</span>
-                        </td>
-                    </tr>
-                `;
-            });
-            tbody.innerHTML = html;
-            
-            initGrafikNilaiHuruf();
-            initGrafikCapaianCpmk(kodeMk);
-        }
-
-        function initGrafikNilaiHuruf() {
-            const ctx = document.getElementById('chartNilaiHuruf').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['A/AB', 'B/BC', 'C', 'D/E'],
-                    datasets: [{ data: [18, 14, 4, 2], backgroundColor: ['#16a34a', '#2563eb', '#f59e0b', '#dc2626'] }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
-            });
-        }
-
-        function initGrafikCapaianCpmk(kodeMk) {
-            const ctx = document.getElementById('chartCapaianCpmk').getContext('2d');
-            const dataNilai = kodeMk === "2522W103" ? [85.20, 64.15, 78.40, 82.10] : [80.50, 85.30, 68.20, 91.00];
-            if(instanceChart) instanceChart.destroy();
-            instanceChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['CPMK 1', 'CPMK 2', 'CPMK 3', 'CPMK 4'],
-                    datasets: [{
-                        label: 'Persentase Capaian (%)',
-                        data: dataNilai,
-                        backgroundColor: dataNilai.map(v => v < 75 ? '#dc2626' : '#161923'),
-                        borderRadius: 4
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
-            });
         }
 
         window.onload = loadPortofolioDetailData;

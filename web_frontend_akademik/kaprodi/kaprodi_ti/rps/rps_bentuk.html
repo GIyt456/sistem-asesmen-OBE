@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Bentuk Pembelajaran - OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    <style>
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; }
+        .table-master { width: 100%; border-collapse: collapse; }
+        .table-master th, .table-master td { padding: 15px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+        .table-master th { background: #002878; color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+        .text-center { text-align: center !important; }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <div id="navbar-container"></div>
+
+        <div class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a;">Master <span style="color: #8b0000;">Bentuk Pembelajaran</span></h1>
+                    <p style="margin: 0; color: #64748b;">Kelola referensi bentuk pembelajaran sesuai standar SN-Dikti untuk penyusunan RPS.</p>
+                </div>
+                <button class="btn-primary-red" onclick="openModal()">
+                    <i class="fas fa-plus"></i> Tambah Bentuk
+                </button>
+            </div>
+
+            <div class="card-container">
+                <table class="table-master">
+                    <thead>
+                        <tr>
+                            <th width="10%" class="text-center">ID</th>
+                            <th width="70%">NAMA BENTUK PEMBELAJARAN</th>
+                            <th width="20%" class="text-center">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTable">
+                        <tr><td colspan="3" class="text-center" style="padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Memuat data dari server...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalTambah" class="modal-overlay">
+        <div class="modal-box">
+            <h3 style="margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; color: #0f172a;">
+                Tambah Bentuk Pembelajaran
+            </h3>
+            <div class="form-group">
+                <label>Nama Bentuk Pembelajaran:</label>
+                <input type="text" id="inputNamaBentuk" class="form-control" placeholder="Contoh: Diskusi Kelompok">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
+                <button class="btn-action" style="background: #94a3b8; color: white;" onclick="closeModal()">Batal</button>
+                <button class="btn-action" style="background: #10b981; color: white;" onclick="simpanData()">Simpan Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../js/template.js"></script>
+    <script>
+        // Gunakan Link Webhook N8N Anda
+        const API_GET_BENTUK = "https://arm-semester-inflation-vintage.trycloudflare.com/webhook/get-master-bentuk";
+
+        // Fungsi Load Data
+        async function loadData() {
+            const bodyTbl = document.getElementById("bodyTable");
+            try {
+                const res = await fetch(API_GET_BENTUK);
+                const data = await res.json();
+
+                if (!data || data.length === 0) {
+                    bodyTbl.innerHTML = `<tr><td colspan="3" class="text-center">Belum ada data referensi.</td></tr>`;
+                    return;
+                }
+
+                let html = "";
+                data.forEach((item, index) => {
+                    html += `
+                        <tr>
+                            <td class="text-center" style="font-weight: bold; color: #475569;">${index + 1}</td>
+                            <td style="font-weight: 600; font-size: 1rem;">${item.nama_bentuk}</td>
+                            <td class="text-center">
+                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                bodyTbl.innerHTML = html;
+
+            } catch (e) {
+                bodyTbl.innerHTML = `<tr><td colspan="3" class="text-center" style="color: red;">Gagal terhubung ke N8N.</td></tr>`;
+            }
+        }
+
+        // Fungsi Kontrol Modal
+        function openModal() {
+            document.getElementById("inputNamaBentuk").value = "";
+            document.getElementById("modalTambah").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("modalTambah").style.display = "none";
+        }
+
+        function simpanData() {
+            // Untuk saat ini kita buat alert saja, di pertemuan selanjutnya bisa kita hubungkan ke webhook POST N8N
+            const nama = document.getElementById("inputNamaBentuk").value;
+            if(!nama) return alert("Nama bentuk pembelajaran tidak boleh kosong!");
+            
+            alert(`Berhasil! Data "${nama}" siap dikirim ke database (Segera dibuatkan API-nya)`);
+            closeModal();
+        }
+
+        // Muat data saat halaman dibuka
+        window.onload = loadData;
+    </script>
+</body>
+</html>

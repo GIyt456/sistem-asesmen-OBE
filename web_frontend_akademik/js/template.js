@@ -42,7 +42,7 @@ window.toggleDropdown = function(element) {
 };
 
 // Tambahkan CSS khusus lewat JS agar dropdown terlihat elegan
-const styleDropdown = document.createElement('style');
+var styleDropdown = document.createElement('style');
 styleDropdown.innerHTML = `
     .dropdown-container { display: none; background-color: #1e293b; padding: 5px 0; border-radius: 4px; margin-top: 5px; }
     .dropdown-item { color: #cbd5e1 !important; padding: 10px 15px 10px 40px !important; text-decoration: none !important; display: block; font-size: 0.85rem; transition: 0.2s; }
