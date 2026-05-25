@@ -46,7 +46,16 @@
         <div class="sidebar-header"><i class="fas fa-shield-alt"></i> Panel Admin SI</div>
         <div class="nav-menu">
             <div class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')"><i class="fas fa-home"></i> Dashboard Utama</div>
-            <div class="nav-item" id="nav-mk" onclick="switchTab('mk')"><i class="fas fa-book"></i> Mata Kuliah</div>
+        <!-- Mata Kuliah -->
+                <div class="nav-item" onclick="window.location.href='/kaprodi/kaprodi_si/mata_kuliah/susunan_mk.html'">
+                    <i class="fas fa-book"></i> Mata Kuliah
+                    <i id="chevron-mk" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+                </div>
+                <div id="submenu-mk" style="display: none; flex-direction: column; margin-top: 2px;">
+                    <div class="nav-item" id="nav-daftar-mk" onclick="window.location.href='/kaprodi/kaprodi_si/mata_kuliah/susunan_mk.html'" style="padding-left: 48px; font-size: 0.85rem; padding-top: 10px; padding-bottom: 10px;">
+                        Susunan Mata Kuliah
+                    </div>
+                </div>
             <div class="nav-item" id="nav-cpl" onclick="switchTab('cpl')"><i class="fas fa-bullseye"></i> CPL</div>
             <div class="nav-item" id="nav-cpmk" onclick="switchTab('cpmk')"><i class="fas fa-tasks"></i> CPMK</div>
             <div class="nav-item" id="nav-mapping" onclick="switchTab('mapping')"><i class="fas fa-project-diagram"></i> Mapping CPL-CPMK</div>
