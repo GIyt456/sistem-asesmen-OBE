@@ -6,15 +6,20 @@
     <title>Profil Lulusan - Sistem OBE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <style>
         :root { 
             --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
             --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
+            --success-green: #10b981;
         }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
         body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); }}
-
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
         /* --- GAYA SIDEBAR --- */
         .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
         .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
@@ -33,13 +38,22 @@
         .nav-item.logout { color: #f87171; }
         .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
         
-        .main-content { flex: 1; overflow-y: auto; padding: 40px 50px; }
-        .header-container { margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 50px; }    
+        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+        .header-title-area { display: flex; flex-direction: column; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
         .header-title span { color: var(--primary-blue); }
 
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
+        /* Tombol Aksi */
+        .action-buttons { display: flex; gap: 10px; align-items: center; }
+        .btn-action { color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-download { background: #475569; }
+        .btn-download:hover { background: #334155; transform: translateY(-2px); }
+        .btn-upload { background: var(--success-green); }
+        .btn-upload:hover { background: #059669; transform: translateY(-2px); }
+
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
         th { background: #f8fafc; padding: 18px 25px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; }
         td { padding: 20px 25px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; line-height: 1.6; color: #1e293b; vertical-align: top; }
         
@@ -58,8 +72,21 @@
 
     <div class="main-content">
         <div class="header-container">
-            <h1 class="header-title">Profil <span>Lulusan</span></h1>
-            <p style="color: #64748b; margin-top: 5px;">Rumusan standar kompetensi lulusan Program Studi.</p>
+            <div class="header-title-area">
+                <h1 class="header-title">Profil <span>Lulusan</span></h1>
+                <p style="color: #64748b; margin-top: 5px;">Rumusan standar kompetensi lulusan Program Studi.</p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn-action btn-download" onclick="exportKeExcel()">
+                    <i class="fas fa-file-download"></i> Download Excel
+                </button>
+                
+                <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;" onchange="uploadExcel()">
+                <button class="btn-action btn-upload" onclick="document.getElementById('fileExcel').click()">
+                    <i class="fas fa-file-upload"></i> Impor Excel
+                </button>
+            </div>
         </div>
 
         <div class="table-container">
@@ -83,7 +110,9 @@
         <div class="modal-content">
             <h2 style="margin-bottom: 25px; font-weight: 800;">Edit Profil Lulusan</h2>
             <input type="hidden" id="editKode">
-            <input type="hidden" id="editProfesi"> <div class="form-group">
+            <input type="hidden" id="editProfesi"> 
+            
+            <div class="form-group">
                 <label>KODE PL</label>
                 <input type="text" id="inpKodeShow" disabled style="background: #f8fafc; font-weight: 700;">
             </div>
@@ -104,7 +133,7 @@
     </div>
 
     <script>
-        const API_BASE = "https://chose-colleges-dependent-philips.trycloudflare.com/webhook";
+        const API_BASE = "https://fares-our-films-aquatic.trycloudflare.com/webhook";
         const PRODI = localStorage.getItem("prodi_aktif") || "ti";
 
         window.onload = async () => {
@@ -140,6 +169,75 @@
                 });
             } catch (e) { 
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px;">Gagal memuat data.</td></tr>'; 
+            }
+        }
+
+        // --- FUNGSI EXPORT EXCEL ---
+        async function exportKeExcel() {
+            const btn = document.querySelector('.btn-download');
+            const oriText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/get-master-pl`);
+                const data = await res.json();
+
+                if (!data || data.length === 0) return alert("Tidak ada data untuk didownload.");
+
+                // Sertakan 'profesi' secara diam-diam agar data karir tidak hilang saat di-upload balik
+                const dataUntukExcel = data.map(pl => ({
+                    'kode_pl': pl.kode_pl,
+                    'nama_profil': pl.nama_profil || '',
+                    'deskripsi': pl.deskripsi || '',
+                    'profesi': pl.profesi || ''
+                }));
+
+                const worksheet = XLSX.utils.json_to_sheet(dataUntukExcel);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Master_PL");
+                XLSX.writeFile(workbook, `Profil_Lulusan_${PRODI}.xlsx`);
+            } catch (e) {
+                alert("Gagal mengekspor data.");
+            } finally {
+                btn.innerHTML = oriText;
+                btn.disabled = false;
+            }
+        }
+
+        // --- FUNGSI IMPORT EXCEL ---
+        async function uploadExcel() {
+            const fileInput = document.getElementById('fileExcel');
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('data', file);
+            formData.append('prodi', PRODI);
+
+            const btnUpload = document.querySelector('.btn-upload');
+            const oriText = btnUpload.innerHTML;
+            btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
+            btnUpload.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/upload-master-pl`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (res.ok) {
+                    alert("✅ Data Excel berhasil diimpor!");
+                    await loadDataPL(); 
+                } else {
+                    alert("❌ Gagal memproses file Excel.");
+                }
+            } catch (e) {
+                alert("❌ Terjadi kesalahan koneksi.");
+            } finally {
+                btnUpload.innerHTML = oriText;
+                btnUpload.disabled = false;
+                fileInput.value = ''; 
             }
         }
 
@@ -180,8 +278,6 @@
             try {
                 const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
                 document.getElementById('sidebar-container').innerHTML = await response.text();
-                document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
-                document.getElementById('nav-mapping-mk').style.background = 'var(--sidebar-hover)';
             } catch (error) {}
         }
 

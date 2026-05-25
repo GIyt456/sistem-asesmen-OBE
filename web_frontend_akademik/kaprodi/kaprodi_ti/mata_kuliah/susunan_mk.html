@@ -6,38 +6,19 @@
     <title>Kelola Mata Kuliah - Sistem OBE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
-        /* --- CSS STYLING UTAMA --- */
         :root { 
-            --sidebar-bg: #161923; 
-            --sidebar-text: #7b8395;
-            --sidebar-hover: #262936;
-            --sidebar-active-text: #ffffff;
-            --primary-red: #8b0000; 
-            --bg-main: #ffffff; 
-            --text-dark: #111827;
-            --border-dark: #161923;
+            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
+            --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
+            --success-green: #10b981;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
-        /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
-      /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
-        body { 
-            animation: transitionIn 0.3s ease-in-out; 
-        }
         
-        @keyframes transitionIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(8px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-        }
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         
         /* GAYA SIDEBAR */
         .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
@@ -56,30 +37,36 @@
         .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
         .nav-item.logout { color: #f87171; }
         .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
-
-        /* GAYA MAIN CONTENT & TABEL */
-        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; background-color: var(--bg-main); }
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        
+        .main-content { flex: 1; min-width: 0; overflow-y: auto; padding: 40px 50px; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
         .header-title-area { display: flex; flex-direction: column; }
-        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .header-subtitle { color: #64748b; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
         .header-title span { color: var(--primary-red); }
         .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
-        .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
-        th { background: #f3f4f6; color: var(--text-dark); padding: 14px 16px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
-        td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; }
-        tbody tr:hover { background-color: #f9fafb; }
+        
+        /* Tabel Container dengan Scroll Horizontal */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 40px; }
+        table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
+        th { background: #f8fafc; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; }
+        td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #1e293b; vertical-align: middle; }
+        
+        .action-buttons { display: flex; gap: 10px; align-items: center; }
+        .btn-action { color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-dark { background: #1e293b; }
+        .btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
+        .btn-download { background: #475569; }
+        .btn-download:hover { background: #334155; transform: translateY(-2px); }
+        .btn-upload { background: var(--success-green); }
+        .btn-upload:hover { background: #059669; transform: translateY(-2px); }
     </style>
 </head>
 <body>
 
-    <!-- ✨ TEMPAT SIDEBAR OTOMATIS MUNCUL ✨ -->
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <!-- HEADER HALAMAN -->
         <div class="header-container">
             <div class="header-title-area">
                 <div class="header-subtitle">KELOLA KURIKULUM</div>
@@ -88,92 +75,85 @@
             <div class="badge-prodi">Teknik Informatika</div>
         </div>
 
-        <!-- AREA TABEL MATA KULIAH -->
         <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                 <div>
                     <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Susunan Mata Kuliah</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Menampilkan Daftar Mata Kuliah Terstruktur</p>
+                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500;">Menampilkan Daftar Mata Kuliah Terstruktur</p>
                 </div>
-                <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                
+                <div class="action-buttons">
+                    <button class="btn-action btn-download" onclick="exportKeExcel()">
+                        <i class="fas fa-file-download"></i> Download Excel
+                    </button>
+                    
+                    <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;" onchange="uploadExcel()">
+                    <button class="btn-action btn-upload" onclick="document.getElementById('fileExcel').click()">
+                        <i class="fas fa-file-upload"></i> Impor Excel
+                    </button>
+
+                    <button class="btn-action btn-dark" onclick="loadData()">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+                </div>
             </div>
             
-            <!-- Kontainer ini akan menampung tabel-tabel per semester secara otomatis -->
             <div id="container-tabel-semester"></div>
         </div>
     </div>
 
 <script>
-    // 1. KONFIGURASI API
     const PRODI = 'ti'; 
-<<<<<<< HEAD
-    const API_BASE = "https://yen-title-indicators-thursday.trycloudflare.com/webhook"; 
-=======
-    const API_BASE = "https://fixtures-wildlife-while-senators.trycloudflare.com/webhook"; 
->>>>>>> e1dd140100681e3ef933a266492e84de6f494747
+    const API_BASE = "https://fares-our-films-aquatic.trycloudflare.com/webhook"; 
     const API_MATKUL = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
+    const API_UPLOAD = `${API_BASE}/upload-master-mk`;
     const userLogin = localStorage.getItem("user_login");
 
-    // 2. FUNGSI LOAD SIDEBAR (DIPERBAIKI)
     async function loadSidebar() {
         try {
             const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
             if (!response.ok) throw new Error("File sidebar tidak ditemukan");
-            const html = await response.text();
+            document.getElementById('sidebar-container').innerHTML = await response.text();
             
-            const container = document.getElementById('sidebar-container');
-            if (container) {
-                container.innerHTML = html; // Pakai innerHTML agar div pembungkus tidak hilang
-                
-                // Masukkan nama admin dari localStorage ke sidebar barumu
-                const nameElem = document.getElementById("adminName");
-                if (nameElem) nameElem.innerText = localStorage.getItem("user_login") || "Admin";
-                
-                // Tandai menu Mata Kuliah sedang aktif
-                const navMk = document.getElementById('nav-mk');
-                if (navMk) navMk.classList.add('active');
-            }
-            } catch (error) {
-                console.error('Gagal memuat sidebar:', error);
-                // Jika Fetch gagal (CORS), sidebar tidak akan muncul.
-            }
+            const nameElem = document.getElementById("adminName");
+            if (nameElem) nameElem.innerText = localStorage.getItem("user_login") || "Admin";
+            
+            const navMk = document.getElementById('nav-mk');
+            if(navMk) navMk.style.background = 'var(--sidebar-hover)';
+        } catch (error) { console.error('Gagal memuat sidebar:', error); }
     }
 
-    // 3. FUNGSI LOAD DATA MATKUL PER SEMESTER
     async function loadData() { 
         const container = document.getElementById('container-tabel-semester');
         if (!container) return;
         
-        container.innerHTML = "<p style='text-align:center; padding:20px;'>Memuat data dari database...</p>";
+        container.innerHTML = "<p style='text-align:center; padding:20px;'><i class='fas fa-spinner fa-spin'></i> Memuat data...</p>";
 
         try {
             const res = await fetch(API_MATKUL); 
             const data = await res.json(); 
-            
             container.innerHTML = "";
 
-            // Kelompokkan data berdasarkan semester[cite: 35]
             const perSemester = data.reduce((acc, item) => {
                 if (!acc[item.semester]) acc[item.semester] = [];
                 acc[item.semester].push(item);
                 return acc;
             }, {});
 
-            // Urutkan semester dan render tabelnya
             Object.keys(perSemester).sort().forEach(sem => {
                 let tableHTML = `
-                    <div style="margin-bottom: 40px;">
-                        <h4 style="margin-bottom: 15px; font-size: 1.1rem; color: var(--primary-red); font-weight: 700;">
-                            <i class="fas fa-graduation-cap"></i> SEMESTER ${sem}
-                        </h4>
+                    <h4 style="margin-bottom: 15px; margin-top: 10px; font-size: 1.1rem; color: var(--primary-red); font-weight: 700;">
+                        <i class="fas fa-graduation-cap"></i> SEMESTER ${sem}
+                    </h4>
+                    <div class="table-container">
                         <table>
                             <thead>
                                 <tr>
-                                    <th width="20%">Kode MK</th>
+                                    <th width="15%">Kode MK</th>
                                     <th>Nama Mata Kuliah</th>
                                     <th width="15%" style="text-align: center;">SKS</th>
-                                    <th width="15%" style="text-align: center;">Aksi</th>
+                                    <th width="12%" style="text-align: center;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>`;
@@ -181,16 +161,12 @@
                 perSemester[sem].forEach(mk => {
                     tableHTML += `
                         <tr>
-                            <td><strong>${mk.kode_mk}</strong></td>
-                            <td>
-                                <input type="text" id="in-${mk.kode_mk}" value="${mk.nama_mk}" style="width:100%; padding:8px; border:1px solid #e5e7eb; border-radius:6px;">
-                            </td>
-                            <td style="text-align: center;">
-                                <input type="number" id="sks-${mk.kode_mk}" value="${mk.sks}" style="width:60px; padding:8px; border:1px solid #e5e7eb; border-radius:6px; text-align:center;" min="1" max="6">
-                            </td>
+                            <td style="font-weight: 800; color: var(--primary-blue);">${mk.kode_mk}</td>
+                            <td><input type="text" id="in-${mk.kode_mk}" value="${mk.nama_mk}" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; font-size: 0.95rem;"></td>
+                            <td style="text-align: center;"><input type="number" id="sks-${mk.kode_mk}" value="${mk.sks}" style="width:70px; padding:10px; border:1px solid #cbd5e1; border-radius:6px; text-align:center; font-weight: 600;" min="1" max="6"></td>
                             <td style="text-align:center;">
-                                <button class="btn-dark" style="padding: 8px 12px;" onclick="simpanEdit('mk', '${mk.kode_mk}')">
-                                    <i class="fas fa-save"></i>
+                                <button class="btn-action btn-dark" style="padding: 8px 16px; margin: 0 auto;" onclick="simpanEdit('mk', '${mk.kode_mk}')">
+                                    Simpan
                                 </button>
                             </td>
                         </tr>`;
@@ -201,82 +177,87 @@
             });
 
         } catch(e) { 
-            container.innerHTML = "<p style='color:red; text-align:center;'>Gagal menarik data. Cek koneksi n8n.</p>";
+            container.innerHTML = "<p style='color:red; text-align:center; padding: 20px;'>Gagal menarik data. Pastikan n8n menyala.</p>";
         }
     }
 
+    async function exportKeExcel() {
+        const btn = document.querySelector('.btn-download');
+        const oriText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
+        btn.disabled = true;
 
-    // 4. SATU-SATUNYA WINDOW ONLOAD (PENTING!)
+        try {
+            const res = await fetch(API_MATKUL);
+            const data = await res.json();
+            if (!data || data.length === 0) return alert("Tidak ada data.");
+
+            const dataUntukExcel = data.map(mk => ({ 'kode_mk': mk.kode_mk, 'nama_mk': mk.nama_mk, 'sks': mk.sks, 'semester': mk.semester }));
+            const worksheet = XLSX.utils.json_to_sheet(dataUntukExcel);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Master_MK");
+            XLSX.writeFile(workbook, `Susunan_MK_${PRODI}.xlsx`);
+        } catch (e) { alert("Gagal mengekspor data."); } 
+        finally { btn.innerHTML = oriText; btn.disabled = false; }
+    }
+
+    async function uploadExcel() {
+        const fileInput = document.getElementById('fileExcel');
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('data', file); 
+        formData.append('prodi', PRODI);
+
+        const btnUpload = document.querySelector('.btn-upload');
+        const oriText = btnUpload.innerHTML;
+        btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
+        btnUpload.disabled = true;
+
+        try {
+            const res = await fetch(API_UPLOAD, { method: 'POST', body: formData });
+            if (res.ok) { alert("✅ Data Excel berhasil diimpor!"); await loadData(); } 
+            else { alert("❌ Gagal memproses file Excel."); }
+        } catch (e) { alert("❌ Terjadi kesalahan koneksi."); } 
+        finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
+    }
+
     window.onload = async () => {
-        // Pastikan user sudah login
-        if (!userLogin) {
-            window.location.replace("../login/login.html");
-            return;
-        }
-        
-        await loadSidebar(); // Tunggu sidebar selesai
-        await loadData('mk');    // Baru muat data
+        if (!userLogin) { window.location.replace("../login/login.html"); return; }
+        await loadSidebar(); 
+        await loadData();    
     };
 
-    // 4. FUNGSI SIMPAN EDIT (UBAH NAMA DAN SKS)
     async function simpanEdit(tipe, kode) { 
-        // Ambil nilai dari input Nama MK dan input SKS
         const value = document.getElementById(`in-${kode}`).value; 
         const sksBaru = document.getElementById(`sks-${kode}`).value;
-        
-        // Opsional: Ubah ikon tombol jadi loading
         const btn = event.currentTarget;
         const oldHtml = btn.innerHTML;
+        
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         btn.disabled = true;
 
         try {
             const res = await fetch(API_UPDATE, { 
-                method: "POST", 
-                headers: {"Content-Type":"application/json"}, 
-                // Kirimkan SKS di dalam body agar ditangkap oleh webhook N8n
-                body: JSON.stringify({ 
-                    tipe: tipe, 
-                    kode: kode, 
-                    value: value, 
-                    sks: parseInt(sksBaru), 
-                    prodi: PRODI 
-                }) 
+                method: "POST", headers: {"Content-Type":"application/json"}, 
+                body: JSON.stringify({ tipe: tipe, kode: kode, value: value, sks: parseInt(sksBaru), prodi: PRODI }) 
             }); 
-            
-            if(res.ok) {
-                alert("✅ Data Mata Kuliah & SKS Berhasil Diperbarui!");
-            } else {
-                alert("❌ Gagal menyimpan data di server.");
-            }
-        } catch (e) { 
-            alert("Terjadi kesalahan jaringan."); 
-        } finally {
-            // Kembalikan tombol ke bentuk semula
-            btn.innerHTML = oldHtml;
-            btn.disabled = false;
-        }
+            if(res.ok) alert("✅ Data Mata Kuliah & SKS Berhasil Diperbarui!");
+            else alert("❌ Gagal menyimpan data.");
+        } catch (e) { alert("Terjadi kesalahan jaringan."); } 
+        finally { btn.innerHTML = oldHtml; btn.disabled = false; }
     }
 
-    // Fungsi Animasi Dropdown
     function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex';
-            chevron.style.transform = 'rotate(180deg)';
-        } else {
-            menu.style.display = 'none';
-            chevron.style.transform = 'rotate(0deg)';
-        }
+        const menu = document.getElementById(menuId), chevron = document.getElementById(chevronId);
+        if(menu) menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
+        if(chevron) chevron.style.transform = chevron.style.transform === 'rotate(180deg)' ? 'rotate(0deg)' : 'rotate(180deg)';
     }
 
-    // Fungsi Logout
     function logout() {
         if(confirm("Apakah Anda yakin ingin keluar?")) {
-            localStorage.removeItem("user_login");
-            localStorage.removeItem("user_role");
+            localStorage.removeItem("user_login"); localStorage.removeItem("user_role");
             window.location.replace('/login/login.html');
         }
     }
