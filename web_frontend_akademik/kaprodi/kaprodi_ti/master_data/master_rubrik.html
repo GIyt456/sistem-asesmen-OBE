@@ -161,7 +161,7 @@
 
     // MENGGUNAKAN WEBHOOK N8N UNTUK GET DATA MASTER RUBRIK
     // (JANGAN LUPA UBAH INI JIKA ANDA MENGGUNAKAN URL PRODUCTION BARU DI N8N)
-    const API_GET_MASTER_RUBRIK = 'https://arising-consoles-space-sharp.trycloudflare.com/webhook/get-master-rubrik';
+    const API_GET_MASTER_RUBRIK = 'https://compact-ahead-recycling-rabbit.trycloudflare.com/webhook/get-master-rubrik';
 
     // 2. LOAD SIDEBAR
     async function loadSidebar() {
@@ -217,7 +217,7 @@
 
                 try {
                     // ⚠️ GANTI DENGAN URL CLOUDFLARE TUNNEL ANDA HARI INI
-                    const URL_API = 'https://arising-consoles-space-sharp.trycloudflare.com/webhook/get-master-rubrik';
+                    const URL_API = 'https://compact-ahead-recycling-rabbit.trycloudflare.com/webhook/get-master-rubrik';
                     
                     const response = await fetch(URL_API);
                     
@@ -340,7 +340,7 @@
     document.getElementById('modalDetailRubrik').style.display = "flex";
 
     try {
-        const response = await fetch(`https://arising-consoles-space-sharp.trycloudflare.com/webhook/get-detail-rubrik?id_tugas=${idTugas}`);
+        const response = await fetch(`https://compact-ahead-recycling-rabbit.trycloudflare.com/webhook/get-detail-rubrik?id_tugas=${idTugas}`);
         const textData = await response.text(); 
 
         if (!textData || textData.trim() === '') {
