@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel TI - Sistem OBE</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <script src="../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
@@ -706,13 +708,10 @@
         </div>
     </div>
 
-    <!-- 4. PANGGIL MESIN PERAKIT KOMPONEN (Taruh di atas script n8n Anda) -->
-    <script src="/js/template.js"></script>
-
     <!-- 5. SCRIPT BAWAAN ADMIN CONFIG ANDA -->
     <script>
         const PRODI = 'ti'; 
-    const API_BASE = "https://arm-semester-inflation-vintage.trycloudflare.com/webhook";
+    const API_BASE = "https://compact-ahead-recycling-rabbit.trycloudflare.com/webhook";
     const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_INSERT = `${API_BASE}/admin-insert-master`;
