@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serap RPS - OBE</title>
+    <title>Serap RPS - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../../../css/style.css">
+    
     <style>
-        .card-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; }
+        .card-container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 30px; }
         
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .form-group label { display: block; font-weight: 700; color: #1e293b; margin-bottom: 8px; font-size: 0.9rem; }
@@ -16,16 +19,28 @@
         
         .import-arrow { display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #94a3b8; }
         
-        .alert-box { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; border-radius: 4px; color: #1e3a8a; font-size: 0.9rem; line-height: 1.5; }
+        .alert-box { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin-bottom: 20px; border-radius: 8px; color: #1e3a8a; font-size: 0.9rem; line-height: 1.5; }
+        
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
+    
     <div id="sidebar-container"></div>
-    <div style="flex: 1; display: flex; flex-direction: column;">
+    
+    <div class="main-content">
         <div id="navbar-container"></div>
 
-        <div class="main-content">
-            <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a;">Serap <span style="color: #8b0000;">RPS</span></h1>
+        <div class="content-wrapper">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">MANAJEMEN RPS</div>
+                    <h1 class="header-title">SERAP <span>RPS</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
             <p style="margin: 0 0 20px 0; color: #64748b;">Duplikasi Rencana Pembelajaran Semester dari tahun ajaran sebelumnya ke semester aktif saat ini.</p>
 
             <div class="alert-box">
@@ -63,14 +78,14 @@
                             <label>Dosen Pengampu Baru:</label>
                             <select class="form-control" id="dosenTujuan">
                                 <option value="0610029301">Tegar Yaswananta, M.Kom</option>
-                                <option value="0611027301">Dosen Sistem Informasi</option>
+                                <option value="0611027301">Dosen Pengampu Lainnya</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div style="margin-top: 30px; text-align: right;">
-                    <button id="btnProses" class="btn-action" style="background: #10b981; color: white; padding: 12px 25px; font-size: 1rem;" onclick="prosesSerap()">
+                    <button id="btnProses" class="btn-dark" style="background: #10b981; border: none; padding: 12px 25px; font-size: 1rem;" onclick="prosesSerap()">
                         <i class="fas fa-copy"></i> Proses Serap RPS Sekarang
                     </button>
                 </div>
@@ -78,18 +93,41 @@
         </div>
     </div>
 
-    <div id="modalSukses" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;">
-        <div style="background: white; padding: 40px; border-radius: 16px; width: 400px; text-align: center; border: 3px solid #10b981;">
+    <div id="modalSukses" class="modal-overlay">
+        <div class="modal-box" style="text-align: center; border: 3px solid #10b981;">
             <i class="fas fa-check-circle" style="font-size: 4rem; color: #10b981; margin-bottom: 20px;"></i>
             <h2 style="margin: 0 0 10px 0; color: #0f172a;">Serap RPS Berhasil!</h2>
             <p style="color: #64748b; margin-bottom: 25px;">Data RPS telah berhasil diduplikasi ke Tahun Ajaran 2025/2026. Anda dapat melihatnya di menu Kelola RPS.</p>
-            <button class="btn-action" style="background: #1e293b; color: white; padding: 10px 20px; width: 100%;" onclick="tutupModal()">Tutup & Lanjutkan</button>
+            <button class="btn-dark" style="width: 100%; justify-content: center;" onclick="tutupModal()">Tutup & Lanjutkan</button>
         </div>
     </div>
 
-    <script src="../../../js/template.js"></script>
+    <script src="/js/template.js"></script>
+
     <script>
-        const API_GET_MK = "https://arm-semester-inflation-vintage.trycloudflare.com/webhook/get-mk-serap";
+        // DETEKSI PRODI DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+        
+        // PENTING: Ganti URL di bawah dengan link Cloudflare Tunnel n8n Anda!
+        const API_BASE = "https://contributor-launch-mel-collection.trycloudflare.com/webhook"; 
+        // Menggunakan variabel PRODI agar dropdown MK tersaring
+        const API_GET_MK = `${API_BASE}/get-mk-serap?prodi=${PRODI}`;
+
+        // SATPAM HALAMAN
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        // Set Label Prodi UI
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            
+            // Tema Khusus SI
+            if(PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+            }
+        });
 
         async function loadPilihanMK() {
             const selectMk = document.getElementById("mkSumber");
@@ -98,7 +136,7 @@
                 const data = await res.json();
 
                 if (!data || data.length === 0) {
-                    selectMk.innerHTML = `<option value="">Belum ada mata kuliah</option>`;
+                    selectMk.innerHTML = `<option value="">Belum ada mata kuliah terdaftar</option>`;
                     return;
                 }
 
@@ -108,21 +146,20 @@
                 });
                 selectMk.innerHTML = html;
             } catch (e) {
-                selectMk.innerHTML = `<option value="">Gagal memuat mata kuliah</option>`;
+                selectMk.innerHTML = `<option value="">Gagal memuat mata kuliah dari server</option>`;
             }
         }
 
         function prosesSerap() {
             const mk = document.getElementById("mkSumber").value;
-            if (!mk) return alert("Pilih Mata Kuliah sumber terlebih dahulu!");
+            if (!mk) return alert("⚠️ Pilih Mata Kuliah sumber terlebih dahulu!");
 
-            // Ubah tombol jadi loading
             const btn = document.getElementById("btnProses");
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses Duplikasi...`;
             btn.style.opacity = "0.7";
             btn.disabled = true;
 
-            // Simulasi proses delay 1.5 detik agar terlihat realistis
+            // Simulasi proses ke N8N
             setTimeout(() => {
                 btn.innerHTML = `<i class="fas fa-copy"></i> Proses Serap RPS Sekarang`;
                 btn.style.opacity = "1";
@@ -134,11 +171,13 @@
 
         function tutupModal() {
             document.getElementById("modalSukses").style.display = "none";
-            // Redirect otomatis ke Kelola RPS
-            // window.location.href = "rps_kelola.html";
+            // Arahkan kembali ke halaman kelola RPS
+            window.location.href = `rps_kelola.html`;
         }
 
-        window.onload = loadPilihanMK;
+        window.onload = () => {
+            setTimeout(loadPilihanMK, 300);
+        };
     </script>
 </body>
 </html>
