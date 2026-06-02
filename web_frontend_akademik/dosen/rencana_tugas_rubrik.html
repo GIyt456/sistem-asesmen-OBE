@@ -116,13 +116,7 @@
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label">Teknik Evaluasi</label>
-                    <select id="selectTeknik" class="input-field" style="font-weight: 600;">
-                        <option value="">-- Pilih Teknik Evaluasi --</option>
-                        <option value="Unjuk Kerja">Unjuk Kerja</option>
-                        <option value="Tes Tertulis">Tes Tertulis</option>
-                        <option value="Observasi">Observasi</option>
-                        <option value="Hasil Proyek">Hasil Proyek</option>
-                    </select>
+                    <input type="text" id="inputTeknik" class="input-field" placeholder="Contoh: Tes Tertulis / Observasi / Proyek">
                 </div>
             </div>
 
@@ -202,7 +196,7 @@
 
             // 1. Tarik Data CPMK dari Webhook
             try {
-                const resCpmk = await fetch(`https://compact-ahead-recycling-rabbit.trycloudflare.com/webhook/get-matkul-cpmk?kode_mk=${kodeMk}`);
+                const resCpmk = await fetch(`https://contributor-launch-mel-collection.trycloudflare.com/webhook/get-matkul-cpmk?kode_mk=${kodeMk}`);
                 const dataCpmk = await resCpmk.json();
                 selectCpmk.innerHTML = '<option value="">-- Pilih CPMK --</option>';
                 dataCpmk.forEach(item => {
@@ -213,9 +207,8 @@
                 selectCpmk.innerHTML = '<option value="">Gagal memuat CPMK</option>';
             }
 
-            // 2. Tarik Data CPL (Dengan Opsi Fallback Standar)
+            // 2. Tarik Data CPL 
             try {
-                // Di masa depan bisa gunakan webhook get-cpl-matkul. Fallback UI:
                 selectCpl.innerHTML = `
                     <option value="">-- Pilih CPL Terkait --</option>
                     <option value="CPL-01">CPL-01 (Sikap & Etika)</option>
@@ -265,7 +258,7 @@
             updateSum();
         }
 
-        // FUNGSI SIMPAN ULTIMATE (ANTI-GAGAL)
+        // FUNGSI SIMPAN ULTIMATE
         async function simpanTugasRubrik() {
             const btn = document.getElementById('btnSimpanTop');
             const total = parseInt(document.getElementById('totalBobot').innerText);
@@ -282,8 +275,8 @@
                 kode_mk: new URLSearchParams(window.location.search).get('kode_mk') || 'DEFAULT_MK',
                 judul_tugas: document.getElementById('judulTugas').value || 'Tanpa Judul',
                 kode_cpl: document.getElementById('selectCPL').value || '-',
-                sub_cpmk: document.getElementById('selectCPMK').value || '-',
-                teknik_evaluasi: document.getElementById('selectTeknik').value || '-',
+                sub_cpmk: document.getElementById('selectCPMK').value || 'CPMK000',
+                teknik_evaluasi: document.getElementById('inputTeknik').value || '-',
                 metode: document.getElementById('inputMetode').value || '-',
                 waktu: document.getElementById('inputWaktu').value || '-',
                 luaran: document.getElementById('inputLuaran').value || '-',
@@ -308,8 +301,7 @@
             });
 
             try {
-                // PASTIKAN ALAMAT N8N INI VALID
-                const URL_N8N_ANDA = 'https://compact-ahead-recycling-rabbit.trycloudflare.com/webhook/simpan-tugas-rubrik';
+                const URL_N8N_ANDA = 'https://contributor-launch-mel-collection.trycloudflare.com/webhook/simpan-tugas-rubrik';
                 
                 const response = await fetch(URL_N8N_ANDA, {
                     method: 'POST',
@@ -322,21 +314,21 @@
                         "✅ DATA BERHASIL DISIMPAN!\n\n" +
                         "Apakah Anda ingin menginput TUGAS BERIKUTNYA (Tugas 2, Tugas 3, dst.) untuk mata kuliah ini?\n\n" +
                         "- Klik 'OK' jika ingin langsung input tugas baru.\n" +
-                        "- Klik 'Cancel' jika sudah selesai dan ingin kembali."
+                        "- Klik 'Cancel' jika sudah selesai dan ingin kembali ke halaman utama."
                     );
 
                     if (pengenInputLagi) {
-                        // Reset Field RTM
+                        // Kosongkan form input
                         document.getElementById('judulTugas').value = '';
-                        document.getElementById('selectCPL').value = '';
                         document.getElementById('selectCPMK').value = '';
-                        document.getElementById('selectTeknik').value = '';
+                        document.getElementById('selectCPL').value = '';
+                        document.getElementById('inputTeknik').value = '';
                         document.getElementById('inputMetode').value = '';
                         document.getElementById('inputWaktu').value = '';
                         document.getElementById('inputLuaran').value = '';
                         document.getElementById('inputDeskripsi').value = '';
                         
-                        // Reset Rubrik
+                        // Bersihkan rubrik
                         const container = document.getElementById('rubricContainer');
                         if (container) {
                             container.innerHTML = '';
@@ -361,6 +353,15 @@
             } finally {
                 btn.innerHTML = '<i class="fas fa-check-double"></i> Simpan Data Tugas';
                 btn.disabled = false;
+            }
+        }
+        
+        function cetakRpsDosen() {
+            const idTugas = new URLSearchParams(window.location.search).get('id_tugas');
+            if(idTugas) {
+                window.location.href = `cetak_rps.html?id_tugas=${idTugas}`;
+            } else {
+                alert("⚠️ ID Tugas tidak ditemukan. Simpan data tugas terlebih dahulu!");
             }
         }
     </script>

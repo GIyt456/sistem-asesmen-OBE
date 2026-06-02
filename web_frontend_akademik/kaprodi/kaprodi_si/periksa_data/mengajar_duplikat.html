@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Makul Duplikat - Sistem OBE</title>
+    <title>Mengajar Duplikat SI - Sistem OBE</title>
     <link rel="stylesheet" href="../../../css/style.css">
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- VARIABEL WARNA --- */
+        /* --- VARIABEL WARNA KHUSUS SI --- */
         :root { 
             --sidebar-bg: #161923; 
             --sidebar-text: #7b8395;
             --sidebar-hover: #262936;
             --sidebar-active-text: #ffffff;
-            --primary-red: #8b0000; 
+            --primary-teal: #0097a7; /* Warna Utama SI */
             --bg-main: #ffffff; 
             --text-dark: #111827;
             --border-light: #e5e7eb;
@@ -35,46 +35,26 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- GAYA SIDEBAR --- */
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; min-height: 100vh; }
-        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
-        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .sidebar-profile-info { display: flex; flex-direction: column; }
-        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
-        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
-        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .nav-menu::-webkit-scrollbar { display: none; }
-        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
-        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
-        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
-        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-        .nav-item.logout { color: #f87171; }
-        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
-
         /* --- GAYA KONTEN UTAMA --- */
         .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
 
         .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
-        .header-title span { color: var(--primary-red); }
-        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
+        .header-title span { color: var(--primary-teal); }
+        .badge-prodi { background: var(--primary-teal); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0, 151, 167, 0.2); }
 
-        /* --- ALERT BOX --- */
-        .alert-box { background: #fff1f2; border-left: 5px solid #e11d48; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; gap: 15px; align-items: flex-start; }
-        .alert-box i { color: #e11d48; font-size: 1.5rem; margin-top: 2px; }
-        .alert-box h4 { margin: 0 0 6px 0; color: #9f1239; font-size: 1.05rem; font-weight: 700; }
-        .alert-box p { margin: 0; color: #be123c; font-size: 0.9rem; line-height: 1.5; }
+        /* --- ALERT BOX (Dipertahankan Kuning/Oranye) --- */
+        .alert-box { background: #fffbeb; border-left: 5px solid #f59e0b; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; gap: 15px; align-items: flex-start; }
+        .alert-box i { color: #f59e0b; font-size: 1.5rem; margin-top: 2px; }
+        .alert-box h4 { margin: 0 0 6px 0; color: #92400e; font-size: 1.05rem; font-weight: 700; }
+        .alert-box p { margin: 0; color: #b45309; font-size: 0.9rem; line-height: 1.5; }
 
         /* --- TOMBOL --- */
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-dark:hover { background: #000000; transform: translateY(-2px); }
         .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; background: #e11d48; }
         .btn-action:hover { background: #be123c; }
-        .btn-merge { background: #10b981; }
-        .btn-merge:hover { background: #059669; }
 
         /* --- GAYA TABEL --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
@@ -82,7 +62,8 @@
         td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; color: #4b5563; }
         tbody tr:hover { background-color: #f9fafb; }
         
-        .konflik-text { color: #e11d48; font-weight: 600; font-size: 0.85rem; }
+        .badge-warning { background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
+        .dosen-name { font-weight: 600; color: #1f2937; }
     </style>
 </head>
 <body>
@@ -96,24 +77,24 @@
         <div class="header-container">
             <div class="header-title-area">
                 <div class="header-subtitle">PERIKSA DATA / VALIDASI</div>
-                <h1 class="header-title">MATA KULIAH <span>DUPLIKAT</span></h1>
+                <h1 class="header-title">MENGAJAR <span>DUPLIKAT</span></h1>
             </div>
-            <div class="badge-prodi">Teknik Informatika</div>
+            <div class="badge-prodi"><i class="fas fa-clone"></i> Sistem Informasi</div>
         </div>
 
         <div class="alert-box">
-            <i class="fas fa-radiation"></i>
+            <i class="fas fa-copy"></i>
             <div>
-                <h4>Peringatan Kritis: Kode MK Ganda Ditemukan!</h4>
-                <p>Sistem mendeteksi adanya Kode Mata Kuliah yang di-input lebih dari satu kali ke dalam database kurikulum. Hal ini akan menyebabkan perhitungan total SKS dan IPK mahasiswa menjadi kacau. Segera gabungkan (Merge) atau hapus data yang salah.</p>
+                <h4>Peringatan: Data Mengajar Ganda Ditemukan (SI)</h4>
+                <p>Tabel ini menampilkan dosen Sistem Informasi yang tidak sengaja terdaftar lebih dari satu kali untuk mengajar pada <strong>kelas dan mata kuliah yang sama persis</strong>. Silakan hapus duplikatnya untuk menghindari redudansi form input nilai.</p>
             </div>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                Ditemukan <strong>2</strong> konflik kode Mata Kuliah.
+                Ditemukan <strong>2</strong> duplikasi penugasan mengajar.
             </div>
-            <button class="btn-dark" onclick="alert('Merefresh pengecekan data...')"><i class="fas fa-sync-alt"></i> Pindai Ulang Database</button>
+            <button class="btn-dark" onclick="alert('Sinkronisasi ulang penugasan dosen SI...')"><i class="fas fa-sync-alt"></i> Pindai Ulang</button>
         </div>
 
         <!-- Tabel Data Duplikat -->
@@ -121,40 +102,47 @@
             <thead>
                 <tr>
                     <th width="5%" style="text-align: center;">No</th>
-                    <th width="15%">Kode MK</th>
-                    <th width="25%">Nama Mata Kuliah</th>
-                    <th width="10%" style="text-align: center;">SKS</th>
-                    <th width="20%">Status Konflik</th>
-                    <th width="25%" style="text-align: center;">Tindakan</th>
+                    <th width="25%">Nama Dosen</th>
+                    <th width="30%">Mata Kuliah & Kelas</th>
+                    <th width="20%" style="text-align: center;">Jumlah Entry Data</th>
+                    <th width="20%" style="text-align: center;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Dummy Data Anomali 1 -->
+                <!-- Dummy Data Anomali 1 Khusus SI -->
                 <tr>
                     <td style="text-align: center;">1</td>
-                    <td style="font-weight: 700; color: #e11d48;">TI022</td>
-                    <td style="font-weight: 600; color: #111827;">Struktur Data</td>
-                    <td style="text-align: center; font-weight: 600;">3</td>
                     <td>
-                        <span class="konflik-text"><i class="fas fa-code-branch"></i> Terdaftar di Semester 2 & Semester 3</span>
+                        <div class="dosen-name">Dr. Budi Santoso, M.Kom.</div>
+                        <div style="font-size: 0.8rem; color: #6b7280;">NIDN: 0611091111</div>
                     </td>
-                    <td style="text-align: center; display: flex; gap: 8px; justify-content: center;">
-                        <button class="btn-action btn-merge" onclick="alert('Menggabungkan data ke Semester 2')"><i class="fas fa-compress-alt"></i> Merge</button>
-                        <button class="btn-action" onclick="alert('Menghapus salah satu baris')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                    <td>
+                        <div style="font-weight: 600; color: #111827;">Sistem Basis Data Terdistribusi</div>
+                        <div style="font-size: 0.85rem;">Kelas: SI-Pagi</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Terinput 2 Kali</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-action" onclick="alert('Menghapus 1 data duplikat dan menyisakan 1 data utama')"><i class="fas fa-trash-alt"></i> Hapus Duplikat</button>
                     </td>
                 </tr>
-                <!-- Dummy Data Anomali 2 -->
+                <!-- Dummy Data Anomali 2 Khusus SI -->
                 <tr>
                     <td style="text-align: center;">2</td>
-                    <td style="font-weight: 700; color: #e11d48;">TI045</td>
-                    <td style="font-weight: 600; color: #111827;">Pemrograman Web Lanjut</td>
-                    <td style="text-align: center; font-weight: 600;">3</td>
                     <td>
-                        <span class="konflik-text"><i class="fas fa-clone"></i> Di-input 2x pada Semester 4</span>
+                        <div class="dosen-name">Siti Aminah, M.T., Ph.D.</div>
+                        <div style="font-size: 0.8rem; color: #6b7280;">NIDN: 0622032222</div>
                     </td>
-                    <td style="text-align: center; display: flex; gap: 8px; justify-content: center;">
-                        <button class="btn-action btn-merge" onclick="alert('Menggabungkan duplikasi')"><i class="fas fa-compress-alt"></i> Merge</button>
-                        <button class="btn-action" onclick="alert('Menghapus salah satu baris')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                    <td>
+                        <div style="font-weight: 600; color: #111827;">Audit Sistem Informasi</div>
+                        <div style="font-size: 0.85rem;">Kelas: SI-Malam</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Terinput 3 Kali</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-action" onclick="alert('Menghapus 2 data duplikat dan menyisakan 1 data utama')"><i class="fas fa-trash-alt"></i> Hapus Duplikat</button>
                     </td>
                 </tr>
             </tbody>
@@ -166,23 +154,23 @@
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace('/login/login.html');
 
-    // 2. LOAD SIDEBAR
+    // 2. LOAD SIDEBAR KHUSUS SI
     async function loadSidebar() {
         try {
-            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
+            const response = await fetch('/kaprodi/kaprodi_si/components/sidebar.html');
             const html = await response.text();
             
             document.getElementById('sidebar-container').outerHTML = html;
-            document.getElementById("adminName").innerText = userLogin;
+            document.getElementById("adminName").innerText = userLogin || "Kaprodi SI";
 
             setTimeout(() => {
                 const navDashboard = document.getElementById('nav-home');
-                const navMakulDuplikat = document.getElementById('nav-makul-duplikat'); 
+                const navMengajarDuplikat = document.getElementById('nav-mengajar-duplikat'); 
                 const menuPeriksa = document.getElementById('menu-periksa');
                 const chevronPeriksa = document.getElementById('chevron-periksa');
 
                 if(navDashboard) navDashboard.classList.remove('active');
-                if(navMakulDuplikat) navMakulDuplikat.classList.add('active'); 
+                if(navMengajarDuplikat) navMengajarDuplikat.classList.add('active'); 
                 
                 // Buka dropdown otomatis
                 if(menuPeriksa && chevronPeriksa) {

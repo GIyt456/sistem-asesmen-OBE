@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mengajar Salah - Sistem OBE</title>
+    <title>Mengajar Salah SI - Sistem OBE</title>
     <link rel="stylesheet" href="../../../css/style.css">
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- VARIABEL WARNA --- */
+        /* --- VARIABEL WARNA KHUSUS SI --- */
         :root { 
             --sidebar-bg: #161923; 
             --sidebar-text: #7b8395;
             --sidebar-hover: #262936;
             --sidebar-active-text: #ffffff;
-            --primary-red: #8b0000; 
+            --primary-teal: #0097a7; /* Warna Utama SI */
             --bg-main: #ffffff; 
             --text-dark: #111827;
             --border-light: #e5e7eb;
@@ -35,34 +35,16 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- GAYA SIDEBAR --- */
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; min-height: 100vh; }
-        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
-        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .sidebar-profile-info { display: flex; flex-direction: column; }
-        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
-        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
-        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .nav-menu::-webkit-scrollbar { display: none; }
-        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
-        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
-        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
-        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-        .nav-item.logout { color: #f87171; }
-        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
-
         /* --- GAYA KONTEN UTAMA --- */
         .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
 
         .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
-        .header-title span { color: var(--primary-red); }
-        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
+        .header-title span { color: var(--primary-teal); }
+        .badge-prodi { background: var(--primary-teal); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0, 151, 167, 0.2); }
 
-        /* --- ALERT BOX --- */
+        /* --- ALERT BOX Peringatan (Dipertahankan warna kuning) --- */
         .alert-box { background: #f0fdf4; border-left: 5px solid #10b981; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; gap: 15px; align-items: flex-start; }
         .alert-box.warning { background: #fffbeb; border-color: #f59e0b; }
         .alert-box.warning i { color: #f59e0b; }
@@ -75,8 +57,8 @@
         /* --- TOMBOL --- */
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; background: #6366f1; }
-        .btn-action:hover { background: #4f46e5; }
+        .btn-action-si { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; background: var(--primary-teal); }
+        .btn-action-si:hover { background: #006064; }
 
         /* --- GAYA TABEL --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
@@ -101,14 +83,14 @@
                 <div class="header-subtitle">PERIKSA DATA / VALIDASI</div>
                 <h1 class="header-title">MENGAJAR <span>SALAH</span></h1>
             </div>
-            <div class="badge-prodi">Teknik Informatika</div>
+            <div class="badge-prodi"><i class="fas fa-exclamation-triangle"></i> Sistem Informasi</div>
         </div>
 
         <div class="alert-box warning">
             <i class="fas fa-chalkboard-teacher"></i>
             <div>
-                <h4>Anomali Penugasan Dosen</h4>
-                <p>Tabel ini menampilkan daftar penugasan dosen yang terdeteksi tidak valid dari data pusat (SISTA). Contoh: Kelas tidak memiliki mahasiswa, SKS bernilai 0, atau referensi Mata Kuliah tidak ditemukan di kurikulum lokal.</p>
+                <h4>Anomali Penugasan Dosen (SI)</h4>
+                <p>Tabel ini menampilkan daftar penugasan dosen Sistem Informasi yang terdeteksi tidak valid dari sinkronisasi data pusat (SISTA). Contoh masalah: Kelas tidak memiliki mahasiswa, SKS bernilai 0, atau referensi Mata Kuliah tidak ditemukan di kurikulum lokal.</p>
             </div>
         </div>
 
@@ -116,7 +98,7 @@
             <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
                 Ditemukan <strong>2</strong> anomali data mengajar.
             </div>
-            <button class="btn-dark" onclick="alert('Sinkronisasi ulang penugasan dosen...')"><i class="fas fa-sync-alt"></i> Pindai Data Mengajar</button>
+            <button class="btn-dark" onclick="alert('Sinkronisasi ulang penugasan dosen SI...')"><i class="fas fa-sync-alt"></i> Pindai Data Mengajar SI</button>
         </div>
 
         <!-- Tabel Data Mengajar Salah -->
@@ -131,40 +113,40 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Dummy Data Anomali 1 -->
+                <!-- Dummy Data Anomali 1 Khusus SI -->
                 <tr>
                     <td style="text-align: center;">1</td>
                     <td>
-                        <div class="dosen-name">Christian Sawunggaling., M.M</div>
-                        <div style="font-size: 0.8rem; color: #6b7280;">NIDN: 0612056801</div>
+                        <div class="dosen-name">Budi Santoso, M.Kom</div>
+                        <div style="font-size: 0.8rem; color: #6b7280;">NIDN: 0612051111</div>
                     </td>
                     <td>
-                        <div style="font-weight: 600; color: #111827;">Kecerdasan Buatan</div>
-                        <div style="font-size: 0.85rem;">Kelas: TI-Pagi</div>
+                        <div style="font-weight: 600; color: #111827;">Sistem Basis Data Terdistribusi</div>
+                        <div style="font-size: 0.85rem;">Kelas: SI-Pagi</div>
                     </td>
                     <td>
                         <span class="error-text"><i class="fas fa-exclamation-circle"></i> SKS tercatat "0" di SISTA.</span>
                     </td>
                     <td style="text-align: center;">
-                        <button class="btn-action" onclick="alert('Membuka form edit data mengajar manual')"><i class="fas fa-edit"></i> Perbaiki</button>
+                        <button class="btn-action-si" onclick="alert('Membuka form edit data mengajar manual')"><i class="fas fa-edit"></i> Perbaiki</button>
                     </td>
                 </tr>
-                <!-- Dummy Data Anomali 2 -->
+                <!-- Dummy Data Anomali 2 Khusus SI -->
                 <tr>
                     <td style="text-align: center;">2</td>
                     <td>
-                        <div class="dosen-name">Yoga Yogi, M.Kom</div>
-                        <div style="font-size: 0.8rem; color: #6b7280;">NIDN: 0622087502</div>
+                        <div class="dosen-name">Siti Aminah, M.Kom</div>
+                        <div style="font-size: 0.8rem; color: #6b7280;">NIDN: 0622082222</div>
                     </td>
                     <td>
-                        <div style="font-weight: 600; color: #111827;">Jaringan Komputer</div>
-                        <div style="font-size: 0.85rem;">Kelas: TI-Pagi</div>
+                        <div style="font-weight: 600; color: #111827;">Manajemen Proyek TI</div>
+                        <div style="font-size: 0.85rem;">Kelas: SI-Malam</div>
                     </td>
                     <td>
                         <span class="error-text"><i class="fas fa-user-times"></i> Kelas ini tidak memiliki mahasiswa aktif.</span>
                     </td>
                     <td style="text-align: center;">
-                        <button class="btn-action" style="background: #ef4444;" onclick="alert('Menghapus penugasan fiktif')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                        <button class="btn-action-si" style="background: #ef4444;" onclick="alert('Menghapus penugasan fiktif')"><i class="fas fa-trash-alt"></i> Hapus</button>
                     </td>
                 </tr>
             </tbody>
@@ -176,14 +158,14 @@
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace('/login/login.html');
 
-    // 2. LOAD SIDEBAR
+    // 2. LOAD SIDEBAR KHUSUS SI
     async function loadSidebar() {
         try {
-            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
+            const response = await fetch('/kaprodi/kaprodi_si/components/sidebar.html');
             const html = await response.text();
             
             document.getElementById('sidebar-container').outerHTML = html;
-            document.getElementById("adminName").innerText = userLogin;
+            document.getElementById("adminName").innerText = userLogin || "Kaprodi SI";
 
             setTimeout(() => {
                 const navDashboard = document.getElementById('nav-home');
