@@ -135,7 +135,7 @@
     </div>
 
 <script>
-    const API_BASE = "https://compact-ahead-recycling-rabbit.trycloudflare.com/webhook";
+    const API_BASE = "https://gilbert-mean-pursuant-chronicles.trycloudflare.com/webhook";
     const API_METADATA = `${API_BASE}/get-metadata`;
     const API_GET_BK = `${API_BASE}/get-master-bk`;
     const API_GET_MAPPING = `${API_BASE}/get-mapping-matriks`;
@@ -362,7 +362,7 @@
     // --- FUNGSI SIDEBAR ---
     async function loadSidebar() {
         try {
-            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
+            const response = await fetch('/kaprodi/kaprodi_si/components/sidebar.html');
             document.getElementById('sidebar-container').innerHTML = await response.text();
             document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
             
