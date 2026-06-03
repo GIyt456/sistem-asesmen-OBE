@@ -106,7 +106,7 @@
     </div>
 
 <script>
-    const PRODI = 'ti';
+    const PRODI = 'si';
     const API_BASE = "https://gilbert-mean-pursuant-chronicles.trycloudflare.com/webhook";
     
     // Endpoint API dari N8N
@@ -272,12 +272,10 @@
 
     // FUNGSI STANDAR (Sidebar & Dropdown)
     async function loadSidebar() {
-        try {
-            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
-            document.getElementById('sidebar-container').innerHTML = await response.text();
-            document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
-            document.getElementById('nav-mapping-mk').style.background = 'var(--sidebar-hover)';
-        } catch (error) {}
+        const response = await fetch(`/kaprodi/kaprodi_${PRODI}/components/sidebar.html`);
+        document.getElementById('sidebar-container').innerHTML = await response.text();
+        document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
+        document.getElementById('nav-mapping-cpl-cpmk').style.background = 'var(--sidebar-hover)';
     }
 
     function toggleDropdown(menuId, chevronId) {

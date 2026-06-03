@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Susunan Mata Kuliah (Matriks CPL-BK-MK) - OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
+            --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
+        }
+
+        /* GAYA SIDEBAR */
+        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
+        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
+        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .sidebar-profile-info { display: flex; flex-direction: column; }
+        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
+        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .nav-menu::-webkit-scrollbar { display: none; }
+        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
+        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
+        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
+        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
+        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
+        .nav-item.logout { color: #f87171; }
+        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* KONTEN UTAMA */
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 50px; position: relative; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+        .header-subtitle { color: #6b7280; font-size: 0.9rem; font-weight: 500; margin-top: 5px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary-blue); }
+
+        .btn-save { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2); }
+        .btn-save:hover { background: #172554; transform: translateY(-2px); }
+        .btn-save:disabled { background: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* DESAIN TABEL MATRIKS */
+        .matrix-container { background: white; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow: auto; max-height: 70vh; }
+        table { border-collapse: collapse; width: max-content; min-width: 100%; text-align: left; }  
+
+        th { background: #1e293b; color: white; font-size: 0.85rem; font-weight: 700; padding: 18px 15px; position: sticky; top: 0; z-index: 10; border-right: 1px solid #334155; border-bottom: 2px solid #0f172a; text-align: center; }        
+        th:first-child { left: 0; z-index: 20; background: #0f172a; min-width: 140px; text-align: left; padding-left: 25px; }        
+        
+        td { padding: 12px 15px; border: 1px solid var(--border-color); transition: background 0.2s; vertical-align: top; min-width: 200px; }
+        td:first-child { position: sticky; left: 0; background: #f8fafc; font-weight: 700; color: var(--primary-red); text-align: left; padding: 18px 25px; z-index: 5; border-right: 2px solid var(--border-color); cursor: help; min-width: 140px; }
+        
+        /* Sel Matriks & Badges */
+        .cell-content { display: flex; flex-direction: column; gap: 6px; min-height: 60px; }
+        .mk-badge { background: #e0f2fe; color: #0369a1; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: 1px solid #bae6fd; display: inline-block; white-space: normal; line-height: 1.3; }
+        .btn-add-mk { background: #f1f5f9; color: #64748b; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; text-align: center; margin-top: auto; }
+        .btn-add-mk:hover { background: #e2e8f0; color: #334155; border-color: #94a3b8; }
+        .btn-add-mk.has-data { border: none; background: transparent; padding: 4px; margin-top: 5px; text-align: left; color: #3b82f6; }
+        .btn-add-mk.has-data:hover { background: transparent; text-decoration: underline; }
+
+        /* MODAL (POP-UP) STYLING */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: 0.2s; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-box { background: white; width: 500px; max-width: 90%; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; transform: translateY(20px); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; }
+        .modal-overlay.show .modal-box { transform: translateY(0); }
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+        .modal-title { font-weight: 800; color: #111827; font-size: 1.1rem; line-height: 1.4; }
+        .modal-subtitle { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+        .btn-close { background: none; border: none; font-size: 1.5rem; color: #9ca3af; cursor: pointer; transition: 0.2s; }
+        .btn-close:hover { color: #ef4444; }
+        
+        .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+        .mk-checkbox-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
+        .mk-checkbox-item:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .mk-checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-blue); cursor: pointer; }
+        .mk-info { display: flex; flex-direction: column; }
+        .mk-kode { font-size: 0.75rem; font-weight: 700; color: #64748b; }
+        .mk-nama { font-size: 0.9rem; font-weight: 600; color: #111827; }
+
+        .modal-footer { padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc; }
+        .btn-cancel { padding: 10px 20px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; color: #475569; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-cancel:hover { background: #f1f5f9; }
+        .btn-save-modal { padding: 10px 20px; border-radius: 8px; border: none; background: var(--primary-blue); color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-save-modal:hover { background: #172554; }
+
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <div class="header-container">
+            <div>
+                <h1 class="header-title">Susunan <span>Mata Kuliah</span> (CPL - BK - MK)</h1>
+                <p class="header-subtitle">Petakan Mata Kuliah apa saja yang mendukung Bahan Kajian (Baris) untuk mencapai CPL (Kolom).</p>
+            </div>
+            <button id="btnSaveAll" class="btn-save" onclick="saveAllMapping()">
+                <i class="fas fa-save"></i> Simpan Seluruh Matriks
+            </button>
+        </div>
+
+        <div class="matrix-container">
+            <table id="matrixTable">
+                <thead id="matrixHead"><tr><th>Memuat Header...</th></tr></thead>
+                <tbody id="matrixBody"><tr><td style="padding: 30px; text-align: center;">Memuat data...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL PILIH MATA KULIAH -->
+    <div class="modal-overlay" id="mkModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-subtitle" id="modalTargetCPL">CPL01</div>
+                    <div class="modal-title" id="modalTargetBK">Foundation of Information Systems</div>
+                </div>
+                <button class="btn-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="modalBodyList">
+                <!-- Checkbox MK akan di-render di sini -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">Batal</button>
+                <button class="btn-save-modal" onclick="applySelectionToCell()">Pilih & Terapkan</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const API_BASE = "https://gilbert-mean-pursuant-chronicles.trycloudflare.com/webhook";
+    const API_METADATA = `${API_BASE}/get-metadata`;
+    const API_GET_BK = `${API_BASE}/get-master-bk`;
+    const API_GET_MAPPING = `${API_BASE}/get-mapping-matriks`;
+    const API_SAVE_MAPPING = `${API_BASE}/admin-map-matriks`;
+    
+    const PRODI = localStorage.getItem("prodi_aktif") || "si";
+
+    let listCPL = []; 
+    let listBK = [];  
+    let listMK = [];
+    
+    // Memory State untuk menyimpan data: matrixState["CPL01_BK01"] = ["MK_A", "MK_B"]
+    let matrixState = {}; 
+    
+    // Variabel pembantu untuk Modal
+    let currentEditCPL = "";
+    let currentEditBK = "";
+
+    window.onload = async () => {
+        if (!localStorage.getItem("user_login")) { window.location.replace("/login/login.html"); return; }
+        await loadSidebar();
+        await initMatriks();
+    };
+
+    async function initMatriks() {
+        try {
+            const [resMeta, resBk, resMap] = await Promise.all([
+                fetch(`${API_METADATA}?prodi=${PRODI}`),
+                fetch(API_GET_BK),
+                fetch(API_GET_MAPPING)
+            ]);
+
+            let textMeta = await resMeta.text();
+            if (textMeta.startsWith('=')) textMeta = textMeta.substring(1);
+            const rawMeta = textMeta ? JSON.parse(textMeta) : [];
+
+            const textBk = await resBk.text();
+            listBK = textBk ? JSON.parse(textBk) : [];
+
+            const textMap = await resMap.text();
+            const existingMapping = textMap ? JSON.parse(textMap) : [];
+
+            // Pisahkan Meta menjadi CPL dan MK
+            listCPL = rawMeta.filter(m => m.tipe === 'cpl').sort((a, b) => a.kode.localeCompare(b.kode));
+            listMK = rawMeta.filter(m => m.tipe === 'mk').sort((a, b) => a.label.localeCompare(b.label));
+
+            // Bangun Memory State dari Database
+            existingMapping.forEach(row => {
+                let key = `${row.kode_cpl}_${row.kode_bk}`;
+                if(!matrixState[key]) matrixState[key] = [];
+                matrixState[key].push(row.kode_mk);
+            });
+
+            renderMatrixTable();
+
+        } catch (error) {
+            console.error("Detail Error:", error);
+            document.getElementById("matrixBody").innerHTML = '<tr><td style="color: red; padding: 20px;">Gagal memuat data. Cek Console.</td></tr>';
+        }
+    }
+
+    function renderMatrixTable() {
+        const thead = document.getElementById("matrixHead");
+        const tbody = document.getElementById("matrixBody");
+
+        // --- RENDER HEADER (CPL) ---
+        // Judul header juga kita ganti dan persempit
+        let thHtml = `<tr><th style="min-width: 140px;">KODE BK</th>`;
+        listCPL.forEach(cpl => {
+            let safeLabel = (cpl.label || cpl.nama || "CPL").replace(/"/g, '&quot;');
+            thHtml += `<th title="${safeLabel}">${cpl.kode}</th>`;
+        });
+        thHtml += `</tr>`;
+        thead.innerHTML = thHtml;
+
+        // --- RENDER BODY (BK + SEL MK) ---
+        let tbHtml = '';
+        if(listBK.length === 0) {
+            tbHtml = `<tr><td colspan="${listCPL.length + 1}" style="text-align: center; padding: 30px;">Master Data BK kosong.</td></tr>`;
+        } else {
+            listBK.forEach(bk => {
+                let kodeBahanKajian = bk.kode_bk || bk.kode || "";
+                let rawName = bk.nama_bk || bk.nama || bk.BK || "Nama tidak tersedia";
+                let safeName = rawName.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+                // Teks Nama BK dihapus dari layar, hanya disisakan Kode BK dan ditaruh di dalam atribut title=""
+                tbHtml += `<tr>
+                    <td title="${safeName}" style="cursor: help; vertical-align: middle;">
+                        <i class="fas fa-info-circle" style="color:#9ca3af; font-size:1rem; margin-right:8px;"></i>
+                        <span style="font-weight:800; color:var(--primary-red); font-size: 1rem;">${kodeBahanKajian}</span>
+                    </td>`;
+                
+                listCPL.forEach(cpl => {
+                    let cellKey = `${cpl.kode}_${kodeBahanKajian}`;
+                    tbHtml += `<td id="cell_${cellKey}">${generateCellHTML(cpl.kode, kodeBahanKajian, safeName)}</td>`;
+                });
+                tbHtml += `</tr>`;
+            });
+        }
+        tbody.innerHTML = tbHtml;
+    }
+
+    // Fungsi Pembantu: Render isi sel berdasarkan memory state
+    function generateCellHTML(cplKode, bkKode, bkNamaRaw) {
+        let key = `${cplKode}_${bkKode}`;
+        let selectedMKs = matrixState[key] || [];
+        
+        // Escape nama BK agar aman ditaruh di onclick function
+        let safeBkNama = bkNamaRaw.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        
+        let html = `<div class="cell-content">`;
+        
+        if (selectedMKs.length > 0) {
+            selectedMKs.forEach(mkKode => {
+                let mkObj = listMK.find(m => m.kode === mkKode);
+                let namaMk = mkObj ? (mkObj.label || mkObj.nama) : mkKode;
+                html += `<div class="mk-badge" title="${namaMk}">[${mkKode}] ${namaMk}</div>`;
+            });
+            html += `<button class="btn-add-mk has-data" onclick="openModal('${cplKode}', '${bkKode}', '${safeBkNama}')"><i class="fas fa-edit"></i> Edit MK</button>`;
+        } else {
+            html += `<button class="btn-add-mk" onclick="openModal('${cplKode}', '${bkKode}', '${safeBkNama}')"><i class="fas fa-plus"></i> Pilih MK</button>`;
+        }
+        
+        html += `</div>`;
+        return html;
+    }
+
+    // --- LOGIKA MODAL ---
+    function openModal(cplKode, bkKode, bkNama) {
+        currentEditCPL = cplKode;
+        currentEditBK = bkKode;
+        
+        document.getElementById('modalTargetCPL').innerText = `Target: ${cplKode}`;
+        document.getElementById('modalTargetBK').innerText = `Bahan Kajian: ${bkNama}`;
+        
+        let key = `${cplKode}_${bkKode}`;
+        let selectedMKs = matrixState[key] || [];
+        
+        let htmlList = '';
+        if(listMK.length === 0) {
+            htmlList = '<p style="text-align:center; color:#ef4444; padding:20px;">Belum ada Master Mata Kuliah di Database!</p>';
+        } else {
+            listMK.forEach(mk => {
+                let isChecked = selectedMKs.includes(mk.kode) ? "checked" : "";
+                htmlList += `
+                    <label class="mk-checkbox-item">
+                        <input type="checkbox" class="modal-chk-mk" value="${mk.kode}" ${isChecked}>
+                        <div class="mk-info">
+                            <span class="mk-kode">${mk.kode}</span>
+                            <span class="mk-nama">${mk.label || mk.nama}</span>
+                        </div>
+                    </label>
+                `;
+            });
+        }
+        
+        document.getElementById('modalBodyList').innerHTML = htmlList;
+        document.getElementById('mkModal').classList.add('show');
+    }
+
+    function closeModal() {
+        document.getElementById('mkModal').classList.remove('show');
+    }
+
+    function applySelectionToCell() {
+        let key = `${currentEditCPL}_${currentEditBK}`;
+        
+        // Ambil semua checkbox yang dicentang di Modal
+        let checkedBoxes = document.querySelectorAll('.modal-chk-mk:checked');
+        let newSelectedMKs = Array.from(checkedBoxes).map(cb => cb.value);
+        
+        // Simpan ke Memory State
+        matrixState[key] = newSelectedMKs;
+        
+        // Render ulang hanya sel yang bersangkutan (Sangat Cepat!)
+        let bkObj = listBK.find(b => (b.kode_bk || b.kode) === currentEditBK);
+        let bkNama = bkObj ? (bkObj.nama_bk || bkObj.nama || bkObj.BK || "BK") : currentEditBK;
+        
+        document.getElementById(`cell_${key}`).innerHTML = generateCellHTML(currentEditCPL, currentEditBK, bkNama);
+        
+        closeModal();
+    }
+
+    // --- LOGIKA SIMPAN KE DATABASE ---
+    async function saveAllMapping() {
+        const btnSave = document.getElementById('btnSaveAll');
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btnSave.disabled = true;
+
+        let fetchPromises = [];
+
+        // Loop melalui seluruh State Memory
+        for (const [key, mkArray] of Object.entries(matrixState)) {
+            // Pecah key "CPL01_BK01"
+            const [cplKode, bkKode] = key.split('_');
+
+            const payload = {
+                kode_cpl: cplKode,
+                kode_bk: bkKode,
+                mk_list: mkArray, // Mengirimkan array kosong [] juga penting agar n8n menghapus relasi lama jika di-uncheck semua
+                prodi: PRODI
+            };
+
+            const request = fetch(API_SAVE_MAPPING, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            fetchPromises.push(request);
+        }
+
+        try {
+            await Promise.all(fetchPromises);
+            alert("✅ Seluruh Susunan Mata Kuliah berhasil disimpan permanen!");
+        } catch (error) {
+            console.error(error);
+            alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi.");
+        } finally {
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Seluruh Matriks';
+            btnSave.disabled = false;
+        }
+    }
+
+    // --- FUNGSI SIDEBAR ---
+    async function loadSidebar() {
+        try {
+            const response = await fetch('/components/sidebar.html');
+            document.getElementById('sidebar-container').innerHTML = await response.text();
+            document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
+            
+            // Tandai menu Susunan Mata Kuliah aktif
+            const navMk = document.getElementById('nav-mk');
+            if(navMk) navMk.style.background = 'var(--sidebar-hover)';
+        } catch (error) {}
+    }
+
+    function toggleDropdown(menuId, chevronId) {
+        const menu = document.getElementById(menuId), chevron = document.getElementById(chevronId);
+        if(menu) { menu.style.display = menu.style.display === 'none' ? 'flex' : 'none'; }
+        if(chevron) { chevron.style.transform = chevron.style.transform === 'rotate(180deg)' ? 'rotate(0deg)' : 'rotate(180deg)'; }
+    }
+
+    function logout() { localStorage.clear(); window.location.replace('/login/login.html'); }
+</script>
+</body>
+</html>

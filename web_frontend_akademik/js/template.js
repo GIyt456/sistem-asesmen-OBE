@@ -27,8 +27,12 @@ async function loadComponent(elementId, fileUrl) {
 }
 
 function inisialisasiKomponenGlobal() {
+    // 1. Ambil data prodi aktif dari localStorage (default ke 'ti' jika kosong)
+    const prodi = localStorage.getItem("prodi_aktif") || "ti"; 
+    
     if (document.getElementById("sidebar-container")) {
-        loadComponent("sidebar-container", "/components/sidebar.html");
+        // 2. Ubah path-nya menjadi dinamis mengikuti prodi
+        loadComponent("sidebar-container", `/kaprodi/kaprodi_${prodi}/components/sidebar.html`);
     }
     if (document.getElementById("navbar-container")) {
         loadComponent("navbar-container", "/components/navbar.html");

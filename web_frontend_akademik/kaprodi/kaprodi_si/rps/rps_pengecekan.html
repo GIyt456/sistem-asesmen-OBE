@@ -196,7 +196,7 @@
                 prodi: PRODI
             };
 
-            
+       
             try {
                 const res = await fetch(`${API_BASE}/update-status-rps`, {
                     method: 'POST',
@@ -208,7 +208,7 @@
                     loadData(); // Refresh Data
                 }
             } catch(e) { alert("Error koneksi"); }
-        
+            
 
             alert(`✅ Simulasi: RPS Mata Kuliah ${rpsTerpilih} berhasil diubah statusnya menjadi: ${keputusan}!\nCatatan: ${catatan || '-'}`);
             closeModal();

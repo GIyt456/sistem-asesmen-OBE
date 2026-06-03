@@ -155,46 +155,25 @@
     if (!userLogin) window.location.replace('/login/login.html');
 
     // 2. LOAD SIDEBAR KHUSUS SI
-    async function loadSidebar() {
-        try {
-            const response = await fetch('/kaprodi/kaprodi_si/components/sidebar.html');
-            const html = await response.text();
+    window.onload = () => { 
+        loadData(); // Tarik data dari n8n
+        
+        // Nyalakan warna menu yang sedang aktif (Beri jeda agar template.js selesai memuat sidebar)
+        setTimeout(() => {
+            const navDashboard = document.getElementById('nav-home');
+            const navMenuIni = document.getElementById('nav-mengajar-duplikat'); 
+            const menuPeriksa = document.getElementById('menu-periksa');
+            const chevronPeriksa = document.getElementById('chevron-periksa');
+
+            if(navDashboard) navDashboard.classList.remove('active');
+            if(navMenuIni) navMenuIni.classList.add('active'); 
             
-            document.getElementById('sidebar-container').outerHTML = html;
-            document.getElementById("adminName").innerText = userLogin || "Kaprodi SI";
-
-            setTimeout(() => {
-                const navDashboard = document.getElementById('nav-home');
-                const navMengajarDuplikat = document.getElementById('nav-mengajar-duplikat'); 
-                const menuPeriksa = document.getElementById('menu-periksa');
-                const chevronPeriksa = document.getElementById('chevron-periksa');
-
-                if(navDashboard) navDashboard.classList.remove('active');
-                if(navMengajarDuplikat) navMengajarDuplikat.classList.add('active'); 
-                
-                // Buka dropdown otomatis
-                if(menuPeriksa && chevronPeriksa) {
-                    menuPeriksa.style.display = 'flex';
-                    chevronPeriksa.style.transform = 'rotate(180deg)';
-                }
-            }, 100);
-        } catch (error) { console.error('Gagal memuat sidebar:', error); }
-    }
-
-    // Fungsi Dropdown Sidebar
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex'; chevron.style.transform = 'rotate(180deg)'; 
-        } else {
-            menu.style.display = 'none'; chevron.style.transform = 'rotate(0deg)';   
-        }
-    }
-
-    function logout() { localStorage.clear(); window.location.replace("/login/login.html"); }
-
-    window.onload = loadSidebar;
+            if(menuPeriksa && chevronPeriksa) {
+                menuPeriksa.style.display = 'flex';
+                chevronPeriksa.style.transform = 'rotate(180deg)';
+            }
+        }, 300); // Jeda 300ms
+    };
 </script>
 </body>
 </html>
