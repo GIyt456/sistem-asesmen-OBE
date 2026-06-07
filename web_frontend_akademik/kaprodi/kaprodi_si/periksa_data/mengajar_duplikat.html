@@ -12,15 +12,20 @@
     <style>
         /* --- VARIABEL WARNA KHUSUS SI --- */
         :root { 
-            --sidebar-bg: #161923; 
-            --sidebar-text: #7b8395;
-            --sidebar-hover: #262936;
-            --sidebar-active-text: #ffffff;
-            --primary-teal: #0097a7; /* Warna Utama SI */
+            --primary-teal: #0097a7; 
+            --primary-teal-dark: #006064; 
             --bg-main: #ffffff; 
             --text-dark: #111827;
             --border-light: #e5e7eb;
             --border-dark: #161923;
+        }
+
+        /* --- OVERRIDE SIDEBAR KHUSUS SI --- */
+        .sidebar { background-color: #005a65 !important; border-right: none !important; }
+        .sidebar .nav-item { color: #9bb7bd !important; }
+        .sidebar .nav-item:hover, .sidebar .nav-item.active { 
+            background-color: #1c7b87 !important; 
+            color: #ffffff !important; 
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -42,10 +47,10 @@
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
         .header-title span { color: var(--primary-teal); }
-        .badge-prodi { background: var(--primary-teal); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0, 151, 167, 0.2); }
+        .badge-prodi { background: var(--primary-teal-dark); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0, 151, 167, 0.2); }
 
         /* --- ALERT BOX (Dipertahankan Kuning/Oranye) --- */
-        .alert-box { background: #fffbeb; border-left: 5px solid #f59e0b; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; gap: 15px; align-items: flex-start; }
+        .alert-box { background: #fffbeb; border-left: 5px solid #f59e0b; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; gap: 15px; align-items: flex-start; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .alert-box i { color: #f59e0b; font-size: 1.5rem; margin-top: 2px; }
         .alert-box h4 { margin: 0 0 6px 0; color: #92400e; font-size: 1.05rem; font-weight: 700; }
         .alert-box p { margin: 0; color: #b45309; font-size: 0.9rem; line-height: 1.5; }
@@ -53,8 +58,11 @@
         /* --- TOMBOL --- */
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; background: #e11d48; }
-        .btn-action:hover { background: #be123c; }
+        
+        .btn-action-delete {
+            background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s;
+        }
+        .btn-action-delete:hover { background: #dc2626; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2); }
 
         /* --- GAYA TABEL --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
@@ -68,10 +76,8 @@
 </head>
 <body>
 
-    <!-- Wadah Sidebar -->
     <div id="sidebar-container"></div>
 
-    <!-- Konten Utama -->
     <div class="main-content">
         
         <div class="header-container">
@@ -86,7 +92,7 @@
             <i class="fas fa-copy"></i>
             <div>
                 <h4>Peringatan: Data Mengajar Ganda Ditemukan (SI)</h4>
-                <p>Tabel ini menampilkan dosen Sistem Informasi yang tidak sengaja terdaftar lebih dari satu kali untuk mengajar pada <strong>kelas dan mata kuliah yang sama persis</strong>. Silakan hapus duplikatnya untuk menghindari redudansi form input nilai.</p>
+                <p>Tabel ini menampilkan dosen Sistem Informasi yang tidak sengaja terdaftar lebih dari satu kali untuk mengajar pada <strong>kelas dan mata kuliah yang sama persis</strong>. Silakan hapus duplikatnya untuk menghindari redundansi form input nilai.</p>
             </div>
         </div>
 
@@ -97,7 +103,6 @@
             <button class="btn-dark" onclick="alert('Sinkronisasi ulang penugasan dosen SI...')"><i class="fas fa-sync-alt"></i> Pindai Ulang</button>
         </div>
 
-        <!-- Tabel Data Duplikat -->
         <table>
             <thead>
                 <tr>
@@ -109,7 +114,6 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Dummy Data Anomali 1 Khusus SI -->
                 <tr>
                     <td style="text-align: center;">1</td>
                     <td>
@@ -124,10 +128,9 @@
                         <span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Terinput 2 Kali</span>
                     </td>
                     <td style="text-align: center;">
-                        <button class="btn-action" onclick="alert('Menghapus 1 data duplikat dan menyisakan 1 data utama')"><i class="fas fa-trash-alt"></i> Hapus Duplikat</button>
+                        <button class="btn-action-delete" onclick="alert('Menghapus 1 data duplikat dan menyisakan 1 data utama')"><i class="fas fa-trash-alt"></i> Hapus Duplikat</button>
                     </td>
                 </tr>
-                <!-- Dummy Data Anomali 2 Khusus SI -->
                 <tr>
                     <td style="text-align: center;">2</td>
                     <td>
@@ -142,7 +145,7 @@
                         <span class="badge-warning"><i class="fas fa-exclamation-triangle"></i> Terinput 3 Kali</span>
                     </td>
                     <td style="text-align: center;">
-                        <button class="btn-action" onclick="alert('Menghapus 2 data duplikat dan menyisakan 1 data utama')"><i class="fas fa-trash-alt"></i> Hapus Duplikat</button>
+                        <button class="btn-action-delete" onclick="alert('Menghapus 2 data duplikat dan menyisakan 1 data utama')"><i class="fas fa-trash-alt"></i> Hapus Duplikat</button>
                     </td>
                 </tr>
             </tbody>
@@ -154,19 +157,17 @@
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace('/login/login.html');
 
-    // 2. LOAD SIDEBAR KHUSUS SI
+    // 2. JALANKAN SAAT HALAMAN DIBUKA
     window.onload = () => { 
-        loadData(); // Tarik data dari n8n
-        
-        // Nyalakan warna menu yang sedang aktif (Beri jeda agar template.js selesai memuat sidebar)
+        // Jeda agar template.js selesai menyusun sidebar sebelum kita ubah menu aktifnya
         setTimeout(() => {
             const navDashboard = document.getElementById('nav-home');
-            const navMenuIni = document.getElementById('nav-mengajar-duplikat'); 
+            const navMengajarDuplikat = document.querySelector('[data-path="/periksa_data/mengajar_duplikat.html"]'); 
             const menuPeriksa = document.getElementById('menu-periksa');
             const chevronPeriksa = document.getElementById('chevron-periksa');
 
             if(navDashboard) navDashboard.classList.remove('active');
-            if(navMenuIni) navMenuIni.classList.add('active'); 
+            if(navMengajarDuplikat) navMengajarDuplikat.classList.add('active'); 
             
             if(menuPeriksa && chevronPeriksa) {
                 menuPeriksa.style.display = 'flex';

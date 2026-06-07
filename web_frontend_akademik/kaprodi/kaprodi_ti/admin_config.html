@@ -8,1406 +8,440 @@
     <script src="../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <style>
+        /* --- WAJIB: Layout Flexbox agar Sidebar dan Konten bersebelahan --- */
+        body { 
+            display: flex; 
+            margin: 0; 
+            background: #f9fafb; 
+            height: 100vh; 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif;
+            color: #111827;
+        }
+
+        .main-content { 
+            flex: 1; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        /* --- Tambahan Tema TI (Merah Gelap) --- */
+        .btn-primary-ti { background: linear-gradient(to right, #8b0000, #5c0000); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; box-shadow: 0 2px 4px rgba(139, 0, 0, 0.2); }
+        .btn-primary-ti:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3); }
+        
+        .section { display: none; animation: fadeIn 0.3s ease; padding: 0 40px 40px 40px; }
+        .section.active { display: block; }
+        
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 40px 40px 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: #8b0000; }
+        .badge-prodi { background: #8b0000; color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 4px rgba(139, 0, 0, 0.2); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
 <body>
+    
     <div id="sidebar-container"></div>
 
-        <div class="main-content">
-            <div id="navbar-container"></div>
-                <div class="header-container">
-                    <div class="header-title-area">
-                        <div class="header-subtitle" id="pageSubtitle">KELOLA KURIKULUM</div>
-                        <h1 class="header-title" id="pageTitle">PANEL KENDALI <span>ADMIN</span></h1>
-                    </div>
-                    <div class="badge-prodi">Teknik Informatika</div>
+    <div class="main-content">
+        <div id="navbar-container"></div>
+        
+        <div class="header-container">
+            <div class="header-title-area">
+                <div class="header-subtitle" id="pageSubtitle">KELOLA KURIKULUM</div>
+                <h1 class="header-title" id="pageTitle">PANEL KENDALI <span>ADMIN</span></h1>
+            </div>
+            <div class="badge-prodi">Teknik Informatika</div>
+        </div>
+
+        <div id="content-dashboard" class="section active">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
+                <div style="background: var(--border-dark); color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #9ca3af;">Total Mahasiswa Dinilai</h4>
+                    <h2 id="totMhs" style="margin: 0; font-size: 2.2rem;">0</h2>
                 </div>
+                <div style="background: #10b981; color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #d1fae5;">Mahasiswa Lulus (A - C)</h4>
+                    <h2 id="totLulus" style="margin: 0; font-size: 2.2rem;">0</h2>
+                </div>
+                <div style="background: #ef4444; color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                    <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #fee2e2;">Tidak Lulus (D - E)</h4>
+                    <h2 id="totGagal" style="margin: 0; font-size: 2.2rem;">0</h2>
+                </div>
+            </div>
 
-                <div id="content-dashboard" class="section active">
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
-                        <div style="background: var(--border-dark); color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-                            <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #9ca3af;">Total Mahasiswa Dinilai</h4>
-                            <h2 id="totMhs" style="margin: 0; font-size: 2.2rem;">0</h2>
-                        </div>
-                        <div style="background: #10b981; color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-                            <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #d1fae5;">Mahasiswa Lulus (A - C)</h4>
-                            <h2 id="totLulus" style="margin: 0; font-size: 2.2rem;">0</h2>
-                        </div>
-                        <div style="background: #ef4444; color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-                            <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #fee2e2;">Tidak Lulus (D - E)</h4>
-                            <h2 id="totGagal" style="margin: 0; font-size: 2.2rem;">0</h2>
-                        </div>
-                    </div>
-
-                    <!-- Area Kanvas Grafik -->
-                    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr; max-width: 100%;">
-                        <div class="figma-card" style="width: 100%;">
-                            <h3>Distribusi Nilai (Grade) Prodi</h3>
-                            <div style="position: relative; height: 300px; width: 100%; display: flex; justify-content: center;">
-                                <canvas id="gradeChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="figma-card" style="width: 100%;">
-                            <h3>Rata-rata Pencapaian CPL</h3>
-                            <div style="position: relative; height: 300px; width: 100%;">
-                                <canvas id="cplChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="dashboard-grid">
-                        <div class="figma-card">
-                            <h3>Pintasan Laporan Kelas</h3>
-                            <p>Lihat analisis transkrip nilai dan ketercapaian CPL dan CPMK mahasiswa secara spesifik per mata kuliah</p>
-                            <button class="btn-dark" onclick="window.location.href='../../Kaprodi/laporan.html'">
-                                <i class="fas fa-external-link-alt"></i> Open
-                            </button>
-                        </div>
-                        
-                        <div class="figma-card">
-                            <h3>Portofolio CPL Global</h3>
-                            <p>Cari dan lihat rekapitulasi persentase penguasaan CPL mahasiswa Teknik Informatika dari total seluruh mata kuliah</p>
-                            <button class="btn-dark" onclick="window.location.href='portofolio_admin.html'">
-                                <i class="fas fa-external-link-alt"></i> Open
-                            </button>
-                        </div>
+            <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+                <div class="figma-card" style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
+                    <h3 style="margin-top: 0; color: #111827;">Distribusi Nilai (Grade) Prodi</h3>
+                    <div style="position: relative; height: 300px; width: 100%; display: flex; justify-content: center;">
+                        <canvas id="gradeChart"></canvas>
                     </div>
                 </div>
 
-                <div id="content-tahun" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Tahun Kurikulum</h3>
-                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data master acuan tahun kurikulum untuk pemetaan OBE.</p>
-                        </div>
-                        <div style="display: flex; gap: 12px;">
-                            <button class="btn-primary-red" onclick="bukaModalTahun()"><i class="fas fa-plus"></i> Tambah Tahun</button>
-                            <button class="btn-dark" onclick="loadDataTahun()"><i class="fas fa-sync-alt"></i> Refresh</button>
-                        </div>
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th width="5%" style="text-align: center;">No</th>
-                                <th width="15%">Kode</th>
-                                <th>Nama (Tahun)</th>
-                                <th style="text-align: center;">Prosentase Minimal Lulus</th>
-                                <th style="text-align: center;">Status</th>
-                                <th width="20%" style="text-align: center;">Opsi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyTahunKurikulum">
-                        <tr>
-                            <td style="text-align: center;">1</td>
-                            <td><strong>K-21</strong></td>
-                            <td>2021</td>
-                            <td style="text-align: center; font-weight: 600;">41%</td>
-                            <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
-                            <td style="text-align: center;">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align: center;">2</td>
-                            <td><strong>K-25</strong></td>
-                            <td>2025</td>
-                            <td style="text-align: center; font-weight: 600;">41%</td>
-                            <td style="text-align: center;"><span class="badge-status status-nonaktif">Nonaktif</span></td>
-                            <td style="text-align: center;">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                    </table>
-                </div>
-
-                <!-- ... (Biarkan section lainnya seperti rumpun, cpl, mahasiswa, skripsi tetap ada di sini) ... -->
-                <div id="content-rumpun" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Rumpun Mata Kuliah</h3>
-                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola pengelompokkan keahlian dosen dan mata kuliah.</p>
-                        </div>
-                        <div style="display: flex; gap: 12px;">
-                            <button class="btn-primary-red" onclick="bukaModalRumpun()"><i class="fas fa-plus"></i> Tambah</button>
-                            <button class="btn-dark" onclick="loadDataRumpun()"><i class="fas fa-sync-alt"></i> Refresh</button>
-                        </div>
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th width="5%" style="text-align: center;">#</th>
-                                <th width="35%">Nama</th>
-                                <th>Koordinator</th>
-                                <th width="15%" style="text-align: center;">NIK</th>
-                                <th width="20%" style="text-align: center;">Opsi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyRumpunMK">
-                            <tr>
-                                <td style="text-align: center;">1</td>
-                                <td style="font-weight: 600;">Project Management</td>
-                                <td>Atik Nurmasani, M.Kom</td>
-                                <td style="text-align: center;">190302354</td>
-                                <td style="text-align: center;">
-                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: center;">2</td>
-                                <td style="font-weight: 600;">User Experience Design</td>
-                                <td>Eli Pujiastuti, M.Kom</td>
-                                <td style="text-align: center;">190302227</td>
-                                <td style="text-align: center;">
-                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div id="content-jenis-cpl" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Jenis CPL SN DIKTI</h3>
-                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola kategori Capaian Pembelajaran Lulusan.</p>
-                        </div>
-                        <div style="display: flex; gap: 12px;">
-                            <button class="btn-primary-red" onclick="bukaModalJenisCPL()"><i class="fas fa-plus"></i> Tambah</button>
-                            <button class="btn-dark" onclick="loadDataJenisCPL()"><i class="fas fa-sync-alt"></i> Refresh</button>
-                        </div>
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th width="5%" style="text-align: center;">#</th>
-                                <th>Jenis</th>
-                                <th width="20%" style="text-align: center;">Opsi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyJenisCPL">
-                            <tr>
-                                <td style="text-align: center;">1</td>
-                                <td style="font-weight: 600;">SIKAP (S)</td>
-                                <td style="text-align: center;">
-                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: center;">2</td>
-                                <td style="font-weight: 600;">KETERAMPILAN UMUM (KU)</td>
-                                <td style="text-align: center;">
-                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: center;">3</td>
-                                <td style="font-weight: 600;">KETERAMPILAN KHUSUS (KK)</td>
-                                <td style="text-align: center;">
-                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: center;">4</td>
-                                <td style="font-weight: 600;">PENGETAHUAN (P)</td>
-                                <td style="text-align: center;">
-                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div id="content-mahasiswa" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mahasiswa</h3>
-                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk mahasiswa Teknik Informatika.</p>
-                        </div>
-                        <div style="display: flex; gap: 12px;">
-                            <button class="btn-primary-red" onclick="bukaModalMahasiswa()"><i class="fas fa-plus"></i> Tambah</button>
-                            <button class="btn-dark" onclick="loadData('mahasiswa')"><i class="fas fa-sync-alt"></i> Refresh</button>
-                        </div>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                            Show 
-                            <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
-                                <option>5</option>
-                                <option selected>10</option>
-                                <option>25</option>
-                            </select> 
-                            entries
-                        </div>
-                        
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                            <input type="text" id="searchMahasiswa" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#d1d5db'">
-                        </div>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th width="5%" style="text-align: center;">No</th>
-                                <th width="15%">NIM</th>
-                                <th>Nama Mahasiswa</th>
-                                <th width="15%" style="text-align: center;">Angkatan</th>
-                                <th width="15%" style="text-align: center;">Status</th>
-                                <th width="20%" style="text-align: center;">Opsi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyMahasiswa">
-                            <tr>
-                                <td style="text-align: center;">1</td>
-                                <td><strong>223220042</strong></td>
-                                <td style="font-weight: 600;">Georgius Krisna</td>
-                                <td style="text-align: center;">2022</td>
-                                <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
-                                <td style="text-align: center;">
-                                    <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Ubah</button>
-                                    <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div id="pagination-mahasiswa" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-                </div>
-                <div id="content-dosen" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Dosen</h3>
-                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk dosen pengajar.</p>
-                        </div>
-                        <div style="display: flex; gap: 12px;">
-                            <button class="btn-primary-red" onclick="alert('Fitur Upload Excel sedang disiapkan!')" style="background: var(--primary-red);"><i class="fas fa-file-excel"></i> Upload Excel</button>
-                            <button class="btn-dark" onclick="loadData('dosen')"><i class="fas fa-sync-alt"></i> Refresh</button>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                            Show 
-                            <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
-                                <option>5</option>
-                                <option selected>10</option>
-                                <option>25</option>
-                            </select> 
-                            entries
-                        </div>
-                        
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                            <input type="text" id="searchDosen" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#d1d5db'">
-                        </div>
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th width="5%" style="text-align: center;">#</th>
-                                <th width="5%" style="text-align: center;">ID</th>
-                                <th width="25%">Nama</th>
-                                <th width="20%">Homebase</th>
-                                <th width="15%">NIDN</th>
-                                <th width="20%">Email</th>
-                                <th width="10%" style="text-align: center;">Opsi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyDosen">
-                            <tr>
-                                <td style="text-align: center;">1</td>
-                                <td style="text-align: center;">256</td>
-                                <td style="font-weight: 600;">Prof. Dr. Amba, M.M.</td>
-                                <td>Doktor Informatika</td>
-                                <td>190302001</td>
-                                <td>amba@tukam.ac.id</td>
-                                <td style="text-align: center;">
-                                    <button class="btn-action" style="background: white; color: var(--primary-red); border: 1.5px solid var(--primary-red); font-weight: 700;" onclick="alert('Masuk ke mode Rasuk')">Rasuk</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="text-align: center;">2</td>
-                                <td style="text-align: center;">272</td>
-                                <td style="font-weight: 600;">Dr. Drs. fuad, M.M.</td>
-                                <td>-</td>
-                                <td>190302004</td>
-                                <td>fuad@kebun.ac.id</td>
-                                <td style="text-align: center;">
-                                    <button class="btn-action" style="background: white; color: var(--primary-red); border: 1.5px solid var(--primary-red); font-weight: 700;" onclick="alert('Masuk ke mode Rasuk')">Rasuk</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div id="pagination-dosen" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-                </div>
-                <div id="content-mengajar" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Data Mengajar</h3>
-                            <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola plotting dosen mengajar per mata kuliah dan kelas.</p>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn-primary-red" onclick="bukaModalMengajar()">Tambah</button>
-                            <button class="btn-dark" onclick="alert('Fitur Import dari pusat sedang disiapkan!')">Import dari pusat</button>
-                            <button class="btn-primary-red" onclick="alert('Fitur Upload Excel sedang disiapkan!')">Upload Excel</button>
-                            <button class="btn-dark" onclick="loadData('mengajar')"><i class="fas fa-sync-alt"></i> Refresh</button>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                            Show 
-                            <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
-                                <option>5</option>
-                                <option selected>10</option>
-                                <option>25</option>
-                            </select> 
-                            entries
-                        </div>
-                        
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                            <input type="text" id="searchMengajar" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-family: 'Inter', sans-serif; font-size: 0.9rem; transition: 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#d1d5db'">
-                        </div>
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th width="3%" style="text-align: center;">#</th>
-                                <th width="18%">Mata Kuliah</th>
-                                <th width="10%" style="text-align: center;">Tahun</th>
-                                <th width="10%" style="text-align: center;">Kurikulum</th>
-                                <th width="8%" style="text-align: center;">Semester</th>
-                                <th width="10%" style="text-align: center;">Angkatan</th>
-                                <th width="20%">Dosen Koordinator dan Anggota</th>
-                                <th width="15%">Kelas</th>
-                                <th width="6%" style="text-align: center;">Opsi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyMengajar">
-                            <tr>
-                                <td style="text-align: center; vertical-align: top; padding-top: 18px;">1</td>
-                                <td style="vertical-align: top; padding-top: 18px;">
-                                    <span style="display:block; color:#6b7280; font-size:0.8rem; margin-bottom: 4px;">SI038</span>
-                                    <strong style="color: var(--text-dark); font-size: 0.9rem;">MATEMATIKA DISKRET</strong>
-                                </td>
-                                <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025/2026</option></select></td>
-                                <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025</option></select></td>
-                                <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>1</option></select></td>
-                                <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025</option></select></td>
-                                <td style="vertical-align: top; font-size: 0.85rem; color: #4338ca; padding-top: 18px; line-height: 1.6;">
-                                    Sri Mulyatun, Dra., M.M<br>
-                                    Dina Maulina, S.Kom., M.Kom.
-                                </td>
-                                <td style="vertical-align: top; font-size: 0.8rem; color: #6b7280; padding-top: 18px; line-height: 1.6;">
-                                    25S1SI01-Matemat(SI038)<br>
-                                    25S1SI02-Matemat(SI038)<br>
-                                    25S1SI03-Matemat(SI038)
-                                </td>
-                                <td style="text-align: center; vertical-align: top; padding-top: 18px;">
-                                    <button class="btn-action" style="background: var(--border-dark); color: white; width: 100%; justify-content: center; margin-bottom: 6px;">Detail</button>
-                                    <button class="btn-action btn-delete" style="width: 100%; justify-content: center;">Hapus</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div id="pagination-mengajar" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
-                </div>
-                
-                <div id="content-mapping-mk" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800;">Mapping Mata Kuliah ke CPMK</h3>
-                            <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Menghubungkan antara Mata Kuliah dan CPMK sesuai kebutuhan</p>
-                        </div>
-                        <button class="btn-dark" onclick="simpanMappingMK()"><i class="fas fa-save"></i> Simpan Mapping</button>
-                    </div>
-
-                    <div class="custom-select-wrapper">
-                        <select id="pilihMKMapping" class="custom-select-figma" onchange="loadMappingUI()">
-                            <option value="">Pilih Mata Kuliah</option>
-                        </select>
-                        <i class="fas fa-chevron-down select-icon"></i>
-                    </div>
-
-                    <div class="mapping-content-area">
-                        <div id="mappingEmptyState" style="display: flex; flex-direction: column; justify-content: center; height: 100%; flex: 1; margin-top: 40px; max-width: 500px; margin-left: auto; margin-right: auto;">
-                            <h3 style="font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 30px;">Panduan Pemetaan Mata Kuliah</h3>
-                            <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;">
-                                <div style="width: 32px; height: 32px; border-radius: 50%; background: #111827; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
-                                <div>
-                                    <h4 style="margin: 0 0 4px 0; font-size: 1rem;">Pilih Mata Kuliah</h4>
-                                    <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Gunakan kotak dropdown di atas untuk memilih mata kuliah.</p>
-                                </div>
-                            </div>
-                            <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px;">
-                                <div style="width: 32px; height: 32px; border-radius: 50%; background: #8b0000; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
-                                <div>
-                                    <h4 style="margin: 0 0 4px 0; font-size: 1rem;">Centang CPMK</h4>
-                                    <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Beri centang pada capaian pembelajaran yang dibebankan.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div id="loadingMapping" style="display:none; color:#6b7280; font-style: italic; text-align: center; margin-top: 50px;">
-                            <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Memuat data mapping...
-                        </div>
-                        
-                        <div id="mappingContainer" style="display:none;">
-                            <div id="checklistArea"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="content-reset" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800;">Reset Password Dosen</h3>
-                            <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Ubah kata sandi akun dosen Teknik Informatika dengan paksa</p>
-                        </div>
-                    </div>
-
-                    <div style="background: white; border: 2.5px solid #111827; border-radius: 16px; padding: 40px; max-width: 600px;">
-                        <div style="margin-bottom: 24px;">
-                            <label style="display: block; font-weight: 700; margin-bottom: 10px; font-size: 0.95rem;">Cari Nama Dosen / Username</label>
-                            <div style="position: relative;">
-                                <i class="fas fa-user" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
-                                <input list="daftarDosenTI" id="targetUsername" placeholder="Ketik username atau nama..." style="width: 100%; padding: 14px 16px 14px 45px; border-radius: 8px; border: 2px solid #e5e7eb; font-size: 1rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#e5e7eb'">
-                                <datalist id="daftarDosenTI"></datalist>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-bottom: 32px;">
-                            <label style="display: block; font-weight: 700; margin-bottom: 10px; font-size: 0.95rem;">Password Baru</label>
-                            <div style="position: relative;">
-                                <i class="fas fa-lock" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
-                                <input type="password" id="newPassword" placeholder="Masukkan password baru..." style="width: 100%; padding: 14px 16px 14px 45px; border-radius: 8px; border: 2px solid #e5e7eb; font-size: 1rem; outline: none; transition: all 0.2s;" onfocus="this.style.borderColor='#111827'" onblur="this.style.borderColor='#e5e7eb'">
-                            </div>
-                        </div>
-                        
-                        <button onclick="prosesResetPassword()" class="btn-dark" style="width: 100%; padding: 16px; font-size: 1.05rem; justify-content: center; background: #8b0000; border: none; border-radius: 8px;">
-                            <i class="fas fa-key"></i> Paksa Reset Password
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="content-krs" class="section">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800;">Import KRS Mahasiswa</h3>
-                            <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Format file yang didukung: Excel (.xlsx)</p>
-                        </div>
-                    </div>
-
-                    <div style="background: #fafafa; border: 2.5px dashed #111827; border-radius: 16px; padding: 50px 40px; max-width: 550px; text-align: center; margin: 0 auto;">
-                        <i class="fas fa-cloud-upload-alt" style="font-size: 4rem; color: #8b0000; margin-bottom: 20px;"></i>
-                        <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 10px;">Upload File KRS</h4>
-                        <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.5; margin-bottom: 30px;">
-                            Sistem akan otomatis mengekstrak data dan menyinkronkan Mahasiswa, Mata Kuliah, serta Dosen ke dalam database.
-                        </p>
-                        
-                        <div style="margin-bottom: 30px; background: white; padding: 10px; border-radius: 8px; border: 2px solid #e5e7eb;">
-                            <input type="file" id="krsFileInputTI" accept=".xlsx" style="width: 100%; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #4b5563; cursor: pointer; outline: none;">
-                        </div>
-                        
-                        <button class="btn-dark" onclick="handleKRSUpload('TI')" style="width: 100%; justify-content: center; padding: 16px; font-size: 1.05rem; background: #111827;">
-                            <i class="fas fa-magic"></i> Jalankan Otomatisasi n8n
-                        </button>
-                    </div>
-                </div>
-                <div id="modalKurikulum" class="modal-overlay">
-                    <div class="modal-box">
-                        <h3 id="modalTitle" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Tahun Kurikulum</h3>
-                        <input type="hidden" id="idKurikulum">
-                        <div class="form-group">
-                            <label>Kode Kurikulum</label>
-                            <input type="text" id="inputKode" class="form-control" placeholder="Contoh: K-21">
-                        </div>
-                        <div class="form-group">
-                            <label>Nama (Tahun)</label>
-                            <input type="number" id="inputTahun" class="form-control" placeholder="Contoh: 2021">
-                        </div>
-                        <div class="form-group">
-                            <label>Prosentase Minimal Lulus CPMK (%)</label>
-                            <input type="number" id="inputProsentase" class="form-control" placeholder="Contoh: 41">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 30px;">
-                            <label>Status</label>
-                            <select id="inputStatus" class="form-control" style="cursor: pointer;">
-                                <option value="aktif">Aktif</option>
-                                <option value="nonaktif">Nonaktif</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                            <button onclick="tutupModalTahun()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                            <button onclick="simpanTahun()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="modalRumpun" class="modal-overlay">
-                    <div class="modal-box">
-                        <h3 id="modalTitleRumpun" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Rumpun Mata Kuliah</h3>
-                        <input type="hidden" id="idRumpun">
-                        <div class="form-group">
-                            <label>Nama Rumpun</label>
-                            <input type="text" id="inputNamaRumpun" class="form-control" placeholder="Contoh: Project Management">
-                        </div>
-                        <div class="form-group">
-                            <label>Koordinator</label>
-                            <input type="text" id="inputKoordinator" class="form-control" placeholder="Nama Dosen Koordinator">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 30px;">
-                            <label>NIK Koordinator</label>
-                            <input type="number" id="inputNIK" class="form-control" placeholder="Nomor Induk Karyawan/Dosen">
-                        </div>
-                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                            <button onclick="tutupModalRumpun()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                            <button onclick="simpanRumpun()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="modalJenisCPL" class="modal-overlay">
-                    <div class="modal-box">
-                        <h3 id="modalTitleJenisCPL" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Jenis CPL</h3>
-                        
-                        <input type="hidden" id="idJenisCPL">
-                        
-                        <div class="form-group" style="margin-bottom: 30px;">
-                            <label>Nama Jenis CPL</label>
-                            <input type="text" id="inputNamaJenisCPL" class="form-control" placeholder="Contoh: SIKAP (S)">
-                        </div>
-                        
-                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                            <button onclick="tutupModalJenisCPL()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                            <button onclick="simpanJenisCPL()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
-                        </div>
-                    </div>
-                </div>
-                <div id="modalMahasiswa" class="modal-overlay">
-                    <div class="modal-box">
-                        <h3 id="modalTitleMahasiswa" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Mahasiswa</h3>
-                        
-                        <input type="hidden" id="idMahasiswa">
-                        
-                        <div class="form-group">
-                            <label>NIM</label>
-                            <input type="text" id="inputNIM" class="form-control" placeholder="Contoh: 22.11.1234">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Nama Lengkap</label>
-                            <input type="text" id="inputNamaMahasiswa" class="form-control" placeholder="Nama lengkap mahasiswa">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Angkatan (Tahun)</label>
-                            <input type="number" id="inputAngkatan" class="form-control" placeholder="Contoh: 2022">
-                        </div>
-
-                        <div class="form-group" style="margin-bottom: 30px;">
-                            <label>Status</label>
-                            <select id="inputStatusMahasiswa" class="form-control" style="cursor: pointer;">
-                                <option value="aktif">Aktif</option>
-                                <option value="cuti">Cuti</option>
-                                <option value="lulus">Lulus</option>
-                            </select>
-                        </div>
-                        
-                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                            <button onclick="tutupModalMahasiswa()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                            <button onclick="simpanMahasiswa()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
-                        </div>
-                    </div>
-                </div>
-                <div id="modalDosen" class="modal-overlay">
-                    <div class="modal-box">
-                        <h3 id="modalTitleDosen" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Edit Data Dosen</h3>
-                        
-                        <input type="hidden" id="idDosenDatabase"> <div class="form-group">
-                            <label>NIDN</label>
-                            <input type="text" id="inputNIDNDosen" class="form-control" placeholder="Nomor Induk Dosen Nasional" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
-                            <small style="color: #6b7280; font-size: 0.8rem;">*NIDN adalah kunci utama dan tidak dapat diubah.</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Nama Lengkap (Serta Gelar)</label>
-                            <input type="text" id="inputNamaDosen" class="form-control" placeholder="Contoh: Prof. Dr. Fulan, M.Kom">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Homebase</label>
-                            <input type="text" id="inputHomebaseDosen" class="form-control" placeholder="Contoh: Teknik Informatika">
-                        </div>
-
-                        <div class="form-group" style="margin-bottom: 30px;">
-                            <label>Email Akademik</label>
-                            <input type="email" id="inputEmailDosen" class="form-control" placeholder="Contoh: dosen@univ.ac.id">
-                        </div>
-                        
-                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                            <button onclick="tutupModalDosen()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                            <button onclick="simpanDosen()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Perubahan</button>
-                        </div>
-                    </div>
-                </div>
-                <div id="modalMengajar" class="modal-overlay">
-                    <div class="modal-box" style="width: 550px;">
-                        <h3 id="modalTitleMengajar" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Data Mengajar</h3>
-                        
-                        <input type="hidden" id="idMengajar">
-                        
-                        <div class="form-group">
-                            <label>Mata Kuliah</label>
-                            <select id="inputMatkulMengajar" class="form-control">
-                                <option value="">-- Pilih Mata Kuliah --</option>
-                                <option value="SI038">SI038 - MATEMATIKA DISKRET</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Dosen Koordinator</label>
-                            <select id="inputDosenMengajar" class="form-control">
-                                <option value="">-- Pilih Dosen --</option>
-                                <option value="sri">Sri Mulyatun, Dra., M.M</option>
-                            </select>
-                        </div>
-
-                        <div style="display: flex; gap: 15px; margin-bottom: 25px;">
-                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                                <label>Tahun Akademik</label>
-                                <input type="text" id="inputTahunMengajar" class="form-control" placeholder="Contoh: 2025/2026">
-                            </div>
-                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
-                                <label>Semester</label>
-                                <input type="number" id="inputSemesterMengajar" class="form-control" placeholder="Contoh: 1">
-                            </div>
-                        </div>
-                        
-                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                            <button onclick="tutupModalMengajar()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                            <button onclick="simpanMengajar()" class="btn-dark" style="padding: 12px 18px; border-radius: 8px;"><i class="fas fa-save"></i> Simpan Data</button>
-                        </div>
+                <div class="figma-card" style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
+                    <h3 style="margin-top: 0; color: #111827;">Rata-rata Pencapaian CPL</h3>
+                    <div style="position: relative; height: 300px; width: 100%;">
+                        <canvas id="cplChart"></canvas>
                     </div>
                 </div>
             </div>
+
+            <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                <div class="figma-card" style="border-top: 4px solid #217346; background: white; padding: 20px; border-radius: 12px;">
+                    <h3 style="margin-top: 0; color: #217346;"><i class="fas fa-chart-pie"></i> Pintasan Laporan Kelas</h3>
+                    <p style="color: #666; font-size: 0.95rem;">Lihat analisis transkrip nilai dan ketercapaian CPL dan CPMK mahasiswa secara spesifik per mata kuliah</p>
+                    <button class="btn-dark" style="width: 100%; padding: 10px; background: #217346; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="window.location.href='laporan.html'">
+                        <i class="fas fa-external-link-alt"></i> Buka Laporan Kelas
+                    </button>
+                </div>
+                
+                <div class="figma-card" style="border-top: 4px solid #8b0000; background: white; padding: 20px; border-radius: 12px;">
+                    <h3 style="margin-top: 0; color: #8b0000;"><i class="fas fa-user-graduate"></i> Portofolio CPL Global</h3>
+                    <p style="color: #666; font-size: 0.95rem;">Cari dan lihat rekapitulasi persentase penguasaan CPL mahasiswa Teknik Informatika dari total seluruh mata kuliah</p>
+                    <button class="btn-primary-ti" style="width: 100%; padding: 10px; text-align: center;" onclick="window.location.href='portofolio_admin.html'">
+                        <i class="fas fa-external-link-alt"></i> Buka Portofolio CPL
+                    </button>
+                </div>
+            </div>
         </div>
+
+        <div id="content-mapping-mk" class="section">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                <div style="width: 60%;">
+                    <label><strong>Pilih Mata Kuliah TI:</strong></label>
+                    <select id="pilihMKMapping" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;" onchange="loadMappingUI()">
+                        <option value="">-- Pilih Mata Kuliah --</option>
+                    </select>
+                </div>
+                <button class="btn-primary-ti" onclick="simpanMappingMK()"><i class="fas fa-save"></i> Simpan Mapping</button>
+            </div>
+
+            <div id="mappingEmptyState" style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 40px;">
+                <h3 style="font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 30px;">Panduan Pemetaan Mata Kuliah (TI)</h3>
+                <p style="color: #6b7280;">Pilih Mata Kuliah dari dropdown di atas untuk mulai memetakan CPMK.</p>
+            </div>
+
+            <div id="loadingMapping" style="display:none; text-align:center; color:#666; margin-top: 40px;"><i class="fas fa-spinner fa-spin"></i> Memuat data pemetaan TI...</div>
+            
+            <div id="mappingContainer" style="display:none;">
+                <p style="background: #fee2e2; padding: 10px; border-radius: 5px; color: #8b0000; font-size: 0.9rem;"><i class="fas fa-info-circle"></i> Centang CPMK TI yang dibebankan ke Mata Kuliah ini.</p>
+                <div id="checklistArea"></div>
+            </div>
+        </div>
+
+        <div id="content-reset" class="section" style="max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+            <h3 style="color: #8b0000; margin-top: 0;"><i class="fas fa-key"></i> Reset Password Dosen TI</h3>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Gunakan form ini jika ada Dosen Teknik Informatika (TI) yang lupa password mereka.</p>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">Cari Nama Dosen / Username</label>
+                <input list="daftarDosenTI" id="targetUsername" placeholder="🔍 Ketik username atau nama..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
+                <datalist id="daftarDosenTI"></datalist>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">Password Baru</label>
+                <input type="password" id="newPassword" placeholder="Masukkan password baru..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
+            </div>
+            
+            <button onclick="prosesResetPassword()" class="btn-primary-ti" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Paksa Reset Password</button>
+        </div>
+
+        <div id="content-krs" class="section">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.5rem; font-weight: 800;">Import KRS Mahasiswa TI</h3>
+                    <p style="margin: 6px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Format file yang didukung: Excel (.xlsx)</p>
+                </div>
+            </div>
+
+            <div style="background: #fafafa; border: 2.5px dashed #8b0000; border-radius: 16px; padding: 50px 40px; max-width: 550px; text-align: center; margin: 0 auto;">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 4rem; color: #8b0000; margin-bottom: 20px;"></i>
+                <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 10px;">Upload File KRS</h4>
+                <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.5; margin-bottom: 30px;">
+                    Sistem akan otomatis mengekstrak data dan menyinkronkan Mahasiswa, Mata Kuliah, serta Dosen TI ke dalam database.
+                </p>
+                
+                <div style="margin-bottom: 30px; background: white; padding: 10px; border-radius: 8px; border: 2px solid #e5e7eb;">
+                    <input type="file" id="krsFileInputTI" accept=".xlsx" style="width: 100%; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #4b5563; cursor: pointer; outline: none;">
+                </div>
+                
+                <button class="btn-primary-ti" onclick="handleKRSUpload('TI')" style="width: 100%; justify-content: center; padding: 16px; font-size: 1.05rem;">
+                    <i class="fas fa-magic"></i> Jalankan Sinkronisasi n8n
+                </button>
+            </div>
+        </div>
+
     </div>
 
-    <!-- 5. SCRIPT BAWAAN ADMIN CONFIG ANDA -->
     <script>
+        // 1. KONFIGURASI API KHUSUS TI
         const PRODI = 'ti'; 
-    const API_BASE = "https://sink-stephanie-wives-discussion.trycloudflare.com/webhook";
-    const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
-    const API_UPDATE = `${API_BASE}/admin-update-master`;
-    const API_INSERT = `${API_BASE}/admin-insert-master`;
-    const API_MAP_MK = `${API_BASE}/admin-map-mk-cpmk`;
-    const API_GET_USERS = `${API_BASE}/get-users`;
-    const API_DASHBOARD = `${API_BASE}/get-dashboard-kaprodi`;
+        const API_BASE = "https://estimation-fourth-promotions-steel.trycloudflare.com/webhook";
+        const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
+        const API_MAP_MK = `${API_BASE}/admin-map-mk-cpmk`;
+        const API_GET_USERS = `${API_BASE}/get-users`;
+        const API_DASHBOARD = `${API_BASE}/get-dashboard-kaprodi?prodi=` + PRODI;
 
-    // --- SATPAM ADMIN TI ---
-    const userLogin = localStorage.getItem("user_login");
-    const userRole = localStorage.getItem("user_role");
-    const userProdi = localStorage.getItem("prodi_aktif");
+        // 2. SATPAM AKSES LOGIN TI
+        const userLogin = localStorage.getItem("user_login");
+        const userRole = localStorage.getItem("user_role");
+        const userProdi = localStorage.getItem("prodi_aktif");
 
-    if (!userLogin) window.location.replace("../login/login.html");
-    
-    setTimeout(() => {
-        const nameEl = document.getElementById("adminName");
-        const avatarEl = document.getElementById("sidebarAvatar");
-        if(nameEl && avatarEl) {
-            nameEl.innerText = userLogin;
-            avatarEl.src = `https://ui-avatars.com/api/?name=${userLogin}&background=8b0000&color=fff&bold=true`;
-        }
-    }, 500);
+        if (!userLogin) window.location.replace("../../login/login.html");
 
-    if (userRole !== 'head_admin') {
-        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
-        else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
-    }
-
-    // --- FUNGSI ANIMASI DROPDOWN SIDEBAR ---
-    window.toggleDropdown = function(element) {
-        var dropdownContent = element.nextElementSibling;
-
-        // PENGAMAN: Jika di bawah menu tidak ada kotak dropdown, hentikan! (Ini yang mencegah error 'null')
-        if (!dropdownContent || !dropdownContent.classList.contains('dropdown-container')) {
-            return; 
+        if (userRole !== 'head_admin') {
+            if (userRole === 'dosen') window.location.replace("../../dosen/input_nilai.html");
+            else if (userRole === 'admin' && userProdi === 'si') window.location.replace("../kaprodi_si/admin_config_si.html");
         }
 
-        // Tutup dropdown lain
-        let allDropdowns = document.querySelectorAll('.dropdown-container');
-        allDropdowns.forEach(dropdown => {
-            if(dropdown !== dropdownContent) {
-                dropdown.style.display = 'none';
+        // 3. MESIN PENGUBAH TAB INTERNAL SPA
+        function switchTab(type) {
+            document.querySelectorAll('.section').forEach(el => { 
+                el.style.display = 'none'; 
+                el.classList.remove('active'); 
+            });
+            
+            const contentSection = document.getElementById('content-' + type);
+            if(contentSection) {
+                contentSection.style.display = 'block';
+                contentSection.classList.add('active');
             }
-        });
 
-        // Buka/Tutup dropdown ini
-        if (dropdownContent.style.display === "block") {
-            dropdownContent.style.display = "none";
-        } else {
-            dropdownContent.style.display = "block";
-        }
-    };
+            const titles = {
+                'dashboard': '📊 Dashboard Admin TI',
+                'mapping-mk': '🔗 Mapping Mata Kuliah - CPMK TI',
+                'reset': '🔑 Reset Password Dosen TI',
+                'krs': '📂 Import KRS Mahasiswa TI'
+            };
+            document.getElementById('pageTitle').innerHTML = titles[type] || 'Panel Admin TI';
 
-    // --- LOGIKA SIDEBAR & SECTION ---
-    function switchTab(type) {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.section').forEach(el => { el.style.display = 'none'; el.classList.remove('active'); });
-        
-        const navBtn = document.getElementById('nav-' + type);
-        if(navBtn) navBtn.classList.add('active');
-        
-        const contentSection = document.getElementById('content-' + type);
-        if(contentSection) {
-            contentSection.style.display = 'block';
-            contentSection.classList.add('active');
+            if(type === 'dashboard') loadDashboard();
+            if(type === 'reset') loadUserList();
+            if(type === 'mapping-mk') loadDropdownMK();
         }
 
-        // Penamaan Judul Halaman Dinamis
-        const titles = { 
-            'dashboard': 'PANEL KENDALI <span>ADMIN</span>', 
-            'mk': 'KELOLA MATA <span>KULIAH</span>', 
-            'cpl': 'CAPAIAN PEMBELAJARAN <span>LULUSAN</span>',
-            'cpmk': 'CAPAIAN PEMBELAJARAN <span>MATA KULIAH</span>',
-            'tahun': 'TAHUN <span>KURIKULUM</span>',
-            'rumpun': 'RUMPUN <span>MATA KULIAH</span>',
-            'jenis-cpl': 'JENIS <span>CPL</span>',
-            'mahasiswa': 'DATA <span>MAHASISWA</span>',
-            'dosen': 'DATA <span>DOSEN</span>',
-            'mengajar': 'DATA <span>MENGAJAR</span>',
-            'mapping': 'MAPPING <span>CPL - CPMK</span>',
-            'mapping-mk': 'MAPPING <span>MK - CPMK</span>',
-            'reset': 'KELOLA <span>PASSWORD</span>',
-            'krs': 'IMPORT <span>KRS MAHASISWA</span>'
-        };
-        document.getElementById('pageTitle').innerHTML = titles[type] || 'PANEL <span>ADMIN</span>';
+        // 4. JEMBATAN SIDEBAR SPA
+        function pasangJembatanSidebar() {
+            const petaMenu = {
+                '/mapping/map_mk_cpmk.html': 'mapping-mk',
+                '/settings.html': 'reset',
+                '/import_krs.html': 'krs'
+            };
 
-        if(type === 'mapping-mk') loadDropdownMK();
-        if (type === 'tahun') loadDataTahun();
-        else if (type === 'dashboard') loadDashboard();
-        else if(type === 'mapping') loadMappingData();
-        else if(type === 'reset') loadUserList(); 
-        else if(type === 'mk' || type === 'cpl' || type === 'cpmk') loadData(type);
-        else if(type === 'mk' || type === 'cpl' || type === 'cpmk' || type === 'mahasiswa') loadData(type);
-        else if(type === 'mk' || type === 'cpl' || type === 'cpmk' || type === 'mahasiswa' || type === 'dosen') loadData(type);
-        else if(type === 'mk' || type === 'cpl' || type === 'cpmk' || type === 'mahasiswa' || type === 'dosen' || type === 'mengajar') loadData(type);
-    }
-
-    // --- VARIABEL PAGINASI PINTAR ---
-    const paginationState = {
-        'mk':      { data: [], page: 1, bodyId: 'bodyMK',      paginationId: 'pagination-mk' },
-        'cpl':     { data: [], page: 1, bodyId: 'bodyCPL',     paginationId: 'pagination-cpl' },
-        'cpmk':    { data: [], page: 1, bodyId: 'bodyCPMK',    paginationId: 'pagination-cpmk' },
-        'mapping': { data: [], page: 1, bodyId: 'bodyMapping', paginationId: 'pagination-mapping' },
-        'mahasiswa': { data: [], page: 1, bodyId: 'bodyMahasiswa', paginationId: 'pagination-mahasiswa' },
-        'dosen':     { data: [], page: 1, bodyId: 'bodyDosen',     paginationId: 'pagination-dosen' },
-        'mengajar': { data: [], page: 1, bodyId: 'bodyMengajar', paginationId: 'pagination-mengajar' },
-        
-    };
-    const rowsPerPage = 5; 
-    let globalCPL = []; 
-
-    // --- FUNGSI LOAD DATA UTAMA ---
-    async function loadData(tipe) { 
-        try {
-            const res = await fetch(API_URL); 
-            const data = await res.json();
-            
-            paginationState[tipe].data = data.filter(i => i.tipe === tipe);
-            paginationState[tipe].page = 1; 
-            
-            renderTablePaginated(tipe);
-        } catch(e) { console.error(e); }
-    }
-
-    // --- FUNGSI RENDER TABEL DINAMIS ---
-    function renderTablePaginated(tipe) {
-        const state = paginationState[tipe];
-        const tbody = document.getElementById(state.bodyId);
-        tbody.innerHTML = "";
-
-        const startIndex = (state.page - 1) * rowsPerPage;
-        const endIndex = startIndex + rowsPerPage;
-        const dataHalamanIni = state.data.slice(startIndex, endIndex);
-
-        if (tipe === 'mapping') {
-            dataHalamanIni.forEach(cpmk => {
-                let options = '<option value="">-- Pilih CPL --</option>';
-                globalCPL.forEach(cpl => { 
-                    const selected = (cpl.kode === cpmk.parent) ? 'selected' : ''; 
-                    options += `<option value="${cpl.kode}" ${selected}>${cpl.kode} - ${cpl.label.substring(0, 30)}...</option>`; 
-                });
-                tbody.innerHTML += `<tr>
-                    <td><strong>${cpmk.kode}</strong></td>
-                    <td style="text-align:left; font-size:0.9rem; color:#4b5563;">${cpmk.label}</td>
-                    <td><select id="sel-${cpmk.kode}" style="width:100%; padding:10px; border-radius:6px; border:1px solid #d1d5db; outline:none;">${options}</select></td>
-                    <td style="text-align:center;"><button class="btn-dark" style="padding: 10px 14px;" onclick="simpanMappingCPL('${cpmk.kode}')"><i class="fas fa-save"></i></button></td>
-                </tr>`;
-            });
-        } 
-        // ✨ LOGIKA KHUSUS RENDER MAHASISWA ✨
-        else if (tipe === 'mahasiswa') {
-            dataHalamanIni.forEach((item, index) => {
-                const noUrut = startIndex + index + 1;
-                // Membongkar data yang kita gabungkan dengan || di n8n tadi
-                const parts = item.label ? item.label.split('||') : ['Tidak Diketahui', '-'];
-                const namaMhs = parts[0];
-                const angkatan = parts[1] || '-';
-
-                tbody.innerHTML += `<tr>
-                    <td style="text-align: center;">${noUrut}</td>
-                    <td><strong>${item.kode}</strong></td>
-                    <td style="font-weight: 600;">${namaMhs}</td>
-                    <td style="text-align: center;">${angkatan}</td>
-                    <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
-                    <td style="text-align: center;">
-                        <button class="btn-action btn-edit" onclick="bukaModalMahasiswa('${item.kode}')"><i class="fas fa-edit"></i> Ubah</button>
-                        <button class="btn-action btn-delete" onclick="hapusData('${tipe}', '${item.kode}')"><i class="fas fa-trash"></i> Hapus</button>
-                    </td>
-                </tr>`;
-            });
-        }
-        // ✨ LOGIKA KHUSUS RENDER DOSEN ✨
-        else if (tipe === 'dosen') {
-            dataHalamanIni.forEach((item, index) => {
-                const noUrut = startIndex + index + 1;
-                const nidn = item.kode;
-                // Jika nama kosong dari database, kita beri tulisan '- Belum Ada Nama -'
-                const namaDosen = item.label ? item.label : '<span style="color:#ef4444; font-style:italic;">- Belum Ada Nama -</span>';
-
-                tbody.innerHTML += `<tr>
-                    <td style="text-align: center;">${noUrut}</td>
-                    <td style="text-align: center;">-</td> 
-                    <td style="font-weight: 600;">${namaDosen}</td>
-                    <td>-</td> 
-                    <td>${nidn}</td>
-                    <td>-</td> 
-                    <td style="text-align: center; display: flex; justify-content: center; gap: 8px; border-bottom: none;">
-                        <button class="btn-action btn-edit" onclick="bukaModalDosen('${nidn}')"><i class="fas fa-edit"></i> Ubah</button>
-                        
-                        <button class="btn-action" style="background: white; color: var(--primary-red); border: 1.5px solid var(--primary-red); font-weight: 700;" onclick="alert('Masuk mode Rasuk untuk NIDN: ${nidn}')">Rasuk</button>
-                    </td>
-                </tr>`;
-            });
-        }
-        // ✨ LOGIKA KHUSUS RENDER MENGAJAR ✨
-        else if (tipe === 'mengajar') {
-            dataHalamanIni.forEach((item, index) => {
-                const noUrut = startIndex + index + 1;
+            document.querySelectorAll('.nav-menu .nav-item, .dropdown-container .dropdown-item').forEach(el => {
+                const path = el.getAttribute('data-path');
                 
-                // Membongkar 6 data yang disatukan SQL tadi
-                const parts = item.label ? item.label.split('||') : ['-','-','-','-','-','-'];
-                const kodeMk = parts[0];
-                const namaMk = parts[1];
-                const tahun = parts[2];
-                const semester = parts[3];
-                const namaDosen = parts[4];
-                const namaKelas = parts[5];
-
-                // Memasukkan data ke dalam template HTML sesuai gaya Figma Anda
-                tbody.innerHTML += `<tr>
-                    <td style="text-align: center; vertical-align: top; padding-top: 18px;">${noUrut}</td>
-                    <td style="vertical-align: top; padding-top: 18px;">
-                        <span style="display:block; color:#6b7280; font-size:0.8rem; margin-bottom: 4px;">${kodeMk}</span>
-                        <strong style="color: var(--text-dark); font-size: 0.9rem;">${namaMk}</strong>
-                    </td>
-                    <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>${tahun}</option></select></td>
-                    <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025</option></select></td>
-                    <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>${semester}</option></select></td>
-                    <td style="vertical-align: top; padding-top: 18px;"><select class="form-control" style="padding: 6px; font-size:0.85rem; width: 100%;"><option>2025</option></select></td>
-                    <td style="vertical-align: top; font-size: 0.85rem; color: #4338ca; padding-top: 18px; line-height: 1.6; font-weight: 600;">
-                        ${namaDosen}
-                    </td>
-                    <td style="vertical-align: top; font-size: 0.8rem; color: #6b7280; padding-top: 18px; line-height: 1.6;">
-                        ${namaKelas}
-                    </td>
-                    <td style="text-align: center; vertical-align: top; padding-top: 18px;">
-                        <button class="btn-action" style="background: var(--border-dark); color: white; width: 100%; justify-content: center; margin-bottom: 6px;">Detail</button>
-                        <button class="btn-action btn-delete" style="width: 100%; justify-content: center;">Hapus</button>
-                    </td>
-                </tr>`;
-            });
-        }
-        // ✨ LOGIKA KHUSUS RENDER SKRIPSI ✨
-        else if (tipe === 'skripsi') {
-        
-            const dummySkripsi = [
-                {
-                    kode: "SI049",
-                    judul: "PERANCANGAN ANTARMUKA SISTEM PENILAIAN CAPAIAN PEMBELAJARAN LULUSAN MENGGUNAKAN PLATFORM OTOMATISASI N8N",
-                    namaMhs: "Georgius Krisna",
-                    nim: "223220042",
-                    kelas: "22S1SI03-Skripsi(SI049)",
-                    namaDosen: "Sri Mulyatun, Dra., M.M",
-                    nidn: "0601067503",
-                    tanggal: "2026-02-27",
-                    tipe: "REGULER",
-                    tahun: "2025/2026",
-                    semester: "Ganjil",
-                    nilai: "= 0.00"
+                if (petaMenu[path]) {
+                    el.href = "#"; 
+                    el.onclick = (e) => {
+                        e.preventDefault();
+                        switchTab(petaMenu[path]);
+                    };
                 }
-            ];
-
-            dummySkripsi.forEach(item => {
-                tbody.innerHTML += `<tr style="border-bottom: 1px solid #e5e7eb;">
-                    <td style="text-align: center; vertical-align: top; padding-top: 16px; color: #6b7280; font-size: 0.9rem;">${item.kode}</td>
-                    <td style="vertical-align: top; padding-top: 16px;">
-                        <div style="font-weight: 600; font-size: 0.85rem; color: #4b5563; margin-bottom: 4px; line-height: 1.4; text-transform: uppercase;">${item.judul}</div>
-                        <div style="color: #6b7280; font-size: 0.8rem; line-height: 1.5;">
-                            ${item.namaMhs}<br>
-                            ${item.nim}<br>
-                            ${item.kelas}<br>
-                            ${item.namaDosen}<br>
-                            ${item.nidn}
-                        </div>
-                    </td>
-                    <td style="vertical-align: top; padding-top: 16px; color: #6b7280; font-size: 0.8rem; line-height: 1.5;">
-                        ${item.tanggal}<br>
-                        ${item.tipe}<br>
-                        ${item.tahun}<br>
-                        ${item.semester}
-                    </td>
-                    <td style="vertical-align: top; padding-top: 16px; color: #6b7280; font-size: 0.85rem;">
-                        ${item.nilai}
-                    </td>
-                    <td style="text-align: center; vertical-align: top; padding-top: 16px;">
-                        <button class="btn-action" style="background: white; color: #8b0000; border: 1.5px solid #8b0000; font-weight: 700; width: 100%; margin-bottom: 6px;">Input Nilai</button>
-                    </td>
-                </tr>`;
-            });
-            return; // Hentikan render paginasi asli karena ini masih dummy
-        }
-        else {
-            dataHalamanIni.forEach(item => {
-                tbody.innerHTML += `<tr>
-                    <td><strong>${item.kode}</strong></td>
-                    <td><input type="text" id="in-${item.kode}" value="${item.label || ''}" style="width:100%; padding:10px; border:1px solid #d1d5db; border-radius:6px; outline:none; font-family:'Inter', sans-serif;"></td>
-                    <td style="text-align:center;"><button class="btn-dark" style="padding: 10px 14px;" onclick="simpanEdit('${tipe}', '${item.kode}')"><i class="fas fa-check"></i></button></td>
-                </tr>`;
-            });
-        }
-        
-
-        renderPaginationUI(tipe);
-    }
-
-    // --- FUNGSI RENDER TOMBOL PREV & NEXT ---
-    function renderPaginationUI(tipe) {
-        const state = paginationState[tipe];
-        const container = document.getElementById(state.paginationId);
-        container.innerHTML = "";
-        
-        const totalPages = Math.ceil(state.data.length / rowsPerPage);
-        if (totalPages <= 1) return; 
-
-        const btnPrev = document.createElement('button');
-        btnPrev.className = 'btn-dark';
-        btnPrev.innerHTML = '<i class="fas fa-chevron-left"></i> Prev';
-        btnPrev.disabled = state.page === 1;
-        btnPrev.onclick = () => { if (state.page > 1) { state.page--; renderTablePaginated(tipe); } };
-        container.appendChild(btnPrev);
-
-        const info = document.createElement('span');
-        info.innerHTML = `Halaman <strong>${state.page}</strong> dari <strong>${totalPages}</strong>`;
-        info.style.fontSize = "0.95rem";
-        info.style.color = "#4b5563";
-        container.appendChild(info);
-
-        const btnNext = document.createElement('button');
-        btnNext.className = 'btn-dark';
-        btnNext.innerHTML = 'Next <i class="fas fa-chevron-right"></i>';
-        btnNext.disabled = state.page === totalPages;
-        btnNext.onclick = () => { if (state.page < totalPages) { state.page++; renderTablePaginated(tipe); } };
-        container.appendChild(btnNext);
-    }
-
-    // --- FUNGSI MODAL TAHUN KURIKULUM ---
-    function bukaModalTahun() {
-        document.getElementById('modalTitle').innerText = "Tambah Tahun Kurikulum";
-        document.getElementById('idKurikulum').value = "";
-        document.getElementById('inputKode').value = "";
-        document.getElementById('inputTahun').value = "";
-        document.getElementById('inputProsentase').value = "";
-        document.getElementById('inputStatus').value = "aktif";
-        document.getElementById('modalKurikulum').style.display = "flex";
-    }
-
-    function tutupModalTahun() {
-        document.getElementById('modalKurikulum').style.display = "none";
-    }
-
-    async function simpanTahun() {
-        const kode = document.getElementById('inputKode').value.trim();
-        const tahun = document.getElementById('inputTahun').value.trim();
-        const prosentase = document.getElementById('inputProsentase').value.trim();
-        const status = document.getElementById('inputStatus').value;
-
-        // Validasi: Cegah form kosong dikirim
-        if (!kode || !tahun || !prosentase) {
-            alert("⚠️ Mohon lengkapi semua data Tahun Kurikulum!");
-            return;
-        }
-
-        try {
-            const res = await fetch(API_INSERT, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ tipe: 'tahun', kode: kode, tahun: tahun, prosentase: prosentase, status: status, prodi: PRODI })
-            });
-            if (res.ok) {
-                alert("✅ Tahun Kurikulum berhasil ditambahkan!");
-                tutupModalTahun();
-                // Opsional: loadDataTahun(); agar tabel langsung ter-refresh
-            } else alert("❌ Gagal menyimpan ke server.");
-        } catch (e) { alert("❌ Terjadi kesalahan koneksi ke n8n."); }
-    }
-
-    // --- FUNGSI MODAL RUMPUN MK ---
-    function bukaModalRumpun() {
-        document.getElementById('modalTitleRumpun').innerText = "Tambah Rumpun Mata Kuliah";
-        document.getElementById('idRumpun').value = "";
-        document.getElementById('inputNamaRumpun').value = "";
-        document.getElementById('inputKoordinator').value = "";
-        document.getElementById('inputNIK').value = "";
-        document.getElementById('modalRumpun').style.display = "flex";
-    }
-
-    function tutupModalRumpun() {
-        document.getElementById('modalRumpun').style.display = "none";
-    }
-
-  async function simpanRumpun() {
-        const nama = document.getElementById('inputNamaRumpun').value.trim();
-        const koordinator = document.getElementById('inputKoordinator').value.trim();
-        const nik = document.getElementById('inputNIK').value.trim();
-
-        if (!nama || !koordinator || !nik) {
-            alert("⚠️ Mohon lengkapi semua data Rumpun Mata Kuliah!");
-            return;
-        }
-
-        try {
-            const res = await fetch(API_INSERT, {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({ tipe: 'rumpun', nama_rumpun: nama, koordinator: koordinator, nik: nik, prodi: PRODI })
-            });
-            if (res.ok) {
-                alert("✅ Rumpun MK berhasil ditambahkan!");
-                tutupModalRumpun();
-            } else alert("❌ Gagal menyimpan ke server.");
-        } catch (e) { alert("❌ Terjadi kesalahan koneksi ke n8n."); }
-    }
-    
-    function loadDataRumpun() {
-        alert("Fungsi refresh Rumpun MK sedang disiapkan untuk Database.");
-    }
-
-    // --- ✨ FUNGSI MODAL JENIS CPL ✨ ---
-    function bukaModalJenisCPL() {
-        document.getElementById('modalTitleJenisCPL').innerText = "Tambah Jenis CPL";
-        document.getElementById('idJenisCPL').value = "";
-        document.getElementById('inputNamaJenisCPL').value = "";
-        document.getElementById('modalJenisCPL').style.display = "flex";
-    }
-
-    function tutupModalJenisCPL() {
-        document.getElementById('modalJenisCPL').style.display = "none";
-    }
-
-    function simpanJenisCPL() {
-        alert("Pop-up Jenis CPL bekerja! Data akan dikirim ke n8n.");
-        tutupModalJenisCPL();
-    }
-    
-    function loadDataJenisCPL() {
-        alert("Fungsi refresh Jenis CPL sedang disiapkan untuk Database.");
-    }
-    // --- ✨ FUNGSI MODAL MAHASISWA ✨ ---
-    function bukaModalMahasiswa() {
-        document.getElementById('modalTitleMahasiswa').innerText = "Tambah Mahasiswa";
-        document.getElementById('idMahasiswa').value = "";
-        document.getElementById('inputNIM').value = "";
-        document.getElementById('inputNamaMahasiswa').value = "";
-        document.getElementById('inputAngkatan').value = "";
-        document.getElementById('modalMahasiswa').style.display = "flex";
-    }
-
-    function tutupModalMahasiswa() {
-        document.getElementById('modalMahasiswa').style.display = "none";
-    }
-
-    function simpanMahasiswa() {
-        alert("Pop-up Mahasiswa bekerja! Data akan dikirim ke n8n.");
-        tutupModalMahasiswa();
-    }
-    
-    function loadDataMahasiswa() {
-        alert("Fungsi refresh Mahasiswa sedang disiapkan untuk Database.");
-    }
-    // --- ✨ FUNGSI MODAL DOSEN ✨ ---
-    function bukaModalDosen(nidn) {
-        // Otomatis mengisi NIDN yang diklik ke dalam form
-        document.getElementById('inputNIDNDosen').value = nidn;
-        
-        // Mengosongkan form lain agar siap diisi (Nantinya ini bisa diisi otomatis dari database jika data API di n8n sudah lengkap)
-        document.getElementById('inputNamaDosen').value = "";
-        document.getElementById('inputHomebaseDosen').value = "";
-        document.getElementById('inputEmailDosen').value = "";
-        
-        document.getElementById('modalDosen').style.display = "flex";
-    }
-
-    function tutupModalDosen() {
-        document.getElementById('modalDosen').style.display = "none";
-    }
-
-    function simpanDosen() {
-        const nidn = document.getElementById('inputNIDNDosen').value;
-        const nama = document.getElementById('inputNamaDosen').value;
-        
-        alert("Sistem berhasil menangkap perubahan untuk " + nama + " (NIDN: " + nidn + "). Data siap dikirim ke n8n!");
-        tutupModalDosen();
-    }
-    // --- ✨ FUNGSI MODAL MENGAJAR ✨ ---
-    function bukaModalMengajar() {
-        document.getElementById('modalTitleMengajar').innerText = "Tambah Data Mengajar";
-        document.getElementById('idMengajar').value = "";
-        document.getElementById('inputMatkulMengajar').value = "";
-        document.getElementById('inputDosenMengajar').value = "";
-        document.getElementById('inputTahunMengajar').value = "";
-        document.getElementById('inputSemesterMengajar').value = "";
-        document.getElementById('modalMengajar').style.display = "flex";
-    }
-
-    function tutupModalMengajar() {
-        document.getElementById('modalMengajar').style.display = "none";
-    }
-
-    function simpanMengajar() {
-        alert("Pop-up Data Mengajar bekerja! Data siap disinkronkan.");
-        tutupModalMengajar();
-    }
-    
-
-    // --- FUNGSI RESET PASSWORD ---
-    async function loadUserList() { 
-        try {
-            const res = await fetch(API_GET_USERS);
-            if (!res.ok) return;
-            const data = await res.json();
-            const datalist = document.getElementById("daftarDosenTI");
-            datalist.innerHTML = ""; 
-            let users = Array.isArray(data) ? ((data[0] && data[0].data) ? data[0].data : data) : (data.data || []);
-            users.forEach(u => { if (u.role === 'dosen' && u.prodi === 'ti') { const option = document.createElement('option'); option.value = u.username; option.text = `${u.nama_lengkap} (Dosen TI)`; datalist.appendChild(option); } });
-        } catch (e) { console.error("Gagal memuat daftar dosen:", e); }
-    }
-
-    async function prosesResetPassword() { 
-        const username = document.getElementById("targetUsername").value.trim(); const newPassword = document.getElementById("newPassword").value.trim();
-        if (!username || !newPassword) { alert("⚠️ Username dan Password baru tidak boleh kosong!"); return; }
-        if (!confirm(`Apakah Anda yakin ingin mengganti password untuk akun "${username}"?`)) return;
-        try {
-           const res = await fetch(`${API_BASE}/reset-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) });
-            const data = await res.json();
-            if (res.ok && data.status === "success") { alert(`✅ BERHASIL: ${data.message}`); document.getElementById("targetUsername").value = ""; document.getElementById("newPassword").value = ""; } 
-            else alert("❌ Gagal mereset password. Pastikan username benar.");
-        } catch (e) { alert("❌ Terjadi kesalahan koneksi ke server n8n."); }
-    }
-
-    // --- FUNGSI MAPPING DATA ---
-    async function loadMappingData() { 
-        try {
-            const res = await fetch(API_URL); 
-            const data = await res.json();
-            globalCPL = data.filter(i => i.tipe === 'cpl'); 
-            paginationState['mapping'].data = data.filter(i => i.tipe === 'cpmk');
-            paginationState['mapping'].page = 1; 
-            renderTablePaginated('mapping');
-        } catch(e) { console.error(e); }
-    }
-
-    async function loadDropdownMK() { 
-        const res = await fetch(API_URL); const data = await res.json(); const select = document.getElementById("pilihMKMapping"); select.innerHTML = '<option value="">-- Pilih Mata Kuliah TI --</option>';
-        data.filter(i => i.tipe === 'mk').forEach(mk => { select.innerHTML += `<option value="${mk.kode}">${mk.kode} - ${mk.label}</option>`; });
-    }
-
-    async function loadMappingUI() { 
-        const mkKode = document.getElementById("pilihMKMapping").value; 
-        const area = document.getElementById("checklistArea"); 
-        const container = document.getElementById("mappingContainer"); 
-        const loading = document.getElementById("loadingMapping");
-        const emptyState = document.getElementById("mappingEmptyState"); 
-
-        if(!mkKode) { 
-            container.style.display = 'none'; 
-            loading.style.display = 'none';
-            emptyState.style.display = 'flex'; 
-            return; 
-        }
-        
-        emptyState.style.display = 'none'; 
-        loading.style.display = 'block'; 
-        container.style.display = 'none';
-        area.innerHTML = "";
-        
-        try {
-            const [resMeta, resMap] = await Promise.all([ fetch(API_URL), fetch(`${API_BASE}/get-mapping-mk?mk=${mkKode}&prodi=${PRODI}`) ]);
-            const meta = await resMeta.json(); const existing = await resMap.json(); const checkedCPMKs = new Set(existing.map(e => e.kode_cpmk));
-            const listCPL = meta.filter(i => i.tipe === 'cpl'); const listCPMK = meta.filter(i => i.tipe === 'cpmk');
-            
-            listCPL.forEach(cpl => {
-                const childCPMK = listCPMK.filter(c => c.parent === cpl.kode);
-                if (childCPMK.length > 0) {
-                    let html = "";
-                    childCPMK.forEach(cpmk => { const isChecked = checkedCPMKs.has(cpmk.kode) ? "checked" : ""; html += `<div style="display:flex; align-items:center; padding: 12px; border-bottom:1px solid #e5e7eb; background: white;"><input type="checkbox" class="chk-cpmk" value="${cpmk.kode}" ${isChecked} style="width:18px; height:18px; margin-right:12px; cursor:pointer;"><div><strong style="color:#111827;">${cpmk.kode}</strong> - <span style="color:#4b5563;">${cpmk.label}</span></div></div>`; });
-                    area.innerHTML += `<div style="margin-bottom:16px; border:1.5px solid #111827; border-radius:8px; overflow:hidden;"><div style="background:#f3f4f6; padding:12px 16px; font-weight:700; color:#111827; border-bottom:1.5px solid #111827;"><i class="fas fa-folder-open" style="margin-right:8px;"></i> ${cpl.kode}</div><div>${html}</div></div>`;
+                
+                if (path === '/admin_config.html') {
+                    el.href = "#";
+                    el.onclick = (e) => {
+                        e.preventDefault();
+                        switchTab('dashboard');
+                    };
                 }
             });
+        }
+
+        // 5. FUNGSI SINKRONISASI BACKEND N8N
+        async function loadUserList() { 
+            try { const res = await fetch(API_GET_USERS); if (!res.ok) return; const data = await res.json(); const datalist = document.getElementById("daftarDosenTI"); datalist.innerHTML = ""; let users = Array.isArray(data) ? ((data[0] && data[0].data) ? data[0].data : data) : (data.data || []); users.forEach(u => { if (u.role === 'dosen' && u.prodi === 'ti') { const option = document.createElement('option'); option.value = u.username; option.text = `${u.nama_lengkap} (Dosen TI)`; datalist.appendChild(option); } }); } catch (e) { console.error(e); }
+        }
+
+        async function prosesResetPassword() { 
+            const username = document.getElementById("targetUsername").value.trim(); const newPassword = document.getElementById("newPassword").value.trim();
+            if (!username || !newPassword) { alert("⚠️ Username dan Password baru tidak boleh kosong!"); return; }
+            if (!confirm(`Apakah Anda yakin ingin mengganti password untuk akun "${username}"?`)) return;
+            try {
+               const res = await fetch(`${API_BASE}/reset-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) });
+                const data = await res.json();
+                if (res.ok && data.status === "success") { alert(`✅ BERHASIL: ${data.message}`); document.getElementById("targetUsername").value = ""; document.getElementById("newPassword").value = ""; } 
+                else alert("❌ Gagal mereset password. Pastikan username benar.");
+            } catch (e) { alert("❌ Terjadi kesalahan koneksi ke server n8n."); }
+        }
+
+        async function loadDropdownMK() { 
+            try {
+                const res = await fetch(API_URL); const data = await res.json(); 
+                const select = document.getElementById("pilihMKMapping"); 
+                select.innerHTML = '<option value="">-- Pilih Mata Kuliah TI --</option>';
+                data.filter(i => i.tipe === 'mk').forEach(mk => { select.innerHTML += `<option value="${mk.kode}">${mk.kode} - ${mk.label}</option>`; });
+            } catch (e) { console.error("Gagal load MK:", e); }
+        }
+
+        async function loadMappingUI() { 
+            const mkKode = document.getElementById("pilihMKMapping").value; 
+            const area = document.getElementById("checklistArea"); 
+            const container = document.getElementById("mappingContainer"); 
+            const loading = document.getElementById("loadingMapping");
+            const emptyState = document.getElementById("mappingEmptyState"); 
+
+            if(!mkKode) { 
+                container.style.display = 'none'; 
+                loading.style.display = 'none';
+                emptyState.style.display = 'flex'; 
+                return; 
+            }
             
-            loading.style.display = 'none'; 
-            container.style.display = 'block'; 
-        } catch (e) { alert("Error memuat UI Mapping!"); }
-    }
+            emptyState.style.display = 'none'; 
+            loading.style.display = 'block'; 
+            container.style.display = 'none';
+            area.innerHTML = "";
+            
+            try {
+                const [resMeta, resMap] = await Promise.all([ fetch(API_URL), fetch(`${API_BASE}/get-mapping-mk?mk=${mkKode}&prodi=${PRODI}`) ]);
+                const meta = await resMeta.json(); const existing = await resMap.json(); const checkedCPMKs = new Set(existing.map(e => e.kode_cpmk));
+                const listCPL = meta.filter(i => i.tipe === 'cpl'); const listCPMK = meta.filter(i => i.tipe === 'cpmk');
+                
+                listCPL.forEach(cpl => {
+                    const childCPMK = listCPMK.filter(c => c.parent === cpl.kode);
+                    if (childCPMK.length > 0) {
+                        let html = "";
+                        childCPMK.forEach(cpmk => { const isChecked = checkedCPMKs.has(cpmk.kode) ? "checked" : ""; html += `<div style="display:flex; align-items:center; padding: 12px; border-bottom:1px solid #e5e7eb; background: white;"><input type="checkbox" class="chk-cpmk" value="${cpmk.kode}" ${isChecked} style="width:18px; height:18px; margin-right:12px; cursor:pointer;"><div><strong style="color:#111827;">${cpmk.kode}</strong> - <span style="color:#4b5563;">${cpmk.label}</span></div></div>`; });
+                        area.innerHTML += `<div style="margin-bottom:16px; border:1.5px solid #8b0000; border-radius:8px; overflow:hidden;"><div style="background:#fee2e2; padding:12px 16px; font-weight:700; color:#8b0000; border-bottom:1.5px solid #8b0000;"><i class="fas fa-folder-open" style="margin-right:8px;"></i> ${cpl.kode}</div><div>${html}</div></div>`;
+                    }
+                });
+                
+                loading.style.display = 'none'; 
+                container.style.display = 'block'; 
+            } catch (e) { alert("Error memuat UI Mapping!"); }
+        }
 
-    // --- FUNGSI SAVE/UPDATE KE N8N ---
-    async function simpanEdit(tipe, kode) { const value = document.getElementById(`in-${kode}`).value; const res = await fetch(API_UPDATE, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ tipe, kode, value, prodi: PRODI }) }); if(res.ok) alert("✅ Berhasil diperbarui!"); }
-    async function simpanMappingCPL(kodeCpmk) { const kodeCpl = document.getElementById(`sel-${kodeCpmk}`).value; const res = await fetch(API_UPDATE, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ tipe: 'mapping', kode: kodeCpmk, value: kodeCpl, prodi: PRODI }) }); if(res.ok) alert("✅ Mapping CPL-CPMK Tersimpan!"); }
-    async function simpanMappingMK() { const mkKode = document.getElementById("pilihMKMapping").value; const listCpmk = Array.from(document.querySelectorAll('.chk-cpmk:checked')).map(cb => cb.value); const token = localStorage.getItem("api_token"); const res = await fetch(API_MAP_MK, { method: "POST", headers: {"Content-Type":"application/json", "Authorization": "Bearer " + token}, body: JSON.stringify({ kode_mk: mkKode, cpmk_list: listCpmk, prodi: PRODI }) }); if(res.ok) alert("✅ Mapping MK-CPMK TI Berhasil!"); }
+        async function simpanMappingMK() { 
+            const mkKode = document.getElementById("pilihMKMapping").value; 
+            const listCpmk = Array.from(document.querySelectorAll('.chk-cpmk:checked')).map(cb => cb.value); 
+            const token = localStorage.getItem("api_token"); 
+            
+            try {
+                const res = await fetch(API_MAP_MK, { method: "POST", headers: {"Content-Type":"application/json", "Authorization": "Bearer " + token}, body: JSON.stringify({ kode_mk: mkKode, cpmk_list: listCpmk, prodi: PRODI }) }); 
+                if(res.ok) alert("✅ Mapping MK-CPMK TI Berhasil Tersimpan!"); 
+                else alert("❌ Gagal menyimpan mapping.");
+            } catch (e) { alert("❌ Terjadi kesalahan koneksi."); }
+        }
 
-    window.onload = () => { 
-        setTimeout(() => { switchTab('dashboard'); }, 500); 
-    };
-    function logout() { localStorage.clear(); window.location.replace("login.html"); }
-    
-    async function handleKRSUpload(role) {
-        const inputId = role === 'TI' ? 'krsFileInputTI' : (role === 'SI' ? 'krsFileInputSI' : 'krsFileInputHead');
-        const fileInput = document.getElementById(inputId);
-        const file = fileInput.files[0];
+        async function handleKRSUpload(role) {
+            const inputId = 'krsFileInputTI';
+            const fileInput = document.getElementById(inputId);
+            const file = fileInput.files[0];
 
-        if (!file) { alert("Silakan pilih file Excel (.xlsx) terlebih dahulu!"); return; }
+            if (!file) { alert("Silakan pilih file Excel (.xlsx) terlebih dahulu!"); return; }
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('uploaded_by', role); 
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('uploaded_by', role); 
 
             try {
-                // GANTI URL DI BAWAH INI DENGAN URL WEBHOOK N8N ANDA NANTI
-                const response = await fetch(`${API_BASE}/upload-krs`, {
-                    method: 'POST',
-                    body: formData
-                });
-
+                const response = await fetch(`${API_BASE}/upload-krs`, { method: 'POST', body: formData });
                 if (response.ok) {
-                    alert("✅ File berhasil dikirim! n8n sedang memproses relasi Database.");
+                    alert("✅ File berhasil dikirim! n8n sedang memproses relasi Database TI.");
                     fileInput.value = ""; 
                 } else {
                     alert("❌ Gagal terhubung ke n8n. Pastikan workflow n8n sudah aktif.");
                 }
+            } catch (error) { alert("Terjadi kesalahan jaringan saat menghubungi server n8n."); }
+        }
+
+        // --- FUNGSI DASHBOARD GRAFIK CHART.JS ---
+        let chartGradeInst, chartCplInst; 
+
+        async function loadDashboard() {
+            try {
+                const res = await fetch(API_DASHBOARD);
+                if (!res.ok) return;
+                const data = await res.json();
+
+                const dataCPL = data.filter(item => item.kategori === 'performa_cpl');
+                const dataGrade = data.filter(item => item.kategori === 'distribusi_grade');
+
+                renderGradeChart(dataGrade);
+                renderCPLChart(dataCPL);
+                calculateSummary(dataGrade);
             } catch (error) {
-                console.error("Error:", error);
-                alert("Terjadi kesalahan jaringan saat menghubungi server n8n.");
+                console.error("Gagal memuat grafik Dashboard:", error);
             }
         }
 
-        // --- FUNGSI DASHBOARD GRAFIK ---
-    let chartGradeInst, chartCplInst; // Penyimpan memori grafik agar tidak menumpuk
-
-    async function loadDashboard() {
-        try {
-            const res = await fetch(API_DASHBOARD);
-            if (!res.ok) return;
-            const data = await res.json();
-
-            // Memisahkan data dari API n8n
-            const dataCPL = data.filter(item => item.kategori === 'performa_cpl');
-            const dataGrade = data.filter(item => item.kategori === 'distribusi_grade');
-
-            renderGradeChart(dataGrade);
-            renderCPLChart(dataCPL);
-            calculateSummary(dataGrade);
-        } catch (error) {
-            console.error("Gagal memuat grafik Dashboard:", error);
+        function renderGradeChart(gradeData) {
+            const labels = gradeData.map(item => item.label);
+            const values = gradeData.map(item => item.nilai);
+            const ctx = document.getElementById('gradeChart').getContext('2d');
+            
+            if(chartGradeInst) chartGradeInst.destroy(); 
+            
+            chartGradeInst = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6b7280'],
+                        borderWidth: 2
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
         }
-    }
 
-    function renderGradeChart(gradeData) {
-        const labels = gradeData.map(item => item.label);
-        const values = gradeData.map(item => item.nilai);
-        const ctx = document.getElementById('gradeChart').getContext('2d');
-        
-        if(chartGradeInst) chartGradeInst.destroy(); // Hapus kanvas lama jika di-refresh
-        
-        chartGradeInst = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6b7280'],
-                    borderWidth: 2
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-    }
+        function renderCPLChart(cplData) {
+            const labels = cplData.map(item => item.label);
+            const values = cplData.map(item => parseFloat(item.nilai));
+            const ctx = document.getElementById('cplChart').getContext('2d');
+            
+            if(chartCplInst) chartCplInst.destroy();
+            
+            chartCplInst = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Persentase Capaian (%)',
+                        data: values,
+                        backgroundColor: '#8b0000', // Warna merah TI
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, max: 100 } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
 
-    function renderCPLChart(cplData) {
-        const labels = cplData.map(item => item.label);
-        const values = cplData.map(item => parseFloat(item.nilai));
-        const ctx = document.getElementById('cplChart').getContext('2d');
-        
-        if(chartCplInst) chartCplInst.destroy();
-        
-        chartCplInst = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Persentase Capaian (%)',
-                    data: values,
-                    backgroundColor: '#8b0000', // Warna merah Unaki
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                scales: { y: { beginAtZero: true, max: 100 } },
-                plugins: { legend: { display: false } }
-            }
-        });
-    }
+        function calculateSummary(gradeData) {
+            let total = 0, lulus = 0, gagal = 0;
+            const lulusGrades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C'];
 
-    function calculateSummary(gradeData) {
-        let total = 0, lulus = 0, gagal = 0;
-        const lulusGrades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C'];
+            gradeData.forEach(item => {
+                total += item.nilai;
+                if (lulusGrades.includes(item.label)) lulus += item.nilai;
+                else gagal += item.nilai;
+            });
 
-        gradeData.forEach(item => {
-            total += item.nilai;
-            if (lulusGrades.includes(item.label)) lulus += item.nilai;
-            else gagal += item.nilai;
-        });
+            document.getElementById('totMhs').innerText = total;
+            document.getElementById('totLulus').innerText = lulus;
+            document.getElementById('totGagal').innerText = gagal;
+        }
 
-        document.getElementById('totMhs').innerText = total;
-        document.getElementById('totLulus').innerText = lulus;
-        document.getElementById('totGagal').innerText = gagal;
-    }
+        // 6. EKSEKUSI SAAT HALAMAN DIMUAT
+        window.onload = () => { 
+            setTimeout(() => { 
+                switchTab('dashboard'); 
+                pasangJembatanSidebar(); 
+            }, 350); 
+        };
     </script>
 </body>
 </html>

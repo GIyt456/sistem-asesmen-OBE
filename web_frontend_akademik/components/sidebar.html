@@ -1,6 +1,6 @@
 <div class="sidebar">
     <div class="sidebar-profile">
-        <img src="https://ui-avatars.com/api/?name=Admin&background=8b0000&color=fff&bold=true" id="sidebarAvatar" alt="User Avatar">
+        <img src="https://ui-avatars.com/api/?name=Admin&background=0097a7&color=fff&bold=true" id="sidebarAvatar" alt="User Avatar">
         <div class="sidebar-profile-info">
             <span class="name" id="adminName">Loading...</span>
             <span class="role" id="adminRole">FAKULTAS TEKNIK INFORMATIKA</span>
@@ -11,7 +11,6 @@
 
     <div class="nav-menu">
         <div class="menu-category">MAIN</div>
-
         <div class="nav-item" data-path="/admin_config.html"><i class="fas fa-home"></i> Home</div>
 
         <div class="nav-item" onclick="toggleDropdown('submenu-mk', 'chevron-mk')">
@@ -66,7 +65,7 @@
             <i id="chevron-periksa" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
         </div>
         <div id="menu-periksa" style="display: none; flex-direction: column; padding-left: 20px; margin-top: 4px;">
-            <div class="nav-item" data-path="/periksa_data/cek_live_data.html"><i class="fas fa-cloud-download-alt" style="width: 20px;"></i> Cek Live Data Pusat</div>
+            <div class="nav-item" data-path="/periksa_data/cek_live_data.html"><i class="fas fa-cloud-download-alt" style="width: 20px;"></i> Cek Live Data</div>
             <div class="nav-item" data-path="/periksa_data/rps_duplikat.html"><i class="fas fa-copy" style="width: 20px;"></i> RPS Duplikat</div>
             <div class="nav-item" data-path="/periksa_data/makul_duplikat.html"><i class="fas fa-clone" style="width: 20px;"></i> Makul Duplikat</div>
             <div class="nav-item" data-path="/periksa_data/mengajar_salah.html"><i class="fas fa-exclamation-triangle" style="width: 20px;"></i> Mengajar Salah</div>
@@ -150,7 +149,7 @@
     </div>
 
     <div class="nav-bottom">
-        <div class="nav-item logout" onclick="logout()">
+        <div class="nav-item logout" onclick="window.logout()">
             <i class="fas fa-sign-out-alt"></i> Logout Account
         </div>
     </div>

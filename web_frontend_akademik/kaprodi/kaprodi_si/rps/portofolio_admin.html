@@ -3,60 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan CPL & CPMK - Panel Kaprodi</title>
+    <title>Laporan CPL & CPMK - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- PANGGIL CSS GLOBAL -->
-    <link rel="stylesheet" href="../../../css/style.css">
-
-    <!-- Panggil Chart.js dari CDN untuk Grafik OBE -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 20px; }
-        .chart-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
-        .stat-card { background: var(--primary-red); color: white; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .stat-value { font-size: 2.5rem; font-weight: 800; margin: 10px 0; }
-        .stat-label { font-size: 0.9rem; font-weight: 500; opacity: 0.9; }
+        .chart-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+        .stat-card { color: white; border-radius: 12px; padding: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .stat-value { font-size: 3rem; font-weight: 800; margin: 10px 0; letter-spacing: -1px; }
+        .stat-label { font-size: 0.95rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .table-master { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 15px;}
+        .table-master th, .table-master td { padding: 15px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: middle; }
+        .table-master th { background: #111827; color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+        
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- 1. Wadah Sidebar -->
     <div id="sidebar-container"></div>
 
-    <div style="flex: 1; display: flex; flex-direction: column;">
-        <!-- 2. Wadah Navbar -->
+    <div class="main-content">
         <div id="navbar-container"></div>
 
-        <!-- 3. KONTEN UTAMA LAPORAN OBE -->
-        <div class="main-content">
-            <div style="margin-bottom: 20px;">
-                <h1 style="margin:0; font-size: 2rem; color: var(--text-dark);">Laporan <span style="color: var(--primary-red);">CPL & CPMK</span></h1>
-                <p style="color: #6b7280; margin-top: 5px;">Analisis Ketercapaian Pembelajaran Lulusan (CPL) Program Studi Teknik Informatika.</p>
+        <div class="content-wrapper">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">EVALUASI & RPS</div>
+                    <h1 class="header-title">LAPORAN <span>CPL & CPMK</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
 
-            <!-- Filter Laporan -->
-            <div style="background: white; padding: 15px 20px; border-radius: 10px; border: 1px solid #e5e7eb; display: flex; gap: 15px; margin-bottom: 20px;">
-                <select id="filterAngkatan" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; width: 200px;">
+            <p style="color: #64748b; font-size: 0.95rem; margin: 0 0 20px 0;">Analisis Ketercapaian Pembelajaran Lulusan (CPL) untuk evaluasi kurikulum.</p>
+
+            <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; display: flex; gap: 15px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); align-items: center;">
+                <label style="font-weight: 600; color: #1e293b;">Pilih Angkatan:</label>
+                <select id="filterAngkatan" class="form-control" style="width: 250px;">
                     <option value="2023">Angkatan 2023</option>
                     <option value="2022">Angkatan 2022</option>
+                    <option value="2021">Angkatan 2021</option>
                 </select>
-                <button class="btn-action btn-edit" onclick="loadDataLaporan()"><i class="fas fa-search"></i> Tampilkan Analisis</button>
+                <button class="btn-dark" onclick="loadDataLaporan()"><i class="fas fa-chart-pie"></i> Tampilkan Analisis</button>
             </div>
 
-            <!-- Area Grafik & Statistik -->
             <div class="dashboard-grid">
-                <!-- Grafik Bar CPL -->
                 <div class="chart-card">
-                    <h3 style="margin-top: 0; color: #374151;">Rata-rata Ketercapaian CPL Mahasiswa</h3>
-                    <canvas id="cplBarChart" height="100"></canvas>
+                    <h3 style="margin-top: 0; color: #1e293b; font-size: 1.2rem; font-weight: 800; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 20px;">Rata-rata Ketercapaian CPL</h3>
+                    <canvas id="cplBarChart" height="110"></canvas>
                 </div>
 
-                <!-- Kolom Status Singkat -->
                 <div style="display: flex; flex-direction: column; gap: 20px;">
-                    <div class="stat-card">
+                    <div class="stat-card" id="cardTertinggi" style="background: var(--primary-red);">
                         <i class="fas fa-trophy fa-2x"></i>
                         <div class="stat-value" id="cplTertinggi">-</div>
                         <div class="stat-label">Capaian Tertinggi</div>
@@ -69,63 +75,86 @@
                 </div>
             </div>
 
-            <!-- Tabel Detail -->
-            <div style="margin-top: 30px;">
-                <h3 style="color: #374151; margin-bottom: 15px;">Detail Skor CPL Angkatan <span id="labelAngkatan">2023</span></h3>
-                <table>
+            <div style="margin-top: 40px;">
+                <h3 style="color: #1e293b; margin-bottom: 15px; font-size: 1.3rem; font-weight: 800;">Detail Skor CPL Angkatan <span id="labelAngkatan" style="color: #4b5563;">2023</span></h3>
+                <table class="table-master">
                     <thead>
                         <tr>
-                            <th width="10%">Kode CPL</th>
-                            <th width="60%">Deskripsi Capaian Pembelajaran</th>
+                            <th width="12%">Kode CPL</th>
+                            <th width="58%">Deskripsi Capaian Pembelajaran</th>
                             <th width="15%">Kategori</th>
                             <th width="15%" style="text-align: center;">Skor (Skala 100)</th>
                         </tr>
                     </thead>
                     <tbody id="tableBodyCPL">
-                        <!-- Teks loading default -->
-                        <tr><td colspan="4" style="text-align: center;">Mengambil data dari n8n... <i class="fas fa-spinner fa-spin"></i></td></tr>
+                        <tr><td colspan="4" style="text-align: center; padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Mengambil data laporan CPL...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Panggil Mesin Pemasang Komponen -->
-    <script src="../../../js/template.js"></script>
+    <script src="/js/template.js"></script>
 
-    <!-- Logika Laporan OBE -->
     <script>
-        // URL N8N Anda yang terlihat di Tab Browser (Pastikan ini sesuai)
-        const API_BASE = "https://sink-stephanie-wives-discussion.trycloudflare.com/webhook"; 
+        // DETEKSI PRODI DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
         
+        // PENTING: Ganti URL di bawah dengan link Cloudflare Tunnel n8n Anda!
+        const API_BASE = "https://contributor-launch-mel-collection.trycloudflare.com/webhook"; 
+
+        // SATPAM HALAMAN
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
         let cplChartInstance = null; 
+
+        // Tema Dinamis
+        const warnaChartAman = PRODI === 'si' ? 'rgba(0, 96, 100, 0.8)' : 'rgba(139, 0, 0, 0.8)';
+        const warnaChartBahaya = 'rgba(220, 38, 38, 0.85)'; // Tetap merah menyala untuk peringatan
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            const cardTertinggi = document.getElementById("cardTertinggi");
+            
+            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            
+            if(PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                cardTertinggi.style.background = "var(--primary-teal)";
+                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+            }
+        });
 
         async function loadDataLaporan() {
             const angkatan = document.getElementById('filterAngkatan').value;
             document.getElementById('labelAngkatan').innerText = angkatan;
             const tbody = document.getElementById('tableBodyCPL');
             
-            // Ubah teks saat mulai mengambil data
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Menarik 11 Data CPL dari Server... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Menarik data CPL dari Server N8N...</td></tr>`;
 
             try {
-                // Eksekusi API n8n
-                const res = await fetch(`${API_BASE}/get-laporan-cpl?angkatan=${angkatan}`);
+                // Eksekusi API n8n (MENYERTAKAN PARAMETER PRODI)
+                const res = await fetch(`${API_BASE}/get-laporan-cpl?angkatan=${angkatan}&prodi=${PRODI}`);
                 if (!res.ok) throw new Error("Gagal load API N8N");
                 
                 const dataCPL = await res.json();
-                
-                // Bersihkan tabel
                 tbody.innerHTML = "";
+
+                if (!dataCPL || dataCPL.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px;">Belum ada data CPL untuk angkatan ini.</td></tr>`;
+                    if(cplChartInstance) cplChartInstance.destroy();
+                    return;
+                }
                 
                 // Isi tabel dengan data asli
                 dataCPL.forEach(item => {
-                    const warnaSkor = item.skor < 70 ? 'color: #dc2626; font-weight: bold;' : 'color: #059669; font-weight: bold;';
+                    const warnaSkor = item.skor < 70 ? 'color: #dc2626; font-weight: 800; font-size: 1.1rem;' : 'color: #059669; font-weight: 800; font-size: 1.1rem;';
                     tbody.innerHTML += `
                         <tr>
-                            <td><strong>${item.kode}</strong></td>
-                            <td>${item.deskripsi || 'Deskripsi belum diatur'}</td>
-                            <td><span style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${item.kategori}</span></td>
+                            <td><strong style="color: ${PRODI === 'si' ? 'var(--primary-teal)' : 'var(--primary-red)'};">${item.kode}</strong></td>
+                            <td style="color: #374151; line-height: 1.5;">${item.deskripsi || 'Deskripsi belum diatur'}</td>
+                            <td><span style="background: #f1f5f9; color: #475569; font-weight: 600; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid #cbd5e1;">${item.kategori}</span></td>
                             <td style="text-align: center; ${warnaSkor}">${item.skor}</td>
                         </tr>
                     `;
@@ -135,16 +164,12 @@
                 renderChart(dataCPL);
 
                 // Update Status Kanan (Tertinggi & Terendah)
-                if(dataCPL.length > 0) {
-                    // Duplikat array agar tidak merusak urutan tabel, lalu urutkan berdasarkan skor
-                    const sortedData = [...dataCPL].sort((a, b) => b.skor - a.skor);
-                    document.getElementById('cplTertinggi').innerText = sortedData[0].kode;
-                    document.getElementById('cplTerendah').innerText = sortedData[sortedData.length - 1].kode;
-                }
+                const sortedData = [...dataCPL].sort((a, b) => b.skor - a.skor);
+                document.getElementById('cplTertinggi').innerText = sortedData[0].kode;
+                document.getElementById('cplTerendah').innerText = sortedData[sortedData.length - 1].kode;
 
             } catch (error) {
-                // Munculkan pesan merah jika N8N mati/URL salah
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">❌ Gagal terhubung ke N8N. Pastikan Workflow aktif dan URL Cloudflare benar!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red; padding: 30px;"><i class="fas fa-exclamation-triangle"></i> Gagal terhubung ke N8N.</td></tr>`;
                 console.error(error);
             }
         }
@@ -152,15 +177,13 @@
         function renderChart(dataCPL) {
             const ctx = document.getElementById('cplBarChart').getContext('2d');
             
-            if (cplChartInstance) {
-                cplChartInstance.destroy();
-            }
+            if (cplChartInstance) { cplChartInstance.destroy(); }
 
             const labels = dataCPL.map(item => item.kode);
             const skorData = dataCPL.map(item => item.skor);
 
-            // Warna merah jika di bawah 70, hijau jika di atas
-            const bgColors = skorData.map(skor => skor < 70 ? 'rgba(220, 38, 38, 0.7)' : 'rgba(139, 0, 0, 0.7)');
+            // Warna merah jika di bawah 70, ikuti warna prodi jika aman
+            const bgColors = skorData.map(skor => skor < 70 ? warnaChartBahaya : warnaChartAman);
 
             cplChartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -170,25 +193,32 @@
                         label: 'Skor CPL Rata-rata',
                         data: skorData,
                         backgroundColor: bgColors,
-                        borderWidth: 1,
-                        borderRadius: 4
+                        borderWidth: 0,
+                        borderRadius: 6,
+                        barPercentage: 0.6
                     }]
                 },
                 options: {
                     responsive: true,
+                    plugins: {
+                        legend: { display: false } // Sembunyikan tulisan legend karena sudah jelas
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 100 
+                            max: 100,
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false }
                         }
                     }
                 }
             });
         }
 
-        // Jalankan saat web pertama kali direfresh
         window.onload = () => {
-            setTimeout(loadDataLaporan, 500);
+            setTimeout(loadDataLaporan, 400);
         };
     </script>
 </body>

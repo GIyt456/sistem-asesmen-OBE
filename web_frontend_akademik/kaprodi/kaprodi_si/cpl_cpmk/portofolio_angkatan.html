@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofolio Mata Kuliah - OBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    
+    <style>
+        .report-page { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; max-width: 1000px; margin-left: auto; margin-right: auto; }
+        .report-header { text-align: center; border-bottom: 3px solid #002878; padding-bottom: 20px; margin-bottom: 30px; }
+        .report-header h1 { margin: 0; color: #002878; text-transform: uppercase; font-size: 1.8rem; }
+        
+        .section-title { background: #f1f5f9; padding: 10px 15px; border-left: 5px solid #8b0000; font-weight: 800; margin: 25px 0 15px 0; color: #1e293b; text-transform: uppercase; }
+        
+        .info-grid { display: grid; grid-template-columns: 200px 1fr; gap: 10px; margin-bottom: 20px; }
+        .info-label { font-weight: 700; color: #64748b; }
+        
+        table.laporan { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        table.laporan th, table.laporan td { border: 1px solid #cbd5e1; padding: 12px; text-align: center; }
+        table.laporan th { background: #f8fafc; font-weight: 700; }
+        
+        @media print {
+            .no-print, #sidebar-container, #navbar-container { display: none !important; }
+            .main-content { padding: 0 !important; margin: 0 !important; }
+            .report-page { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+            body { background: white; }
+        }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <div id="navbar-container"></div>
+
+        <div class="main-content">
+            <div class="card-container no-print" style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="font-weight: 700;">Pilih Tahun Angkatan:</label>
+                    <select id="selectAngkatan" style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; width: 200px;">
+                        <option value="2022">Angkatan 2022</option>
+                        <option value="2023">Angkatan 2023</option>
+                        <option value="2024">Angkatan 2024</option>
+                    </select>
+                    <button class="btn-action" style="background: #8b0000; color: white;" onclick="loadPortofolioAngkatan()">
+                        <i class="fas fa-file-contract"></i> Generate Portofolio Angkatan
+                    </button>
+                </div>
+            </div>
+
+            <div id="printArea" class="report-page">
+                <div class="report-header">
+                    <img src="../../../gambar/LogoUnaki.png" style="height: 60px; margin-bottom: 10px;" alt="Logo UNAKI">
+                    <h1>Portofolio Mata Kuliah (OBE)</h1>
+                    <p>Program Studi Teknik Informatika - Universitas AKI</p>
+                </div>
+
+                <div class="section-title">I. Identitas Mata Kuliah</div>
+                <div class="info-grid">
+                    <div class="info-label">Mata Kuliah</div>
+                    <div id="resNamaMK">-</div>
+                    <div class="info-label">Kode MK</div>
+                    <div id="resKodeMK">-</div>
+                    <div class="info-label">Dosen Pengampu</div>
+                    <div id="resDosen">-</div>
+                    <div class="info-label">Tahun Ajaran</div>
+                    <div>2025/2026</div>
+                </div>
+
+                <div class="section-title">II. Pencapaian CPMK (Rerata Kelas)</div>
+                <table class="laporan">
+                    <thead>
+                        <tr>
+                            <th>Kode CPMK</th>
+                            <th>Target Luaran</th>
+                            <th>Rata-Rata Nilai</th>
+                            <th>Ketercapaian (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resCPMK">
+                        <tr><td colspan="4">Klik Generate untuk memproses data.</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="section-title">III. Pencapaian CPL (Rerata Kelas)</div>
+                <table class="laporan">
+                    <thead>
+                        <tr>
+                            <th>Kode CPL</th>
+                            <th>Rerata Nilai</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resCPL">
+                        <tr><td colspan="3">-</td></tr>
+                    </tbody>
+                </table>
+
+                <div class="section-title">IV. Distribusi Nilai & Grade</div>
+                <div id="resDistribusi" style="font-weight: 600; color: #1e293b; line-height: 1.6;">
+                    Menunggu data...
+                </div>
+
+                <div style="margin-top: 50px; display: flex; justify-content: flex-end;">
+                    <div style="text-align: center; width: 250px;">
+                        <p>Semarang, <span id="resTanggal"></span></p>
+                        <p style="margin-bottom: 80px;">Ketua Program Studi,</p>
+                        <p><b>( _________________________ )</b></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../js/template.js"></script>
+    <script>
+        const API_PORTOFOLIO = "https://arm-semester-inflation-vintage.trycloudflare.com/webhook/get-portofolio-angkatan";
+
+        async function loadPortofolioAngkatan() { // NAMA FUNGSI SUDAH DISESUAIKAN
+            const selectEl = document.getElementById("selectAngkatan");
+            const angkatan = selectEl.value;
+            
+            // Tampilkan loading di tombol
+            document.getElementById("resTanggal").innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            try {
+                // Memanggil N8N dengan parameter angkatan
+                const res = await fetch(`${API_PORTOFOLIO}?angkatan=${angkatan}`);
+                const data = await res.json();
+
+                if (!data || data.length === 0) return alert(`Data nilai belum tersedia untuk Angkatan ${angkatan}!`);
+
+                // 1. ISI IDENTITAS
+                // Karena ini angkatan, kita "akali" label identitasnya
+                document.getElementById("resNamaMK").innerText = "Akumulasi Seluruh Mata Kuliah";
+                document.getElementById("resKodeMK").innerText = `Angkatan ${angkatan}`;
+                document.getElementById("resDosen").innerText = "Seluruh Dosen Program Studi";
+
+                // Variabel untuk menampung total
+                let cpmkStats = {};
+                let cplStats = {};
+                let totalMahasiswa = new Set(); // Menghitung jumlah mahasiswa unik
+
+                // 2. OLAH DATA MENTAH DARI N8N
+                data.forEach(row => {
+                    totalMahasiswa.add(row.nim); // Simpan NIM untuk dihitung
+                    
+                    // Pengaman agar tidak menjadi NaN
+                    let nilai = parseFloat(row.nilai_tertimbang) || 0;
+                    let bobot = parseFloat(row.total_bobot) || 0;
+                    
+                    // Hitung persentase nilai mahasiswa ini (Skala 100)
+                    let skorMhs = bobot > 0 ? (nilai / bobot) * 100 : 0;
+
+                    // Agregat untuk CPMK
+                    if (row.kode_cpmk) {
+                        if (!cpmkStats[row.kode_cpmk]) cpmkStats[row.kode_cpmk] = { totalSkor: 0, countMhs: 0 };
+                        cpmkStats[row.kode_cpmk].totalSkor += skorMhs;
+                        cpmkStats[row.kode_cpmk].countMhs += 1;
+                    }
+
+                    // Agregat untuk CPL
+                    if (row.kode_cpl) {
+                        if (!cplStats[row.kode_cpl]) cplStats[row.kode_cpl] = { totalSkor: 0, countMhs: 0 };
+                        cplStats[row.kode_cpl].totalSkor += skorMhs;
+                        cplStats[row.kode_cpl].countMhs += 1;
+                    }
+                });
+
+                // 3. RENDER TABEL CPMK (TARGET 75.00)
+                let cpmkHtml = "";
+                Object.keys(cpmkStats).sort().forEach(c => {
+                    let avg = (cpmkStats[c].totalSkor / cpmkStats[c].countMhs).toFixed(2);
+                    cpmkHtml += `<tr><td>${c}</td><td>Minimal 75.00</td><td>${avg}</td><td><b>${avg}%</b></td></tr>`;
+                });
+                document.getElementById("resCPMK").innerHTML = cpmkHtml;
+
+                // 4. RENDER TABEL CPL (TARGET 75.00)
+                let cplHtml = "";
+                Object.keys(cplStats).sort().forEach(c => {
+                    let avg = (cplStats[c].totalSkor / cplStats[c].countMhs).toFixed(2);
+                    cplHtml += `<tr><td>${c}</td><td>${avg}</td><td>${avg >= 75 ? '✅ TERCAPAI' : '❌ PERLU EVALUASI'}</td></tr>`;
+                });
+                document.getElementById("resCPL").innerHTML = cplHtml;
+
+                // 5. KESIMPULAN DISTRIBUSI
+                document.getElementById("resDistribusi").innerText = `Berdasarkan evaluasi terhadap ${totalMahasiswa.size} mahasiswa dari Angkatan ${angkatan}, capaian kompetensi menunjukkan tren yang sangat positif secara kumulatif.`;
+
+            } catch (e) {
+                console.error(e);
+                alert("Terjadi kesalahan saat memuat data. Periksa koneksi ke N8N.");
+            }
+        }
+    </script>
+</body>
+</html>

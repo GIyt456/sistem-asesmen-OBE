@@ -8,13 +8,37 @@
     <script src="../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* Tambahan sedikit tema SI jika diperlukan di konten utama */
+        /* --- WAJIB: Layout Flexbox agar Sidebar dan Konten bersebelahan --- */
+        body { 
+            display: flex; 
+            margin: 0; 
+            background: #f9fafb; 
+            height: 100vh; 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif;
+            color: #111827;
+        }
+
+        /* Pembungkus Konten Utama */
+        .main-content { 
+            flex: 1; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        /* --- Tambahan Tema SI --- */
         .btn-primary-si { background: linear-gradient(to right, #0097a7, #006064); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .section { display: none; animation: fadeIn 0.3s ease; }
+        .section { display: none; animation: fadeIn 0.3s ease; padding: 0 40px 40px 40px; }
         .section.active { display: block; }
+        
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 40px 40px 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: #006064; }
+        .badge-prodi { background: #006064; color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -25,12 +49,12 @@
     <div class="main-content">
         <div id="navbar-container"></div>
         
-        <div class="header-container" style="margin-top: 20px;">
+        <div class="header-container">
             <div class="header-title-area">
                 <div class="header-subtitle" id="pageSubtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title" id="pageTitle" style="color: #006064;">PANEL KENDALI <span>SI</span></h1>
+                <h1 class="header-title" id="pageTitle">PANEL KENDALI <span>SI</span></h1>
             </div>
-            <div class="badge-prodi" style="background: #006064; color: white;">Sistem Informasi</div>
+            <div class="badge-prodi">Sistem Informasi</div>
         </div>
 
         <div id="content-dashboard" class="section active">
@@ -38,7 +62,7 @@
                 <div class="figma-card" style="border-top: 4px solid #217346; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                     <h3 style="margin-top: 0; color: #217346;"><i class="fas fa-chart-pie"></i> Pintasan Laporan Kelas</h3>
                     <p style="color: #666; line-height: 1.5; font-size: 0.95rem;">Lihat analisis transkrip nilai dan ketercapaian CPL/CPMK mahasiswa secara spesifik per Mata Kuliah.</p>
-                    <button class="btn-dark" style="margin-top: 10px; width: 100%; background: #217346;" onclick="window.location.href='laporan.html'">
+                    <button class="btn-dark" style="margin-top: 10px; width: 100%; background: #217346; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="window.location.href='laporan.html'">
                         <i class="fas fa-external-link-alt"></i> Buka Laporan Kelas
                     </button>
                 </div>
@@ -82,16 +106,14 @@
                 <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">Password Baru</label>
                 <input type="password" id="newPassword" placeholder="Masukkan password baru..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 1rem;">
             </div>
-            <button onclick="prosesResetPassword()" class="btn-primary-si" style="width: 100%; padding: 12px; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Paksa Reset Password</button>
+            <button onclick="prosesResetPassword()" class="btn-primary-si" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Paksa Reset Password</button>
         </div>
 
     </div>
 
-    <script src="/js/template.js"></script>
-
     <script>
         const PRODI = 'si'; 
-        const API_BASE = "https://compact-ahead-recycling-rabbit.trycloudflare.com/webhook";
+        const API_BASE = "https://toolbox-router-wyoming-definitions.trycloudflare.com/webhook";
         const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
         const API_MAP_MK = `${API_BASE}/admin-map-mk-cpmk`;
         const API_GET_USERS = `${API_BASE}/get-users`;
@@ -110,20 +132,17 @@
 
         // 2. Mesin Pengubah Tab Internal Dashboard SI
         function switchTab(type) {
-            // Sembunyikan semua elemen class section
             document.querySelectorAll('.section').forEach(el => { 
                 el.style.display = 'none'; 
                 el.classList.remove('active'); 
             });
             
-            // Tampilkan section yang dipilih
             const contentSection = document.getElementById('content-' + type);
             if(contentSection) {
                 contentSection.style.display = 'block';
                 contentSection.classList.add('active');
             }
 
-            // Pengondisian Judul Top Bar Dinamis
             const titles = {
                 'dashboard': '📊 Dashboard Admin SI',
                 'cpl': '🎯 Daftar CPL Sistem Informasi',
@@ -135,14 +154,12 @@
             };
             document.getElementById('pageTitle').innerText = titles[type] || 'Panel Admin SI';
 
-            // Eksekusi fungsi penarik data sesuai tab
             if(type === 'reset') loadUserList();
             if(type === 'mapping-mk') loadDropdownMK();
             if(type === 'mapping') loadMappingData();
         }
 
-        // 3. ✨ REVISI UTAMA: SCRIPT JEMBATAN BIAR SIDEBAR TIDAK 404 ✨
-        // Menerjemahkan path file di sidebar.html menjadi perintah switchTab internal SI
+        // 3. Jembatan Sidebar Tanpa Reload (SPA)
         function pasangJembatanSidebar() {
             const petaMenu = {
                 '/cpl.html': 'cpl',
@@ -153,12 +170,10 @@
                 '/import_krs.html': 'krs-upload'
             };
 
-            // Cari semua item menu di dalam sidebar yang baru selesai dimuat
             document.querySelectorAll('.nav-menu .nav-item, .dropdown-container .dropdown-item').forEach(el => {
                 const path = el.getAttribute('data-path');
                 
-                if (petaMenu[path]) {
-                    // Putus fungsi bawaan pindah halaman, ganti dengan switchTab
+                if (petaMenu[path] && document.getElementById('content-' + petaMenu[path])) {
                     el.href = "#"; 
                     el.onclick = (e) => {
                         e.preventDefault();
@@ -166,8 +181,7 @@
                     };
                 }
                 
-                // Khusus tombol Home kembali ke dashboard utama
-                if (path === '/admin_config.html') {
+                if (path === '/admin_config.html' || path === '/admin_config_si.html') {
                     el.href = "#";
                     el.onclick = (e) => {
                         e.preventDefault();
@@ -177,24 +191,17 @@
             });
         }
 
-        // 4. Sinkronisasi Data Backend (Fungsi Bawaan Anda)
         async function loadUserList() { 
             try { const res = await fetch(API_GET_USERS); if (!res.ok) return; const data = await res.json(); const datalist = document.getElementById("daftarDosenSI"); datalist.innerHTML = ""; let users = Array.isArray(data) ? ((data[0] && data[0].data) ? data[0].data : data) : (data.data || []); users.forEach(u => { if (u.role === 'dosen' && u.prodi === 'si') { const option = document.createElement('option'); option.value = u.username; option.text = `${u.nama_lengkap} (Dosen SI)`; datalist.appendChild(option); } }); } catch (e) { console.error(e); }
         }
-
-        async function loadMappingData() { 
-            // Tempatkan fungsi fetch CPL & CPMK SI Anda di sini jika diperlukan
-        }
-
-        async function loadDropdownMK() { 
-            // Tempatkan fungsi fetch dropdown MK SI Anda di sini jika diperlukan
-        }
+        async function loadMappingData() { }
+        async function loadDropdownMK() { }
 
         // Jalankan inisialisasi secara sekuensial saat halaman siap
         window.onload = () => { 
             setTimeout(() => { 
                 switchTab('dashboard'); 
-                pasangJembatanSidebar(); // Aktifkan pengambilalihan menu sidebar
+                pasangJembatanSidebar(); 
             }, 350); 
         };
     </script>

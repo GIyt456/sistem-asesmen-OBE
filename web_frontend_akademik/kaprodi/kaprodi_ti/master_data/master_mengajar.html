@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Mengajar - Sistem OBE</title>
+    <title>Data Mengajar TI - Sistem OBE</title>
     <link rel="stylesheet" href="../../../css/style.css">
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- VARIABEL WARNA --- */
+        /* --- VARIABEL WARNA KHUSUS TI --- */
         :root { 
-            --sidebar-bg: #161923; 
-            --sidebar-text: #7b8395;
-            --sidebar-hover: #262936;
-            --sidebar-active-text: #ffffff;
             --primary-red: #8b0000; 
+            --primary-red-dark: #5c0000; 
             --bg-main: #ffffff; 
             --text-dark: #111827;
             --border-light: #e5e7eb;
@@ -35,25 +32,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- GAYA SIDEBAR --- */
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; min-height: 100vh; }
-        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
-        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .sidebar-profile-info { display: flex; flex-direction: column; }
-        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
-        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
-        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .nav-menu::-webkit-scrollbar { display: none; }
-        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
-        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
-        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
-        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-        .nav-item.logout { color: #f87171; }
-        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
-        #menu-master .nav-item { padding-left: 20px; font-size: 0.75rem; }
-
         /* --- GAYA KONTEN UTAMA --- */
         .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
 
@@ -61,13 +39,40 @@
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
         .header-title span { color: var(--primary-red); }
-        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
+        
+        .badge-prodi { 
+            background: var(--primary-red-dark); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 30px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
+        }
 
         /* --- TOMBOL --- */
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
         .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        .btn-primary-red { background: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .btn-primary-red:hover { background: #660000; transform: translateY(-2px); }
+        
+        .btn-primary-ti { 
+            background: linear-gradient(to right, var(--primary-red), var(--primary-red-dark)); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            font-size: 0.95rem; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            transition: 0.2s; 
+            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
+        }
+        .btn-primary-ti:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3);
+        }
 
         /* --- GAYA TABEL --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
@@ -85,30 +90,27 @@
 </head>
 <body>
 
-    <!-- Wadah Sidebar -->
     <div id="sidebar-container"></div>
 
-    <!-- Konten Utama -->
     <div class="main-content">
         
-        <!-- Header -->
         <div class="header-container">
             <div class="header-title-area">
                 <div class="header-subtitle">KELOLA KURIKULUM</div>
                 <h1 class="header-title">DATA <span>MENGAJAR</span></h1>
             </div>
-            <div class="badge-prodi">Teknik Informatika</div>
+            <div class="badge-prodi"><i class="fas fa-chalkboard"></i> Teknik Informatika</div>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <div>
-                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Data Mengajar</h3>
-                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola plotting dosen mengajar per mata kuliah dan kelas.</p>
+                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Data Mengajar (TI)</h3>
+                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola plotting dosen mengajar per mata kuliah dan kelas Teknik Informatika.</p>
             </div>
             <div style="display: flex; gap: 10px;">
-                <button class="btn-primary-red" onclick="alert('Fitur tambah disiapkan')">Tambah</button>
-                <button class="btn-dark" onclick="alert('Fitur Import disiapkan')">Import dari pusat</button>
-                <button class="btn-primary-red" onclick="alert('Fitur Upload disiapkan')">Upload Excel</button>
+                <button class="btn-primary-ti" onclick="alert('Fitur tambah disiapkan')"><i class="fas fa-plus"></i> Tambah</button>
+                <button class="btn-dark" onclick="alert('Fitur Import disiapkan')"><i class="fas fa-cloud-download-alt"></i> Import dari pusat</button>
+                <button class="btn-primary-ti" onclick="alert('Fitur Upload disiapkan')"><i class="fas fa-file-excel"></i> Upload Excel</button>
                 <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
         </div>
@@ -116,20 +118,19 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
                 Show 
-                <select style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer;">
-                    <option>5</option>
-                    <option selected>10</option>
-                    <option>25</option>
+                <select id="showEntries" style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer;">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="25">25</option>
                 </select> entries
             </div>
             
             <div style="display: flex; align-items: center; gap: 10px;">
                 <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                <input type="text" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-size: 0.9rem;">
+                <input type="text" id="searchBox" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-size: 0.9rem;">
             </div>
         </div>
 
-        <!-- Tabel Data Mengajar -->
         <table>
             <thead>
                 <tr>
@@ -145,8 +146,7 @@
                 </tr>
             </thead>
             <tbody id="bodyMengajar">
-                <!-- Data API masuk ke sini -->
-            </tbody>
+                </tbody>
         </table>
 
         <div id="pagination-mengajar" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.85rem; color: #6b7280;">
@@ -155,9 +155,9 @@
     </div>
 
 <script>
-    // 1. PENGATURAN API N8N
+    // 1. PENGATURAN API N8N (Diselaraskan dengan tunnel aktif terakhir Anda)
     const PRODI = 'ti'; 
-    const API_BASE = "https://highlights-something-thirty-thousands.trycloudflare.com/webhook"; 
+    const API_BASE = "https://estimation-fourth-promotions-steel.trycloudflare.com/webhook"; 
     const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
 
     // 2. SISTEM KEAMANAN & SATPAM AKUN
@@ -168,51 +168,11 @@
     if (!userLogin) window.location.replace('/login/login.html');
     if (userRole !== 'head_admin') {
         if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
-        else if (userRole === 'admin' && userProdi === 'si') window.location.replace("admin_config_si.html");
+        else if (userRole === 'admin' && userProdi === 'si') window.location.replace("../kaprodi_si/admin_config_si.html");
     }
-
-    // 3. FUNGSI PEMANGGIL SIDEBAR OTOMATIS
-    async function loadSidebar() {
-        try {
-            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
-            const html = await response.text();
-            
-            document.getElementById('sidebar-container').outerHTML = html;
-            document.getElementById("adminName").innerText = userLogin;
-            document.getElementById("sidebarAvatar").src = `https://ui-avatars.com/api/?name=${userLogin}&background=8b0000&color=fff&bold=true`;
-
-            setTimeout(() => {
-                const navDashboard = document.getElementById('nav-dashboard');
-                const navMengajar = document.getElementById('nav-mengajar');
-                const menuMaster = document.getElementById('menu-master');
-                const chevronMaster = document.getElementById('chevron-master');
-
-                if(navDashboard) navDashboard.classList.remove('active');
-                if(navMengajar) navMengajar.classList.add('active'); 
-                
-                if(menuMaster && chevronMaster) {
-                    menuMaster.style.display = 'flex';
-                    chevronMaster.style.transform = 'rotate(180deg)';
-                }
-            }, 100);
-
-        } catch (error) { console.error('Gagal memuat sidebar:', error); }
-    }
-
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex'; chevron.style.transform = 'rotate(180deg)'; 
-        } else {
-            menu.style.display = 'none'; chevron.style.transform = 'rotate(0deg)';   
-        }
-    }
-
-    function logout() { localStorage.clear(); window.location.replace("login.html"); }
 
     // ==========================================
-    // 4. LOGIKA DATA, PAGINASI, & PENCARIAN
+    // 3. LOGIKA DATA, PAGINASI, & PENCARIAN
     // ==========================================
     
     let allDataMengajar = []; // Tempat menyimpan semua data dari n8n
@@ -315,11 +275,11 @@
         
         // Tombol Prev
         const prevDisabled = currentPage === 1;
-        html += `<button class="btn" style="background: ${prevDisabled ? '#e5e7eb' : 'var(--text-dark)'}; color: ${prevDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px;" ${prevDisabled ? 'disabled' : `onclick="changePage(-1)"`}><i class="fas fa-chevron-left"></i> Prev</button>`;
+        html += `<button class="btn" style="background: ${prevDisabled ? '#e5e7eb' : 'var(--border-dark)'}; color: ${prevDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; cursor: ${prevDisabled ? 'not-allowed' : 'pointer'}; border:none; border-radius:8px;" ${prevDisabled ? 'disabled' : `onclick="changePage(-1)"`}><i class="fas fa-chevron-left"></i> Prev</button>`;
         
         // Tombol Next
         const nextDisabled = currentPage === totalPages || totalPages === 0;
-        html += `<button class="btn" style="background: ${nextDisabled ? '#e5e7eb' : 'var(--text-dark)'}; color: ${nextDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px;" ${nextDisabled ? 'disabled' : `onclick="changePage(1)"`}>Next <i class="fas fa-chevron-right"></i></button>`;
+        html += `<button class="btn" style="background: ${nextDisabled ? '#e5e7eb' : 'var(--border-dark)'}; color: ${nextDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; cursor: ${nextDisabled ? 'not-allowed' : 'pointer'}; border:none; border-radius:8px;" ${nextDisabled ? 'disabled' : `onclick="changePage(1)"`}>Next <i class="fas fa-chevron-right"></i></button>`;
         
         html += `</div>`;
         paginationContainer.innerHTML = html;
@@ -332,14 +292,13 @@
     }
 
     // ==========================================
-    // 5. JALANKAN SAAT WEB PERTAMA KALI DIBUKA
+    // 4. JALANKAN SAAT WEB PERTAMA KALI DIBUKA
     // ==========================================
     window.onload = () => { 
-        loadSidebar(); 
         loadData(); 
         
         // Event Listener untuk Dropdown "Show Entries"
-        const selectBox = document.querySelector('.control-area select');
+        const selectBox = document.getElementById('showEntries');
         if(selectBox) {
             selectBox.onchange = (e) => {
                 rowsPerPage = parseInt(e.target.value);
@@ -349,7 +308,7 @@
         }
 
         // Event Listener untuk Kolom Pencarian
-        const searchBox = document.querySelector('.search-box input');
+        const searchBox = document.getElementById('searchBox');
         if(searchBox) {
             searchBox.oninput = (e) => {
                 searchQuery = e.target.value.toLowerCase();
@@ -357,6 +316,22 @@
                 renderTablePaginated();
             }
         }
+
+        // Jeda agar template.js selesai menyusun sidebar sebelum kita ubah menu aktifnya
+        setTimeout(() => {
+            const navDashboard = document.getElementById('nav-home');
+            const navMengajar = document.querySelector('[data-path="/master_data/master_mengajar.html"]'); 
+            const menuMaster = document.getElementById('menu-master');
+            const chevronMaster = document.getElementById('chevron-master');
+
+            if(navDashboard) navDashboard.classList.remove('active');
+            if(navMengajar) navMengajar.classList.add('active'); 
+            
+            if(menuMaster && chevronMaster) {
+                menuMaster.style.display = 'flex';
+                chevronMaster.style.transform = 'rotate(180deg)';
+            }
+        }, 300);
     };
 </script>
 </body>

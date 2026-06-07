@@ -10,14 +10,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* --- VARIABEL WARNA KHUSUS SI --- */
         :root { 
-            --sidebar-bg: #161923; 
-            --sidebar-text: #7b8395;
-            --sidebar-hover: #262936;
-            --sidebar-active-text: #ffffff;
-            --primary-teal: #0097a7; 
+            /* Background sidebar dihapus agar mengikuti theme-si dari style.css global */
+            --primary-teal: #01626d; 
+            --primary-teal-dark: #006064; 
             --bg-main: #ffffff; 
             --text-dark: #111827;
+            --border-dark: #161923;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -29,13 +29,40 @@
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
         .header-title span { color: var(--primary-teal); }
-        .badge-prodi { background: var(--primary-teal); color: white; padding: 8px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
+        
+        .badge-prodi { 
+            background: var(--primary-teal-dark); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 30px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            box-shadow: 0 4px 6px rgba(0, 96, 100, 0.2); 
+        }
 
         /* BUTTONS */
-        .btn-add { background: #8b0000; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
-        .btn-add:hover { background: #660000; }
-        .btn-refresh { background: #1f2937; color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; margin-left: 8px;}
-        .btn-refresh:hover { background: #111827; }
+        .btn-primary-si { 
+            background: linear-gradient(to right, var(--primary-teal), var(--primary-teal-dark)); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            font-size: 0.95rem; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            transition: 0.2s; 
+            box-shadow: 0 4px 6px rgba(0, 96, 100, 0.2);
+        }
+        .btn-primary-si:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(0, 96, 100, 0.3);
+        }
+
+        .btn-refresh { background: #1f2937; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s; margin-left: 8px; display: flex; align-items: center; gap: 10px; }
+        .btn-refresh:hover { background: #111827; transform: translateY(-2px); }
         
         .btn-edit { background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
         .btn-edit:hover { background: #d97706; }
@@ -70,7 +97,7 @@
                 <div class="header-subtitle">KELOLA KURIKULUM</div>
                 <h1 class="header-title">JENIS <span>CPL</span></h1>
             </div>
-            <div class="badge-prodi">SISTEM INFORMASI</div>
+            <div class="badge-prodi">Sistem Informasi</div>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -78,8 +105,8 @@
                 <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800;">Jenis CPL SN DIKTI</h3>
                 <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 0.9rem;">Kelola kategori Capaian Pembelajaran Lulusan.</p>
             </div>
-            <div>
-                <button class="btn-add" onclick="bukaModal()"><i class="fas fa-plus"></i> Tambah</button>
+            <div style="display: flex;">
+                <button class="btn-primary-si" onclick="bukaModal()"><i class="fas fa-plus"></i> Tambah</button>
                 <button class="btn-refresh" onclick="loadJenisCPL()"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
         </div>
@@ -103,7 +130,6 @@
 
     </div>
 
-    <!-- MODAL FORM -->
     <div id="modalJenisCPL" class="modal-overlay">
         <div class="modal-box">
             <h3 class="modal-title" id="modalTitle">Tambah Jenis CPL</h3>
@@ -121,33 +147,9 @@
 
 <script>
     const userLogin = localStorage.getItem("user_login");
-    const BASE_N8N_URL = 'https://gilbert-mean-pursuant-chronicles.trycloudflare.com';
+    const BASE_N8N_URL = 'https://toolbox-router-wyoming-definitions.trycloudflare.com';
 
-    async function loadSidebar() {
-        try {
-            const response = await fetch('/kaprodi/kaprodi_si/components/sidebar.html');
-            document.getElementById('sidebar-container').outerHTML = await response.text();
-            document.getElementById("adminName").innerText = userLogin || "Kaprodi SI";
-            
-            setTimeout(() => {
-                const menuMaster = document.getElementById('menu-master');
-                const chevronMaster = document.getElementById('chevron-master');
-                if(menuMaster) menuMaster.style.display = 'flex';
-                if(chevronMaster) chevronMaster.style.transform = 'rotate(180deg)';
-            }, 100);
-        } catch (error) { console.error('Sidebar error:', error); }
-    }
-
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex'; chevron.style.transform = 'rotate(180deg)'; 
-        } else {
-            menu.style.display = 'none'; chevron.style.transform = 'rotate(0deg)';   
-        }
-    }
-    function logout() { localStorage.clear(); window.location.replace("/login/login.html"); }
+    if (!userLogin) window.location.replace('/login/login.html');
 
     // ==========================================
     // FUNGSI CRUD JENIS CPL
@@ -246,7 +248,7 @@
         
         try {
             const response = await fetch(`${BASE_N8N_URL}/webhook/hapus-jenis-cpl`, {
-                method: 'POST', // Gunakan POST untuk kemudahan di n8n
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: id })
             });
@@ -261,9 +263,27 @@
         }
     }
 
+    // ==========================================
+    // EVENT LISTENER SAAT HALAMAN DIBUKA
+    // ==========================================
     window.onload = () => {
-        loadSidebar();
         loadJenisCPL();
+
+        // Memberikan jeda agar template.js selesai melakukan perakitan DOM sidebar
+        setTimeout(() => {
+            const navDashboard = document.getElementById('nav-home');
+            const navJenisCpl = document.querySelector('[data-path="/master_data/master_jenis_cpl.html"]');
+            const menuMaster = document.getElementById('menu-master');
+            const chevronMaster = document.getElementById('chevron-master');
+
+            if(navDashboard) navDashboard.classList.remove('active');
+            if(navJenisCpl) navJenisCpl.classList.add('active'); 
+            
+            if(menuMaster && chevronMaster) {
+                menuMaster.style.display = 'flex';
+                chevronMaster.style.transform = 'rotate(180deg)';
+            }
+        }, 300);
     };
 </script>
 </body>

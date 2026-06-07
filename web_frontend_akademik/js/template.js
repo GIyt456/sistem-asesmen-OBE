@@ -2,23 +2,29 @@
 // MESIN PERAKIT KOMPONEN GLOBAL & LOGIKA SIDEBAR
 // =========================================================
 
-
 async function loadComponent(elementId, fileUrl) {
     try {
+        console.log(`[Sistem OBE] Memuat komponen: ${fileUrl}...`); // Pelacak Proses
+        
         // Trik anti-cache agar selalu memuat file terbaru
         const clearCacheUrl = fileUrl + "?v=" + new Date().getTime(); 
         const response = await fetch(clearCacheUrl);
-        if (!response.ok) throw new Error(`Gagal memuat ${fileUrl}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP Error! Status: ${response.status} saat memuat ${fileUrl}`);
+        }
         
         const html = await response.text();
         const targetElement = document.getElementById(elementId);
         
         if (targetElement) {
             targetElement.innerHTML = html;
+            console.log(`[Sistem OBE] ✅ Berhasil memuat ke dalam #${elementId}`);
             
             // JIKA SIDEBAR BERHASIL DIMUAT, LANGSUNG JALANKAN INISIALISASINYA
             if (fileUrl.includes("sidebar.html") && typeof window.initSmartSidebar === "function") {
-                setTimeout(window.initSmartSidebar, 150);
+                // Jeda sedikit untuk memastikan DOM benar-benar sudah di-render browser
+                setTimeout(window.initSmartSidebar, 200); 
             }
         }
     } catch (error) {
@@ -27,13 +33,13 @@ async function loadComponent(elementId, fileUrl) {
 }
 
 function inisialisasiKomponenGlobal() {
-    // 1. Ambil data prodi aktif dari localStorage (default ke 'ti' jika kosong)
-    const prodi = localStorage.getItem("prodi_aktif") || "ti"; 
+    // Tidak perlu lagi mengecek prodi untuk path file HTML-nya,
+    // karena kita menggunakan SATU file sidebar bersama di root/luar.
     
     if (document.getElementById("sidebar-container")) {
-        // 2. Ubah path-nya menjadi dinamis mengikuti prodi
-        loadComponent("sidebar-container", `/kaprodi/kaprodi_${prodi}/components/sidebar.html`);
+        loadComponent("sidebar-container", "/components/sidebar.html");
     }
+    
     if (document.getElementById("navbar-container")) {
         loadComponent("navbar-container", "/components/navbar.html");
     }
@@ -76,9 +82,9 @@ window.toggleDropdownPlus = function(element) {
 };
 
 window.logout = function() {
-    if(confirm("Apakah Anda yakin ingin keluar?")) {
+    if(confirm("Apakah Anda yakin ingin keluar dari Sistem OBE?")) {
         localStorage.clear();
-        // Pastikan path ke halaman login ini sesuai dengan folder Anda
+        // Pastikan path ke halaman login ini sesuai dengan struktur root web Anda
         window.location.replace('/login/login.html'); 
     }
 };
@@ -92,6 +98,8 @@ window.initSmartSidebar = function() {
     const adminRoleEl = document.getElementById("adminRole");
     const avatarEl = document.getElementById("sidebarAvatar");
     const sidebarEl = document.querySelector('.sidebar');
+    
+    // Sisipkan gaya warna jika ini SI
     if (sidebarEl && prodi === 'si') {
         sidebarEl.classList.add('theme-si');
     }
@@ -100,7 +108,8 @@ window.initSmartSidebar = function() {
     if(adminNameEl) adminNameEl.innerText = loginName;
     if(adminRoleEl) adminRoleEl.innerText = prodi === 'si' ? "PRODI SISTEM INFORMASI" : "PRODI TEKNIK INFORMATIKA";
     if(avatarEl) {
-        const avatarColor = prodi === 'si' ? '1e3a8a' : '8b0000'; 
+        // ✨ PERBAIKAN WARNA AVATAR SI MENJADI TEAL
+        const avatarColor = prodi === 'si' ? '0097a7' : '8b0000'; 
         avatarEl.src = `https://ui-avatars.com/api/?name=${loginName}&background=${avatarColor}&color=fff&bold=true`;
     }
 
@@ -124,14 +133,14 @@ window.initSmartSidebar = function() {
                     '/mapping/map_cpl_cpmk.html': 'mapping',
                     '/mapping/map_mk_cpmk.html': 'mapping-mk',
                     '/settings.html': 'reset',
-                    '/import_krs.html': prodi === 'si' ? 'krs-upload' : 'krs', // Beda nama ID antara SI & TI
+                    '/import_krs.html': prodi === 'si' ? 'krs-upload' : 'krs',
                     '/admin_config_si.html': 'dashboard',
                     '/admin_config.html': 'dashboard'
                 };
 
                 const namaTab = ruteInternal[path];
                 
-                // ✨ KUNCI PERBAIKAN ERROR: Cek apakah elemen target beneran ADA di file HTML ini? ✨
+                // Cek apakah elemen target beneran ADA di file HTML ini?
                 let elemenTargetAda = false;
                 if (namaTab) {
                     elemenTargetAda = document.getElementById('content-' + namaTab) || document.getElementById(namaTab);
@@ -140,7 +149,7 @@ window.initSmartSidebar = function() {
                 // Jika fungsi pindah tab tersedia DAN elemennya memang ada di file ini...
                 if (typeof window.switchTab === "function" && elemenTargetAda) {
                     e.preventDefault();
-                    window.switchTab(namaTab); // Pindah tab dengan mulus
+                    window.switchTab(namaTab); // Pindah tab dengan mulus tanpa loading web
                 } else {
                     // Jika elemennya tidak ada, berarti itu file terpisah. Lakukan pindah halaman normal!
                     window.location.href = basePath + path; 
@@ -151,7 +160,7 @@ window.initSmartSidebar = function() {
 };
 
 // =========================================================
-// PENGAMAN CSS
+// PENGAMAN CSS DROPDOWN
 // =========================================================
 var styleDropdown = document.createElement('style');
 styleDropdown.innerHTML = `

@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Rubrik - Sistem OBE</title>
+    <title>Master Rubrik TI - Sistem OBE</title>
     <link rel="stylesheet" href="../../../css/style.css">
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- VARIABEL WARNA --- */
+        /* --- VARIABEL WARNA KHUSUS TI --- */
         :root { 
-            --sidebar-bg: #161923; 
-            --sidebar-text: #7b8395;
-            --sidebar-hover: #262936;
-            --sidebar-active-text: #ffffff;
             --primary-red: #8b0000; 
+            --primary-red-dark: #5c0000; 
             --bg-main: #ffffff; 
             --text-dark: #111827;
             --border-light: #e5e7eb;
@@ -35,25 +32,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- GAYA SIDEBAR --- */
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; }
-        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
-        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .sidebar-profile-info { display: flex; flex-direction: column; }
-        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
-        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
-        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .nav-menu::-webkit-scrollbar { display: none; }
-        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
-        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
-        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
-        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-        .nav-item.logout { color: #f87171; }
-        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
-        #menu-master .nav-item { padding-left: 20px; font-size: 0.75rem; }
-
         /* --- GAYA KONTEN UTAMA --- */
         .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
 
@@ -61,13 +39,37 @@
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
         .header-title span { color: var(--primary-red); }
-        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
+        
+        .badge-prodi { 
+            background: var(--primary-red); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 30px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
+        }
 
         /* --- TOMBOL --- */
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; background: #3b82f6; }
-        .btn-action:hover { background: #2563eb; }
+        
+        .btn-primary-ti { 
+            background: linear-gradient(to right, var(--primary-red), var(--primary-red-dark)); 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            font-size: 0.85rem; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            transition: 0.2s; 
+            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
+        }
+        .btn-primary-ti:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3); }
 
         /* --- GAYA TABEL --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
@@ -89,10 +91,6 @@
         .rubric-table td { border: 1px solid #d1d5db; vertical-align: top; font-size: 0.85rem; line-height: 1.5; padding: 12px; }
         .rubric-table td:first-child { font-weight: 700; color: #111827; }
         .rubric-table td:nth-child(2) { text-align: center; font-weight: 700; color: var(--primary-red); }
-        .rubric-section-header { background: #f3f4f6; font-weight: 800; color: #111827; padding: 10px 16px; margin-top: 20px; border-left: 4px solid var(--primary-red); }
-        
-        /* LOADING ROW STYLES */
-        .loading-row { text-align: center; padding: 40px; color: #6b7280; font-style: italic; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -111,8 +109,8 @@
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <div>
-                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Rubrik Penilaian</h3>
-                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Daftar parameter dan kriteria penilaian dari semua RPS aktif.</p>
+                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Rubrik Penilaian (TI)</h3>
+                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Daftar parameter dan kriteria penilaian dari semua RPS aktif prodi TI.</p>
             </div>
             <div style="display: flex; gap: 12px;">
                 <button class="btn-dark" onclick="loadMasterRubrik()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
@@ -161,49 +159,11 @@
     // 1. SISTEM KEAMANAN & PENGATURAN API
     const userLogin = localStorage.getItem("user_login");
 
-    // ⚠️ GANTI VARIABEL INI SETIAP KALI URL CLOUDFLARE TUNNEL BERUBAH
-    const BASE_N8N_URL = 'https://contributor-launch-mel-collection.trycloudflare.com';
-
-    // 2. LOAD SIDEBAR
-    async function loadSidebar() {
-        try {
-            const response = await fetch('../components/sidebar.html');
-            const html = await response.text();
-            
-            document.getElementById('sidebar-container').outerHTML = html;
-            document.getElementById("adminName").innerText = userLogin || "Kaprodi TI";
-
-            setTimeout(() => {
-                const navDashboard = document.getElementById('nav-home');
-                const navRubrik = document.getElementById('nav-rubrik');
-                const menuMaster = document.getElementById('menu-master');
-                const chevronMaster = document.getElementById('chevron-master');
-
-                if(navDashboard) navDashboard.classList.remove('active');
-                if(navRubrik) navRubrik.classList.add('active'); 
-                
-                if(menuMaster && chevronMaster) {
-                    menuMaster.style.display = 'flex';
-                    chevronMaster.style.transform = 'rotate(180deg)';
-                }
-            }, 100);
-        } catch (error) { console.error('Gagal memuat sidebar:', error); }
-    }
-
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex'; chevron.style.transform = 'rotate(180deg)'; 
-        } else {
-            menu.style.display = 'none'; chevron.style.transform = 'rotate(0deg)';   
-        }
-    }
-
-    function logout() { localStorage.clear(); window.location.replace("/login/login.html"); }
+    // Pastikan URL ini sesuai dengan tunnel n8n Anda yang sedang aktif
+    const BASE_N8N_URL = 'https://district-spend-penguin-charter.trycloudflare.com';
 
     // ==========================================
-    // 3. FUNGSI MENARIK DATA DARI DATABASE (N8N)
+    // 2. FUNGSI MENARIK DATA DARI DATABASE (N8N)
     // ==========================================
     async function loadMasterRubrik() {
         const tableBody = document.getElementById('tabelDataTugas');
@@ -211,7 +171,6 @@
         if (!tableBody) return;
 
         try {
-            // Memanggil menggunakan BASE_N8N_URL
             const URL_API = `${BASE_N8N_URL}/webhook/get-master-rubrik`;
             
             const response = await fetch(URL_API);
@@ -248,12 +207,11 @@
                 tableBody.innerHTML += `
                     <tr style="background-color: #f1f5f9; font-weight: bold;">
                         <td colspan="6" style="padding: 12px 15px; color: #0f172a; border-bottom: 2px solid #e5e7eb; text-align: left;">
-                            <i class="fas fa-book" style="color: #8b0000; margin-right: 8px;"></i> 
+                            <i class="fas fa-book" style="color: var(--primary-red); margin-right: 8px;"></i> 
                             ${matkul.nama_mk} (${kodeMk}) — <span style="color: #64748b;">Total: ${matkul.tugasList.length} Tugas</span>
                         </td>
                         <td style="text-align: center; background-color: #f1f5f9; border-bottom: 2px solid #e5e7eb;">
-                            <button class="btn-print" style="background: #8b0000; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; display: inline-flex; align-items: center; gap: 5px;"
-                                onclick="window.open('/dosen/cetak_rps_matkul.html?kode_mk=${kodeMk}', '_blank')">
+                            <button class="btn-primary-ti" onclick="window.open('/dosen/cetak_rps_matkul.html?kode_mk=${kodeMk}', '_blank')">
                                 <i class="fas fa-file-pdf"></i> Cetak Semua
                             </button>
                         </td>
@@ -272,7 +230,7 @@
                             <td style="font-weight: 500; color: #4b5563;">${tugas.teknik_evaluasi || '-'}</td>
                             <td>${tugas.waktu_pengerjaan || '-'}</td>
                             <td style="text-align:center;">
-                                <button class="btn-action" style="padding: 6px 12px; font-size: 12px; background: #1e293b; color: white; border: none; border-radius: 6px; cursor: pointer;" 
+                                <button class="btn-dark" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;" 
                                     onclick="bukaModalDetailRubrik('${tugas.id_tugas}', '${tugas.judul_tugas}', '${tugas.kode_mk}', '${tugas.kode_cpmk}')">
                                     <i class="fas fa-eye"></i> Detail
                                 </button>
@@ -288,7 +246,7 @@
     }
 
     // ==========================================
-    // 4. FUNGSI MENAMPILKAN DETAIL RUBRIK 
+    // 3. FUNGSI MENAMPILKAN DETAIL RUBRIK 
     // ==========================================
     async function bukaModalDetailRubrik(idTugas, judulTugas, kodeMk, kodeCpmk) {
         document.getElementById('modalRubrikJudul').innerText = judulTugas;
@@ -301,7 +259,7 @@
                 <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Mata Kuliah: ${kodeMk} | Sub-CPMK: ${kodeCpmk}</p>
             </div>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <button class="btn-print" style="background: #8b0000; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px;" 
+                <button class="btn-primary-ti" style="padding: 10px 20px; border-radius: 6px;" 
                     onclick="window.open('/dosen/cetak_rps.html?id_tugas=${idTugas}', '_blank')">
                     <i class="fas fa-file-pdf"></i> Cetak PDF
                 </button>
@@ -317,7 +275,6 @@
         document.getElementById('modalDetailRubrik').style.display = "flex";
 
         try {
-            // Memanggil menggunakan BASE_N8N_URL yang sudah dideklarasikan di atas
             const response = await fetch(`${BASE_N8N_URL}/webhook/get-detail-rubrik?id_tugas=${idTugas}`);
             const textData = await response.text(); 
 
@@ -329,15 +286,15 @@
             const rubrikData = JSON.parse(textData);
 
             let htmlTabel = `
-                <table style="width:100%; border-collapse: collapse; margin-top:10px;">
+                <table class="rubric-table" style="width:100%; border-collapse: collapse; margin-top:10px;">
                     <thead>
-                        <tr style="background:#f3f4f6;">
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Kriteria</th>
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Bobot</th>
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Skala 1</th>
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Skala 2</th>
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Skala 3</th>
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Skala 4</th>
+                        <tr style="background:#1f2937;">
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Kriteria</th>
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Bobot</th>
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Skala 1</th>
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Skala 2</th>
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Skala 3</th>
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Skala 4</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -346,12 +303,12 @@
             rubrikData.forEach(item => {
                 htmlTabel += `
                     <tr>
-                        <td style="border:1px solid #e5e7eb; padding:10px; font-weight:bold;">${item.kriteria}</td>
-                        <td style="border:1px solid #e5e7eb; padding:10px; text-align:center;">${item.bobot_persen}%</td>
-                        <td style="border:1px solid #e5e7eb; padding:10px;">${item.skala_1}</td>
-                        <td style="border:1px solid #e5e7eb; padding:10px;">${item.skala_2}</td>
-                        <td style="border:1px solid #e5e7eb; padding:10px;">${item.skala_3}</td>
-                        <td style="border:1px solid #e5e7eb; padding:10px;">${item.skala_4}</td>
+                        <td style="border:1px solid #d1d5db; padding:10px; font-weight:bold;">${item.kriteria}</td>
+                        <td style="border:1px solid #d1d5db; padding:10px; text-align:center;">${item.bobot_persen}%</td>
+                        <td style="border:1px solid #d1d5db; padding:10px;">${item.skala_1}</td>
+                        <td style="border:1px solid #d1d5db; padding:10px;">${item.skala_2}</td>
+                        <td style="border:1px solid #d1d5db; padding:10px;">${item.skala_3}</td>
+                        <td style="border:1px solid #d1d5db; padding:10px;">${item.skala_4}</td>
                     </tr>
                 `;
             });
@@ -369,9 +326,27 @@
         document.getElementById('modalDetailRubrik').style.display = "none";
     }
 
+    // ==========================================
+    // 4. JALANKAN SAAT HALAMAN DIBUKA
+    // ==========================================
     window.onload = () => {
-        loadSidebar();
         loadMasterRubrik(); 
+        
+        // Memberikan jeda agar template.js selesai memuat sidebar sebelum menyorot menu
+        setTimeout(() => {
+            const navDashboard = document.getElementById('nav-home');
+            const navRubrik = document.querySelector('[data-path="/master_data/master_rubrik.html"]');
+            const menuMaster = document.getElementById('menu-master');
+            const chevronMaster = document.getElementById('chevron-master');
+
+            if(navDashboard) navDashboard.classList.remove('active');
+            if(navRubrik) navRubrik.classList.add('active'); 
+            
+            if(menuMaster && chevronMaster) {
+                menuMaster.style.display = 'flex';
+                chevronMaster.style.transform = 'rotate(180deg)';
+            }
+        }, 300);
     };
 </script>
 </body>

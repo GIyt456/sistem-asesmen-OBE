@@ -3,20 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPS Duplikat - Sistem OBE</title>
+    <title>RPS Duplikat TI - Sistem OBE</title>
     <link rel="stylesheet" href="../../../css/style.css">
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- VARIABEL WARNA --- */
+        /* --- VARIABEL WARNA KHUSUS TI --- */
         :root { 
-            --sidebar-bg: #161923; 
-            --sidebar-text: #7b8395;
-            --sidebar-hover: #262936;
-            --sidebar-active-text: #ffffff;
+            /* Background sidebar dihapus agar mengikuti theme global */
             --primary-red: #8b0000; 
+            --primary-red-dark: #5c0000; 
             --bg-main: #ffffff; 
             --text-dark: #111827;
             --border-light: #e5e7eb;
@@ -35,25 +33,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- GAYA SIDEBAR --- */
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; min-height: 100vh; }
-        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
-        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .sidebar-profile-info { display: flex; flex-direction: column; }
-        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
-        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
-        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .nav-menu::-webkit-scrollbar { display: none; }
-        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
-        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
-        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
-        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-        .nav-item.logout { color: #f87171; }
-        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
-        #menu-periksa .nav-item { padding-left: 20px; font-size: 0.75rem; }
-
         /* --- GAYA KONTEN UTAMA --- */
         .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
 
@@ -61,10 +40,19 @@
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
         .header-title span { color: var(--primary-red); }
-        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; }
+        
+        .badge-prodi { 
+            background: var(--primary-red-dark); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 30px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2); 
+        }
 
         /* --- ALERT BOX --- */
-        .alert-box { background: #fffbeb; border-left: 5px solid #f59e0b; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; gap: 15px; align-items: flex-start; }
+        .alert-box { background: #fffbeb; border-left: 5px solid #f59e0b; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; gap: 15px; align-items: flex-start; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .alert-box i { color: #f59e0b; font-size: 1.5rem; margin-top: 2px; }
         .alert-box h4 { margin: 0 0 6px 0; color: #92400e; font-size: 1.05rem; font-weight: 700; }
         .alert-box p { margin: 0; color: #b45309; font-size: 0.9rem; line-height: 1.5; }
@@ -72,8 +60,23 @@
         /* --- TOMBOL --- */
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; background: #3b82f6; }
-        .btn-action:hover { background: #2563eb; }
+        
+        .btn-action-ti { 
+            background: linear-gradient(to right, var(--primary-red), var(--primary-red-dark)); 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            font-size: 0.85rem; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            transition: 0.2s; 
+            box-shadow: 0 2px 4px rgba(139, 0, 0, 0.2);
+        }
+        .btn-action-ti:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3); }
 
         /* --- GAYA TABEL --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
@@ -86,10 +89,8 @@
 </head>
 <body>
 
-    <!-- Wadah Sidebar -->
     <div id="sidebar-container"></div>
 
-    <!-- Konten Utama -->
     <div class="main-content">
         
         <div class="header-container">
@@ -97,14 +98,14 @@
                 <div class="header-subtitle">PERIKSA DATA / VALIDASI</div>
                 <h1 class="header-title">RPS <span>DUPLIKAT</span></h1>
             </div>
-            <div class="badge-prodi">Teknik Informatika</div>
+            <div class="badge-prodi"><i class="fas fa-copy"></i> Teknik Informatika</div>
         </div>
 
         <div class="alert-box">
             <i class="fas fa-exclamation-triangle"></i>
             <div>
                 <h4>Perhatian: Data Anomali Ditemukan!</h4>
-                <p>Tabel di bawah menampilkan Mata Kuliah yang memiliki <strong>lebih dari satu RPS aktif</strong> pada tahun kurikulum yang sama. Silakan tinjau dan tetapkan satu RPS utama agar perhitungan persentase beban CPL tidak ganda/berantakan.</p>
+                <p>Tabel di bawah menampilkan Mata Kuliah yang memiliki <strong>lebih dari satu RPS aktif</strong> pada tahun kurikulum yang sama. Silakan tinjau dan tetapkan satu RPS utama agar perhitungan persentase beban CPL tidak ganda/berantakan pada program studi Teknik Informatika.</p>
             </div>
         </div>
 
@@ -115,7 +116,6 @@
             <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Pindai Ulang</button>
         </div>
 
-        <!-- Tabel Data Duplikat -->
         <table>
             <thead>
                 <tr>
@@ -128,64 +128,22 @@
                 </tr>
             </thead>
             <tbody id="bodyRpsDuplikat">
-                <!-- Data API akan di-render di sini -->
-            </tbody>
+                </tbody>
         </table>
     </div>
 
 <script>
-    // 1. PENGATURAN API N8N
+    // 1. PENGATURAN API N8N (Filter Khusus TI)
     const PRODI = 'ti'; 
-    const API_BASE = "https://willing-robot-ministry-reported.trycloudflare.com/webhook"; 
-    // Sesuaikan URL ini dengan webhook n8n khusus untuk pengecekan RPS
-    const API_URL = `${API_BASE}/get-periksa-data?prodi=${PRODI}&jenis=rps_duplikat`; 
+    const BASE_N8N_URL = 'https://willing-robot-ministry-reported.trycloudflare.com';
+    const API_URL = `${BASE_N8N_URL}/webhook/get-periksa-data?prodi=${PRODI}&jenis=rps_duplikat`; 
 
     // 2. SISTEM KEAMANAN
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace('/login/login.html');
 
-    // 3. LOAD SIDEBAR
-    async function loadSidebar() {
-        try {
-            const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
-            const html = await response.text();
-            
-            document.getElementById('sidebar-container').outerHTML = html;
-            document.getElementById("adminName").innerText = userLogin;
-
-            setTimeout(() => {
-                const navDashboard = document.getElementById('nav-home');
-                const navRpsDuplikat = document.getElementById('nav-rps-duplikat'); 
-                const menuPeriksa = document.getElementById('menu-periksa');
-                const chevronPeriksa = document.getElementById('chevron-periksa');
-
-                if(navDashboard) navDashboard.classList.remove('active');
-                if(navRpsDuplikat) navRpsDuplikat.classList.add('active'); 
-                
-                // Buka dropdown Periksa Data otomatis
-                if(menuPeriksa && chevronPeriksa) {
-                    menuPeriksa.style.display = 'flex';
-                    chevronPeriksa.style.transform = 'rotate(180deg)';
-                }
-            }, 100);
-        } catch (error) { console.error('Gagal memuat sidebar:', error); }
-    }
-
-    // Fungsi Dropdown Sidebar
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex'; chevron.style.transform = 'rotate(180deg)'; 
-        } else {
-            menu.style.display = 'none'; chevron.style.transform = 'rotate(0deg)';   
-        }
-    }
-
-    function logout() { localStorage.clear(); window.location.replace("/login/login.html"); }
-
     // ==========================================
-    // 4. LOGIKA MENARIK DATA DARI DATABASE
+    // 3. LOGIKA MENARIK DATA DARI DATABASE
     // ==========================================
     async function loadData() {
         const tbody = document.getElementById("bodyRpsDuplikat");
@@ -200,7 +158,7 @@
             const data = await response.json();
             */
 
-            // Dummy sementara (Untuk mensimulasikan bentuk data json yang dikirim n8n dari query MySQL "GROUP BY kode_mk HAVING COUNT(*) > 1")
+            // Dummy sementara (Disesuaikan dengan Mata Kuliah TI)
             const data = [
                 {
                     kode_mk: "2023W276",
@@ -237,7 +195,7 @@
                         <td style="text-align: center;">${item.tahun}</td>
                         <td style="text-align: center;"><span class="badge-danger-soft">${item.jumlah_rps} RPS Aktif</span></td>
                         <td style="text-align: center;">
-                            <button class="btn-action" onclick="alert('Membuka detail perbandingan RPS untuk ${item.kode_mk}')"><i class="fas fa-search"></i> Selesaikan</button>
+                            <button class="btn-action-ti" onclick="alert('Membuka detail perbandingan RPS untuk ${item.kode_mk}')"><i class="fas fa-search"></i> Selesaikan</button>
                         </td>
                     </tr>
                 `;
@@ -249,10 +207,27 @@
         }
     }
 
-    // Eksekusi Saat Halaman Dimuat
+    // ==========================================
+    // 4. JALANKAN SAAT HALAMAN DIMUAT
+    // ==========================================
     window.onload = () => {
-        loadSidebar();
         loadData();
+
+        // Jeda agar template.js selesai menyusun sidebar sebelum kita ubah menu aktifnya
+        setTimeout(() => {
+            const navDashboard = document.getElementById('nav-home');
+            const navRpsDuplikat = document.querySelector('[data-path="/periksa_data/rps_duplikat.html"]'); 
+            const menuPeriksa = document.getElementById('menu-periksa');
+            const chevronPeriksa = document.getElementById('chevron-periksa');
+
+            if(navDashboard) navDashboard.classList.remove('active');
+            if(navRpsDuplikat) navRpsDuplikat.classList.add('active'); 
+            
+            if(menuPeriksa && chevronPeriksa) {
+                menuPeriksa.style.display = 'flex';
+                chevronPeriksa.style.transform = 'rotate(180deg)';
+            }
+        }, 300);
     };
 </script>
 </body>

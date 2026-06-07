@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafik Rerata CPL Angkatan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../../css/style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; }
+        .chart-wrapper { position: relative; height: 550px; width: 100%; margin: 20px auto; display: flex; justify-content: center; }
+        #cplChart { max-width: 700px; }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+    <div style="flex: 1; display: flex; flex-direction: column;">
+        <div id="navbar-container"></div>
+
+        <div class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a;">Grafik Rerata <span style="color: #8b0000;">CPL Angkatan</span></h1>
+                    <p style="margin: 0; color: #64748b;">Visualisasi Radar pencapaian profil lulusan berdasarkan data akumulasi satu angkatan.</p>
+                </div>
+                <button class="btn-action" style="background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="window.print()">
+                    <i class="fas fa-print"></i> Cetak PDF
+                </button>
+            </div>
+
+            <div class="card-container" style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="font-weight: 700;">Pilih Angkatan:</label>
+                    <select id="selectAngkatan" style="padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; width: 200px;">
+                        <option value="2022">Angkatan 2022</option>
+                        <option value="2023">Angkatan 2023</option>
+                        <option value="2024">Angkatan 2024</option>
+                    </select>
+                    
+                    <button class="btn-action" style="background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="loadGrafikCPL()">
+                        <i class="fas fa-sync-alt"></i> Bangun Grafik Radar
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-container">
+                <div id="loadingMsg" style="text-align: center; color: #64748b; padding: 40px; display: none;">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Menghitung data CPL lintas mata kuliah...
+                </div>
+                <div id="errorMsg" style="text-align: center; color: red; padding: 40px; display: none;"></div>
+                
+                <div class="chart-wrapper">
+                    <canvas id="cplChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../js/template.js"></script>
+    <script>
+        // Gunakan URL Cloudflare Anda yang sedang aktif
+        const API_GRAFIK_CPL = "https://arm-semester-inflation-vintage.trycloudflare.com/webhook/get-grafik-cpl";
+        let myRadarChart = null;
+
+        async function loadGrafikCPL() {
+            const angkatan = document.getElementById("selectAngkatan").value;
+            const loadingMsg = document.getElementById("loadingMsg");
+            const errorMsg = document.getElementById("errorMsg");
+            const canvas = document.getElementById("cplChart");
+            
+            loadingMsg.style.display = "block";
+            errorMsg.style.display = "none";
+            canvas.style.display = "none";
+
+            try {
+                const res = await fetch(`${API_GRAFIK_CPL}?angkatan=${angkatan}`);
+                const data = await res.json();
+                loadingMsg.style.display = "none";
+
+                if(!data || data.length === 0) {
+                    errorMsg.innerText = `Data nilai untuk angkatan ${angkatan} belum tersedia di database.`;
+                    errorMsg.style.display = "block";
+                    return;
+                }
+
+                // 1. Olah Data -> Rerata per CPL (CPL01, CPL02, dst)
+                let cplStats = {};
+                data.forEach(item => {
+                    let cpl = item.kode_cpl;
+                    if (!cplStats[cpl]) {
+                        cplStats[cpl] = { totalSkor: 0, countMhs: 0 };
+                    }
+                    let skorMhs = (item.total_nilai_tertimbang / item.total_bobot_cpl) * 100;
+                    cplStats[cpl].totalSkor += skorMhs;
+                    cplStats[cpl].countMhs += 1;
+                });
+
+                let labels = [];
+                let averages = [];
+
+                Object.keys(cplStats).sort().forEach(cpl => {
+                    labels.push(cpl);
+                    averages.push((cplStats[cpl].totalSkor / cplStats[cpl].countMhs).toFixed(2));
+                });
+
+                canvas.style.display = "block";
+                renderRadarChart(labels, averages);
+
+            } catch (e) {
+                loadingMsg.style.display = "none";
+                errorMsg.innerText = "Error: Gagal memuat data dari n8n. Periksa koneksi internet dan status workflow.";
+                errorMsg.style.display = "block";
+            }
+        }
+
+        function renderRadarChart(labels, dataAvg) {
+            const ctx = document.getElementById('cplChart').getContext('2d');
+            if (myRadarChart) { myRadarChart.destroy(); }
+
+            myRadarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Pencapaian CPL Angkatan (%)',
+                        data: dataAvg,
+                        fill: true,
+                        backgroundColor: 'rgba(139, 0, 0, 0.2)', // Warna merah transparan (Primary Red Anda)
+                        borderColor: 'rgba(139, 0, 0, 1)',
+                        pointBackgroundColor: 'rgba(139, 0, 0, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(139, 0, 0, 1)'
+                    }]
+                },
+                options: {
+                    elements: { line: { borderWidth: 3 } },
+                    scales: {
+                        r: {
+                            angleLines: { display: true },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { stepSize: 20 }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

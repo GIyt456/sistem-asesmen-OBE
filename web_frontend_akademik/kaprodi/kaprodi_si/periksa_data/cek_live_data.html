@@ -12,16 +12,22 @@
     <style>
         /* --- VARIABEL WARNA KHUSUS SI --- */
         :root { 
-            --sidebar-bg: #161923; 
-            --sidebar-text: #7b8395;
-            --sidebar-hover: #262936;
-            --sidebar-active-text: #ffffff;
-            --primary-teal: #0097a7; /* Warna utama SI */
+            --primary-teal: #0097a7; 
+            --primary-teal-dark: #006064; /* Dikembalikan ke warna terang untuk gradasi tombol */
             --bg-main: #ffffff; 
             --text-dark: #111827;
             --border-light: #e5e7eb;
             --border-dark: #161923;
         }
+
+        /* --- OVERRIDE SIDEBAR GELAP --- */
+        /* Memaksa sidebar berwarna gelap khusus file ini tanpa merusak warna tombol */
+        .sidebar { background-color: #005a65 !important; border-right: none !important; }
+        .sidebar .nav-item { color: #9bb7bd !important; } /* Warna teks menu tidak aktif */
+        .sidebar .nav-item:hover, .sidebar .nav-item.active { 
+        background-color: #1c7b87 !important; 
+        color: #ffffff !important; 
+}
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         
@@ -42,13 +48,39 @@
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
         .header-title span { color: var(--primary-teal); }
-        .badge-prodi { background: var(--primary-teal); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0, 151, 167, 0.2); }
+        
+        .badge-prodi { 
+            background: var(--primary-teal-dark); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 30px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            box-shadow: 0 4px 6px rgba(0, 151, 167, 0.2); 
+        }
 
-        /* --- TOMBOL --- */
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
         .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        .btn-primary-si { background: var(--primary-teal); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 151, 167, 0.2); }
-        .btn-primary-si:hover { background: #006064; transform: translateY(-2px); }
+        
+        .btn-primary-si { 
+            background: linear-gradient(to right, var(--primary-teal), var(--primary-teal-dark)); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            font-size: 0.95rem; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            transition: 0.2s; 
+            box-shadow: 0 4px 6px rgba(0, 151, 167, 0.2);
+        }
+        .btn-primary-si:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(0, 151, 167, 0.3);
+        }
 
         /* --- GAYA TABEL --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
@@ -63,10 +95,8 @@
 </head>
 <body>
 
-    <!-- Wadah Sidebar -->
     <div id="sidebar-container"></div>
 
-    <!-- Konten Utama -->
     <div class="main-content">
         
         <div class="header-container">
@@ -92,7 +122,6 @@
 
         <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: #111827;"><i class="fas fa-history" style="color: #6b7280; margin-right: 8px;"></i> Log Riwayat Sinkronisasi</h3>
         
-        <!-- Tabel Data Log -->
         <table>
             <thead>
                 <tr>
@@ -107,15 +136,15 @@
             <tbody>
                 <tr>
                     <td style="text-align: center;">1</td>
-                    <td style="font-weight: 600;">01 Juni 2026 - 08:30:15</td>
+                    <td style="font-weight: 600;">05 Juni 2026 - 08:30:15</td>
                     <td>Master Mahasiswa (SI)</td>
                     <td style="text-align: center;"><span class="badge-success"><i class="fas fa-check-circle"></i> Sukses</span></td>
-                    <td style="text-align: center; font-weight: 700;">850</td>
+                    <td style="text-align: center; font-weight: 700;">1,150</td>
                     <td style="font-size: 0.85rem;">Selesai tanpa error.</td>
                 </tr>
                 <tr>
                     <td style="text-align: center;">2</td>
-                    <td style="font-weight: 600;">01 Juni 2026 - 08:29:40</td>
+                    <td style="font-weight: 600;">05 Juni 2026 - 08:29:40</td>
                     <td>Master Dosen (SI)</td>
                     <td style="text-align: center;"><span class="badge-success"><i class="fas fa-check-circle"></i> Sukses</span></td>
                     <td style="text-align: center; font-weight: 700;">38</td>
@@ -123,7 +152,7 @@
                 </tr>
                 <tr>
                     <td style="text-align: center;">3</td>
-                    <td style="font-weight: 600;">31 Mei 2026 - 23:00:00</td>
+                    <td style="font-weight: 600;">04 Juni 2026 - 23:00:00</td>
                     <td>Data KRS / Mengajar</td>
                     <td style="text-align: center;"><span class="badge-danger"><i class="fas fa-times-circle"></i> Gagal</span></td>
                     <td style="text-align: center; font-weight: 700;">0</td>
@@ -136,57 +165,32 @@
 <script>
     // 1. SISTEM KEAMANAN
     const userLogin = localStorage.getItem("user_login");
-    
+
     if (!userLogin) window.location.replace('/login/login.html');
 
-    // 2. LOAD SIDEBAR KHUSUS SI
-    async function loadSidebar() {
-        try {
-            const response = await fetch('/kaprodi/kaprodi_si/components/sidebar.html');
-            const html = await response.text();
-            
-            document.getElementById('sidebar-container').outerHTML = html;
-            document.getElementById("adminName").innerText = userLogin || "Kaprodi SI";
-
-            setTimeout(() => {
-                const navDashboard = document.getElementById('nav-home');
-                // Sesuaikan ID nav jika di sidebar SI Anda namanya berbeda
-                const navCekLive = document.getElementById('nav-cek-live'); 
-                const menuPeriksa = document.getElementById('menu-periksa');
-                const chevronPeriksa = document.getElementById('chevron-periksa');
-
-                if(navDashboard) navDashboard.classList.remove('active');
-                if(navCekLive) navCekLive.classList.add('active'); 
-                
-                // Buka dropdown Periksa Data secara otomatis
-                if(menuPeriksa && chevronPeriksa) {
-                    menuPeriksa.style.display = 'flex';
-                    chevronPeriksa.style.transform = 'rotate(180deg)';
-                }
-            }, 100);
-        } catch (error) { console.error('Gagal memuat sidebar:', error); }
-    }
-
-    // Fungsi klik animasi dropdown untuk sidebar
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex'; chevron.style.transform = 'rotate(180deg)'; 
-        } else {
-            menu.style.display = 'none'; chevron.style.transform = 'rotate(0deg)';   
-        }
-    }
-
-    function logout() { localStorage.clear(); window.location.replace("/login/login.html"); }
-
-    // Fungsi Tombol Tarik Data (Nantinya dihubungkan ke webhook n8n)
+    // Fungsi Tombol Tarik Data
     function tarikData() {
         alert("Mengirim request ke Webhook n8n untuk menarik data Sistem Informasi terbaru...");
-        // Tambahkan fungsi fetch webhook n8n di sini
     }
 
-    window.onload = loadSidebar;
+    // 2. JALANKAN SAAT HALAMAN DIBUKA
+    window.onload = () => {
+        // Jeda agar template.js selesai menyusun sidebar sebelum kita ubah menu aktifnya
+        setTimeout(() => {
+            const navDashboard = document.getElementById('nav-home');
+            const navCekLive = document.querySelector('[data-path="/periksa_data/cek_live_data.html"]'); 
+            const menuPeriksa = document.getElementById('menu-periksa');
+            const chevronPeriksa = document.getElementById('chevron-periksa');
+
+            if(navDashboard) navDashboard.classList.remove('active');
+            if(navCekLive) navCekLive.classList.add('active'); 
+            
+            if(menuPeriksa && chevronPeriksa) {
+                menuPeriksa.style.display = 'flex';
+                chevronPeriksa.style.transform = 'rotate(180deg)';
+            }
+        }, 300);
+    };
 </script>
 </body>
 </html>

@@ -12,15 +12,20 @@
     <style>
         /* --- VARIABEL WARNA KHUSUS SI --- */
         :root { 
-            --sidebar-bg: #161923; 
-            --sidebar-text: #7b8395;
-            --sidebar-hover: #262936;
-            --sidebar-active-text: #ffffff;
-            --primary-teal: #0097a7; /* Warna utama SI */
+            --primary-teal: #0097a7; 
+            --primary-teal-dark: #006064; 
             --bg-main: #ffffff; 
             --text-dark: #111827;
             --border-light: #e5e7eb;
             --border-dark: #161923;
+        }
+
+        /* --- OVERRIDE SIDEBAR KHUSUS SI --- */
+        .sidebar { background-color: #005a65 !important; border-right: none !important; }
+        .sidebar .nav-item { color: #9bb7bd !important; }
+        .sidebar .nav-item:hover, .sidebar .nav-item.active { 
+            background-color: #1c7b87 !important; 
+            color: #ffffff !important; 
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -42,33 +47,57 @@
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
         .header-title span { color: var(--primary-teal); }
-        .badge-prodi { background: var(--primary-teal); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0, 151, 167, 0.2); }
+        .badge-prodi { background: var(--primary-teal-dark); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0, 151, 167, 0.2); }
 
-        /* --- ALERT BOX (Tetap kuning/oranye untuk peringatan) --- */
-        .alert-box { background: #fffbeb; border-left: 5px solid #f59e0b; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; gap: 15px; align-items: flex-start; }
-        .alert-box i { color: #f59e0b; font-size: 1.5rem; margin-top: 2px; }
-        .alert-box h4 { margin: 0 0 6px 0; color: #92400e; font-size: 1.05rem; font-weight: 700; }
-        .alert-box p { margin: 0; color: #b45309; font-size: 0.9rem; line-height: 1.5; }
+        /* --- ALERT BOX --- */
+        .alert-box { background: #f0fdf4; border-left: 5px solid #10b981; padding: 16px 20px; border-radius: 8px; margin-bottom: 24px; display: flex; gap: 15px; align-items: flex-start; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .alert-box.warning { background: #fffbeb; border-color: #f59e0b; }
+        .alert-box.warning i { color: #f59e0b; }
+        .alert-box.warning h4 { color: #92400e; }
+        .alert-box.warning p { color: #b45309; }
+        .alert-box i { font-size: 1.5rem; margin-top: 2px; }
+        .alert-box h4 { margin: 0 0 6px 0; font-size: 1.05rem; font-weight: 700; }
+        .alert-box p { margin: 0; font-size: 0.9rem; line-height: 1.5; }
 
         /* --- TOMBOL --- */
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-dark:hover { background: #000000; transform: translateY(-2px); }
         
-        .btn-action-si { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; background: var(--primary-teal); }
-        .btn-action-si:hover { background: #006064; }
+        .btn-action-si { 
+            background: linear-gradient(to right, var(--primary-teal), var(--primary-teal-dark)); 
+            color: white; 
+            border: none; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            font-size: 0.85rem; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            transition: 0.2s; 
+            box-shadow: 0 2px 4px rgba(0, 151, 167, 0.2);
+        }
+        .btn-action-si:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 151, 167, 0.3); }
+        
+        .btn-action-delete {
+            background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s;
+        }
+        .btn-action-delete:hover { background: #dc2626; }
 
         /* --- GAYA TABEL --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
         th { background: #f3f4f6; color: var(--text-dark); padding: 14px 16px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
         td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; color: #4b5563; }
         tbody tr:hover { background-color: #f9fafb; }
-
-        .badge-danger-soft { background: #fee2e2; color: #b91c1c; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-block; }
+        
+        .error-text { color: #9a3412; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+        .dosen-name { font-weight: 600; color: #1f2937; }
     </style>
 </head>
 <body>
 
-    <!-- Wadah Sidebar -->
+    <!-- Wadah Sidebar (Otomatis diisi template.js) -->
     <div id="sidebar-container"></div>
 
     <!-- Konten Utama -->
@@ -125,48 +154,8 @@
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace('/login/login.html');
 
-    // 3. LOAD SIDEBAR KHUSUS SI
-    async function loadSidebar() {
-        try {
-            const response = await fetch('/kaprodi/kaprodi_si/components/sidebar.html');
-            const html = await response.text();
-            
-            document.getElementById('sidebar-container').outerHTML = html;
-            document.getElementById("adminName").innerText = userLogin || "Kaprodi SI";
-
-            setTimeout(() => {
-                const navDashboard = document.getElementById('nav-home');
-                const navRpsDuplikat = document.getElementById('nav-rps-duplikat'); 
-                const menuPeriksa = document.getElementById('menu-periksa');
-                const chevronPeriksa = document.getElementById('chevron-periksa');
-
-                if(navDashboard) navDashboard.classList.remove('active');
-                if(navRpsDuplikat) navRpsDuplikat.classList.add('active'); 
-                
-                // Buka dropdown Periksa Data otomatis
-                if(menuPeriksa && chevronPeriksa) {
-                    menuPeriksa.style.display = 'flex';
-                    chevronPeriksa.style.transform = 'rotate(180deg)';
-                }
-            }, 100);
-        } catch (error) { console.error('Gagal memuat sidebar:', error); }
-    }
-
-    // Fungsi Dropdown Sidebar
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex'; chevron.style.transform = 'rotate(180deg)'; 
-        } else {
-            menu.style.display = 'none'; chevron.style.transform = 'rotate(0deg)';   
-        }
-    }
-
-    function logout() { localStorage.clear(); window.location.replace("/login/login.html"); }
-
     // ==========================================
-    // 4. LOGIKA MENARIK DATA DARI DATABASE
+    // 3. LOGIKA MENARIK DATA DARI DATABASE
     // ==========================================
     async function loadData() {
         const tbody = document.getElementById("bodyRpsDuplikat");
@@ -230,10 +219,27 @@
         }
     }
 
-    // Eksekusi Saat Halaman Dimuat
+    // ==========================================
+    // 4. JALANKAN SAAT HALAMAN DIMUAT
+    // ==========================================
     window.onload = () => {
-        loadSidebar();
         loadData();
+
+        // Jeda agar template.js selesai menyusun sidebar sebelum kita ubah menu aktifnya
+        setTimeout(() => {
+            const navDashboard = document.getElementById('nav-home');
+            const navRpsDuplikat = document.querySelector('[data-path="/periksa_data/rps_duplikat.html"]'); 
+            const menuPeriksa = document.getElementById('menu-periksa');
+            const chevronPeriksa = document.getElementById('chevron-periksa');
+
+            if(navDashboard) navDashboard.classList.remove('active');
+            if(navRpsDuplikat) navRpsDuplikat.classList.add('active'); 
+            
+            if(menuPeriksa && chevronPeriksa) {
+                menuPeriksa.style.display = 'flex';
+                chevronPeriksa.style.transform = 'rotate(180deg)';
+            }
+        }, 300);
     };
 </script>
 </body>
