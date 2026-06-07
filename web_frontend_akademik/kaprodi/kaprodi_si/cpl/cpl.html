@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola CPL - Sistem OBE</title>
+    <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
         :root { 
@@ -16,30 +16,14 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
         
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); }}
-        
-        /* GAYA SIDEBAR */
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
-        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
-        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .sidebar-profile-info { display: flex; flex-direction: column; }
-        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
-        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
-        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .nav-menu::-webkit-scrollbar { display: none; }
-        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
-        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
-        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
-        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-        .nav-item.logout { color: #f87171; }
-        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
-        
-        .main-content { flex: 1; min-width: 0; overflow-y: auto; padding: 40px 50px; }
-        
+        #sidebar-container { width: 280px; min-width: 280px; height: 100vh; background: var(--sidebar-bg); flex-shrink: 0; }
+        /* 1. Ubah main-content jadi sistem Flexbox bersusun */
+        .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; padding: 0; background: var(--bg-main); }
+        .fixed-header { padding: 40px 50px 20px 50px;flex-shrink: 0;background: var(--bg-main);z-index: 10;border-bottom: 1px solid var(--border-color); }
+        .scrollable-content { flex: 1; overflow-y: auto; padding: 30px 50px 40px 50px }
+
         .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
         .header-title-area { display: flex; flex-direction: column; }
         .header-subtitle { color: #64748b; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
@@ -49,7 +33,7 @@
         
         .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 20px; }
         table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
-        th { background: #f8fafc; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; }
+        th { background: #f8fafc; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; position: sticky; top: 0; z-index: 5;}
         td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #1e293b; vertical-align: middle; }
         
         .action-buttons { display: flex; gap: 10px; align-items: center; }
@@ -61,7 +45,6 @@
         .btn-upload { background: var(--success-green); }
         .btn-upload:hover { background: #059669; transform: translateY(-2px); }
         
-        /* PAGINATION STYLING */
         #pagination-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; padding-bottom: 40px; }
         #pagination-container button { padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s; }
         #pagination-container button:hover:not(:disabled) { background: #f1f5f9; color: var(--text-dark); }
@@ -73,16 +56,16 @@
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <div class="header-container">
-            <div class="header-title-area">
-                <div class="header-subtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title">CAPAIAN <span>PEMBELAJARAN (CPL)</span></h1>
+        <div class="fixed-header">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">KELOLA KURIKULUM</div>
+                    <h1 class="header-title">CAPAIAN <span>PEMBELAJARAN (CPL)</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
-            <div class="badge-prodi" id="prodiBadge">PRODI</div>
-        </div>
 
-        <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar CPL</h3>
                     <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500;">Rumusan Capaian Pembelajaran Lulusan</p>
@@ -99,7 +82,8 @@
                     </button>
                 </div>
             </div>
-            
+        </div>
+        <div class="scrollable-content">
             <div class="table-container">
                 <table>
                     <thead>
@@ -117,38 +101,28 @@
             
             <div id="pagination-container"></div>
         </div>
-    </div>
+        </div>
+
+<script src="/js/template.js"></script>
 
 <script>
+    // --- 1. VARIABEL API ---
     const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
     
-    const API_BASE = "https://gilbert-mean-pursuant-chronicles.trycloudflare.com/webhook"; 
+    // 👇 PASTIKAN LINK INI MENGGUNAKAN LINK CLOUDFLARE-MU YANG PALING BARU 👇
+    const API_BASE = "https://estimation-fourth-promotions-steel.trycloudflare.com/webhook"; 
+    
     const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
-    const API_UPLOAD = `${API_BASE}/upload-master-cpl`; // Asumsi URL upload jika ada
+    const API_UPLOAD = `${API_BASE}/upload-master-cpl`;
 
     const userLogin = localStorage.getItem("user_login");
-    
+        if (!userLogin) window.location.replace("/login/login.html");
+
     let allData = [];
-    let state = { page: 1, itemsPerPage: 10 }; // 10 Data per halaman (Bisa diubah)
+    let state = { page: 1, itemsPerPage: 10 };
 
-    // --- FUNGSI SIDEBAR OTOMATIS (Mendeteksi SI/TI) ---
-    async function loadSidebar() {
-        try {
-            const response = await fetch(`/kaprodi/kaprodi_${PRODI}/components/sidebar.html`);
-            if (!response.ok) throw new Error("File sidebar tidak ditemukan");
-            document.getElementById('sidebar-container').innerHTML = await response.text();
-            
-            const nameElem = document.getElementById("adminName");
-            if (nameElem) nameElem.innerText = localStorage.getItem("user_login") || "Admin";
-            
-            // Highlight menu CPL di sidebar (Sesuaikan dengan ID di sidebar kamu)
-            const navCPL = document.getElementById('nav-cpl');
-            if(navCPL) navCPL.style.background = 'var(--sidebar-hover)';
-        } catch (error) { console.error('Gagal memuat sidebar:', error); }
-    }
-
-    // --- FUNGSI AMBIL DATA ---
+    // --- 2. FUNGSI AMBIL DATA TABEL ---
     async function loadData() { 
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding:40px;'><i class='fas fa-spinner fa-spin'></i> Memuat data...</td></tr>";
@@ -170,7 +144,7 @@
         }
     }
 
-    // --- FUNGSI RENDER TABEL & PAGINATION ---
+    // --- 3. RENDER TABEL & PAGINATION ---
     function renderTablePaginated() {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "";
@@ -180,7 +154,7 @@
         const paginatedItems = allData.slice(start, end);
         
         paginatedItems.forEach(cpl => {
-            const deskripsi = cpl.deskripsi || cpl.deskripsi_cpl || ""; // Menghindari error jika kolom kosong
+            const deskripsi = cpl.deskripsi || cpl.deskripsi_cpl || ""; 
             
             let tr = document.createElement('tr');
             tr.innerHTML = `
@@ -228,7 +202,7 @@
         container.appendChild(btnNext);
     }
 
-    // --- FUNGSI SIMPAN EDIT ---
+    // --- 4. FUNGSI SIMPAN & EXCEL ---
     async function simpanEdit(tipe, kode) { 
         const value = document.getElementById(`in-${kode}`).value; 
         const btn = event.currentTarget;
@@ -249,7 +223,6 @@
         finally { btn.innerHTML = oldHtml; btn.disabled = false; }
     }
 
-    // --- FUNGSI EXPORT / IMPORT EXCEL ---
     async function exportKeExcel() {
         const btn = document.querySelector('.btn-download');
         const oriText = btn.innerHTML;
@@ -295,31 +268,9 @@
         finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
     }
 
-    // --- INISIALISASI HALAMAN SAAT DIBUKA ---
-    window.onload = async () => {
-        if (!userLogin) { window.location.replace("../login/login.html"); return; }
-        
-        // Memasang nama prodi di header
-        document.getElementById("prodiBadge").innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
-        
-        await loadSidebar(); 
-        await loadData();    
-    };
-    
-    // Fungsi animasi Dropdown di Sidebar
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId), chevron = document.getElementById(chevronId);
-        if(menu) menu.style.display = menu.style.display === 'none' ? 'flex' : 'none';
-        if(chevron) chevron.style.transform = chevron.style.transform === 'rotate(180deg)' ? 'rotate(0deg)' : 'rotate(180deg)';
-    }
-
-    // Fungsi Logout
-    function logout() {
-        if(confirm("Apakah Anda yakin ingin keluar?")) {
-            localStorage.removeItem("user_login"); localStorage.removeItem("user_role");
-            window.location.replace('/login/login.html');
-        }
-    }
+    window.onload = () => {
+            setTimeout(loadData, 400); // Langsung eksekusi analisis saat web dibuka
+        };
 </script>
 </body>
 </html>

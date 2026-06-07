@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapping CPL - CPMK - Sistem OBE</title>
     <link rel="stylesheet" href="../../../css/style.css">
-    <script src="../../../js/template.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -15,23 +15,7 @@
             --primary-red: #8b0000; --bg-main: #ffffff; --text-dark: #111827; --border-dark: #161923;
         }
 
-        /* --- GAYA SIDEBAR --- */
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
-        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
-        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .sidebar-profile-info { display: flex; flex-direction: column; }
-        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
-        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
-        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .nav-menu::-webkit-scrollbar { display: none; }
-        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
-        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
-        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
-        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-        .nav-item.logout { color: #f87171; }
-        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
+        #sidebar-container { width: 280px; min-width: 280px; height: 100vh; background: var(--sidebar-bg); flex-shrink: 0; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { display: flex; background: #f9fafb; height: 100vh; overflow: hidden; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
@@ -100,18 +84,23 @@
         </div>
     </div>
 
+<script src="/js/template.js"></script>
+
 <script>
-    const API_BASE = "https://gilbert-mean-pursuant-chronicles.trycloudflare.com/webhook";
+    const PRODI = localStorage.getItem("prodi_aktif") || "si";
+
+    const API_BASE = "https://toolbox-router-wyoming-definitions.trycloudflare.com/webhook";
     const API_METADATA = `${API_BASE}/get-metadata`;
     const API_UPDATE = `${API_BASE}/admin-update-master`; // Jalur 'mapping' di n8n
 
+    const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
     let allMetadata = [];
 
-    window.onload = async () => {
-        if (!localStorage.getItem("user_login")) { window.location.replace("/login/login.html"); return; }
-        await loadSidebar();
-        await initData();
-    };
+    window.onload = () => {
+            setTimeout(initData, 400); // Langsung eksekusi analisis saat web dibuka
+        };
 
     // Tarik data CPL dan CPMK sekaligus
     async function initData() {
@@ -217,23 +206,6 @@
         finally { 
             btnSave.disabled = false; 
             btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Relasi'; 
-        }
-    }
-
-    // Fungsi Standar Sidebar & Dropdown
-    async function loadSidebar() {
-        const response = await fetch('/kaprodi/kaprodi_${PRODI}/components/sidebar.html');
-        document.getElementById('sidebar-container').innerHTML = await response.text();
-        document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
-        document.getElementById('nav-mapping-cpl-cpmk').style.background = 'var(--sidebar-hover)';
-    }
-
-    function toggleDropdown(m, c) {
-        const menu = document.getElementById(m), chev = document.getElementById(c);
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex'; chev.style.transform = 'rotate(180deg)';
-        } else {
-            menu.style.display = 'none'; chev.style.transform = 'rotate(0deg)';
         }
     }
 </script>
