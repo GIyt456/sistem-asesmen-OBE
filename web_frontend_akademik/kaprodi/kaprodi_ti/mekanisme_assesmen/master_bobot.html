@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Bobot - Sistem OBE</title>
-    <link rel="stylesheet" href="../../../css/style.css">
-    <script src="../../../js/template.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -14,24 +13,6 @@
             --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
             --primary-red: #8b0000; --bg-main: #ffffff; --text-dark: #111827; --border-dark: #161923;
         }
-
-        /* --- GAYA SIDEBAR --- */
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
-        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
-        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .sidebar-profile-info { display: flex; flex-direction: column; }
-        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
-        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
-        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .nav-menu::-webkit-scrollbar { display: none; }
-        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
-        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
-        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
-        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-        .nav-item.logout { color: #f87171; }
-        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { display: flex; animation: transitionIn 0.3s ease-in-out; background: #f9fafb; height: 100vh; overflow: hidden; color: var(--text-dark); }
@@ -122,14 +103,19 @@
         </div>
     </div>
 
-<script>
-    const API_BASE = "https://yen-title-indicators-thursday.trycloudflare.com/webhook";
-    const API_GET_BOBOT = `${API_BASE}/get-master-bobot`;
+<script src="/js/template.js"></script>
 
-    window.onload = async () => {
-        if (!localStorage.getItem("user_login")) { window.location.replace("/login/login.html"); return; }
-        await loadSidebar();
-        await loadDataBobot(); 
+<script>
+    const PRODI = localStorage.getItem("prodi_aktif") || "ti";
+    
+    const API_BASE = "https://recommend-promised-nasa-robinson.trycloudflare.com/webhook";
+    const API_GET_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
+
+    const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+    window.onload = () => {
+        setTimeout(loadDataBobot, 400); 
     };
 
     async function loadDataBobot() {
@@ -188,10 +174,10 @@
                 // 3. Kolom CPMK & Input Nilai (Selalu digambar per baris)
                 tr += `
                     <td class="col-cpmk">${row.cpmk}</td>
-                    <td><input type="number" class="input-bobot" data-field="tugas" value="${row.tugas}" oninput="hitungTotal(${index})"></td>
-                    <td><input type="number" class="input-bobot" data-field="uts" value="${row.uts}" oninput="hitungTotal(${index})"></td>
-                    <td><input type="number" class="input-bobot" data-field="presentasi" value="${row.presentasi}" oninput="hitungTotal(${index})"></td>
-                    <td><input type="number" class="input-bobot" data-field="uas" value="${row.uas}" oninput="hitungTotal(${index})"></td>
+                    <td><input type="number" class="input-bobot" data-field="tugas" value="${row.tugas || 0}" min="0" max="100" oninput="hitungTotal(${index})"></td>
+                    <td><input type="number" class="input-bobot" data-field="uts" value="${row.uts || 0}" min="0" max="100" oninput="hitungTotal(${index})"></td>
+                    <td><input type="number" class="input-bobot" data-field="presentasi" value="${row.presentasi || 0}" min="0" max="100" oninput="hitungTotal(${index})"></td>
+                    <td><input type="number" class="input-bobot" data-field="uas" value="${row.uas || 0}" min="0" max="100" oninput="hitungTotal(${index})"></td>
                     <td class="col-total ${totalClass}" id="total-${index}">${total}</td>
                 </tr>`;
 
@@ -219,37 +205,6 @@
 
     function saveSemuaBobot() {
         alert("Sabar, fitur simpan menyusul! Cek dulu apakah datanya sudah tampil semua?");
-    }
-
-    //Sidebar
-    async function loadSidebar() {
-        const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
-        document.getElementById('sidebar-container').innerHTML = await response.text();
-        document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
-        document.getElementById('nav-master-bobot').style.background = 'var(--sidebar-hover)';
-    }
-
-    // Fungsi Animasi Dropdown
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex';
-            chevron.style.transform = 'rotate(180deg)';
-        } else {
-            menu.style.display = 'none';
-            chevron.style.transform = 'rotate(0deg)';
-        }
-    }
-
-    // Fungsi Logout
-    function logout() {
-        if(confirm("Apakah Anda yakin ingin keluar?")) {
-            localStorage.removeItem("user_login");
-            localStorage.removeItem("user_role");
-            window.location.replace('/login/login.html');
-        }
     }
 </script>
 </script>
