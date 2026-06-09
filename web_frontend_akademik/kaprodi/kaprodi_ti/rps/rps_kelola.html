@@ -3,80 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola RPS - Panel Kaprodi</title>
+    <title>Kelola RPS - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../../../css/style.css">
-    <script src="../../../js/template.js"></script>
+    
+    <style>
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 30px; }
+        .table-master { width: 100%; border-collapse: collapse; }
+        .table-master th, .table-master td { padding: 15px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: middle; }
+        .table-master th { background: #111827; color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+        .text-center { text-align: center !important; }
+        
+        /* Warna Status RPS */
+        .badge-status { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-block; }
+        .status-ready { background: #d1fae5; color: #065f46; } /* Hijau */
+        .status-draft { background: #fef3c7; color: #b45309; } /* Kuning/Oranye */
+        
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
 <body>
 
-    <!-- 1. Wadah Sidebar -->
     <div id="sidebar-container"></div>
-
-    <div style="flex: 1; display: flex; flex-direction: column;">
-        <!-- 2. Wadah Navbar -->
+    
+    <div class="main-content">
         <div id="navbar-container"></div>
 
-        <!-- 3. KONTEN UTAMA RPS -->
-        <div class="main-content">
-            <div style="margin-bottom: 30px;">
-                <h1 style="margin:0; font-size: 2rem; color: var(--text-dark);">Kelola <span style="color: var(--primary-red);">RPS</span></h1>
-                <p style="color: #6b7280; margin-top: 5px;">Pantau dan susun Rencana Pembelajaran Semester untuk setiap Mata Kuliah.</p>
+        <div class="content-wrapper">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">MANAJEMEN RPS</div>
+                    <h1 class="header-title">KELOLA <span>RPS</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                <input type="text" id="searchRPS" placeholder="Cari Kode atau Nama MK..." style="padding: 10px 15px; width: 300px; border: 1px solid #d1d5db; border-radius: 6px;">
-                <button class="btn-action btn-edit" onclick="loadDataRPS()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
+                <p style="margin: 0; color: #64748b; font-size: 0.95rem;">Pantau dan susun Rencana Pembelajaran Semester untuk setiap Mata Kuliah.</p>
+                
+                <div style="display: flex; gap: 10px;">
+                    <div style="position: relative;">
+                        <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                        <input type="text" id="searchRPS" class="form-control" placeholder="Cari Kode atau Nama MK..." style="padding: 10px 10px 10px 35px; width: 250px;">
+                    </div>
+                    <button class="btn-dark" onclick="loadDataRPS()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%">No</th>
-                        <th width="15%">Kode MK</th>
-                        <th width="35%">Nama Mata Kuliah</th>
-                        <th width="20%">Koordinator</th>
-                        <th width="10%" style="text-align: center;">Status RPS</th>
-                        <th width="15%" style="text-align: center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBodyRPS">
-                    <tr><td colspan="6" style="text-align: center; color: #6b7280;">Memuat data dari n8n...</td></tr>
-                </tbody>
-            </table>
+            <div class="card-container">
+                <table class="table-master">
+                    <thead>
+                        <tr>
+                            <th width="5%" class="text-center">No</th>
+                            <th width="15%">Kode MK</th>
+                            <th width="35%">Nama Mata Kuliah</th>
+                            <th width="20%">Koordinator</th>
+                            <th width="10%" class="text-center">Status</th>
+                            <th width="15%" class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyRPS">
+                        <tr><td colspan="6" class="text-center" style="padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Memuat daftar RPS dari n8n...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Logika Halaman RPS -->
-    <script>
-        // GANTI INI DENGAN URL CLOUDFLARE ANDA YANG AKTIF
-        const API_BASE = "https://sink-stephanie-wives-discussion.trycloudflare.com/webhook"; 
-        const API_RPS_LIST = `${API_BASE}/get-rps-list?prodi=ti`;
+    <script src="/js/template.js"></script>
 
+    <script>
+        // DETEKSI PRODI DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+        
+        // PENTING: Ganti URL di bawah dengan link Cloudflare Tunnel n8n Anda!
+        const API_BASE = "https://recommend-promised-nasa-robinson.trycloudflare.com/webhook"; 
+        // Menggunakan variabel PRODI agar query data tidak terkunci di TI saja
+        const API_RPS_LIST = `${API_BASE}/get-rps-list?prodi=${PRODI}`;
+
+        // SATPAM HALAMAN
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        // Set Label Prodi UI
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            
+            // Tema Khusus SI
+            if(PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+            }
+        });
+
+        // FUNGSI LOAD DATA RPS
         async function loadDataRPS() {
             const tbody = document.getElementById('tableBodyRPS');
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Sedang menyinkronkan data...</td></tr>`;
+            
             try {
-                // Di sini kita akan memanggil n8n untuk minta data daftar MK
                 const res = await fetch(API_RPS_LIST);
-                if (!res.ok) throw new Error("Gagal load");
+                if (!res.ok) throw new Error("Gagal mengambil data dari server");
                 
                 const data = await res.json();
                 tbody.innerHTML = "";
                 
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center">Belum ada mata kuliah yang terdaftar untuk RPS.</td></tr>`;
+                    return;
+                }
+
                 data.forEach((item, index) => {
-                    // Logic warna badge status
-                    const badgeClass = item.status === 'Selesai' ? 'status-ready' : 'status-draft';
+                    // Penentuan warna status
+                    const badgeClass = (item.status === 'Selesai' || item.status === 'Ready') ? 'status-ready' : 'status-draft';
+                    const statusText = item.status || 'Draft';
                     
                     tbody.innerHTML += `
                         <tr>
-                            <td>${index + 1}</td>
-                            <td><strong>${item.kode_mk}</strong></td>
-                            <td>${item.nama_mk}</td>
-                            <td>${item.koordinator || 'Belum Diatur'}</td>
-                            <td style="text-align: center;"><span class="badge-status ${badgeClass}">${item.status || 'Kosong'}</span></td>
-                            <td style="text-align: center;">
-                                <button class="btn-action btn-edit" onclick="bukaEditorRPS('${item.kode_mk}', '${item.nama_mk}')">
+                            <td class="text-center" style="font-weight: bold; color: #475569;">${index + 1}</td>
+                            <td><strong style="color: var(--text-dark);">${item.kode_mk}</strong></td>
+                            <td style="font-weight: 600;">${item.nama_mk}</td>
+                            <td style="color: #4b5563;">${item.koordinator || '- Belum Diatur -'}</td>
+                            <td class="text-center">
+                                <span class="badge-status ${badgeClass}"><i class="fas ${badgeClass === 'status-ready' ? 'fa-check-circle' : 'fa-clock'}"></i> ${statusText}</span>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn-action btn-dark" style="width: 100%; justify-content: center;" onclick="bukaEditorRPS('${item.kode_mk}', '${item.nama_mk}')">
                                     <i class="fas fa-pen"></i> Susun RPS
                                 </button>
                             </td>
@@ -85,23 +142,34 @@
                 });
             } catch (error) {
                 console.error(error);
+                // Data Fallback / Dummy jika N8N mati
                 tbody.innerHTML = `
-                    <!-- CONTOH DUMMY SEMENTARA JIKA N8N BELUM AKTIF -->
                     <tr>
-                        <td>1</td><td><strong>SI038</strong></td><td>MATEMATIKA DISKRET</td><td>Sri Mulyatun</td>
-                        <td style="text-align: center;"><span class="badge-status status-draft">Draft</span></td>
-                        <td style="text-align: center;"><button class="btn-action btn-edit" onclick="alert('Buka halaman editor untuk SI038')"><i class="fas fa-pen"></i> Susun</button></td>
+                        <td class="text-center" style="font-weight: bold; color: #475569;">1</td>
+                        <td><strong style="color: var(--text-dark);">SI038</strong></td>
+                        <td style="font-weight: 600;">MATEMATIKA DISKRET</td>
+                        <td style="color: #4b5563;">Sri Mulyatun</td>
+                        <td class="text-center"><span class="badge-status status-draft"><i class="fas fa-clock"></i> Draft</span></td>
+                        <td class="text-center">
+                            <button class="btn-action btn-dark" style="width: 100%; justify-content: center;" onclick="bukaEditorRPS('SI038', 'MATEMATIKA DISKRET')">
+                                <i class="fas fa-pen"></i> Susun
+                            </button>
+                        </td>
                     </tr>
                 `;
             }
         }
+
+        // FUNGSI BUKA EDITOR
         function bukaEditorRPS(kodeMK, namaMK) {
             // Membawa "koper" berisi kode_mk dan nama_mk ke halaman editor
+            // Menggunakan path relatif agar tetap fleksibel jika diakses dari folder SI atau TI
             window.location.href = `rps_editor.html?kode=${kodeMK}&nama=${encodeURIComponent(namaMK)}`;
         }
 
         window.onload = () => {
-            setTimeout(loadDataRPS, 500); // Tunggu komponen selesai
+            // Beri jeda sedikit agar template global merakit navbar/sidebar dulu
+            setTimeout(loadDataRPS, 400); 
         };
     </script>
 </body>

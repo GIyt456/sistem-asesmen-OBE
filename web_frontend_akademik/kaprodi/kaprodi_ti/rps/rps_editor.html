@@ -3,36 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor RPS - Panel Kaprodi</title>
+    <title>Editor RPS - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../../../css/style.css">
-    <script src="../../../js/template.js"></script>
 
     <style>
-        .rps-table th { background: var(--border-dark); color: white; border: 1px solid #374151; padding: 12px 10px; text-align: center; font-size: 0.8rem; text-transform: uppercase; }
+        .rps-table th { background: #111827; color: white; border: 1px solid #374151; padding: 12px 10px; text-align: center; font-size: 0.8rem; text-transform: uppercase; }
         .rps-table td { border: 1px solid #e5e7eb; padding: 8px; vertical-align: top; }
-        .rps-input { width: 100%; min-height: 50px; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 0.85rem; resize: vertical; outline: none; }
-        .rps-input:focus { border-color: var(--primary-red); box-shadow: 0 0 0 2px rgba(139,0,0,0.1); }
+        .rps-input { width: 100%; min-height: 50px; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 0.85rem; resize: vertical; outline: none; transition: 0.2s; }
+        .rps-input:focus { border-color: #111827; box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1); }
         
         input.rps-input { min-height: 40px; background: #f8fafc; cursor: pointer; }
         input.rps-input:focus { background: #ffffff; cursor: text; }
+        
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
+    
     <div id="sidebar-container"></div>
 
-    <div style="flex: 1; display: flex; flex-direction: column;">
+    <div class="main-content">
         <div id="navbar-container"></div>
 
-        <div class="main-content">
+        <div class="content-wrapper">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">MANAJEMEN RPS</div>
+                    <h1 class="header-title">PENYUSUNAN <span>RPS</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px;">
                 <div>
-                    <h1 style="margin: 0; font-size: 1.8rem; color: var(--text-dark);">Penyusunan RPS</h1>
-                    <p style="margin: 5px 0 0 0; color: #6b7280; font-weight: 600;" id="identitasMK">Memuat data Mata Kuliah...</p>
+                    <h2 style="margin: 0; font-size: 1.4rem; color: var(--text-dark);">Identitas Mata Kuliah</h2>
+                    <p style="margin: 5px 0 0 0; color: #6b7280; font-weight: 600; font-size: 1rem;" id="identitasMK">Memuat data Mata Kuliah...</p>
                 </div>
                 <div>
-                    <button class="btn-dark" style="background: #10b981; border: none; padding: 12px 24px;" onclick="simpanRPS()">
+                    <button class="btn-dark" style="background: #10b981; border: none; padding: 12px 24px; font-size: 1rem;" onclick="simpanRPS()">
                         <i class="fas fa-save"></i> Simpan RPS
                     </button>
                 </div>
@@ -41,7 +54,7 @@
             <datalist id="cpmk_options">
                 </datalist>
 
-            <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow-x: auto;">
+            <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow-x: auto; border: 1px solid #e5e7eb;">
                 <table class="rps-table" style="min-width: 1400px; width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
@@ -63,8 +76,14 @@
         </div>
     </div>
 
+    <script src="/js/template.js"></script>
+
     <script>
-        const API_BASE = "https://fares-our-films-aquatic.trycloudflare.com/webhook"; 
+        // DETEKSI PRODI DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+        
+        // PENTING: Ganti URL di bawah dengan link Cloudflare Tunnel n8n Anda!
+        const API_BASE = "https://recommend-promised-nasa-robinson.trycloudflare.com/webhook"; 
 
         const urlParams = new URLSearchParams(window.location.search);
         const kodeMK = urlParams.get('kode');
@@ -72,13 +91,33 @@
         
         let masterCPMK = []; 
 
-        if (kodeMK && namaMK) {
-            document.getElementById('identitasMK').innerHTML = `<span style="color: var(--primary-red);">${kodeMK}</span> - ${namaMK}`;
-        }
+        // SATPAM HALAMAN
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
 
+        // UI Setup
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            
+            if(PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+                if (kodeMK && namaMK) {
+                    document.getElementById('identitasMK').innerHTML = `<span style="color: var(--primary-teal);">${kodeMK}</span> - ${namaMK}`;
+                }
+            } else {
+                if (kodeMK && namaMK) {
+                    document.getElementById('identitasMK').innerHTML = `<span style="color: var(--primary-red);">${kodeMK}</span> - ${namaMK}`;
+                }
+            }
+        });
+
+        // AMBIL MASTER CPMK (Difilter sesuai Prodi)
         async function loadMasterCPMK() {
             try {
-                const res = await fetch(`${API_BASE}/get-cpmk-list`);
+                // Menambahkan ?prodi= agar list CPMK yang muncul sesuai dengan prodi yang aktif
+                const res = await fetch(`${API_BASE}/get-cpmk-list?prodi=${PRODI}`);
                 if (res.ok) {
                     masterCPMK = await res.json();
                     let htmlOptions = "";
@@ -92,31 +131,35 @@
             }
         }
 
+        // FUNGSI AUTO-FILL
         function isiOtomatisDeskripsi(indexBaris) {
             const inputKode = document.getElementById(`id_cpmk_${indexBaris}`).value;
             const cpmkDitemukan = masterCPMK.find(item => item.kode_cpmk === inputKode);
             
             if (cpmkDitemukan) {
                 document.getElementById(`sub_cpmk_${indexBaris}`).value = cpmkDitemukan.deskripsi;
-                document.getElementById(`sub_cpmk_${indexBaris}`).style.backgroundColor = "#dcfce3";
+                // Highlight warna sebentar
+                const warnaHighlight = PRODI === "si" ? "#ccfbf1" : "#fee2e2";
+                document.getElementById(`sub_cpmk_${indexBaris}`).style.backgroundColor = warnaHighlight;
                 setTimeout(() => { document.getElementById(`sub_cpmk_${indexBaris}`).style.backgroundColor = ""; }, 500);
             }
         }
 
+        // AMBIL DATA RPS TERDAHULU JIKA ADA
         async function loadEditorData() {
             let dataServer = [];
             try {
-                document.getElementById('bodyRPS').innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px;">Menarik data RPS dari Server... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
+                document.getElementById('bodyRPS').innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:#64748b;"><i class="fas fa-spinner fa-spin" style="font-size:2rem; margin-bottom:15px; display:block;"></i> Menyiapkan Editor RPS...</td></tr>`;
                 
-                const res = await fetch(`${API_BASE}/get-rps-detail?kode=${kodeMK}`);
+                const res = await fetch(`${API_BASE}/get-rps-detail?kode=${kodeMK}&prodi=${PRODI}`);
                 if (res.ok) dataServer = await res.json();
             } catch (e) {
-                console.log("Server n8n belum merespon.");
+                console.log("Server n8n belum merespon atau data masih kosong.");
             }
             generateTableRows(dataServer);
         }
 
-        // REVISI UTAMA: Baris 8 & 16 tidak lagi di-lock, melainkan diberi input murni
+        // RENDER 16 BARIS EDITOR
         function generateTableRows(dataServer) {
             const tbody = document.getElementById('bodyRPS');
             let html = "";
@@ -133,20 +176,22 @@
                 const valTatapMuka = rowData.tatap_muka || ""; 
                 const valDaring = rowData.daring || ""; 
 
-                // Tetap beri warna background pembeda untuk UTS & UAS/TAS agar estetik
-                const bgStyle = (i === 8 || i === 16) ? 'style="background: #fef2f2;"' : '';
+                // Memberi warna latar khusus untuk UTS dan UAS
+                const warnaKhusus = PRODI === 'si' ? '#f0fdfa' : '#fef2f2'; // Teal muda atau Merah muda
+                const textColor = PRODI === 'si' ? 'var(--primary-teal)' : 'var(--primary-red)';
+                const bgStyle = (i === 8 || i === 16) ? `style="background: ${warnaKhusus};"` : '';
                 const placeholderHint = i === 8 ? "[UTS] " : (i === 16 ? "[UAS/TAS] " : "");
 
                 html += `
                     <tr ${bgStyle}>
-                        <td style="text-align: center; font-weight: bold; color: ${ (i===8 || i===16) ? 'var(--primary-red)' : '#4b5563' }; padding-top: 15px;">${i}</td>
+                        <td style="text-align: center; font-weight: bold; color: ${ (i===8 || i===16) ? textColor : '#4b5563' }; padding-top: 15px; font-size: 1.1rem;">${i}</td>
                         <td>
                             <input type="text" list="cpmk_options" class="rps-input" id="id_cpmk_${i}" value="${valIdCpmk}" 
                             placeholder="Ketik/Pilih..." onchange="isiOtomatisDeskripsi(${i})">
                         </td>
                         <td><textarea class="rps-input" id="sub_cpmk_${i}" placeholder="${placeholderHint}Tulis Deskripsi...">${valSubCpmk}</textarea></td>
                         <td><textarea class="rps-input" id="indikator_${i}" placeholder="Ketepatan/Indikator...">${valIndikator}</textarea></td>
-                        <td><textarea class="rps-input" id="assessmen_${i}" placeholder="Bentuk Ujian/Asesmen...">${valAssessmen}</textarea></td>
+                        <td><textarea class="rps-input" id="assessmen_${i}" placeholder="Bentuk Asesmen...">${valAssessmen}</textarea></td>
                         <td><textarea class="rps-input" id="materi_${i}" placeholder="Materi...">${valMateri}</textarea></td>
                         <td><textarea class="rps-input" id="metode_${i}" placeholder="Metode...">${valMetode}</textarea></td>
                         <td><textarea class="rps-input" id="tatap_muka_${i}" placeholder="Tatap Muka...">${valTatapMuka}</textarea></td>
@@ -157,7 +202,7 @@
             tbody.innerHTML = html;
         }
 
-        // REVISI UTAMA: Looping penangkap data sekarang memproses penuh dari minggu 1 sampai 16
+        // SIMPAN DATA KE N8N
         async function simpanRPS() {
             const btnSimpan = document.querySelector('button[onclick="simpanRPS()"]');
             const teksAsli = btnSimpan.innerHTML;
@@ -166,7 +211,6 @@
 
             let dataRPS = [];
             for (let i = 1; i <= 16; i++) {
-                // Pengunci 'continue' pada baris 8 dan 16 sudah dihapus sepenuhnya
                 dataRPS.push({
                     pertemuan: i,
                     id_cpmk: document.getElementById(`id_cpmk_${i}`).value.trim(),
@@ -183,6 +227,7 @@
             const payloadData = {
                 kode_mk: kodeMK,
                 nidn_dosen: localStorage.getItem("username") || "0610029301", 
+                prodi: PRODI, // Mengirim data prodi agar N8N tahu ini RPS milik siapa
                 detail_pertemuan: dataRPS
             };
 
@@ -206,9 +251,12 @@
             btnSimpan.disabled = false;
         }
 
-        window.onload = async () => {
-            await loadMasterCPMK(); 
-            loadEditorData();       
+        window.onload = () => {
+            // Memberi jeda sedikit agar layout selesai dirender template.js
+            setTimeout(async () => {
+                await loadMasterCPMK(); 
+                loadEditorData();       
+            }, 300);
         };
     </script>
 </body>
