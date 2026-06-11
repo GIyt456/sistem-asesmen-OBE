@@ -419,7 +419,7 @@
     </div>
 
     <script>
-        const API_BASE = "https://recommend-promised-nasa-robinson.trycloudflare.com/webhook";
+        const API_BASE = "https://encounter-system-products-globe.trycloudflare.com/webhook";
         const API_SIMPAN = `${API_BASE}/simpan-konfigurasi`; 
         const API_GET_MAPPING = `${API_BASE}/get-mapping-mk`;
         const API_GET_SETTINGS = `${API_BASE}/get-settings`;
@@ -513,32 +513,45 @@
             tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Menarik Ketetapan Kaprodi...</td></tr>';
 
             try {
-                const res = await fetch(API_GET_MASTER_BOBOT);
-                const allData = await res.json();
+                // 1. Panggil data menggunakan variabel PRODI yang aktif
+                const prodiAktif = localStorage.getItem("prodi_aktif") || "ti";
+                const resBobot = await fetch(`${API_BASE}/get-master-bobot?prodi=${prodiAktif}`);
+                const dataBobot = await resBobot.json();
 
-                // Filter data HANYA untuk Mata Kuliah yang dipilih Dosen
-                const dataMk = allData.filter(d => d.kode_mk === mkKode);
-
-                if (dataMk.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color: #ef4444; font-weight: bold;"><i class="fas fa-exclamation-circle"></i> Kaprodi belum mengatur Master Bobot untuk Mata Kuliah ini.</td></tr>';
-                    gTotal.innerText = "0%";
-                    gTotal.className = "status-err";
-                    return;
+                // 2. Filter data HANYA untuk Mata Kuliah yang dipilih Dosen (Gunakan parameter mkKode)
+                let bobotMK = dataBobot.filter(b => b.kode_mk === mkKode);
+                
+                // 3. SUNTIKAN ANTI-BADAI: Jika Kaprodi belum mengisi, buatkan baris dummy
+                if (bobotMK.length === 0) {
+                    console.warn("Bobot belum diatur oleh Kaprodi. Sistem beralih ke mode default 0%.");
+                    bobotMK.push({
+                        kode_mk: mkKode,
+                        nama_mk: "Belum Diatur Kaprodi",
+                        cpl: "-",
+                        cpmk: "Belum diset",
+                        tugas: 0,
+                        uts: 0,
+                        presentasi: 0,
+                        uas: 0
+                    });
                 }
 
                 let html = '';
                 let totalSeluruh = 0;
                 let cplCount = {};
                 let renderedCpl = {};
-                let namaMk = dataMk[0].nama_mk;
+                
+                // Ambil nama MK dari data bobotMK yang baru saja kita filter
+                let namaMk = bobotMK[0].nama_mk || mkKode;
 
+                // 4. UBAH SEMUA 'dataMk' MENJADI 'bobotMK' SAAT LOOPING
                 // Hitung CPL untuk efek Rowspan (menggabungkan sel)
-                dataMk.forEach(row => {
+                bobotMK.forEach(row => {
                     if(!cplCount[row.cpl]) cplCount[row.cpl] = 0;
                     cplCount[row.cpl]++;
                 });
 
-                dataMk.forEach((row, index) => {
+                bobotMK.forEach((row, index) => {
                     let totalBaris = parseInt(row.tugas) + parseInt(row.uts) + parseInt(row.presentasi) + parseInt(row.uas);
                     totalSeluruh += totalBaris;
 
@@ -550,9 +563,9 @@
                         renderedCpl[row.cpl] = true;
                     }
 
-                    // Sel Nama MK (Selalu digabung dari atas ke bawah)
+                    // Sel Nama MK (Selalu digabung dari atas ke bawah sepanjang jumlah bobotMK)
                     if (index === 0) {
-                        tr += `<td rowspan="${dataMk.length}" style="border: 1px solid #e5e7eb; padding: 18px 15px; vertical-align: middle; font-weight: 700; color: #1e3a8a;">${namaMk}</td>`;
+                        tr += `<td rowspan="${bobotMK.length}" style="border: 1px solid #e5e7eb; padding: 18px 15px; vertical-align: middle; font-weight: 700; color: #1e3a8a;">${namaMk}</td>`;
                     }
 
                     // Sel Sisa Data (CPMK dan Bobot)
@@ -569,10 +582,13 @@
                 });
 
                 tbody.innerHTML = html;
+                
+                // Total Seluruhnya
                 gTotal.innerText = totalSeluruh + "%";
                 gTotal.style.color = totalSeluruh === 100 ? "#16a34a" : "#dc2626";
 
             } catch(e) {
+                console.error(e);
                 tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color: #ef4444;">Gagal memuat data dari Database.</td></tr>';
             }
         }
