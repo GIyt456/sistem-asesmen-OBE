@@ -87,13 +87,14 @@
             </div>
             <div style="display: flex; gap: 12px;">
                 <button class="btn-outline" onclick="window.location.href='rps_dosen.html'"><i class="fas fa-arrow-left"></i> Kembali ke RPS</button>
-                <button class="btn-action" onclick="simpanTugasRubrik()" id="btnSimpanTop"><i class="fas fa-check-double"></i> Simpan Data Tugas</button>
+                <button class="btn-action" onclick="simpanSemuaPermanen()" id="btnSimpanPermanenTop" style="display: none;"><i class="fas fa-cloud-upload-alt"></i> Simpan Permanen ke Server</button>
             </div>
         </div>
 
-        <div class="figma-card">
+        <div class="figma-card" style="border: 2px solid #e2e8f0;" id="formInputArea">
             <h2 style="margin-bottom: 25px; color: var(--primary-navy); border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; font-weight: 800; display: flex; align-items: center; gap: 12px;">
                 <i class="fas fa-file-alt" style="color: var(--primary-red);"></i> 1. Rencana Tugas Mahasiswa (RTM)
+                <span id="badgeTugasKe" style="background: var(--primary-red); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; margin-left: auto; box-shadow: 0 2px 4px rgba(139,0,0,0.2);">Input Tugas Ke-1</span>
             </h2>
             
             <div class="form-group">
@@ -139,10 +140,8 @@
                 <label class="form-label">Deskripsi Tugas (Instruksi Lengkap)</label>
                 <textarea id="inputDeskripsi" class="input-field" rows="4" placeholder="Jelaskan secara detail apa yang harus dilakukan mahasiswa, batasan teknis, dan tahapan pengerjaan..."></textarea>
             </div>
-        </div>
 
-        <div class="figma-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; margin-bottom: 25px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px;">
                 <h2 style="color: var(--primary-navy); font-weight: 800; display: flex; align-items: center; gap: 12px; margin: 0;">
                     <i class="fas fa-tasks" style="color: var(--primary-red);"></i> 2. Matriks Rubrik Penilaian
                 </h2>
@@ -165,119 +164,105 @@
             </div>
 
             <div id="rubricContainer">
-                </div>
+            </div>
 
             <button onclick="tambahKriteria()" style="margin-top: 10px; width: 100%; padding: 15px; border: 2px dashed #cbd5e1; border-radius: 12px; background: #f8fafc; cursor: pointer; color: var(--primary-blue); font-weight: 800; transition: 0.2s;">
                 <i class="fas fa-plus-circle"></i> Tambah Kriteria Penilaian Baru
             </button>
+
+            <button onclick="simpanKeDraft()" id="btnSimpanDraft" class="btn-action" style="width: 100%; margin-top: 20px; justify-content: center; background: var(--primary-blue); padding: 16px; font-size: 1.1rem;">
+                <i class="fas fa-folder-plus"></i> Tambahkan Tugas Ini ke Draft Sementara
+            </button>
         </div>
+
+        <div class="figma-card" id="draftCard" style="display: none; background: #eff6ff; border-color: #bfdbfe;">
+            <h2 style="color: var(--primary-blue); margin-bottom: 15px; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-list-check"></i> Daftar Tugas Sementara (Belum Disimpan)
+            </h2>
+            <p style="color: #475569; font-size: 0.9rem; margin-bottom: 20px;">Review kembali tugas-tugas di bawah ini. Anda dapat mengedit atau menghapusnya sebelum menyimpannya secara permanen ke server.</p>
+            
+            <div id="draftContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                </div>
+
+            <button onclick="simpanSemuaPermanen()" id="btnSimpanPermanenBottom" class="btn-action" style="width: 100%; margin-top: 25px; justify-content: center; background: #10b981; padding: 16px; font-size: 1.1rem;">
+                <i class="fas fa-cloud-upload-alt"></i> Simpan Semua Permanen ke Database
+            </button>
+        </div>
+
     </main>
 
     <script>
+        // ==========================================
+        // KONFIGURASI URL SERVER N8N
+        // ==========================================
         const BASE_N8N_URL = 'https://wooden-branches-elimination-tube.trycloudflare.com';
+        
         document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
 
         // ==========================================
-        // INISIALISASI HALAMAN & TARIK DATA DINAMIS
+        // VARIABEL STATE MANAGEMENT (DRAFTING)
         // ==========================================
+        let daftarTugasDraft = []; // Array keranjang tugas
+        let modeEditIndex = -1; // Penanda jika sedang mode mengedit
+
         window.onload = async () => {
-            tambahKriteria(); // Load 1 baris awal rubrik
+            tambahKriteria(); 
+            document.getElementById('judulTugas').value = "Tugas 1: "; // Awalan otomatis pertama
 
             const urlParams = new URLSearchParams(window.location.search);
             const kodeMk = urlParams.get('kode_mk');
-            
-            if(!kodeMk) {
-                alert("⚠️ Kode Mata Kuliah tidak ditemukan di URL. Anda akan dialihkan kembali.");
-                window.location.href = 'rps_dosen.html';
-                return;
-            }
+            if(!kodeMk) { alert("⚠️ Kode Mata Kuliah tidak ditemukan."); return; }
 
-            const selectCpmk = document.getElementById('selectCPMK');
-            const selectCpl = document.getElementById('selectCPL');
-
-            // 1. Tarik Data CPMK dari Webhook
-           // 1. Tarik Data CPMK (Dinamis dari n8n)
+            // 1. Tarik Data CPMK
             try {
                 const selectCpmk = document.getElementById('selectCPMK');
-                selectCpmk.innerHTML = '<option value="">Memuat CPMK...</option>';
-                
-                // Memanggil endpoint CPMK menggunakan variabel global BASE_N8N_URL
                 const resCpmk = await fetch(`${BASE_N8N_URL}/webhook/get-matkul-cpmk?kode_mk=${kodeMk}`);
                 const dataCpmk = await resCpmk.json();
-                
                 selectCpmk.innerHTML = '<option value="">-- Pilih CPMK / Sub-CPMK Terkait --</option>';
-                
-                // Validasi jika data berhasil ditarik
                 if (dataCpmk && dataCpmk.length > 0 && dataCpmk[0].kode_cpmk) {
                     dataCpmk.forEach(item => {
-                        // Memotong deskripsi jika terlalu panjang agar dropdown tidak berantakan
-                        let teksDeskripsi = item.deskripsi || item.deskripsi_cpmk || item.rumusan || 'Tanpa deskripsi';
-                        let deskripsiSingkat = teksDeskripsi.length > 50 ? teksDeskripsi.substring(0, 50) + "..." : teksDeskripsi;
-                        
-                        selectCpmk.innerHTML += `<option value="${item.kode_cpmk}">${item.kode_cpmk} - ${deskripsiSingkat}</option>`;
+                        let teks = item.deskripsi || item.deskripsi_cpmk || item.rumusan || 'Tanpa deskripsi';
+                        let singkatan = teks.length > 50 ? teks.substring(0, 50) + "..." : teks;
+                        selectCpmk.innerHTML += `<option value="${item.kode_cpmk}">${item.kode_cpmk} - ${singkatan}</option>`;
                     });
-                } else {
-                    selectCpmk.innerHTML = '<option value="">-- Belum ada CPMK dipetakan --</option>';
                 }
-            } catch(e) {
-                console.error("Gagal menarik data CPMK:", e);
-                document.getElementById('selectCPMK').innerHTML = '<option value="">Gagal memuat CPMK dari server</option>';
-            }
-           // 2. Tarik Data CPL (Dinamis dari n8n)
-            // 2. Tarik Data CPL (Dinamis dari n8n)
+            } catch(e) {}
+
+            // 2. Tarik Data CPL
             try {
                 const selectCpl = document.getElementById('selectCPL');
-                selectCpl.innerHTML = '<option value="">Memuat CPL...</option>';
-                
-                // Menggunakan variabel global BASE_N8N_URL agar dinamis
                 const resCpl = await fetch(`${BASE_N8N_URL}/webhook/get-matkul-cpl?kode_mk=${kodeMk}`);
                 const dataCpl = await resCpl.json();
-                
                 selectCpl.innerHTML = '<option value="">-- Pilih CPL Terkait --</option>';
-                
                 if (dataCpl && dataCpl.length > 0 && dataCpl[0].kode_cpl) {
                     dataCpl.forEach(item => {
-                        let deskripsiSingkat = item.deskripsi ? item.deskripsi.substring(0, 40) + "..." : "Tanpa deskripsi";
-                        selectCpl.innerHTML += `<option value="${item.kode_cpl}">${item.kode_cpl} - ${deskripsiSingkat}</option>`;
+                        let singkatan = item.deskripsi ? item.deskripsi.substring(0, 40) + "..." : "Tanpa deskripsi";
+                        selectCpl.innerHTML += `<option value="${item.kode_cpl}">${item.kode_cpl} - ${singkatan}</option>`;
                     });
-                } else {
-                    selectCpl.innerHTML = '<option value="">-- Belum ada CPL dipetakan --</option>';
                 }
-            } catch(e) {
-                console.error("Gagal menarik data CPL:", e);
-                document.getElementById('selectCPL').innerHTML = '<option value="">Gagal memuat CPL dari server</option>';
-            }
+            } catch(e) {}
         };
 
-        // Fungsi Kalkulator Bobot
         function updateSum() {
             const bobotInputs = document.querySelectorAll('.input-bobot');
             let total = 0;
-            bobotInputs.forEach(input => {
-                total += parseFloat(input.value || 0);
-            });
+            bobotInputs.forEach(input => { total += parseFloat(input.value || 0); });
             document.getElementById('totalBobot').innerText = total;
-            
-            const errorBox = document.getElementById('weightError');
-            if (total !== 100 && total > 0) {
-                errorBox.style.display = "block";
-            } else {
-                errorBox.style.display = "none";
-            }
+            document.getElementById('weightError').style.display = (total !== 100 && total > 0) ? "block" : "none";
         }
 
-        // Fungsi Tambah Baris Kriteria
-       function tambahKriteria(data = {}) {
+        function tambahKriteria(data = {}) {
             const container = document.getElementById('rubricContainer');
             const row = document.createElement('div');
             row.className = 'rubric-grid';
+            // Pastikan textarea mengambil nilai dari data.s1 dll dengan benar
             row.innerHTML = `
                 <div><input type="text" class="input-field r-nama" placeholder="Kriteria" value="${data.kriteria || ''}" style="font-weight: 700;"></div>
                 <div><input type="number" class="input-field input-bobot r-bobot" placeholder="%" value="${data.bobot || ''}" oninput="updateSum()"></div>
-                <div><textarea class="input-field r-s1" rows="3" placeholder="Deskripsi skala 1 (< 55)"></textarea></div>
-                <div><textarea class="input-field r-s2" rows="3" placeholder="Deskripsi skala 2 (56-69)"></textarea></div>
-                <div><textarea class="input-field r-s3" rows="3" placeholder="Deskripsi skala 3 (70-84)"></textarea></div>
-                <div><textarea class="input-field r-s4" rows="3" placeholder="Deskripsi skala 4 (85-100)"></textarea></div>
+                <div><textarea class="input-field r-s1" rows="3" placeholder="Deskripsi skala 1 (< 55)">${data.s1 || ''}</textarea></div>
+                <div><textarea class="input-field r-s2" rows="3" placeholder="Deskripsi skala 2 (56-69)">${data.s2 || ''}</textarea></div>
+                <div><textarea class="input-field r-s3" rows="3" placeholder="Deskripsi skala 3 (70-84)">${data.s3 || ''}</textarea></div>
+                <div><textarea class="input-field r-s4" rows="3" placeholder="Deskripsi skala 4 (85-100)">${data.s4 || ''}</textarea></div>
                 <div style="display: flex; align-items: center; justify-content: center;">
                     <button onclick="this.parentElement.parentElement.remove(); updateSum();" style="color: #ef4444; border: none; background: none; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-trash-alt"></i></button>
                 </div>
@@ -286,35 +271,22 @@
             updateSum();
         }
 
-        // FUNGSI SIMPAN ULTIMATE
-        // FUNGSI SIMPAN ULTIMATE (DENGAN VALIDASI KETAT)
-        async function simpanTugasRubrik() {
-            const btn = document.getElementById('btnSimpanTop');
+        // ==========================================
+        // FUNGSI 1: SIMPAN TUGAS KE KERANJANG (DRAFT)
+        // ==========================================
+        function simpanKeDraft() {
             const total = parseInt(document.getElementById('totalBobot').innerText);
-
-            // ==========================================
-            // 1. VALIDASI FORM KOSONG (REQUIRED FIELDS)
-            // ==========================================
             const valJudul = document.getElementById('judulTugas').value.trim();
             const valCPMK = document.getElementById('selectCPMK').value;
             const valWaktu = document.getElementById('inputWaktu').value.trim();
             const valDeskripsi = document.getElementById('inputDeskripsi').value.trim();
 
             if (!valJudul || !valCPMK || !valWaktu || !valDeskripsi) {
-                alert("⚠️ Peringatan: Judul Tugas, CPMK Terkait, Waktu Pengerjaan, dan Deskripsi Tugas wajib diisi!");
-                return; // Menghentikan proses simpan
+                alert("⚠️ Judul Tugas, CPMK, Waktu, dan Deskripsi wajib diisi!"); return; 
             }
-
-            // ==========================================
-            // 2. VALIDASI TOTAL BOBOT 100%
-            // ==========================================
             if(total !== 100) {
-                alert("⚠️ Peringatan: Total bobot kriteria rubrik harus tepat 100%!");
-                return; // Menghentikan proses simpan
+                alert("⚠️ Total bobot kriteria rubrik harus tepat 100%!"); return; 
             }
-
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-            btn.disabled = true;
 
             const payload = {
                 kode_mk: new URLSearchParams(window.location.search).get('kode_mk') || 'DEFAULT_MK',
@@ -330,13 +302,10 @@
             };
 
             const semuaBaris = document.querySelectorAll('.rubric-grid');
-            
             semuaBaris.forEach((row, index) => {
                 const namaKriteria = row.querySelector('.r-nama').value;
-                const kriteriaFinal = namaKriteria.trim() === '' ? `Kriteria ${index + 1}` : namaKriteria;
-                
                 payload.rubrik.push({
-                    kriteria: kriteriaFinal,
+                    kriteria: namaKriteria.trim() === '' ? `Kriteria ${index + 1}` : namaKriteria,
                     bobot_persen: row.querySelector('.r-bobot').value || '0',
                     skala_1: row.querySelector('.r-s1').value || '-',
                     skala_2: row.querySelector('.r-s2').value || '-',
@@ -345,60 +314,155 @@
                 });
             });
 
-            try {
-                // Catatan: URL ini sebaiknya dibuat konstan di atas jika sering berubah
-                const URL_N8N_ANDA = 'https://wooden-branches-elimination-tube.trycloudflare.com/webhook/simpan-tugas-rubrik';
-                
-                const response = await fetch(URL_N8N_ANDA, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload) 
+            // Jika sedang mode update, tindih data lama. Jika tidak, tambah data baru.
+            if (modeEditIndex >= 0) {
+                daftarTugasDraft[modeEditIndex] = payload;
+                modeEditIndex = -1; // Kembalikan ke mode normal
+                alert("✅ Tugas berhasil diupdate di draft!");
+            } else {
+                daftarTugasDraft.push(payload);
+            }
+
+            resetFormInput();
+            renderDaftarDraft();
+        }
+
+        // ==========================================
+        // FUNGSI 2: RENDER (TAMPILKAN) DAFTAR DRAFT
+        // ==========================================
+        function renderDaftarDraft() {
+            const container = document.getElementById('draftContainer');
+            const card = document.getElementById('draftCard');
+            const btnTop = document.getElementById('btnSimpanPermanenTop');
+
+            if (daftarTugasDraft.length === 0) {
+                card.style.display = 'none';
+                btnTop.style.display = 'none';
+                return;
+            }
+
+            card.style.display = 'block';
+            btnTop.style.display = 'flex';
+            container.innerHTML = '';
+
+            daftarTugasDraft.forEach((tugas, index) => {
+                container.innerHTML += `
+                    <div style="border: 1px solid #bfdbfe; padding: 15px 20px; border-radius: 8px; background: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        <div>
+                            <div style="font-weight: 800; color: var(--primary-navy); font-size: 1.05rem;">${tugas.judul_tugas}</div>
+                            <div style="font-size: 0.85rem; color: #475569; margin-top: 4px;">
+                                <span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">${tugas.sub_cpmk}</span> | 
+                                <i class="far fa-clock"></i> ${tugas.waktu} | 
+                                <i class="fas fa-list"></i> ${tugas.rubrik.length} Kriteria
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="editTugasDraft(${index})" class="btn-outline" style="padding: 8px 12px; font-size: 0.85rem; background: #f8fafc;"><i class="fas fa-edit" style="color: #3b82f6;"></i> Edit</button>
+                            <button onclick="hapusTugasDraft(${index})" class="btn-outline" style="padding: 8px 12px; font-size: 0.85rem; border-color: #fca5a5; color: #ef4444;"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // ==========================================
+        // FUNGSI 3: KONTROL EDIT, HAPUS, & RESET FORM
+        // ==========================================
+        function editTugasDraft(index) {
+            modeEditIndex = index;
+            const data = daftarTugasDraft[index];
+            
+            // Isi kembali form dengan data dari draft
+            document.getElementById('judulTugas').value = data.judul_tugas;
+            document.getElementById('selectCPMK').value = data.sub_cpmk;
+            document.getElementById('selectCPL').value = data.kode_cpl;
+            document.getElementById('inputTeknik').value = data.teknik_evaluasi;
+            document.getElementById('inputMetode').value = data.metode;
+            document.getElementById('inputWaktu').value = data.waktu;
+            document.getElementById('inputLuaran').value = data.luaran;
+            document.getElementById('inputDeskripsi').value = data.deskripsi;
+            
+            document.getElementById('rubricContainer').innerHTML = ''; // Kosongkan rubrik
+            data.rubrik.forEach(r => {
+                tambahKriteria({
+                    kriteria: r.kriteria, bobot: r.bobot_persen,
+                    s1: r.skala_1, s2: r.skala_2, s3: r.skala_3, s4: r.skala_4
                 });
+            });
 
-                if(response.ok) {
-                    const pengenInputLagi = confirm(
-                        "✅ DATA BERHASIL DISIMPAN!\n\n" +
-                        "Apakah Anda ingin menginput TUGAS BERIKUTNYA (Tugas 2, Tugas 3, dst.) untuk mata kuliah ini?\n\n" +
-                        "- Klik 'OK' jika ingin langsung input tugas baru.\n" +
-                        "- Klik 'Cancel' jika sudah selesai dan ingin kembali ke halaman utama."
-                    );
+            // Ubah tampilan UI untuk mode edit
+            document.getElementById('badgeTugasKe').innerText = `Mengedit Tugas...`;
+            document.getElementById('badgeTugasKe').style.background = "#d97706"; // Warna orange
+            document.getElementById('btnSimpanDraft').innerHTML = `<i class="fas fa-save"></i> Update Draft Tugas Ini`;
+            document.getElementById('btnSimpanDraft').style.background = "#d97706";
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Gulir ke atas
+        }
 
-                    if (pengenInputLagi) {
-                        // Kosongkan form input
-                        document.getElementById('judulTugas').value = '';
-                        document.getElementById('selectCPMK').value = '';
-                        document.getElementById('selectCPL').value = '';
-                        document.getElementById('inputTeknik').value = '';
-                        document.getElementById('inputMetode').value = '';
-                        document.getElementById('inputWaktu').value = '';
-                        document.getElementById('inputLuaran').value = '';
-                        document.getElementById('inputDeskripsi').value = '';
-                        
-                        // Bersihkan rubrik
-                        const container = document.getElementById('rubricContainer');
-                        if (container) {
-                            container.innerHTML = '';
-                            tambahKriteria();
-                        }
-                        
-                        const totalElem = document.getElementById('totalBobot');
-                        if (totalElem) totalElem.innerText = '0';
-                        
-                        alert("Silakan masukkan data tugas berikutnya.");
-                    } else {
-                        window.location.href = 'rps_dosen.html'; 
+        function hapusTugasDraft(index) {
+            if(confirm("Apakah Anda yakin ingin menghapus tugas ini dari draft?")) {
+                daftarTugasDraft.splice(index, 1);
+                resetFormInput();
+                renderDaftarDraft();
+            }
+        }
+
+        function resetFormInput() {
+            // Hitung urutan tugas secara dinamis berdasarkan isi draft
+            let urutanBaru = daftarTugasDraft.length + 1;
+            document.getElementById('badgeTugasKe').innerText = `Input Tugas Ke-${urutanBaru}`;
+            document.getElementById('badgeTugasKe').style.background = "var(--primary-red)";
+            document.getElementById('judulTugas').value = `Tugas ${urutanBaru}: `;
+            
+            document.getElementById('selectCPMK').value = '';
+            document.getElementById('selectCPL').value = '';
+            document.getElementById('inputTeknik').value = '';
+            document.getElementById('inputMetode').value = '';
+            document.getElementById('inputWaktu').value = '';
+            document.getElementById('inputLuaran').value = '';
+            document.getElementById('inputDeskripsi').value = '';
+            
+            document.getElementById('rubricContainer').innerHTML = '';
+            tambahKriteria();
+            
+            document.getElementById('btnSimpanDraft').innerHTML = `<i class="fas fa-folder-plus"></i> Tambahkan Tugas Ini ke Draft Sementara`;
+            document.getElementById('btnSimpanDraft').style.background = "var(--primary-blue)";
+        }
+
+        // ==========================================
+        // FUNGSI 4: SIMPAN PERMANEN KE SERVER (LOOP)
+        // ==========================================
+        async function simpanSemuaPermanen() {
+            if(!confirm(`Anda akan menyimpan ${daftarTugasDraft.length} tugas secara PERMANEN ke database. Pastikan semua data sudah benar. Lanjutkan?`)) return;
+
+            const btnBottom = document.getElementById('btnSimpanPermanenBottom');
+            btnBottom.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan ke Server...';
+            btnBottom.disabled = true;
+
+            try {
+                const URL_N8N_POST = `${BASE_N8N_URL}/webhook/simpan-tugas-rubrik`;
+                
+                // Melakukan looping (mengirim data satu per satu secara berurutan agar aman di database)
+                for (let i = 0; i < daftarTugasDraft.length; i++) {
+                    const response = await fetch(URL_N8N_POST, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(daftarTugasDraft[i]) 
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Gagal menyimpan Tugas Ke-${i+1} (Tolak oleh Server)`);
                     }
-
-                } else {
-                    const errText = await response.text();
-                    alert("❌ n8n menolak data: " + errText);
                 }
+
+                alert(`✅ BERHASIL! Sebanyak ${daftarTugasDraft.length} Tugas dan Rubrik telah disimpan secara permanen ke Database.`);
+                window.location.href = 'rps_dosen.html'; 
+
             } catch (error) {
                 console.error("Fetch Error:", error);
-                alert("❌ Gagal terhubung ke n8n! Pastikan Cloudflare Tunnel menyala dan URL-nya benar.");
-            } finally {
-                btn.innerHTML = '<i class="fas fa-check-double"></i> Simpan Data Tugas';
-                btn.disabled = false;
+                alert("❌ Terjadi kesalahan saat menyimpan permanen: " + error.message);
+                btnBottom.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Simpan Semua Permanen ke Database';
+                btnBottom.disabled = false;
             }
         }
     </script>

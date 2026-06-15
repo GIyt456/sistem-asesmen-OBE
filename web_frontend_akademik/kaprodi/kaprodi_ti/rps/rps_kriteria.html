@@ -4,15 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Kriteria Penilaian - OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../../../css/style.css">
+    
     <style>
         .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; }
         .table-master { width: 100%; border-collapse: collapse; }
         .table-master th, .table-master td { padding: 15px; border-bottom: 1px solid #e5e7eb; text-align: left; }
         .table-master th { background: #002878; color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
         .text-center { text-align: center !important; }
+
+        /* WARNA TOMBOL AKSI VISUAL */
+        .btn-action { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; color: white; display: inline-flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif; transition: 0.2s; margin: 0 4px; }
+        .btn-edit { background: #3b82f6; } 
+        .btn-edit:hover { background: #2563eb; transform: translateY(-2px); }
+        .btn-delete { background: #ef4444; } 
+        .btn-delete:hover { background: #dc2626; transform: translateY(-2px); }
+        
+        .btn-primary-red { background: #8b0000; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-primary-red:hover { background: #5c0000; }
+        
+        /* Modal Style */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-box { background: white; padding: 30px; border-radius: 12px; width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: 'Inter'; font-size: 1rem; outline: none; }
+        .form-control:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+        
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -20,14 +41,14 @@
     <div style="flex: 1; display: flex; flex-direction: column;">
         <div id="navbar-container"></div>
 
-        <div class="main-content">
+        <div class="main-content" style="padding: 40px;">
             <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                 <div>
-                    <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a;">Master <span style="color: #8b0000;">Kriteria Penilaian</span></h1>
-                    <p style="margin: 0; color: #64748b;">Kelola standar kriteria penilaian yang akan digunakan oleh dosen di setiap pertemuan.</p>
+                    <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a; font-weight: 800;">Master <span style="color: #8b0000;">Kriteria Penilaian</span></h1>
+                    <p style="margin: 0; color: #64748b; font-size: 1.05rem;">Kelola referensi dimensi/kriteria penilaian untuk rubrik Dosen.</p>
                 </div>
                 <button class="btn-primary-red" onclick="openModal()">
-                    <i class="fas fa-plus"></i> Tambah Kriteria
+                    <i class="fas fa-plus"></i> Tambah Kriteria Baru
                 </button>
             </div>
 
@@ -36,12 +57,12 @@
                     <thead>
                         <tr>
                             <th width="10%" class="text-center">ID</th>
-                            <th width="70%">NAMA KRITERIA PENILAIAN</th>
-                            <th width="20%" class="text-center">AKSI</th>
+                            <th width="65%">NAMA DIMENSI / KRITERIA</th>
+                            <th width="25%" class="text-center">AKSI</th>
                         </tr>
                     </thead>
                     <tbody id="bodyTable">
-                        <tr><td colspan="3" class="text-center" style="padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Memuat data kriteria...</td></tr>
+                        <tr><td colspan="3" class="text-center" style="padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Memuat data kriteria...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -50,25 +71,32 @@
 
     <div id="modalTambah" class="modal-overlay">
         <div class="modal-box">
-            <h3 style="margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; color: #0f172a;">
-                Tambah Kriteria Baru
+            <h3 id="modalTitle" style="margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; color: #0f172a; font-weight: 800;">
+                Tambah Kriteria Penilaian
             </h3>
             <div class="form-group">
-                <label>Nama Kriteria Penilaian:</label>
-                <input type="text" id="inputNamaKriteria" class="form-control" placeholder="Contoh: Rubrik Holistik">
+                <label style="display: block; font-weight: 700; color: #334155; margin-bottom: 8px;">Nama Kriteria / Dimensi:</label>
+                <input type="text" id="inputNamaKriteria" class="form-control" placeholder="Contoh: Ketepatan Analisis">
             </div>
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
-                <button class="btn-action" style="background: #94a3b8; color: white;" onclick="closeModal()">Batal</button>
-                <button class="btn-action" style="background: #10b981; color: white;" onclick="simpanData()">Simpan Data</button>
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px;">
+                <button class="btn-action" style="background: #e5e7eb; color: #475569;" onclick="closeModal()">Batal</button>
+                <button class="btn-action" style="background: #10b981;" onclick="simpanData()" id="btnSimpanModal"><i class="fas fa-save"></i> Simpan Data</button>
             </div>
         </div>
     </div>
 
-    <script src="../../../js/template.js"></script>
-    <script>
-        // Sesuaikan dengan URL Cloudflare Anda
-        const API_GET_KRITERIA = "https://eco-monkey-gentleman-pipeline.trycloudflare.com/webhook/get-master-kriteria";
+    <script src="/js/template.js"></script>
 
+    <script>
+        // PENTING: Ganti URL dengan Cloudflare Tunnel yang aktif
+        const API_BASE = "https://copies-groups-outcomes-democrats.trycloudflare.com/webhook";
+        const API_GET_KRITERIA = `${API_BASE}/get-master-kriteria`;
+        const API_SIMPAN_KRITERIA = `${API_BASE}/simpan-master-kriteria`;
+        const API_HAPUS_KRITERIA = `${API_BASE}/hapus-master-kriteria`;
+
+        let currentEditId = ""; 
+
+        // 1. READ
         async function loadData() {
             const bodyTbl = document.getElementById("bodyTable");
             try {
@@ -76,7 +104,7 @@
                 const data = await res.json();
 
                 if (!data || data.length === 0) {
-                    bodyTbl.innerHTML = `<tr><td colspan="3" class="text-center">Belum ada data kriteria.</td></tr>`;
+                    bodyTbl.innerHTML = `<tr><td colspan="3" class="text-center" style="padding:20px;">Belum ada data referensi kriteria penilaian.</td></tr>`;
                     return;
                 }
 
@@ -84,23 +112,30 @@
                 data.forEach((item, index) => {
                     html += `
                         <tr>
-                            <td class="text-center" style="font-weight: bold; color: #475569;">${index + 1}</td>
-                            <td style="font-weight: 600; font-size: 1rem;">${item.nama_kriteria}</td>
+                            <td class="text-center" style="font-weight: 800; color: #475569; font-size: 1.1rem;">${index + 1}</td>
+                            <td style="font-weight: 600; font-size: 1.05rem; color: #1e293b;">${item.nama_kriteria}</td>
                             <td class="text-center">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i> Edit</button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i> Hapus</button>
+                                <button class="btn-action btn-edit" onclick="openModal('${item.id_kriteria}', '${item.nama_kriteria}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn-action btn-delete" onclick="hapusData('${item.id_kriteria}', '${item.nama_kriteria}')">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
                             </td>
                         </tr>
                     `;
                 });
                 bodyTbl.innerHTML = html;
             } catch (e) {
-                bodyTbl.innerHTML = `<tr><td colspan="3" class="text-center" style="color: red;">Gagal terhubung ke N8N.</td></tr>`;
+                bodyTbl.innerHTML = `<tr><td colspan="3" class="text-center" style="color: red; padding:20px;">Gagal terhubung ke Server N8N.</td></tr>`;
             }
         }
 
-        function openModal() {
-            document.getElementById("inputNamaKriteria").value = "";
+        // 2. MODAL KONTROL
+        function openModal(id = "", nama = "") {
+            currentEditId = id; 
+            document.getElementById("inputNamaKriteria").value = nama;
+            document.getElementById("modalTitle").innerText = id ? "Edit Kriteria Penilaian" : "Tambah Kriteria Penilaian";
             document.getElementById("modalTambah").style.display = "flex";
         }
 
@@ -108,11 +143,53 @@
             document.getElementById("modalTambah").style.display = "none";
         }
 
-        function simpanData() {
-            const nama = document.getElementById("inputNamaKriteria").value;
-            if(!nama) return alert("Nama kriteria tidak boleh kosong!");
-            alert(`Berhasil! Data "${nama}" akan diproses.`);
-            closeModal();
+        // 3. CREATE / UPDATE
+        async function simpanData() {
+            const nama = document.getElementById("inputNamaKriteria").value.trim();
+            if(!nama) return alert("⚠️ Nama kriteria tidak boleh kosong!");
+
+            const btnSimpan = document.getElementById("btnSimpanModal");
+            btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btnSimpan.disabled = true;
+
+            const payload = {
+                id_kriteria: currentEditId,
+                nama_kriteria: nama
+            };
+
+            try {
+                const res = await fetch(API_SIMPAN_KRITERIA, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if(res.ok) {
+                    alert("✅ Data kriteria berhasil disimpan!");
+                    closeModal();
+                    loadData(); 
+                } else {
+                    alert("❌ Gagal menyimpan data. Periksa n8n Anda.");
+                }
+            } catch(e) { alert("⚠️ Kendala jaringan saat menghubungi n8n."); }
+
+            btnSimpan.innerHTML = '<i class="fas fa-save"></i> Simpan Data';
+            btnSimpan.disabled = false;
+        }
+
+        // 4. DELETE
+        async function hapusData(id, nama) {
+            if(!confirm(`Apakah Anda yakin ingin menghapus kriteria "${nama}"?`)) return;
+
+            try {
+                const res = await fetch(`${API_HAPUS_KRITERIA}?id=${id}`);
+                if(res.ok) {
+                    alert("✅ Kriteria berhasil dihapus!");
+                    loadData(); 
+                } else {
+                    alert("❌ Gagal menghapus data.");
+                }
+            } catch(e) { alert("⚠️ Kendala jaringan saat menghubungi n8n."); }
         }
 
         window.onload = loadData;
