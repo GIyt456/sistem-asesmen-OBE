@@ -5,8 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data MBKM - Panel Kaprodi</title>
-    <link rel="stylesheet" href="../../../css/style.css">
-    <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -539,8 +537,8 @@
     </div>
 
     <script>
-        // Menggunakan URL Cloudflare Tunnel terbaru Anda
-        const BASE_N8N_URL = "https://fixtures-wildlife-while-senators.trycloudflare.com";
+        // URL BARU N8N
+        const BASE_N8N_URL = "https://wooden-branches-elimination-tube.trycloudflare.com";
         const API_GET_MHS = `${BASE_N8N_URL}/webhook/get-mahasiswa-db`;
         const API_SAVE_MBKM = `${BASE_N8N_URL}/webhook/save-mbkm-data`;
         const API_UPDATE_MBKM = `${BASE_N8N_URL}/webhook/update-mbkm-data`;
@@ -791,7 +789,7 @@
         function bukaDropdown() {
             dropdownList.classList.add("show");
             dropdownWrapper.classList.add("active");
-            renderDropdown(dataMahasiswa); // Memuat seluruh data setiap kali dibuka
+            renderDropdown(dataMahasiswa);
         }
 
         function tutupDropdown() {
@@ -811,7 +809,6 @@
             }
         }
 
-        // Event Listeners untuk Toggle & Pengetikan
         searchInput.addEventListener("click", toggleDropdown);
         toggleBtn.addEventListener("click", toggleDropdown);
 
@@ -826,10 +823,9 @@
             );
             renderDropdown(filtered);
 
-            if (!val) inputNama.value = ""; // Mengosongkan nama otomatis jika input dihapus
+            if (!val) inputNama.value = "";
         });
 
-        // Menutup dropdown jika user mengklik area lain
         document.addEventListener("click", function (event) {
             if (!dropdownWrapper.contains(event.target)) {
                 tutupDropdown();

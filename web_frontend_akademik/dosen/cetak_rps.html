@@ -1,238 +1,586 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
-    <title>Cetak RTM - Sistem OBE UNAKI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cetak RPS & RTM - Terintegrasi</title>
     <style>
-        /* Pengaturan Dasar Kertas & Font */
-        body { 
-            font-family: Arial, sans-serif; 
-            font-size: 11pt; 
-            line-height: 1.4; 
-            color: black; 
-            background: #e5e7eb; 
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12px;
+            color: black;
+            background: #e5e7eb;
             margin: 0;
             padding: 20px;
         }
-        
-        .kertas-a4 { 
-            width: 210mm; 
-            min-height: 297mm; 
-            background: white; 
-            margin: auto; 
-            padding: 15mm 20mm; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+        /* TOMBOL CETAK & KEMBALI */
+        .no-print {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
         }
-        
-        .main-title {
-            text-align: center;
-            font-size: 16pt;
+
+        .btn-print {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 14px;
             font-weight: bold;
-            margin-bottom: 20px;
-            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Tabel RTM Style */
-        table.rtm-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-bottom: 20px; 
-            border: 1.5px solid black; 
-        }
-        table.rtm-table th, table.rtm-table td { 
-            border: 1px solid black; 
-            padding: 8px; 
-            vertical-align: top; 
+        .btn-print:hover {
+            background: #059669;
         }
 
-        /* Warna Biru Muda Khas Header Tabel Word */
-        .bg-blue { background-color: #dbe5f1; font-weight: bold; text-align: center; }
-        .bg-blue-left { background-color: #dbe5f1; font-weight: bold; text-align: left; }
-        
-        .text-center { text-align: center; }
-        .font-bold { font-weight: bold; }
-
-        /* Pengaturan Ukuran Logo */
-        .logo-print {
-            max-width: 160px; /* Sesuaikan ukuran logo di sini */
-            height: auto;
-            display: block;
-            margin: 0 auto;
+        .btn-back {
+            background: #4b5563;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Tombol Aksi */
-        .no-print { text-align: center; margin-bottom: 20px; }
-        .btn-print { background: #8b0000; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
-        .btn-back { background: #4b5563; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; margin-left: 10px; }
+        .btn-back:hover {
+            background: #374151;
+        }
 
-        /* Sembunyikan Tombol Saat Dicetak */
-        @media print { 
-            body { background: white; padding: 0; }
-            .kertas-a4 { box-shadow: none; padding: 0; width: 100%; min-height: auto; margin: 0; }
-            .no-print { display: none !important; } 
-            @page { size: A4 portrait; margin: 15mm; }
+        /* KERTAS UNTUK RPS (LANDSCAPE STYLE) */
+        .document-container {
+            background: white;
+            width: 297mm;
+            /* Format Landscape A4 */
+            min-height: 210mm;
+            margin: 0 auto 20px auto;
+            padding: 15mm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* KERTAS UNTUK RTM (POTRAIT STYLE BISA MENYESUAIKAN LANDSCAPE) */
+        .kertas-rtm {
+            background: white;
+            width: 297mm;
+            /* Disamakan dengan RPS agar seragam saat diprint Landscape */
+            min-height: 210mm;
+            margin: 0 auto 20px auto;
+            padding: 15mm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            page-break-before: always;
+            /* PEMISAH HALAMAN OTOMATIS */
+        }
+
+        /* TABEL GENERAL UTK RPS */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid black;
+            margin-bottom: 15px;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 6px 10px;
+            vertical-align: top;
+        }
+
+        th {
+            background: #e2e8f0;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .header-table td {
+            vertical-align: middle;
+        }
+
+        .text-center {
+            text-align: center !important;
+        }
+
+        .bg-gray {
+            background: #e2e8f0 !important;
+            font-weight: bold;
+        }
+
+        /* KELAS KHUSUS RTM TEMAN ANDA */
+        .bg-blue {
+            background-color: #dbeafe !important;
+        }
+
+        .main-title-rtm {
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 5px;
+            text-decoration: underline;
+        }
+
+        .sub-title-rtm {
+            text-align: center;
+            font-size: 14px;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        ul,
+        ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .row-ujian {
+            background: #e2e8f0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        @media print {
+            @page {
+                size: landscape;
+                /* Kita set Landscape agar tabel 16 minggu tidak terpotong */
+                margin: 10mm;
+            }
+
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .document-container,
+            .kertas-rtm {
+                box-shadow: none;
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            th,
+            .bg-gray,
+            .row-ujian,
+            .bg-blue {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <div class="no-print">
-        <button class="btn-print" onclick="window.print()">🖨️ Cetak / Simpan sebagai PDF</button>
-        <button class="btn-back" onclick="window.close()">❌ Tutup Tab</button>
+        <button class="btn-back" onclick="window.close()">Tutup</button>
+        <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Cetak Dokumen (Ctrl+P)</button>
     </div>
 
-    <div class="kertas-a4">
-        <div class="main-title">RENCANA TUGAS MAHASISWA</div>
-
-        <table class="rtm-table">
-            <!-- Header Institusi -->
+    <div class="document-container" id="rps-section">
+        <table class="header-table">
             <tr>
-                <td width="30%" class="text-center" style="vertical-align: middle; padding: 10px;">
-                    <!-- ⚠️ MASUKKAN LOKASI GAMBAR LOGO ANDA PADA BAGIAN src="" DI BAWAH INI -->
-                    <img src="https://via.placeholder.com/160x60.png?text=Ganti+Logo+UNAKI" alt="Logo UNAKI" class="logo-print">
+                <td width="20%" class="text-center">
+                    <img src="../gambar/LogoUnaki.png" style="max-width: 120px; filter: grayscale(100%);">
                 </td>
-                <td width="70%" colspan="2" style="vertical-align: middle; padding-left: 20px;">
-                    <div style="font-size: 14pt; font-weight: bold; line-height: 1.3;">
-                        UNIVERSITAS AKI<br>
-                        FAKULTAS TEKNIK DAN INFORMATIKA<br>
-                        PROGRAM STUDI SISTEM INFORMASI
-                    </div>
+                <td width="80%" class="text-center">
+                    <h2 style="margin: 0; font-size: 20px;">UNIVERSITAS AKI</h2>
+                    <h3 style="margin: 5px 0 0 0; font-size: 16px; font-weight: normal;">FAKULTAS TEKNIK DAN
+                        INFORMATIKA<br>PROGRAM STUDI <span id="printProdi">INFORMATIKA</span></h3>
                 </td>
-            </tr>
-            
-            <tr>
-                <td colspan="3" class="bg-blue">RENCANA TUGAS MAHASISWA</td>
-            </tr>
-
-            <tr>
-                <td class="font-bold" rowspan="2" style="vertical-align: middle;">Identitas MK</td>
-                <td class="font-bold text-center" width="35%">Nama MK</td>
-                <td class="font-bold text-center" width="35%">Kode MK</td>
-            </tr>
-            <tr>
-                <td class="text-center" id="nama_mk">Memuat...</td>
-                <td class="text-center" id="kode_mk">-</td>
-            </tr>
-
-            <tr>
-                <td class="font-bold text-center">TEKNIK EVALUASI</td>
-                <td class="font-bold text-center">NAMA TUGAS</td>
-                <td class="font-bold text-center">WAKTU PENGERJAAN TUGAS</td>
-            </tr>
-            <tr>
-                <td id="rtm_teknik">-</td>
-                <td id="rtm_judul">-</td>
-                <td id="rtm_waktu">-</td>
-            </tr>
-
-            <tr>
-                <td class="font-bold text-center">CPL</td>
-                <td class="font-bold text-center">CPMK</td>
-                <td class="font-bold text-center">SUB CPMK</td>
-            </tr>
-            <tr>
-                <td id="rtm_cpl">-</td>
-                <td id="rtm_cpmk">-</td>
-                <td id="rtm_subcpmk">-</td>
-            </tr>
-
-            <tr>
-                <td colspan="3" class="bg-blue-left">DESKRIPSI TUGAS</td>
-            </tr>
-            <tr>
-                <td colspan="3" id="deskripsi" style="text-align: justify; padding: 10px;">-</td>
-            </tr>
-
-            <tr>
-                <td colspan="3" class="bg-blue-left">BENTUK DAN FORMAT LUARAN</td>
-            </tr>
-            <tr>
-                <td colspan="3" id="rtm_luaran" style="text-align: justify; padding: 10px;">-</td>
             </tr>
         </table>
 
-        <h4 style="margin: 20px 0 5px 0;">MATRIKS RUBRIK PENILAIAN</h4>
-        <table class="rtm-table" id="tabel_rubrik">
+        <h2 style="text-align: center; margin: 15px 0; font-size: 14px; text-decoration: underline;">RENCANA
+            PEMBELAJARAN SEMESTER (RPS)</h2>
+
+        <table>
+            <tr class="bg-gray text-center">
+                <td width="25%">MATA KULIAH (MK)</td>
+                <td width="15%">KODE</td>
+                <td width="25%">Rumpun MK</td>
+                <td width="10%">BOBOT (sks)</td>
+                <td width="10%">SEMESTER</td>
+                <td width="15%">Tgl Penyusunan</td>
+            </tr>
+            <tr class="text-center">
+                <td id="printNamaMk">-</td>
+                <td id="printKodeMk">-</td>
+                <td id="printRumpun">-</td>
+                <td id="printSks">-</td>
+                <td id="printSem">-</td>
+                <td id="printTgl">-</td>
+            </tr>
+        </table>
+
+        <table style="margin-top: -16px; text-align: center;">
+            <tr>
+                <td width="33%" class="bg-gray">Dosen Pengembang RPS</td>
+                <td width="33%" class="bg-gray">Koordinator RMK</td>
+                <td width="34%" class="bg-gray">Ka PRODI</td>
+            </tr>
+            <tr>
+                <td><br><br><br><br><span id="printDosenNama">-</span></td>
+                <td><br><br><br><br><span id="printKoorNama">-</span></td>
+                <td><br><br><br><br><span id="printKaprodiNama">-</span></td>
+            </tr>
+        </table>
+
+        <table style="margin-top: -16px; margin-bottom: 25px;">
+            <tr>
+                <td width="25%" class="bg-gray">CPL-PRODI yang dibebankan pada MK</td>
+                <td width="75%" id="printCpl">
+                    <span style="color:#6b7280; font-style:italic;">Menarik data CPL dari server...</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="bg-gray">Capaian Pembelajaran Mata Kuliah (CPMK)</td>
+                <td id="printCpmk">
+                    <span style="color:#6b7280; font-style:italic;">Menarik data CPMK dari server...</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="bg-gray">Deskripsi Singkat MK</td>
+                <td id="printDeskripsi">...</td>
+            </tr>
+            <tr>
+                <td class="bg-gray">Bahan Kajian / Materi Pembelajaran</td>
+                <td id="printMateri">...</td>
+            </tr>
+            <tr>
+                <td class="bg-gray">Pustaka Utama</td>
+                <td id="printPustakaUtama">...</td>
+            </tr>
+            <tr>
+                <td class="bg-gray">Pustaka Pendukung</td>
+                <td id="printPustakaPendukung">...</td>
+            </tr>
+        </table>
+
+        <h3 style="font-size: 14px; margin-bottom: 5px;">Rencana Pertemuan 1 - 16</h3>
+
+        <table class="table-sesi">
             <thead>
-                <tr class="bg-blue">
-                    <th width="20%">Kriteria</th>
-                    <th width="10%">Bobot (%)</th>
-                    <th width="17%">Skala 1 (< 55)</th>
-                    <th width="17%">Skala 2 (56-69)</th>
-                    <th width="17%">Skala 3 (70-84)</th>
-                    <th width="17%">Skala 4 (85-100)</th>
+                <tr class="bg-gray text-center">
+                    <td width="5%">MG</td>
+                    <td width="20%">KEMAMPUAN AKHIR (CPMK)</td>
+                    <td width="25%">BAHAN KAJIAN (MATERI)</td>
+                    <td width="15%">METODE PEMBELAJARAN</td>
+                    <td width="8%">WAKTU (MENIT)</td>
+                    <td width="19%">KRITERIA & INDIKATOR PENILAIAN</td>
+                    <td width="8%">BOBOT (%)</td>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Data Rubrik -->
+            <tbody id="bodyTabelSesi">
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 20px;">Memuat data RPS dari server...</td>
+                </tr>
             </tbody>
         </table>
     </div>
 
+    <div id="rtm-section">
+        <div class="kertas-rtm" style="text-align: center; padding-top: 50px;">
+            <h3>Memuat Rencana Tugas Mahasiswa (RTM)...</h3>
+        </div>
+    </div>
+
     <script>
-       const BASE_N8N_URL = 'https://throw-tire-dosage-shipped.trycloudflare.com';
+        const BASE_N8N_URL = "https://wooden-branches-elimination-tube.trycloudflare.com/webhook";
+        const API_GET_RPS = `${BASE_N8N_URL}/get-rps-detail`;
+        const API_GET_CPL_CPMK = `${BASE_N8N_URL}/get-cpl-cpmk`;
+        const API_GET_TUGAS = `${BASE_N8N_URL}/get-tugas-matkul`;
 
-       async function loadDataCetak() {
+        // ==========================================
+        // FUNGSI EKSTRAKSI DATA N8N
+        // ==========================================
+        function extractDBRows(obj, requiredKey) {
+            let results = [];
+            if (!obj) return results;
+
+            if (Array.isArray(obj)) {
+                obj.forEach(item => {
+                    results = results.concat(extractDBRows(item, requiredKey));
+                });
+            } else if (typeof obj === 'object') {
+                if (requiredKey in obj) {
+                    results.push(obj);
+                } else {
+                    for (let key in obj) {
+                        results = results.concat(extractDBRows(obj[key], requiredKey));
+                    }
+                }
+            }
+            return results;
+        }
+
+        window.onload = async () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const idTugas = urlParams.get('id_tugas');
+            const kodeMk = urlParams.get('mk') || urlParams.get('kode_mk'); // Mengambil dari url rps maupun url rtm
 
-            if(!idTugas) {
-                alert("⚠️ Parameter ID Tugas tidak ditemukan di URL.");
+            if (!kodeMk) {
+                document.body.innerHTML = "<h2 style='text-align:center; padding: 50px;'>Kode MK tidak ditemukan di URL.</h2>";
                 return;
             }
 
-            try {
-                const URL_API = `${BASE_N8N_URL}/webhook/get-detail-rubrik?id_tugas=${idTugas}`;
-                
-                const res = await fetch(URL_API);
-                const textData = await res.text();
+            // --- 1. SETTING DATA HEADER RPS DARI LOCALSTORAGE ---
+            const userProdi = localStorage.getItem("prodi_aktif") === "si" ? "SISTEM INFORMASI" : "INFORMATIKA";
+            document.getElementById('printProdi').innerText = userProdi;
 
-                if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {
-                    alert("⚠️ Data kosong atau n8n tidak terhubung.");
+            const mkName = localStorage.getItem('cetak_nama_mk') || '-';
+            document.getElementById('printNamaMk').innerText = mkName;
+            document.getElementById('printKodeMk').innerText = kodeMk;
+            document.getElementById('printSem').innerText = localStorage.getItem('cetak_semester') || '-';
+            document.getElementById('printSks').innerText = localStorage.getItem('cetak_sks') || '-';
+            document.getElementById('printTgl').innerText = localStorage.getItem('cetak_tgl') || '-';
+            document.getElementById('printRumpun').innerText = localStorage.getItem('cetak_rumpun') || '-';
+            document.getElementById('printDosenNama').innerText = (localStorage.getItem("user_login") || "Dosen Pengampu").toUpperCase();
+            document.getElementById('printKoorNama').innerText = localStorage.getItem('cetak_koordinator') || 'Majid Rahardi, S.Kom., M.Eng';
+            document.getElementById('printKaprodiNama').innerText = localStorage.getItem('cetak_kaprodi') || 'Eli Pujiastuti, M.Kom.';
+
+            document.getElementById('printDeskripsi').innerHTML = localStorage.getItem('cetak_deskripsi') || '';
+            document.getElementById('printMateri').innerHTML = localStorage.getItem('cetak_materi') || '';
+            document.getElementById('printPustakaUtama').innerHTML = localStorage.getItem('cetak_pustaka_utama') || '';
+            document.getElementById('printPustakaPendukung').innerHTML = localStorage.getItem('cetak_pustaka_pendukung') || '';
+
+            // --- 2. JALANKAN PENARIKAN DATA PARALEL UNTUK RPS & RTM ---
+            await Promise.all([
+                loadCplCpmkDariDB(kodeMk),
+                loadDataRPSTable(kodeMk),
+                loadSemuaTugasMatkul(kodeMk, mkName)
+            ]);
+
+            // --- 3. BUKA DIALOG PRINT OTOMATIS SETELAH SELESAI ---
+            setTimeout(() => { window.print(); }, 1000);
+        };
+
+        // ==========================================
+        // FUNGSI LOAD RPS (BAGIAN 1)
+        // ==========================================
+        async function loadCplCpmkDariDB(kodeMK) {
+            try {
+                const resCplCpmk = await fetch(`${API_GET_CPL_CPMK}?kode_mk=${kodeMK}`);
+                if (resCplCpmk.ok) {
+                    const jsonCpl = await resCplCpmk.json();
+                    const dataCplCpmk = extractDBRows(jsonCpl, 'kode_cpmk');
+
+                    if (dataCplCpmk.length > 0) {
+                        const cplMap = new Map();
+                        const cpmkArray = [];
+
+                        dataCplCpmk.forEach(row => {
+                            if (row.kode_cpl && row.deskripsi_cpl) {
+                                cplMap.set(row.kode_cpl, row.deskripsi_cpl);
+                            }
+                            if (row.kode_cpmk && row.deskripsi_cpmk) {
+                                cpmkArray.push(`<li><strong>${row.kode_cpmk}</strong> - ${row.deskripsi_cpmk} <em>(Ref: ${row.kode_cpl || '-'})</em></li>`);
+                            }
+                        });
+
+                        let cplHtml = '<ul style="margin: 0; padding-left: 20px;">';
+                        cplMap.forEach((desc, kode) => {
+                            cplHtml += `<li><strong>${kode}</strong> - ${desc}</li>`;
+                        });
+                        cplHtml += '</ul>';
+
+                        let cpmkHtml = '<ul style="margin: 0; padding-left: 20px;">' + cpmkArray.join('') + '</ul>';
+
+                        document.getElementById('printCpl').innerHTML = cplMap.size > 0 ? cplHtml : '<span style="font-style:italic;">Belum ada pemetaan CPL.</span>';
+                        document.getElementById('printCpmk').innerHTML = cpmkArray.length > 0 ? cpmkHtml : '<span style="font-style:italic;">Belum ada pemetaan CPMK.</span>';
+                    } else {
+                        document.getElementById('printCpl').innerHTML = "<em>Mata Kuliah belum dipetakan ke CPL/CPMK.</em>";
+                        document.getElementById('printCpmk').innerHTML = "<em>Mata Kuliah belum dipetakan ke CPL/CPMK.</em>";
+                    }
+                }
+            } catch (e) {
+                console.error("CPL Load Error:", e);
+                document.getElementById('printCpl').innerHTML = "<em>Gagal terhubung ke database.</em>";
+                document.getElementById('printCpmk').innerHTML = "<em>Gagal terhubung ke database.</em>";
+            }
+        }
+
+        async function loadDataRPSTable(kodeMK) {
+            const tbody = document.getElementById("bodyTabelSesi");
+            try {
+                const res = await fetch(`${API_GET_RPS}?kode=${kodeMK}`);
+                let rpsDataJSON = [];
+                if (res.ok) {
+                    try { rpsDataJSON = await res.json(); } catch (e) { }
+                }
+
+                const rpsData = extractDBRows(rpsDataJSON, 'pertemuan');
+
+                tbody.innerHTML = "";
+                for (let i = 1; i <= 16; i++) {
+                    if (i === 8) {
+                        tbody.innerHTML += `<tr><td colspan="7" class="row-ujian">UJIAN TENGAH SEMESTER (UTS)</td></tr>`;
+                        continue;
+                    }
+                    if (i === 16) {
+                        tbody.innerHTML += `<tr><td colspan="7" class="row-ujian">UJIAN AKHIR SEMESTER (UAS)</td></tr>`;
+                        continue;
+                    }
+
+                    const rowData = rpsData.find(item => parseInt(item.pertemuan) === i) || {};
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="text-center bg-gray">${i}</td>
+                            <td>${(rowData.cpmk || rowData.kode_cpmk || '').replace(/\n/g, '<br>')}</td>
+                            <td>${(rowData.materi || rowData.bahan_kajian || '').replace(/\n/g, '<br>')}</td>
+                            <td>${(rowData.metode || rowData.metode_pembelajaran || '').replace(/\n/g, '<br>')}</td>
+                            <td class="text-center">${rowData.waktu || rowData.estimasi_waktu || 150}</td>
+                            <td>${(rowData.kriteria || rowData.indikator_pencapaian || '').replace(/\n/g, '<br>')}</td>
+                            <td class="text-center">${rowData.bobot || rowData.bobot_penilaian || rowData.bobot_persen || 0}</td>
+                        </tr>
+                    `;
+                }
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Gagal memuat tabel RPS dari n8n.</td></tr>`;
+            }
+        }
+
+        // ==========================================
+        // FUNGSI LOAD RTM (BAGIAN 2 - DARI TEMAN ANDA)
+        // ==========================================
+        async function loadSemuaTugasMatkul(kodeMK, namaMK) {
+            const container = document.getElementById('rtm-section');
+            try {
+                const response = await fetch(`${API_GET_TUGAS}?kode_mk=${kodeMK}`);
+                if (!response.ok) throw new Error("Gagal mengambil data tugas.");
+
+                const jsonResponse = await response.json();
+                const rawData = Array.isArray(jsonResponse) ? jsonResponse : (jsonResponse.data || []);
+                let allData = [];
+                if (rawData.length > 0 && Array.isArray(rawData[0])) { allData = rawData.flat(Infinity); }
+                else { allData = rawData; }
+
+                if (!allData || allData.length === 0) {
+                    container.innerHTML = '<div class="kertas-rtm"><h3 style="text-align:center; color:#6b7280; padding-top: 50px;">Tidak ada data Rencana Tugas Mahasiswa (RTM) yang perlu dicetak untuk matkul ini.</h3></div>';
                     return;
                 }
 
-                const rubrikData = JSON.parse(textData);
+                const uniqueTasksMap = new Map();
+                allData.forEach(item => {
+                    if (!item.id_tugas) return;
+                    if (!uniqueTasksMap.has(item.id_tugas)) {
+                        uniqueTasksMap.set(item.id_tugas, {
+                            id_tugas: item.id_tugas,
+                            pertemuan: item.pertemuan,
+                            cpmk: item.cpmk,
+                            judul: item.judul_tugas,
+                            uraian: item.uraian_tugas,
+                            metode: item.metode_pengerjaan,
+                            luaran: item.luaran_tugas,
+                            rubrik: []
+                        });
+                    }
+                    if (item.kriteria_penilaian) {
+                        uniqueTasksMap.get(item.id_tugas).rubrik.push({
+                            kriteria: item.kriteria_penilaian,
+                            bobot: item.bobot_kriteria,
+                            skala1: item.skala1,
+                            skala2: item.skala2,
+                            skala3: item.skala3,
+                            skala4: item.skala4
+                        });
+                    }
+                });
 
-                if(rubrikData.length > 0) {
-                    const row = rubrikData[0];
-                    
-                    document.getElementById('nama_mk').innerText = row.nama_mk || '-';
-                    document.getElementById('kode_mk').innerText = row.kode_mk || '-';
-                    
-                    document.getElementById('rtm_teknik').innerText = row.teknik_evaluasi || '-';
-                    document.getElementById('rtm_judul').innerText = row.judul_tugas || '-';
-                    document.getElementById('rtm_waktu').innerText = row.waktu_pengerjaan || '-';
+                const tasks = Array.from(uniqueTasksMap.values()).sort((a, b) => parseInt(a.pertemuan) - parseInt(b.pertemuan));
 
-                    document.getElementById('rtm_cpl').innerText = row.kode_cpl || '-';
-                    document.getElementById('rtm_cpmk').innerText = row.kode_cpmk || '-';
-                    document.getElementById('rtm_subcpmk').innerText = row.kode_cpmk || '-'; 
-                    
-                    document.getElementById('deskripsi').innerText = row.deskripsi || '-';
-                    document.getElementById('rtm_luaran').innerText = row.luaran_tugas || '-';
-                    
-                    const tbody = document.querySelector('#tabel_rubrik tbody');
-                    tbody.innerHTML = ''; 
-                    
-                    rubrikData.forEach(item => {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td style="font-weight:bold;">${item.kriteria}</td>
-                                <td style="text-align:center; font-weight:bold;">${item.bobot_persen}%</td>
-                                <td>${item.skala_1 || '-'}</td>
-                                <td>${item.skala_2 || '-'}</td>
-                                <td>${item.skala_3 || '-'}</td>
-                                <td>${item.skala_4 || '-'}</td>
-                            </tr>
-                        `;
-                    });
-                }
+                container.innerHTML = "";
+
+                tasks.forEach((t, index) => {
+                    let kriteriaRows = "";
+                    if (t.rubrik.length === 0) {
+                        kriteriaRows = `<tr><td colspan="6" class="text-center" style="font-style:italic;">Belum ada rubrik penilaian.</td></tr>`;
+                    } else {
+                        t.rubrik.forEach(r => {
+                            kriteriaRows += `
+                                <tr>
+                                    <td>${r.kriteria}</td>
+                                    <td class="text-center"><strong>${r.bobot}%</strong></td>
+                                    <td>${r.skala1 || '-'}</td>
+                                    <td>${r.skala2 || '-'}</td>
+                                    <td>${r.skala3 || '-'}</td>
+                                    <td>${r.skala4 || '-'}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+
+                    // Setiap Tugas dibuat dalam 1 Kertas RTM baru (Otomatis terpisah halamannya karena class kertas-rtm)
+                    container.innerHTML += `
+                        <div class="kertas-rtm">
+                            <h1 class="main-title-rtm">RENCANA TUGAS MAHASISWA (RTM)</h1>
+                            <h2 class="sub-title-rtm">${namaMK.toUpperCase()} - PERTEMUAN ${t.pertemuan}</h2>
+
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                                <tr>
+                                    <td width="20%" class="bg-gray">MATA KULIAH</td>
+                                    <td width="80%" style="padding: 10px;"><strong>${kodeMK}</strong> - ${namaMK.toUpperCase()}</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-gray">CPMK</td>
+                                    <td style="padding: 10px;">${t.cpmk || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-gray">BENTUK TUGAS</td>
+                                    <td style="padding: 10px;">${t.judul || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-gray">URAIAN TUGAS</td>
+                                    <td style="text-align: justify; padding: 10px;">${(t.uraian || '-').replace(/\n/g, '<br>')}</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-gray">METODE / CARA PENGERJAAN</td>
+                                    <td style="text-align: justify; padding: 10px;">${(t.metode || '-').replace(/\n/g, '<br>')}</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-gray">LUARAN TUGAS</td>
+                                    <td style="text-align: justify; padding: 10px;">${t.luaran || '-'}</td>
+                                </tr>
+                            </table>
+
+                            <h4 style="margin: 20px 0 5px 0;">MATRIKS RUBRIK PENILAIAN</h4>
+                            <table>
+                                <thead>
+                                    <tr class="bg-blue">
+                                        <th width="20%">Kriteria</th>
+                                        <th width=\"10%\" class="text-center">Bobot (%)</th>
+                                        <th width="17%">Skala 1 (< 55)</th>
+                                        <th width="17%">Skala 2 (56-69)</th>
+                                        <th width="17%">Skala 3 (70-84)</th>
+                                        <th width="17%">Skala 4 (85-100)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${kriteriaRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                });
+
             } catch (error) {
-                console.error("Gagal ambil data:", error);
-                alert("❌ Gagal menarik data dari server.");
+                console.error(error);
+                container.innerHTML = '<div class="kertas-rtm"><h3 style="text-align:center; color:red;">Gagal menarik data tugas matkul.</h3></div>';
             }
         }
-        window.onload = loadDataCetak;
     </script>
 </body>
+
 </html>
