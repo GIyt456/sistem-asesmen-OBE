@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistem Assesmen CPL</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="/js/api_config.js"></script>
     <style>
         :root {
             --primary: #3b82f6; 
@@ -159,8 +160,7 @@
     </div>
 
 <script>
-    const LOGIN_API = "https://wooden-branches-elimination-tube.trycloudflare.com/webhook/login-user";
-
+    const LOGIN_API = `${API_BASE}/login-user`;
     let currentCaptcha = "";
 
     function generateCaptcha() {

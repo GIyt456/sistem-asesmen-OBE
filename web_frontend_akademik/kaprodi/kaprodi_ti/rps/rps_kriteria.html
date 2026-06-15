@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
     <style>
         .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; }
         .table-master { width: 100%; border-collapse: collapse; }
@@ -85,11 +86,7 @@
         </div>
     </div>
 
-    <script src="/js/template.js"></script>
-
     <script>
-        // PENTING: Ganti URL dengan Cloudflare Tunnel yang aktif
-        const API_BASE = "https://copies-groups-outcomes-democrats.trycloudflare.com/webhook";
         const API_GET_KRITERIA = `${API_BASE}/get-master-kriteria`;
         const API_SIMPAN_KRITERIA = `${API_BASE}/simpan-master-kriteria`;
         const API_HAPUS_KRITERIA = `${API_BASE}/hapus-master-kriteria`;
