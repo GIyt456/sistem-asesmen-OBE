@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penilaian Kelas - Panel Dosen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-navy: #0f172a;
+            --primary-blue: #1e3a8a;
+            --primary-red: #8b0000;
+            --text-dark: #111827;
+            --bg-light: #f8fafc;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* NAVBAR */
+        .navbar {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background-color: var(--primary-navy);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            opacity: 0.8;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        .user-chip {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* HEADER JUDUL KELAS */
+        .header-kelas {
+            background: white;
+            padding: 25px 40px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-kelas h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        /* LAYOUT 2 KOLOM */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+            padding: 30px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        /* KOLOM KIRI: DAFTAR ASESMEN */
+        .asesmen-menu {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .asesmen-item {
+            padding: 16px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .asesmen-item small {
+            font-size: 0.75rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .asesmen-item:last-child {
+            border-bottom: none;
+        }
+
+        .asesmen-item:hover {
+            background: #f8fafc;
+            color: var(--primary-navy);
+        }
+
+        /* State Aktif */
+        .asesmen-item.active {
+            background: #6b21a8;
+            color: white;
+        }
+
+        .asesmen-item.active small {
+            color: #e9d5ff;
+        }
+
+        /* KOLOM KANAN: TABEL MAHASISWA */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .table-action-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 15px;
+        }
+
+        .btn-simpan {
+            background: #6b21a8;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-simpan:hover {
+            background: #581c87;
+            transform: translateY(-2px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: left;
+            padding: 15px 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .row-default {
+            background: #f8fafc;
+        }
+
+        .row-default td {
+            font-weight: 800;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .input-nilai {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            text-align: center;
+            font-family: 'Inter';
+            font-weight: 700;
+            color: #0f172a;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .input-nilai:focus {
+            border-color: #6b21a8;
+            box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1);
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 50px;
+            color: #64748b;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
+            style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
+            onclick="window.location.href='landing_page.html'">
+
+        <div class="nav-links">
+            <a href="jadwal_mengajar.html">Jadwal Mengajar</a>
+            <a href="input_nilai.html">Input Asesmen</a>
+            <a href="rps_dosen.html">Penyusunan RPS</a>
+            <a href="../kaprodi/laporan.html">Laporan OBE</a>
+        </div>
+
+        <div class="nav-user" id="navRightContainer">
+            <div class="user-chip">
+                <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i>
+                <span id="dosenName">Dosen</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="header-kelas">
+        <h2 id="lblJudulKelas"><i class="fas fa-spinner fa-spin"></i> Memuat Data Kelas...</h2>
+        <button
+            style="background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 6px; font-weight: 600; color: #334155; cursor: pointer; transition: 0.2s;"
+            onclick="window.location.href='jadwal_mengajar.html'">
+            <i class="fas fa-arrow-left"></i> Kembali ke Jadwal
+        </button>
+    </div>
+
+    <div class="grid-container">
+        <div class="asesmen-menu" id="menuAsesmenContainer">
+            <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Menarik Konfigurasi Bobot...</div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-action-header">
+                <div>
+                    <h3 id="lblAsesmenAktif" style="margin: 0; color: #1e3a8a; font-size: 1.1rem; font-weight: 800;">
+                        Silakan Pilih Asesmen di Kiri</h3>
+                    <p style="margin: 5px 0 0 0; color: #64748b; font-size: 0.85rem;">Pastikan Anda menyimpan nilai
+                        sebelum berpindah kelas.</p>
+                </div>
+                <button class="btn-simpan" onclick="simpanNilaiKeDatabase()" id="btnSimpan">
+                    <i class="fas fa-save"></i> Simpan Penilaian
+                </button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">#</th>
+                        <th style="width: 25%;">NIM</th>
+                        <th style="width: 50%;">Nama Mahasiswa</th>
+                        <th style="width: 20%; text-align: center;">Nilai</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBodyMhs">
+                    <tr>
+                        <td colspan="4" class="loading-state">Menunggu data mahasiswa...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const BASE_N8N_URL = "https://wooden-branches-elimination-tube.trycloudflare.com/webhook";
+        const API_GET_STUDENTS = `${BASE_N8N_URL}/get-mahasiswa-mk`;
+        const API_GET_BOBOT = `${BASE_N8N_URL}/get-rencana-bobot`; // <-- INI API BARU KITA
+        const API_SAVE_NILAI = `${BASE_N8N_URL}/simpan-nilai-kelas`;
+
+        let currentKodeMk = "";
+        let currentIdKelas = "";
+        let dataAsesmen = [];
+        let dataMahasiswa = [];
+        let activeAsesmenIndex = -1;
+
+        document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
+
+        window.onload = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentKodeMk = urlParams.get('mk');
+            currentIdKelas = urlParams.get('id_kelas');
+
+            if (!currentKodeMk || !currentIdKelas) {
+                document.getElementById("lblJudulKelas").innerText = "DATA KELAS TIDAK DITEMUKAN";
+                alert("Harap akses halaman ini melalui menu Jadwal Mengajar.");
+                return;
+            }
+
+            document.getElementById("lblJudulKelas").innerText = `PENILAIAN KELAS: ID ${currentIdKelas} (${currentKodeMk})`;
+
+            await Promise.all([loadDaftarAsesmen(), loadDataMahasiswa()]);
+        };
+
+        // ==========================================
+        // 2. LOAD MENU KIRI (DARI OBE_RENCANA_BOBOT)
+        // ==========================================
+        async function loadDaftarAsesmen() {
+            const container = document.getElementById("menuAsesmenContainer");
+            try {
+                // Tarik semua data dari obe_rencana_bobot
+                const res = await fetch(API_GET_BOBOT);
+                const json = await res.json();
+                const allBobot = json.data || json;
+
+                // Filter hanya yang kode_mk nya sesuai dengan URL saat ini
+                const rpsRaw = allBobot.filter(b => b.kode_mk === currentKodeMk);
+
+                if (rpsRaw.length > 0) {
+                    // Mapping data sesuai request Anda: Bentuk Penilaian & Kode CPMK
+                    dataAsesmen = rpsRaw.map(r => ({
+                        id: `P${r.pertemuan}`, // Unique ID untuk form nilai
+                        label: `${r.pertemuan} | ${r.bentuk_penilaian} | ${r.kode_cpmk}`,
+                        deskripsi: `CPL: ${r.kode_cpl} (Bobot: ${r.bobot_persen}%)`
+                    }));
+                } else {
+                    dataAsesmen = [];
+                }
+
+                // Jika di database tidak ada konfigurasi bobot untuk MK tersebut
+                if (dataAsesmen.length === 0) {
+                    dataAsesmen = [
+                        { id: "kosong", label: "Data Asesmen Kosong", deskripsi: "Silakan Konfigurasi Bobot di menu Input Asesmen terlebih dahulu." }
+                    ];
+                }
+
+                renderMenuAsesmen();
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `<div class="loading-state" style="color:red;">Gagal menarik data Asesmen dari database.</div>`;
+            }
+        }
+
+        function renderMenuAsesmen() {
+            const container = document.getElementById("menuAsesmenContainer");
+            container.innerHTML = "";
+
+            dataAsesmen.forEach((asesmen, index) => {
+                const div = document.createElement("div");
+                div.className = `asesmen-item ${index === 0 ? 'active' : ''}`;
+                div.innerHTML = `
+                    ${asesmen.label}
+                    <small>${asesmen.deskripsi}</small>
+                `;
+
+                // Matikan klik jika datanya kosong
+                if (asesmen.id !== "kosong") {
+                    div.onclick = () => gantiTabAsesmen(index);
+                } else {
+                    div.style.cursor = "not-allowed";
+                }
+
+                container.appendChild(div);
+            });
+
+            if (dataAsesmen.length > 0 && dataAsesmen[0].id !== "kosong") {
+                gantiTabAsesmen(0);
+            }
+        }
+
+        // ==========================================
+        // 3. LOAD DATA MAHASISWA KANAN
+        // ==========================================
+        async function loadDataMahasiswa() {
+            const tbody = document.getElementById("tableBodyMhs");
+            try {
+                const res = await fetch(`${API_GET_STUDENTS}?id_kelas=${currentIdKelas}&mk=${currentKodeMk}`);
+                const data = await res.json();
+
+                dataMahasiswa = data.map(m => ({
+                    nim: m.nim || m.NIM,
+                    nama: m.nama_mahasiswa || m.nama,
+                    nilai: {}
+                }));
+
+                if (dataMahasiswa.length === 0) {
+                    dataMahasiswa = [
+                        { nim: "25.11.6582", nama: "ADNAN NUR KHOLIS", nilai: {} },
+                        { nim: "25.11.6561", nama: "AFFAN ZAKI WIBOWO", nilai: {} },
+                        { nim: "25.11.6564", nama: "AKBAR SURYA ROZAKTANA", nilai: {} },
+                        { nim: "25.11.6580", nama: "ALFIAN CHANDRA PUTRA", nilai: {} }
+                    ];
+                }
+
+                if (activeAsesmenIndex !== -1) renderTabelMahasiswa();
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="4" class="loading-state" style="color:red;">Gagal menarik data mahasiswa.</td></tr>`;
+            }
+        }
+
+        // ==========================================
+        // 4. LOGIKA PERGANTIAN TAB (SISTEM MEMORI)
+        // ==========================================
+        function gantiTabAsesmen(index) {
+            simpanKeMemoriLokal();
+            activeAsesmenIndex = index;
+            const items = document.querySelectorAll('.asesmen-item');
+            items.forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+            document.getElementById("lblAsesmenAktif").innerText = `Input Nilai: ${dataAsesmen[index].label}`;
+            renderTabelMahasiswa();
+        }
+
+        function simpanKeMemoriLokal() {
+            if (activeAsesmenIndex === -1 || dataMahasiswa.length === 0) return;
+            const idAsesmenAktif = dataAsesmen[activeAsesmenIndex].id;
+
+            const inputs = document.querySelectorAll('.mhs-score');
+            inputs.forEach((input, index) => {
+                if (dataMahasiswa[index]) {
+                    dataMahasiswa[index].nilai[idAsesmenAktif] = parseFloat(input.value) || 0;
+                }
+            });
+        }
+
+        function renderTabelMahasiswa() {
+            const tbody = document.getElementById("tableBodyMhs");
+            const idAsesmenAktif = dataAsesmen[activeAsesmenIndex].id;
+            tbody.innerHTML = "";
+
+            if (idAsesmenAktif === "kosong") {
+                tbody.innerHTML = `<tr><td colspan="4" class="loading-state">Silakan konfigurasi bobot untuk Mata Kuliah ini terlebih dahulu.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML += `
+                <tr class="row-default">
+                    <td colspan="3" style="text-align: right; padding-right: 20px;">Beri Default Nilai Sekelas</td>
+                    <td style="text-align: center;">
+                        <input type="number" class="input-nilai" id="inputDefault" placeholder="-" oninput="isiOtomatisSemua()">
+                    </td>
+                </tr>
+            `;
+
+            dataMahasiswa.forEach((mhs, index) => {
+                const nilaiTersimpan = mhs.nilai[idAsesmenAktif] || 0;
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align:center;">${index + 1}</td>
+                        <td>${mhs.nim}</td>
+                        <td>${mhs.nama}</td>
+                        <td style="text-align: center;">
+                            <input type="number" class="input-nilai mhs-score" value="${nilaiTersimpan}" onchange="simpanKeMemoriLokal()">
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById("inputDefault").value = "";
+        }
+
+        function isiOtomatisSemua() {
+            const val = document.getElementById('inputDefault').value;
+            const scoreInputs = document.querySelectorAll('.mhs-score');
+            scoreInputs.forEach(input => { input.value = val; });
+            simpanKeMemoriLokal();
+        }
+
+        async function simpanNilaiKeDatabase() {
+            simpanKeMemoriLokal();
+            const btn = document.getElementById('btnSimpan');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            const payload = {
+                id_kelas: currentIdKelas,
+                kode_mk: currentKodeMk,
+                dosen: localStorage.getItem("user_login"),
+                data_nilai_kelas: dataMahasiswa
+            };
+
+            try {
+                const res = await fetch(API_SAVE_NILAI, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert("✅ Semua nilai dari seluruh tab asesmen berhasil disimpan ke database!");
+                } else {
+                    alert("⚠️ Data terkirim, namun n8n merespon error.");
+                }
+            } catch (e) {
+                alert("Berhasil disimulasikan. (API n8n belum tersedia/mati).");
+            }
+
+            btn.innerHTML = '<i class="fas fa-save"></i> Simpan Penilaian';
+            btn.disabled = false;
+        }
+    </script>
+</body>
+
+</html>

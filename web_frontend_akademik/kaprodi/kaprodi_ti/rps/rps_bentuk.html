@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../../../css/style.css">
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
     <style>
         .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-top: 20px; }
         .table-master { width: 100%; border-collapse: collapse; }
@@ -66,9 +68,8 @@
 
     <script src="../../../js/template.js"></script>
     <script>
-        // Gunakan Link Webhook N8N Anda
-        const API_GET_BENTUK = "https://copies-groups-outcomes-democrats.trycloudflare.com/webhook/get-master-bentuk";
 
+        const API_GET_BENTUK = `${API_BASE}/get-master-bentuk`;
         // Fungsi Load Data
         async function loadData() {
             const bodyTbl = document.getElementById("bodyTable");
