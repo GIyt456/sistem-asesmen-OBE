@@ -240,7 +240,7 @@
 
             // 1. IDENTITAS MATAKULIAH FROM N8N
             try {
-                const resMatkul = await fetch(`https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-matkul-detail?kode_mk=${kodeMk}`);
+                const resMatkul = await fetch(`https://throw-tire-dosage-shipped.trycloudflare.com/webhook/get-matkul-detail?kode_mk=${kodeMk}`);
                 const dataMatkul = await resMatkul.json();
                 if (dataMatkul && dataMatkul.length > 0) {
                     const mk = dataMatkul[0];
@@ -260,7 +260,7 @@
             // 2. DAFTAR CPMK FROM N8N
             let totalCpmkMataKuliah = 4;
             try {
-                const resCpmk = await fetch(`https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-matkul-cpmk?kode_mk=${kodeMk}`);
+                const resCpmk = await fetch(`https://copies-groups-outcomes-democrats.trycloudflare.com/webhook/get-matkul-cpmk?kode_mk=${kodeMk}`);
                 const dataCpmk = await resCpmk.json();
                 tableCpmk.innerHTML = "";
                 if (!dataCpmk || dataCpmk.length === 0) {
@@ -277,7 +277,7 @@
 
             // 3. METODE PENILAIAN
             try {
-                const resPenilaian = await fetch(`https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-metode-penilaian?kode_mk=${kodeMk}`);
+                const resPenilaian = await fetch(`https://copies-groups-outcomes-democrats.trycloudflare.com/webhook/get-metode-penilaian?kode_mk=${kodeMk}`);
                 const dataPenilaian = await resPenilaian.json();
                 tbodyPenilaian.innerHTML = "";
                 dataPenilaian.forEach(item => {
@@ -297,7 +297,7 @@
 
             // 4. REKAPITULASI CAPAIAN STATISTIK CPMK
             try {
-                const resStats = await fetch(`https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-matkul-cpmk-stats?kode_mk=${kodeMk}`);
+                const resStats = await fetch(`https://copies-groups-outcomes-democrats.trycloudflare.com/webhook/get-matkul-cpmk-stats?kode_mk=${kodeMk}`);
                 const dataStats = await resStats.json();
                 tbodyRekapStats.innerHTML = "";
                 dataStats.forEach((row, index) => {
@@ -355,7 +355,7 @@
 
             // 5. EVALUASI LINTAS KELAS
             try {
-                const resLintas = await fetch(`https://encounter-system-products-globe.trycloudflare.com/webhook/get-evaluasi-lintas-kelas?kode_mk=${kodeMk}`);
+                const resLintas = await fetch(`https://copies-groups-outcomes-democrats.trycloudflare.com/webhook/get-evaluasi-lintas-kelas?kode_mk=${kodeMk}`);
                 const dataLintas = await resLintas.json();
                 tbodyLintasKelas.innerHTML = "";
                 dataLintas.forEach((item, index) => {

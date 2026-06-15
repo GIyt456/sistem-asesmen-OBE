@@ -174,6 +174,7 @@
     </main>
 
     <script>
+        const BASE_N8N_URL = 'https://throw-tire-dosage-shipped.trycloudflare.com';
         document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
 
         // ==========================================
@@ -195,29 +196,56 @@
             const selectCpl = document.getElementById('selectCPL');
 
             // 1. Tarik Data CPMK dari Webhook
+           // 1. Tarik Data CPMK (Dinamis dari n8n)
             try {
-                const resCpmk = await fetch(`https://encounter-system-products-globe.trycloudflare.com/webhook/get-matkul-cpmk?kode_mk=${kodeMk}`);
+                const selectCpmk = document.getElementById('selectCPMK');
+                selectCpmk.innerHTML = '<option value="">Memuat CPMK...</option>';
+                
+                // Memanggil endpoint CPMK menggunakan variabel global BASE_N8N_URL
+                const resCpmk = await fetch(`${BASE_N8N_URL}/webhook/get-matkul-cpmk?kode_mk=${kodeMk}`);
                 const dataCpmk = await resCpmk.json();
-                selectCpmk.innerHTML = '<option value="">-- Pilih CPMK --</option>';
-                dataCpmk.forEach(item => {
-                    selectCpmk.innerHTML += `<option value="${item.kode_cpmk}">${item.kode_cpmk}</option>`;
-                });
+                
+                selectCpmk.innerHTML = '<option value="">-- Pilih CPMK / Sub-CPMK Terkait --</option>';
+                
+                // Validasi jika data berhasil ditarik
+                if (dataCpmk && dataCpmk.length > 0 && dataCpmk[0].kode_cpmk) {
+                    dataCpmk.forEach(item => {
+                        // Memotong deskripsi jika terlalu panjang agar dropdown tidak berantakan
+                        let teksDeskripsi = item.deskripsi || item.deskripsi_cpmk || item.rumusan || 'Tanpa deskripsi';
+                        let deskripsiSingkat = teksDeskripsi.length > 50 ? teksDeskripsi.substring(0, 50) + "..." : teksDeskripsi;
+                        
+                        selectCpmk.innerHTML += `<option value="${item.kode_cpmk}">${item.kode_cpmk} - ${deskripsiSingkat}</option>`;
+                    });
+                } else {
+                    selectCpmk.innerHTML = '<option value="">-- Belum ada CPMK dipetakan --</option>';
+                }
             } catch(e) {
-                console.error(e);
-                selectCpmk.innerHTML = '<option value="">Gagal memuat CPMK</option>';
+                console.error("Gagal menarik data CPMK:", e);
+                document.getElementById('selectCPMK').innerHTML = '<option value="">Gagal memuat CPMK dari server</option>';
             }
-
-            // 2. Tarik Data CPL 
+           // 2. Tarik Data CPL (Dinamis dari n8n)
+            // 2. Tarik Data CPL (Dinamis dari n8n)
             try {
-                selectCpl.innerHTML = `
-                    <option value="">-- Pilih CPL Terkait --</option>
-                    <option value="CPL-01">CPL-01 (Sikap & Etika)</option>
-                    <option value="CPL-02">CPL-02 (Penguasaan Pengetahuan)</option>
-                    <option value="CPL-05">CPL-05 (Keterampilan Umum)</option>
-                    <option value="CPL-09">CPL-09 (Keterampilan Khusus)</option>
-                `;
+                const selectCpl = document.getElementById('selectCPL');
+                selectCpl.innerHTML = '<option value="">Memuat CPL...</option>';
+                
+                // Menggunakan variabel global BASE_N8N_URL agar dinamis
+                const resCpl = await fetch(`${BASE_N8N_URL}/webhook/get-matkul-cpl?kode_mk=${kodeMk}`);
+                const dataCpl = await resCpl.json();
+                
+                selectCpl.innerHTML = '<option value="">-- Pilih CPL Terkait --</option>';
+                
+                if (dataCpl && dataCpl.length > 0 && dataCpl[0].kode_cpl) {
+                    dataCpl.forEach(item => {
+                        let deskripsiSingkat = item.deskripsi ? item.deskripsi.substring(0, 40) + "..." : "Tanpa deskripsi";
+                        selectCpl.innerHTML += `<option value="${item.kode_cpl}">${item.kode_cpl} - ${deskripsiSingkat}</option>`;
+                    });
+                } else {
+                    selectCpl.innerHTML = '<option value="">-- Belum ada CPL dipetakan --</option>';
+                }
             } catch(e) {
-                console.error(e);
+                console.error("Gagal menarik data CPL:", e);
+                document.getElementById('selectCPL').innerHTML = '<option value="">Gagal memuat CPL dari server</option>';
             }
         };
 
@@ -259,13 +287,30 @@
         }
 
         // FUNGSI SIMPAN ULTIMATE
+        // FUNGSI SIMPAN ULTIMATE (DENGAN VALIDASI KETAT)
         async function simpanTugasRubrik() {
             const btn = document.getElementById('btnSimpanTop');
             const total = parseInt(document.getElementById('totalBobot').innerText);
 
+            // ==========================================
+            // 1. VALIDASI FORM KOSONG (REQUIRED FIELDS)
+            // ==========================================
+            const valJudul = document.getElementById('judulTugas').value.trim();
+            const valCPMK = document.getElementById('selectCPMK').value;
+            const valWaktu = document.getElementById('inputWaktu').value.trim();
+            const valDeskripsi = document.getElementById('inputDeskripsi').value.trim();
+
+            if (!valJudul || !valCPMK || !valWaktu || !valDeskripsi) {
+                alert("⚠️ Peringatan: Judul Tugas, CPMK Terkait, Waktu Pengerjaan, dan Deskripsi Tugas wajib diisi!");
+                return; // Menghentikan proses simpan
+            }
+
+            // ==========================================
+            // 2. VALIDASI TOTAL BOBOT 100%
+            // ==========================================
             if(total !== 100) {
-                alert("⚠️ Total bobot kriteria rubrik harus tepat 100%!");
-                return;
+                alert("⚠️ Peringatan: Total bobot kriteria rubrik harus tepat 100%!");
+                return; // Menghentikan proses simpan
             }
 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
@@ -273,14 +318,14 @@
 
             const payload = {
                 kode_mk: new URLSearchParams(window.location.search).get('kode_mk') || 'DEFAULT_MK',
-                judul_tugas: document.getElementById('judulTugas').value || 'Tanpa Judul',
+                judul_tugas: valJudul,
                 kode_cpl: document.getElementById('selectCPL').value || '-',
-                sub_cpmk: document.getElementById('selectCPMK').value || 'CPMK000',
+                sub_cpmk: valCPMK,
                 teknik_evaluasi: document.getElementById('inputTeknik').value || '-',
                 metode: document.getElementById('inputMetode').value || '-',
-                waktu: document.getElementById('inputWaktu').value || '-',
+                waktu: valWaktu,
                 luaran: document.getElementById('inputLuaran').value || '-',
-                deskripsi: document.getElementById('inputDeskripsi').value || '-',
+                deskripsi: valDeskripsi,
                 rubrik: [] 
             };
 
@@ -301,7 +346,8 @@
             });
 
             try {
-                const URL_N8N_ANDA = 'https://contributor-launch-mel-collection.trycloudflare.com/webhook/simpan-tugas-rubrik';
+                // Catatan: URL ini sebaiknya dibuat konstan di atas jika sering berubah
+                const URL_N8N_ANDA = 'https://throw-tire-dosage-shipped.trycloudflare.com/webhook/simpan-tugas-rubrik';
                 
                 const response = await fetch(URL_N8N_ANDA, {
                     method: 'POST',
@@ -353,15 +399,6 @@
             } finally {
                 btn.innerHTML = '<i class="fas fa-check-double"></i> Simpan Data Tugas';
                 btn.disabled = false;
-            }
-        }
-        
-        function cetakRpsDosen() {
-            const idTugas = new URLSearchParams(window.location.search).get('id_tugas');
-            if(idTugas) {
-                window.location.href = `cetak_rps.html?id_tugas=${idTugas}`;
-            } else {
-                alert("⚠️ ID Tugas tidak ditemukan. Simpan data tugas terlebih dahulu!");
             }
         }
     </script>
