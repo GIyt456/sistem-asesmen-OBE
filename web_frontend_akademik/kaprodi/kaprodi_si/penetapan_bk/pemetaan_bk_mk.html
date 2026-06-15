@@ -86,7 +86,7 @@
 <script>
     const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
     
-    const API_BASE = "https://estimation-fourth-promotions-steel.trycloudflare.com/webhook"; 
+    const API_BASE = "https://recommend-promised-nasa-robinson.trycloudflare.com/webhook"; 
     
     const API_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
     const API_MK = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
@@ -148,21 +148,27 @@
         const tbody = document.getElementById("bodyMatriks");
         if(!headerRow || !tbody) return;
 
-        // Render Judul Kolom (MK)
-        headerRow.innerHTML = `<th style="min-width: 120px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">BK / MK</th>`;
-        listMK.forEach(mk => {
-            headerRow.innerHTML += `<th title="Kode: ${mk.kode_mk}">${mk.nama_mk || mk.nama_mata_kuliah || ''}</th>`;
+        headerRow.innerHTML = `<th style="min-width: 250px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">Mata Kuliah (MK) \\ Bahan Kajian (BK)</th>`;
+        
+        listBK.forEach(bk => {
+            // Menampilkan kode BK di atas, nama lengkapnya muncul saat di-hover
+            headerRow.innerHTML += `<th title="${bk.nama_bk || ''}">${bk.kode_bk}</th>`;
         });
 
-        // Render Baris (BK)
         tbody.innerHTML = "";
-        listBK.forEach(bk => {
-            let tr = `<tr class="bk-row">
-                <td style="position: sticky; left: 0; background: #f8fafc; z-index: 5; white-space: nowrap;" title="${bk.nama_bk || ''}">${bk.kode_bk}</td>`;
+        listMK.forEach(mk => {
+            let tr = `<tr>
+                <td style="position: sticky; left: 0; background: #f8fafc; z-index: 5; text-align: left; font-weight: 600; color: var(--primary-blue);" title="Kode: ${mk.kode_mk}">
+                    ${mk.nama_mk || mk.nama_mata_kuliah || mk.kode_mk}
+                </td>`;
             
-            listMK.forEach(mk => {
+            // Loop ke samping (Membangun kotak centang untuk setiap BK)
+            listBK.forEach(bk => {
+                // Mengecek apakah kombinasi MK dan BK ini sudah tersimpan di database
                 const isChecked = relasiExisting.some(r => r.kode_bk === bk.kode_bk && r.kode_mk === mk.kode_mk);
                 const chk = isChecked ? 'checked' : '';
+                
+                // Atribut data-bk dan data-mk tetap sama agar fungsi simpan tidak error!
                 tr += `<td><input type="checkbox" class="chk-matrix" data-bk="${bk.kode_bk}" data-mk="${mk.kode_mk}" ${chk}></td>`;
             });
             

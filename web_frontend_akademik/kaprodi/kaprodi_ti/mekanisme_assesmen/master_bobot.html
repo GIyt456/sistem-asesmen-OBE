@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Bobot - Sistem OBE</title>
-    <link rel="stylesheet" href="../../../css/style.css">
-    <script src="../../../js/template.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -14,24 +13,6 @@
             --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
             --primary-red: #8b0000; --bg-main: #ffffff; --text-dark: #111827; --border-dark: #161923;
         }
-
-        /* --- GAYA SIDEBAR --- */
-        .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0;}
-        .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
-        .sidebar-profile img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
-        .sidebar-profile-info { display: flex; flex-direction: column; }
-        .sidebar-profile-info .name { color: white; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
-        .sidebar-profile-info .role { color: var(--sidebar-text); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
-        .sidebar-divider { height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 5px 10px 10px 10px; }
-        .nav-menu { flex: 1; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
-        .nav-menu::-webkit-scrollbar { display: none; }
-        .menu-category { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: var(--sidebar-text); text-transform: uppercase; margin: 10px 0 10px 10px; }
-        .nav-item { padding: 12px 16px; margin-bottom: 4px; cursor: pointer; display: flex; align-items: center; gap: 16px; transition: all 0.2s; border-radius: 8px; font-weight: 500; font-size: 0.80rem; }
-        .nav-item:hover, .nav-item.active { background: var(--sidebar-hover); color: var(--sidebar-active-text); }
-        .nav-item i { font-size: 1.1rem; width: 20px; text-align: center; }
-        .nav-bottom { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; }
-        .nav-item.logout { color: #f87171; }
-        .nav-item.logout:hover { background: rgba(248, 113, 113, 0.1); }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { display: flex; animation: transitionIn 0.3s ease-in-out; background: #f9fafb; height: 100vh; overflow: hidden; color: var(--text-dark); }
@@ -90,7 +71,7 @@
                     <option value="2024">Kurikulum 2020</option>
                     <option value="2023">Kurikulum 2025</option>
                 </select>
-                <button class="btn-save" onclick="saveSemuaBobot()">
+                <button class="btn-save" onclick="simpanBobot()">
                     <i class="fas fa-save"></i> Simpan Perubahan
                 </button>
             </div>
@@ -122,20 +103,29 @@
         </div>
     </div>
 
-<script>
-    const API_BASE = "https://yen-title-indicators-thursday.trycloudflare.com/webhook";
-    const API_GET_BOBOT = `${API_BASE}/get-master-bobot`;
+<script src="/js/template.js"></script>
 
-    window.onload = async () => {
-        if (!localStorage.getItem("user_login")) { window.location.replace("/login/login.html"); return; }
-        await loadSidebar();
-        await loadDataBobot(); 
+<script>
+    const PRODI = localStorage.getItem("prodi_aktif") || "ti";
+    
+    const API_BASE = "https://encounter-system-products-globe.trycloudflare.com/webhook";
+    const API_GET_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
+
+    const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+    window.onload = () => {
+        setTimeout(loadDataBobot, 400); 
     };
 
+    // =========================================================
+    // 1. FUNGSI MEMUAT TABEL (4 INPUT, 1 TOTAL PER MK)
+    // =========================================================
     async function loadDataBobot() {
-        const tbody = document.getElementById('tableBody');
+        // Sesuaikan ID dengan tbody milikmu (bisa 'tableBody' atau 'bodyMasterBobot')
+        const tbody = document.querySelector('tbody'); 
         try {
-            const res = await fetch(API_GET_BOBOT);
+            const res = await fetch(API_GET_BOBOT); // Pastikan nama API_GET_BOBOT sesuai dengan yang ada di kodemu
             const data = await res.json();
             
             tbody.innerHTML = ''; 
@@ -145,110 +135,185 @@
                 return;
             }
 
-            // --- LANGKAH 1: Hitung jumlah baris yang sama (Untuk Rowspan) ---
+            // --- HITUNG ROWSPAN & TOTAL AWAL PER MATA KULIAH ---
             let mkCount = {};
             let cplCount = {};
+            let mkTotal = {};
 
             data.forEach((row) => {
-                // Hitung kembar untuk KODE MK
                 if (!mkCount[row.kode_mk]) mkCount[row.kode_mk] = 0;
-                mkCount[row.kode_mk]++;
+                mkCount[row.kode_mk]++; // Hitung ada berapa baris untuk MK ini
 
-                // Hitung kembar untuk CPL (di dalam MK yang sama)
                 let cplKey = row.kode_mk + '_' + row.cpl;
                 if (!cplCount[cplKey]) cplCount[cplKey] = 0;
                 cplCount[cplKey]++;
+
+                // Jumlahkan ke-4 komponen untuk total awal Mata Kuliah
+                let t = parseInt(row.tugas) || 0;
+                let u = parseInt(row.uts) || 0;
+                let p = parseInt(row.presentasi) || 0;
+                let a = parseInt(row.uas) || 0;
+
+                if (!mkTotal[row.kode_mk]) mkTotal[row.kode_mk] = 0;
+                mkTotal[row.kode_mk] += (t + u + p + a); // Akumulasikan seluruh CPMK
             });
 
-            // --- LANGKAH 2: Render tabel dengan Rowspan ---
+            // --- GAMBAR TABELNYA ---
             let renderedMk = {};
             let renderedCpl = {};
+            let renderedMkTotal = {};
             let html = '';
 
             data.forEach((row, index) => {
-                const total = parseInt(row.tugas) + parseInt(row.uts) + parseInt(row.presentasi) + parseInt(row.uas);
-                const totalClass = total === 100 ? 'total-ok' : 'total-warn';
                 let cplKey = row.kode_mk + '_' + row.cpl;
 
-                let tr = `<tr data-rowid="${index}">`;
+                // Sisipkan data-mk di <tr> agar bisa dilacak oleh tombol simpan
+                let tr = `<tr data-rowid="${index}" data-mk="${row.kode_mk}" data-cpmk="${row.cpmk || row.kode_cpmk}">`;
 
-                // 1. Kolom CPL (Gabungkan jika CPL dan MK sama)
                 if (!renderedCpl[cplKey]) {
                     tr += `<td class="text-left col-cpl" rowspan="${cplCount[cplKey]}" style="vertical-align: middle;">${row.cpl}</td>`;
-                    renderedCpl[cplKey] = true; // Tandai sudah digambar
+                    renderedCpl[cplKey] = true;
                 }
 
-                // 2. Kolom Kode MK & Nama MK (Gabungkan jika MK sama)
                 if (!renderedMk[row.kode_mk]) {
                     tr += `<td class="text-left col-mk" rowspan="${mkCount[row.kode_mk]}" style="vertical-align: middle;">${row.kode_mk}</td>`;
                     tr += `<td class="text-left" rowspan="${mkCount[row.kode_mk]}" style="vertical-align: middle;">${row.nama_mk}</td>`;
-                    renderedMk[row.kode_mk] = true; // Tandai sudah digambar
+                    renderedMk[row.kode_mk] = true;
                 }
 
-                // 3. Kolom CPMK & Input Nilai (Selalu digambar per baris)
+                // 4 KOLOM INPUT (Tugas, UTS, Presentasi, UAS) MUNCUL DI SETIAP BARIS CPMK
                 tr += `
-                    <td class="col-cpmk">${row.cpmk}</td>
-                    <td><input type="number" class="input-bobot" data-field="tugas" value="${row.tugas}" oninput="hitungTotal(${index})"></td>
-                    <td><input type="number" class="input-bobot" data-field="uts" value="${row.uts}" oninput="hitungTotal(${index})"></td>
-                    <td><input type="number" class="input-bobot" data-field="presentasi" value="${row.presentasi}" oninput="hitungTotal(${index})"></td>
-                    <td><input type="number" class="input-bobot" data-field="uas" value="${row.uas}" oninput="hitungTotal(${index})"></td>
-                    <td class="col-total ${totalClass}" id="total-${index}">${total}</td>
-                </tr>`;
+                    <td class="col-cpmk"><strong>${row.cpmk || row.kode_cpmk}</strong></td>
+                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="tugas" value="${row.tugas || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
+                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="uts" value="${row.uts || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
+                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="presentasi" value="${row.presentasi || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
+                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="uas" value="${row.uas || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
+                `;
 
+                // 1 KOTAK TOTAL SPESIAL (Digabung / Rowspan sebesar jumlah CPMK di MK tersebut)
+                if (!renderedMkTotal[row.kode_mk]) {
+                    const total = mkTotal[row.kode_mk];
+                    const warnawarna = total === 100 ? '#16a34a' : '#dc2626'; // Hijau jika 100, Merah jika belum
+                    tr += `<td id="total-mk-${row.kode_mk}" rowspan="${mkCount[row.kode_mk]}" style="vertical-align: middle; text-align: center; font-weight: 800; font-size: 1.1rem; color: ${warnawarna};">${total}%</td>`;
+                    renderedMkTotal[row.kode_mk] = true;
+                }
+
+                tr += `</tr>`;
                 html += tr;
             });
 
             tbody.innerHTML = html;
 
         } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Gagal memuat data dari API. Pastikan n8n menyala!</td></tr>';
+            console.error(error);
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Gagal memuat data dari API.</td></tr>';
         }
     }
 
-    function hitungTotal(rowId) {
-        const row = document.querySelector(`tr[data-rowid="${rowId}"]`);
-        const inputs = row.querySelectorAll('.input-bobot');
+    // =========================================================
+    // 2. FUNGSI PENJUMLAH OTOMATIS SAAT DIKETIK
+    // =========================================================
+    function hitungTotalMK(kodeMk) {
+        // Tarik semua angka dari semua kotak input (Tugas sampai UAS) yang memiliki kode MK yang sama
+        const inputs = document.querySelectorAll(`input[data-mk="${kodeMk}"]`);
         let sum = 0;
         
-        inputs.forEach(input => sum += (parseInt(input.value) || 0));
+        inputs.forEach(input => {
+            sum += (parseInt(input.value) || 0);
+        });
 
-        const totalCell = document.getElementById(`total-${rowId}`);
-        totalCell.innerText = sum;
-        totalCell.className = `col-total ${sum === 100 ? 'total-ok' : 'total-warn'}`;
-    }
-
-    function saveSemuaBobot() {
-        alert("Sabar, fitur simpan menyusul! Cek dulu apakah datanya sudah tampil semua?");
-    }
-
-    //Sidebar
-    async function loadSidebar() {
-        const response = await fetch('/kaprodi/kaprodi_ti/components/sidebar.html');
-        document.getElementById('sidebar-container').innerHTML = await response.text();
-        document.getElementById("adminName").innerText = localStorage.getItem("user_login") || "Admin";
-        document.getElementById('nav-master-bobot').style.background = 'var(--sidebar-hover)';
-    }
-
-    // Fungsi Animasi Dropdown
-    function toggleDropdown(menuId, chevronId) {
-        const menu = document.getElementById(menuId);
-        const chevron = document.getElementById(chevronId);
-        
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'flex';
-            chevron.style.transform = 'rotate(180deg)';
-        } else {
-            menu.style.display = 'none';
-            chevron.style.transform = 'rotate(0deg)';
+        // Lempar total penjumlahannya ke 1 kotak rowspan tadi
+        const totalCell = document.getElementById(`total-mk-${kodeMk}`);
+        if (totalCell) {
+            totalCell.innerText = sum + "%";
+            totalCell.style.color = (sum === 100) ? "#16a34a" : "#dc2626"; 
         }
     }
 
-    // Fungsi Logout
-    function logout() {
-        if(confirm("Apakah Anda yakin ingin keluar?")) {
-            localStorage.removeItem("user_login");
-            localStorage.removeItem("user_role");
-            window.location.replace('/login/login.html');
+    // =========================================================
+    // 3. FUNGSI SIMPAN KE DATABASE
+    // =========================================================
+    async function simpanBobot() {
+        const btnSave = document.querySelector('.btn-save') || document.getElementById('btnSave');
+        const oriText = btnSave.innerHTML;
+        
+        // Cari ada berapa Mata Kuliah di layar
+        const rows = document.querySelectorAll('tbody tr[data-mk]');
+        let mkList = [];
+        rows.forEach(row => {
+            const mk = row.getAttribute('data-mk');
+            if (!mkList.includes(mk)) mkList.push(mk);
+        });
+
+        let dataBobotData = [];
+        let mkError = [];
+
+        // Cek satu per satu Mata Kuliah
+        mkList.forEach(kodeMk => {
+            // Hitung ulang totalnya
+            const inputs = document.querySelectorAll(`input[data-mk="${kodeMk}"]`);
+            let totalMK = 0;
+            inputs.forEach(input => totalMK += (parseInt(input.value) || 0));
+
+            // Jika pas 100%, ambil ke-4 komponen nilai dari tiap baris CPMK-nya
+            if (totalMK === 100) {
+                const mkRows = document.querySelectorAll(`tr[data-mk="${kodeMk}"]`);
+                mkRows.forEach(row => {
+                    const kodeCpmk = row.getAttribute('data-cpmk');
+                    const t = parseInt(row.querySelector('input[data-field="tugas"]')?.value) || 0;
+                    const u = parseInt(row.querySelector('input[data-field="uts"]')?.value) || 0;
+                    const p = parseInt(row.querySelector('input[data-field="presentasi"]')?.value) || 0;
+                    const a = parseInt(row.querySelector('input[data-field="uas"]')?.value) || 0;
+
+                    dataBobotData.push({
+                        kode_mk: kodeMk,
+                        kode_cpmk: kodeCpmk,
+                        prodi: PRODI,
+                        tugas: t,
+                        uts: u,
+                        presentasi: p,
+                        uas: a
+                    });
+                });
+            } else if (totalMK > 0 && totalMK !== 100) {
+                // Jika totalnya masih belum pas 100, masukkan ke daftar error
+                mkError.push(kodeMk);
+            }
+        });
+
+        if (mkError.length > 0) {
+            alert(`⚠️ Gagal Menyimpan!\n\nMata Kuliah berikut total seluruh bobot CPMK-nya belum pas 100%:\n${mkError.join(', ')}`);
+            return;
+        }
+
+        if (dataBobotData.length === 0) {
+            alert("❌ Belum ada data Mata Kuliah dengan bobot valid (Total 100%) yang bisa disimpan.");
+            return;
+        }
+
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btnSave.disabled = true;
+
+        try {
+            const API_SAVE_BOBOT = `${API_BASE}/admin-save-bobot`;
+            
+            for (const payload of dataBobotData) {
+                await fetch(API_SAVE_BOBOT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            }
+
+            alert("✅ Sempurna! Master Bobot berhasil disimpan ke Database!");
+            loadDataBobot(); // Refresh tabel setelah sukses
+
+        } catch (error) {
+            console.error(error);
+            alert("❌ Gagal terhubung ke server n8n.");
+        } finally {
+            btnSave.innerHTML = oriText;
+            btnSave.disabled = false;
         }
     }
 </script>
