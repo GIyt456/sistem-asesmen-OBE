@@ -62,7 +62,7 @@
             <!-- 1. Pilih CPL -->
             <div class="form-group">
                 <label for="selectCpl"><i class="fas fa-graduation-cap" style="color: var(--primary-red); margin-right: 8px;"></i> Pilih CPL Tujuan</label>
-                <select id="selectCpl" class="select-custom" onchange="loadMappingData()">
+                <select id="selectCpl" class="select-custom" onchange="checkExistingMapping()">
                     <option value="">-- Memuat daftar CPL... --</option>
                 </select>
             </div>
@@ -87,110 +87,140 @@
 <script src="/js/template.js"></script>
 
 <script>
+    // ========================================================================
+    // 1. DEKLARASI API (HARUS DI PALING ATAS)
+    // ========================================================================
     const PRODI = localStorage.getItem("prodi_aktif") || "si";
-
-    const API_BASE = "https://eco-monkey-gentleman-pipeline.trycloudflare.com/webhook";
+    
+    // 👇👇 GANTI DENGAN LINK CLOUDFLARE TERBARU KAMU 👇👇
+    const API_BASE = "https://wooden-branches-elimination-tube.trycloudflare.com/webhook"; 
+    const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
+    const API_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
     const API_METADATA = `${API_BASE}/get-metadata`;
-    const API_UPDATE = `${API_BASE}/admin-update-master`; // Jalur 'mapping' di n8n
+    const API_UPDATE = `${API_BASE}/admin-update-master`;
 
+    // Penyimpanan data sementara
+    let listCPMK = [];
+
+    // ========================================================================
+    // 2. AWAL MULA SAAT WEB DIBUKA
+    // ========================================================================
     const userLogin = localStorage.getItem("user_login");
         if (!userLogin) window.location.replace("/login/login.html");
 
-    let allMetadata = [];
-
     window.onload = () => {
-            setTimeout(initData, 400); // Langsung eksekusi analisis saat web dibuka
-        };
+        setTimeout(initData, 400); 
+    };
 
-    // Tarik data CPL dan CPMK sekaligus
+    // ========================================================================
+    // 3. TARIK MASTER CPL & CPMK (Tanpa error gaib lagi)
+    // ========================================================================
     async function initData() {
-    try {
-        const res = await fetch(API_METADATA);
-        allMetadata = await res.json();
-
         const selectCpl = document.getElementById('selectCpl');
-        selectCpl.innerHTML = '<option value="">-- Pilih CPL --</option>';
+        const cpmkContainer = document.getElementById('cpmkContainer');
+        const loadingIndicator = document.getElementById('loadingIndicator');
         
-        // Sesuaikan dengan nama kolom CPL di metadata
-        allMetadata.filter(i => i.tipe === 'cpl').forEach(cpl => {
-            // Kita gunakan cpl.kode_cpl (atau cpl.kode jika sudah di-alias di N8N)
-            const kodeCpl = cpl.kode_cpl || cpl.kode; 
-            selectCpl.innerHTML += `<option value="${kodeCpl}">${kodeCpl} - ${cpl.label || cpl.deskripsi}</option>`;
-        });
+        if(loadingIndicator) loadingIndicator.style.display = 'block';
 
-            renderCpmkGroups();
-        } catch (error) { console.error("Error initData:", error); }
-    }
+        try {
+            const [resCpl, resCpmk] = await Promise.all([
+                fetch(API_CPL),
+                fetch(API_CPMK)
+            ]);
 
-    // Gambar Checkbox CPMK dengan Header Rumpun
-    function renderCpmkGroups() {
-        const container = document.getElementById('cpmkContainer');
-        container.innerHTML = '';
-        
-        // Filter tipe cpmk dan urutkan berdasarkan kode_cpmk
-        const dataCpmk = allMetadata.filter(i => i.tipe === 'cpmk').sort((a,b) => 
-            (a.kode_cpmk || a.kode).localeCompare(b.kode_cpmk || b.kode)
-        );
-        
-        const grouped = {};
-        dataCpmk.forEach(cpmk => {
-            const kCPMK = cpmk.kode_cpmk || cpmk.kode; //
-            const prefix = kCPMK.substring(0, kCPMK.length - 1);
-            if (!grouped[prefix]) grouped[prefix] = [];
-            grouped[prefix].push(cpmk);
-        });
+            const dataCpl = await resCpl.json();
+            listCPMK = await resCpmk.json();
 
-        for (const [prefix, list] of Object.entries(grouped)) {
-            container.innerHTML += `<div style="grid-column:1/-1; margin-top:15px; border-bottom:2px solid #e5e7eb; padding-bottom:5px;"><h4 style="color:var(--text-dark); font-weight:800;">${prefix}x</h4></div>`;
-            list.forEach(cpmk => {
-                const kCPMK = cpmk.kode_cpmk || cpmk.kode; // Ambil kode asli dari DB
-                container.innerHTML += `
-                    <label class="cpmk-card" for="cb-${kCPMK}">
-                        <input type="checkbox" id="cb-${kCPMK}" class="cpmk-checkbox" value="${kCPMK}" disabled>
-                        <div class="cpmk-info">
-                            <span class="cpmk-code">${kCPMK}</span>
-                            <span class="cpmk-desc">${cpmk.deskripsi || cpmk.label}</span>
-                        </div>
-                    </label>
-                `;
-            });
+            // Isi Dropdown CPL
+            if (selectCpl) {
+                selectCpl.innerHTML = '<option value="" disabled selected>-- Pilih CPL --</option>';
+                if (dataCpl.length > 0) {
+                    dataCpl.forEach(cpl => {
+                        selectCpl.innerHTML += `<option value="${cpl.kode_cpl}">${cpl.kode_cpl} - ${cpl.deskripsi || 'Tanpa Deskripsi'}</option>`;
+                    });
+                } else {
+                    selectCpl.innerHTML = '<option value="">Data CPL Kosong (Cek N8N)</option>';
+                }
+            }
+
+            // Gambar Kotak Checkbox CPMK
+            if (cpmkContainer) {
+                cpmkContainer.innerHTML = '';
+                if (listCPMK.length > 0) {
+                    listCPMK.forEach(cpmk => {
+                        // Simpan info "parent" (CPL asalnya) di atribut data-parent
+                        const parentInfo = cpmk.kode_cpl_ref || cpmk.parent || cpmk.kode_cpl || '';
+                        
+                        cpmkContainer.innerHTML += `
+                            <label class="cpmk-card">
+                                <input type="checkbox" class="cpmk-checkbox" value="${cpmk.kode_cpmk}" data-parent="${parentInfo}" disabled>
+                                <div>
+                                    <div style="font-weight: 700; color: #1e293b;">${cpmk.kode_cpmk}</div>
+                                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 4px; line-height: 1.4;">${cpmk.deskripsi || '-'}</div>
+                                </div>
+                            </label>
+                        `;
+                    });
+                } else {
+                    cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1;">Master Data CPMK Kosong.</div>';
+                }
+            }
+
+        } catch (error) {
+            console.error("Error Fetching Data:", error);
+            if(selectCpl) selectCpl.innerHTML = '<option value="">Gagal terhubung ke API</option>';
+            if(cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1;">Gagal menarik data Master dari N8N. Pastikan Link Benar!</div>';
+        } finally {
+            if(loadingIndicator) loadingIndicator.style.display = 'none';
         }
     }
 
-    // Jalankan saat CPL di dropdown dipilih
-    function loadMappingData() {
-        const cplId = document.getElementById('selectCpl').value; // Contoh: "TI-CPL01"
-        const checkboxes = document.querySelectorAll('.cpmk-checkbox');
+    // ========================================================================
+    // 4. CEK RELASI SAAT DROPDOWN CPL DIPILIH
+    // ========================================================================
+    function checkExistingMapping() {
+        const cplId = document.getElementById('selectCpl').value;
         const btnSave = document.getElementById('btnSave');
+        const checkboxes = document.querySelectorAll('.cpmk-checkbox');
 
+        if (!cplId) return;
+
+        // Reset & aktifkan checkbox
         checkboxes.forEach(cb => {
             cb.checked = false;
-            cb.disabled = !cplId;
+            cb.disabled = false; 
             
-            // Cari data di metadata yang kode_cpmk-nya cocok dengan checkbox ini[cite: 2]
-            const originalData = allMetadata.find(m => (m.kode_cpmk || m.kode) === cb.value);
-            
-            // Cek apakah kode_cpl_ref di database sama dengan CPL yang dipilih di dropdown[cite: 2]
-            if (cplId && originalData && originalData.parent === cplId) {
+            // Jurus Kebal-Badai: Cek apakah CPMK ini punya CPL yang sedang dipilih
+            const parentCpmk = cb.getAttribute('data-parent');
+            if (parentCpmk && parentCpmk.trim().toLowerCase() === cplId.trim().toLowerCase()) {
                 cb.checked = true;
             }
         });
-        btnSave.disabled = !cplId;
+
+        if (btnSave) btnSave.disabled = false;
     }
 
-    // Simpan relasi satu per satu ke MySQL lewat n8n[cite: 2]
+    // ========================================================================
+    // 5. SIMPAN RELASI SATU PER SATU KE N8N
+    // ========================================================================
     async function saveMapping() {
         const cplId = document.getElementById('selectCpl').value;
         const btnSave = document.getElementById('btnSave');
         const selectedCpmk = Array.from(document.querySelectorAll('.cpmk-checkbox:checked')).map(cb => cb.value);
 
+        if (!cplId) {
+            alert("Silakan pilih CPL terlebih dahulu!");
+            return;
+        }
+
         btnSave.disabled = true;
         btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
         try {
-            // Kita loop setiap CPMK yang dipilih untuk diupdate kolom kode_cpl_ref nya[cite: 2]
+            // Karena ini 1-to-N (1 CPMK dimiliki oleh 1 CPL), kita update satu per satu seperti kodemu sebelumnya
+            let fetchPromises = [];
             for (const cpmkId of selectedCpmk) {
-                await fetch(API_UPDATE, {
+                const req = fetch(API_UPDATE, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -199,13 +229,20 @@
                         value: cplId 
                     })
                 });
+                fetchPromises.push(req);
             }
-            alert("✅ Pemetaan CPL - CPMK Berhasil!");
-            location.reload(); 
-        } catch (e) { alert("Terjadi kesalahan jaringan."); }
-        finally { 
+            
+            await Promise.all(fetchPromises);
+            alert("✅ Pemetaan CPL - CPMK Berhasil Disimpan!");
+            
+            // Refresh layar agar parent terbarunya langsung terbaca
+            initData(); 
+            
+        } catch (e) { 
+            alert("Terjadi kesalahan jaringan."); 
+        } finally { 
             btnSave.disabled = false; 
-            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Relasi'; 
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Pemetaan';
         }
     }
 </script>
