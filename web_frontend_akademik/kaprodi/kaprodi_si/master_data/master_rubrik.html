@@ -8,6 +8,7 @@
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <script src="../../../js/api_config.js"></script>
     
     <style>
         /* --- VARIABEL WARNA KHUSUS SI --- */
@@ -155,7 +156,6 @@
 
 <script>
     // 1. PENGATURAN API N8N
-    const BASE_N8N_URL = 'https://toolbox-router-wyoming-definitions.trycloudflare.com';
     const userLogin = localStorage.getItem("user_login");
 
     if (!userLogin) window.location.replace('/login/login.html');
@@ -168,7 +168,7 @@
         if (!tableBody) return;
 
         try {
-            const URL_API = `${BASE_N8N_URL}/webhook/get-master-rubrik?prodi=si`;
+            const URL_API = `${API_BASE}/get-master-rubrik?prodi=si`;
             
             const response = await fetch(URL_API);
             const textData = await response.text();
@@ -270,7 +270,7 @@
         document.getElementById('modalDetailRubrik').style.display = "flex";
 
         try {
-            const response = await fetch(`${BASE_N8N_URL}/webhook/get-detail-rubrik?id_tugas=${idTugas}`);
+            const response = await fetch(`${API_BASE}/get-detail-rubrik?id_tugas=${idTugas}`);
             const textData = await response.text(); 
 
             if (!textData || textData.trim() === '') {

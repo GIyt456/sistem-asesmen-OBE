@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Perbaikan jalur relatif menggunakan ../ -->
+    <script src="../js/api_config.js"></script>
+    
     <style>
         :root {
             --primary-navy: #0f172a;
@@ -191,64 +194,113 @@
 
     </main>
 
-    <script src="api_config.js"></script>
-
     <script>
         document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
 
-        // ==========================================
-        // VARIABEL STATE MANAGEMENT (DRAFTING)
-        // ==========================================
-        let daftarTugasDraft = []; // Array keranjang tugas
-        let modeEditIndex = -1; // Penanda jika sedang mode mengedit
-        let tugasCounter = 1; // Variabel penghitung urutan tugas
+        let daftarTugasDraft = []; 
+        let modeEditIndex = -1; 
+        let tugasCounter = 1; 
 
         window.onload = async () => {
             tambahKriteria(); 
-            document.getElementById('judulTugas').value = "Tugas 1: "; // Awalan otomatis pertama
+            document.getElementById('judulTugas').value = "Tugas 1: "; 
 
             const urlParams = new URLSearchParams(window.location.search);
             const kodeMk = urlParams.get('kode_mk');
             if(!kodeMk) { alert("⚠️ Kode Mata Kuliah tidak ditemukan."); return; }
 
-            // 1. Tarik Data CPMK Menggunakan API_CONFIG
+            // ==========================================
+            // 1. TARIK DATA CPMK (Versi Anti-Gagal)
+            // ==========================================
             try {
                 const selectCpmk = document.getElementById('selectCPMK');
-                const resCpmk = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_CPMK}?kode_mk=${kodeMk}`);
-                const dataCpmk = await resCpmk.json();
+                selectCpmk.innerHTML = '<option value="">Memuat CPMK...</option>';
+                
+                if (typeof API_BASE === 'undefined') throw new Error("API_BASE tidak terbaca dari file config.");
+
+                const resCpmk = await fetch(`${API_BASE}/get-matkul-cpmk?kode_mk=${kodeMk}`);
+                if (!resCpmk.ok) throw new Error(`Server n8n menolak dengan status ${resCpmk.status}`);
+
+                const textRes = await resCpmk.text();
+                let dataCpmk;
+                // Trik Pelindung: Cek apakah data kosong sebelum di-parse
+                if (!textRes || textRes.trim() === "") {
+                    dataCpmk = []; 
+                } else {
+                    dataCpmk = JSON.parse(textRes);
+                }
+                
+                console.log("Raw Data CPMK:", dataCpmk); // Bantu debug di Console F12
+
+                // Trik Sakti: Paksa bentuknya jadi Array meskipun dibungkus Object oleh n8n
+                let arrCpmk = Array.isArray(dataCpmk) ? dataCpmk : (dataCpmk.data || Object.values(dataCpmk));
                 
                 selectCpmk.innerHTML = '<option value="">-- Pilih CPMK / Sub-CPMK Terkait --</option>';
-                if (dataCpmk && dataCpmk.length > 0 && dataCpmk[0].kode_cpmk) {
-                    dataCpmk.forEach(item => {
-                        let teks = item.deskripsi || item.deskripsi_cpmk || item.rumusan || 'Tanpa deskripsi';
-                        let singkatan = teks.length > 50 ? teks.substring(0, 50) + "..." : teks;
-                        selectCpmk.innerHTML += `<option value="${item.kode_cpmk}">${item.kode_cpmk} - ${singkatan}</option>`;
+                
+                if (arrCpmk && arrCpmk.length > 0) {
+                    arrCpmk.forEach(item => {
+                        let rawItem = item.json ? item.json : item; // Bersihkan bungkus json jika ada
+                        let valKode = rawItem.kode_cpmk || rawItem.cpmk || rawItem.id_cpmk || null;
+                        let valDeskripsi = rawItem.deskripsi || rawItem.deskripsi_cpmk || rawItem.rumusan || rawItem.rumusan_cpmk || 'Tanpa deskripsi';
+                        let singkatan = valDeskripsi.length > 50 ? valDeskripsi.substring(0, 50) + "..." : valDeskripsi;
+                        
+                        if (valKode) {
+                            selectCpmk.innerHTML += `<option value="${valKode}">${valKode} - ${singkatan}</option>`;
+                        }
                     });
+                }
+                
+                if(selectCpmk.options.length === 1) {
+                    selectCpmk.innerHTML = '<option value="">-- Belum ada CPMK dipetakan --</option>';
                 }
             } catch(e) {
                 console.error("Gagal menarik data CPMK:", e);
-                document.getElementById('selectCPMK').innerHTML = '<option value="">Gagal memuat CPMK dari server</option>';
+                document.getElementById('selectCPMK').innerHTML = `<option value="">⚠️ Error: ${e.message}</option>`;
             }
 
-            // 2. Tarik Data CPL Menggunakan API_CONFIG
+            // ==========================================
+            // 2. TARIK DATA CPL (Versi Anti-Gagal)
+            // ==========================================
             try {
                 const selectCpl = document.getElementById('selectCPL');
-                const resCpl = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_CPL}?kode_mk=${kodeMk}`);
-                const dataCpl = await resCpl.json();
+                selectCpl.innerHTML = '<option value="">Memuat CPL...</option>';
+                
+                const resCpl = await fetch(`${API_BASE}/get-matkul-cpl?kode_mk=${kodeMk}`);
+                if (!resCpl.ok) throw new Error(`Server n8n menolak dengan status ${resCpl.status}`);
+
+                const textCpl = await resCpl.text();
+                let dataCpl = JSON.parse(textCpl);
+                
+                console.log("Raw Data CPL:", dataCpl); // Bantu debug di Console F12
+
+                // Trik Sakti Extract Array
+                let arrCpl = Array.isArray(dataCpl) ? dataCpl : (dataCpl.data || Object.values(dataCpl));
                 
                 selectCpl.innerHTML = '<option value="">-- Pilih CPL Terkait --</option>';
-                if (dataCpl && dataCpl.length > 0 && dataCpl[0].kode_cpl) {
-                    dataCpl.forEach(item => {
-                        let singkatan = item.deskripsi ? item.deskripsi.substring(0, 40) + "..." : "Tanpa deskripsi";
-                        selectCpl.innerHTML += `<option value="${item.kode_cpl}">${item.kode_cpl} - ${singkatan}</option>`;
+                
+                if (arrCpl && arrCpl.length > 0) {
+                    arrCpl.forEach(item => {
+                        let rawItem = item.json ? item.json : item;
+                        let valKode = rawItem.kode_cpl || rawItem.cpl || rawItem.id_cpl || null;
+                        let valDeskripsi = rawItem.deskripsi || rawItem.deskripsi_cpl || rawItem.rumusan || 'Tanpa deskripsi';
+                        let singkatan = valDeskripsi.length > 50 ? valDeskripsi.substring(0, 50) + "..." : valDeskripsi;
+                        
+                        if (valKode) {
+                            selectCpl.innerHTML += `<option value="${valKode}">${valKode} - ${singkatan}</option>`;
+                        }
                     });
+                }
+                
+                if(selectCpl.options.length === 1) {
+                    selectCpl.innerHTML = '<option value="">-- Belum ada CPL dipetakan --</option>';
                 }
             } catch(e) {
                 console.error("Gagal menarik data CPL:", e);
-                document.getElementById('selectCPL').innerHTML = '<option value="">Gagal memuat CPL dari server</option>';
+                document.getElementById('selectCPL').innerHTML = `<option value="">⚠️ Error: ${e.message}</option>`;
             }
         };
 
+        // Fungsi Kalkulator Bobot
         function updateSum() {
             const bobotInputs = document.querySelectorAll('.input-bobot');
             let total = 0;
@@ -257,6 +309,7 @@
             document.getElementById('weightError').style.display = (total !== 100 && total > 0) ? "block" : "none";
         }
 
+        // Fungsi Tambah Baris Kriteria
         function tambahKriteria(data = {}) {
             const container = document.getElementById('rubricContainer');
             const row = document.createElement('div');
@@ -276,9 +329,7 @@
             updateSum();
         }
 
-        // ==========================================
         // FUNGSI 1: SIMPAN TUGAS KE KERANJANG (DRAFT)
-        // ==========================================
         function simpanKeDraft() {
             const total = parseInt(document.getElementById('totalBobot').innerText);
             const valJudul = document.getElementById('judulTugas').value.trim();
@@ -319,10 +370,9 @@
                 });
             });
 
-            // Jika sedang mode update, tindih data lama. Jika tidak, tambah data baru.
             if (modeEditIndex >= 0) {
                 daftarTugasDraft[modeEditIndex] = payload;
-                modeEditIndex = -1; // Kembalikan ke mode normal
+                modeEditIndex = -1; 
                 alert("✅ Tugas berhasil diupdate di draft!");
             } else {
                 daftarTugasDraft.push(payload);
@@ -332,9 +382,7 @@
             renderDaftarDraft();
         }
 
-        // ==========================================
-        // FUNGSI 2: RENDER (TAMPILKAN) DAFTAR DRAFT
-        // ==========================================
+        // FUNGSI 2: RENDER DAFTAR DRAFT
         function renderDaftarDraft() {
             const container = document.getElementById('draftContainer');
             const card = document.getElementById('draftCard');
@@ -370,14 +418,11 @@
             });
         }
 
-        // ==========================================
-        // FUNGSI 3: KONTROL EDIT, HAPUS, & RESET FORM
-        // ==========================================
+        // FUNGSI 3: EDIT, HAPUS, & RESET
         function editTugasDraft(index) {
             modeEditIndex = index;
             const data = daftarTugasDraft[index];
             
-            // Isi kembali form dengan data dari draft
             document.getElementById('judulTugas').value = data.judul_tugas;
             document.getElementById('selectCPMK').value = data.sub_cpmk;
             document.getElementById('selectCPL').value = data.kode_cpl;
@@ -387,7 +432,7 @@
             document.getElementById('inputLuaran').value = data.luaran;
             document.getElementById('inputDeskripsi').value = data.deskripsi;
             
-            document.getElementById('rubricContainer').innerHTML = ''; // Kosongkan rubrik
+            document.getElementById('rubricContainer').innerHTML = ''; 
             data.rubrik.forEach(r => {
                 tambahKriteria({
                     kriteria: r.kriteria, bobot: r.bobot_persen,
@@ -395,13 +440,12 @@
                 });
             });
 
-            // Ubah tampilan UI untuk mode edit
             document.getElementById('badgeTugasKe').innerText = `Mengedit Tugas...`;
-            document.getElementById('badgeTugasKe').style.background = "#d97706"; // Warna orange
+            document.getElementById('badgeTugasKe').style.background = "#d97706"; 
             document.getElementById('btnSimpanDraft').innerHTML = `<i class="fas fa-save"></i> Update Draft Tugas Ini`;
             document.getElementById('btnSimpanDraft').style.background = "#d97706";
             
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // Gulir ke atas
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
         function hapusTugasDraft(index) {
@@ -413,7 +457,6 @@
         }
 
         function resetFormInput() {
-            // Hitung urutan tugas secara dinamis berdasarkan isi draft
             tugasCounter = daftarTugasDraft.length + 1;
             document.getElementById('badgeTugasKe').innerText = `Input Tugas Ke-${tugasCounter}`;
             document.getElementById('badgeTugasKe').style.background = "var(--primary-red)";
@@ -434,9 +477,7 @@
             document.getElementById('btnSimpanDraft').style.background = "var(--primary-blue)";
         }
 
-        // ==========================================
-        // FUNGSI 4: SIMPAN PERMANEN KE SERVER MENGGUNAKAN API_CONFIG
-        // ==========================================
+        // FUNGSI 4: SIMPAN PERMANEN
         async function simpanSemuaPermanen() {
             if(!confirm(`Anda akan menyimpan ${daftarTugasDraft.length} tugas secara PERMANEN ke database. Pastikan semua data sudah benar. Lanjutkan?`)) return;
 
@@ -445,8 +486,7 @@
             btnBottom.disabled = true;
 
             try {
-                // Mengambil Base URL dan Endpoint dari api_config.js
-                const URL_N8N_POST = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SIMPAN_TUGAS_RUBRIK}`;
+                const URL_N8N_POST = `${API_BASE}/simpan-tugas-rubrik`;
                 
                 for (let i = 0; i < daftarTugasDraft.length; i++) {
                     const response = await fetch(URL_N8N_POST, {

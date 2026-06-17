@@ -73,6 +73,7 @@
             @page { size: A4 portrait; margin: 15mm; }
         }
     </style>
+     <script src="../js/api_config.js"></script>
 </head>
 <body>
 
@@ -170,7 +171,7 @@
     </div>
 
     <script>
-       const BASE_N8N_URL = 'https://wooden-branches-elimination-tube.trycloudflare.com';
+
 
        async function loadDataCetak() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -182,7 +183,7 @@
             }
 
             try {
-                const URL_API = `${BASE_N8N_URL}/webhook/get-detail-rubrik?id_tugas=${idTugas}`;
+                const URL_API = `${API_BASE}/get-detail-rubrik?id_tugas=${idTugas}`;
                 
                 const res = await fetch(URL_API);
                 const textData = await res.text();

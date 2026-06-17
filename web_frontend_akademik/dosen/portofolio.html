@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="../js/api_config.js"></script>
+    
     <style>
         :root { 
             --primary-red: #8b0000; 
@@ -141,68 +143,76 @@
         let dataSemuaMatkul = [];
         let dataTersaring = [];
         let halamanSaatIni = 1;
-        const barisPerHalaman = 5; // Ubah angka ini jika ingin menampilkan lebih banyak/sedikit data per halaman
+        const barisPerHalaman = 5; 
 
-        // 1. Fungsi Tarik Data dari Database
         // 1. Fungsi Tarik Data dari Database Khusus Prodi TI
         async function loadDaftarMatkulPortofolio() {
             const tableBody = document.getElementById('tabelMatkulDosen');
 
             try {
-                // ⚠️ TAMBAHKAN ?prodi=ti DI AKHIR URL TUNNEL ANDA
-                const URL_API = 'https://wooden-branches-elimination-tube.trycloudflare.com/webhook/get-matkul-portofolio?prodi=ti';
+                // Semak jika fail api_config.js berjaya dimuatkan
+                if (typeof API_BASE === 'undefined') {
+                    throw new Error("Variabel API_BASE tidak dijumpai. Sila semak pautan fail api_config.js!");
+                }
+
+                // Gunakan pemboleh ubah API_BASE secara dinamik
+                const URL_API = `${API_BASE}/get-matkul-portofolio?prodi=ti`;
                 
                 const response = await fetch(URL_API);
+                
+                if (!response.ok) {
+                    throw new Error(`Pelayan n8n menolak permintaan dengan status ${response.status}`);
+                }
+
                 dataSemuaMatkul = await response.json();
 
-                // Jika data kosong atau error dari n8n
+                // Jika data kosong atau terdapat ralat dari n8n
                 if (!dataSemuaMatkul || dataSemuaMatkul.length === 0 || dataSemuaMatkul.message) {
-                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px;">Tidak ada mata kuliah aktif untuk prodi TI di database.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px;">Tidak ada mata kuliah aktif untuk prodi TI di pangkalan data.</td></tr>';
                     document.getElementById('areaPaginasi').innerHTML = '';
                     return;
                 }
 
-                // Awal kali load, data tersaring = semua data TI
+                // Pada permulaan, data tersaring = semua data
                 dataTersaring = [...dataSemuaMatkul];
                 
-                // Kembalikan ke halaman 1 lalu render tabel
+                // Kembalikan ke halaman 1 lalu papar jadual
                 halamanSaatIni = 1;
                 renderTabelMatkul();
 
             } catch (error) {
                 console.error("Error:", error);
-                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:red; padding:30px;">⚠️ Gagal terhubung ke n8n. Pastikan Tunnel Anda aktif!</td></tr>';
+                tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red; padding:30px;">⚠️ Gagal memuatkan data. ${error.message}</td></tr>`;
                 document.getElementById('areaPaginasi').innerHTML = '';
             }
         }
 
-        // 2. Fungsi Pencarian (Real-time)
+        // 2. Fungsi Carian (Masa Nyata)
         function jalankanPencarian() {
             const kataKunci = document.getElementById('searchInput').value.toLowerCase();
             
-            // Saring data berdasarkan kode MK atau nama MK
+            // Saring data berdasarkan kod MK atau nama MK
             dataTersaring = dataSemuaMatkul.filter(item => 
-                item.kode_mk.toLowerCase().includes(kataKunci) || 
-                item.nama_mk.toLowerCase().includes(kataKunci)
+                (item.kode_mk && item.kode_mk.toLowerCase().includes(kataKunci)) || 
+                (item.nama_mk && item.nama_mk.toLowerCase().includes(kataKunci))
             );
             
-            // Kembalikan ke halaman 1 setiap kali melakukan pencarian baru
             halamanSaatIni = 1; 
             renderTabelMatkul();
         }
 
-        // 3. Fungsi Gambar Tabel Berdasarkan Halaman & Hasil Filter
+        // 3. Fungsi Lukis Jadual Berdasarkan Halaman & Hasil Penapisan
         function renderTabelMatkul() {
             const tableBody = document.getElementById('tabelMatkulDosen');
             tableBody.innerHTML = '';
             
             if (dataTersaring.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#64748b;">Pencarian tidak menemukan hasil.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#64748b;">Carian tidak menemui hasil.</td></tr>';
                 document.getElementById('areaPaginasi').innerHTML = '';
                 return;
             }
 
-            // Hitung indeks awal dan akhir untuk pemotongan data
+            // Kira indeks mula dan akhir untuk pemotongan data
             const totalHalaman = Math.ceil(dataTersaring.length / barisPerHalaman);
             const indexAwal = (halamanSaatIni - 1) * barisPerHalaman;
             const indexAkhir = indexAwal + barisPerHalaman;
@@ -211,11 +221,11 @@
             const dataHalamanIni = dataTersaring.slice(indexAwal, indexAkhir);
 
             dataHalamanIni.forEach(item => {
-                const namaMkEncoded = encodeURIComponent(item.nama_mk);
+                const namaMkEncoded = encodeURIComponent(item.nama_mk || '');
                 tableBody.innerHTML += `
                     <tr>
-                        <td style="font-weight: 700; color: var(--primary-red);">${item.kode_mk}</td>
-                        <td style="font-weight: 600;">${item.nama_mk}</td>
+                        <td style="font-weight: 700; color: var(--primary-red);">${item.kode_mk || '-'}</td>
+                        <td style="font-weight: 600;">${item.nama_mk || '-'}</td>
                         <td>Semester Ganjil</td>
                         <td style="text-align: center;">
                             <a href="portofolio_detail.html?kode_mk=${item.kode_mk}&nama_mk=${namaMkEncoded}" class="btn-detail">
@@ -229,19 +239,18 @@
             renderPaginasi(totalHalaman, indexAwal, dataHalamanIni.length, dataTersaring.length);
         }
 
-        // 4. Fungsi Gambar Tombol Paginasi
+        // 4. Fungsi Lukis Butang Paginasi
         function renderPaginasi(totalHalaman, indexAwal, jumlahSaatIni, totalData) {
             const areaPaginasi = document.getElementById('areaPaginasi');
             
             let htmlPaginasi = `
                 <div class="pagination-info">
-                    Menampilkan <strong>${indexAwal + 1} - ${indexAwal + jumlahSaatIni}</strong> dari <strong>${totalData}</strong> mata kuliah
+                    Menampilkan <strong>${indexAwal + 1} - ${indexAwal + jumlahSaatIni}</strong> daripada <strong>${totalData}</strong> mata kuliah
                 </div>
                 <div class="pagination-buttons">
                     <button class="page-btn" ${halamanSaatIni === 1 ? 'disabled' : ''} onclick="gantiHalaman(${halamanSaatIni - 1})">Prev</button>
             `;
 
-            // Membuat deretan angka halaman
             for (let i = 1; i <= totalHalaman; i++) {
                 htmlPaginasi += `<button class="page-btn ${i === halamanSaatIni ? 'active' : ''}" onclick="gantiHalaman(${i})">${i}</button>`;
             }
@@ -254,13 +263,13 @@
             areaPaginasi.innerHTML = htmlPaginasi;
         }
 
-        // 5. Fungsi Pindah Halaman
+        // 5. Fungsi Tukar Halaman
         function gantiHalaman(halamanTujuan) {
             halamanSaatIni = halamanTujuan;
             renderTabelMatkul();
         }
 
-        // Jalankan fungsi saat web pertama kali di-load
+        // Jalankan fungsi saat web mula-mula dimuatkan
         window.onload = loadDaftarMatkulPortofolio;
     </script>
 </body>

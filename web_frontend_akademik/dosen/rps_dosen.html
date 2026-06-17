@@ -1,320 +1,1232 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Penyusunan RPS - Panel Dosen</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Manajemen RPS - Panel Dosen</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+     <script src="../js/api_config.js"></script>
+
     <style>
         :root {
             --primary-navy: #0f172a;
             --primary-blue: #1e3a8a;
             --primary-red: #8b0000;
-            --primary-teal: #0d9488;
+            --primary-purple: #6b21a8;
             --text-dark: #111827;
             --text-gray: #6b7280;
+            --border-color: #e5e7eb;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: #f8fafc; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-        /* NAVBAR DOSEN MURNI */
+        body {
+            background-color: #f8fafc;
+            color: var(--text-dark);
+        }
+
+        /* NAVBAR DOSEN */
         .navbar {
-            background-color: var(--primary-navy); padding: 15px 40px; 
-            display: flex; justify-content: space-between; align-items: center; color: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            background-color: var(--primary-navy);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        .nav-links { display: flex; gap: 30px; font-weight: 500; font-size: 0.95rem; align-items: center; }
-        .nav-links a { color: white; text-decoration: none; transition: 0.3s; padding-bottom: 4px; opacity: 0.8; }
-        .nav-links a:hover, .nav-links a.active { opacity: 1; font-weight: 800; border-bottom: 2px solid #10b981; }
-        .nav-user { display: flex; align-items: center; gap: 16px; font-weight: 600; }
-        .user-chip { background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; color: #ffffff; border: 1px solid rgba(255,255,255,0.2); }
-        .btn-logout { background: #dc2626; color: white; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold; transition: 0.2s; }
-        .btn-logout:hover { background: #b91c1c; }
 
-        /* KONTEN UTAMA */
-        .container { max-width: 1400px; margin: 40px auto; padding: 0 20px; }
-        .figma-card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; overflow-x: auto; }
-        
-        .btn-action { background: #10b981; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .btn-action:hover { background: #059669; transform: translateY(-2px); }
-        
-        .btn-next { background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .btn-next:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
-        .btn-next:hover:not(:disabled) { background: #2563eb; transform: translateY(-2px); }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            align-items: center;
+        }
 
-        /* TABEL RPS DOSEN */
-        .table-rps { min-width: 1400px; width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .table-rps th { background: #111827; color: white; border: 1px solid #374151; padding: 12px 10px; text-align: center; font-size: 0.85rem; text-transform: uppercase; }
-        .table-rps td { border: 1px solid #cbd5e1; padding: 8px; vertical-align: top; }
-        
-        .rps-input { width: 100%; min-height: 50px; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 0.85rem; resize: vertical; outline: none; background: #f8fafc; transition: 0.2s;}
-        .rps-input:focus { border-color: #3b82f6; background: white; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+            padding-bottom: 4px;
+            opacity: 0.8;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        .nav-links a.active {
+            opacity: 1;
+            font-weight: 800;
+            border-bottom: 2px solid #ffc561;
+        }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-weight: 600;
+        }
+
+        .user-chip {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-logout {
+            background: var(--primary-red);
+            color: white;
+            padding: 8px 24px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .figma-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e5e7eb;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .header-title {
+            margin: 0 0 5px 0;
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            font-weight: 800;
+        }
+
+        /* VIEW 1: DAFTAR RPS */
+        #view-list {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        table tr:first-child th:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        table tr:first-child th:last-child {
+            border-top-right-radius: 8px;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #334155;
+            padding: 16px 15px;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            color: #1f2937;
+            vertical-align: middle;
+            background: white;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .badge-dosen-blue {
+            background: #3b82f6;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: white;
+            text-align: center;
+        }
+
+        .status-pend {
+            background: #ef4444;
+        }
+
+        .btn-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .btn-opsi {
+            background: var(--primary-purple);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-opsi:hover {
+            background: #581c87;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            margin-top: 5px;
+            min-width: 180px;
+            z-index: 999;
+            display: none;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 12px 15px;
+            display: block;
+            color: #334155;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-bottom: 1px solid #f1f5f9;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #f8fafc;
+            color: var(--primary-purple);
+            padding-left: 20px;
+        }
+
+        /* VIEW 2: KELENGKAPAN RPS (TABS) */
+        #view-detail {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tabs-header {
+            display: flex;
+            overflow-x: auto;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .tab-btn {
+            padding: 16px 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #64748b;
+            background: white;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+            font-family: 'Inter';
+        }
+
+        .tab-btn:hover {
+            background: #f8fafc;
+            color: var(--primary-navy);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-purple);
+            border-bottom-color: var(--primary-purple);
+            background: #fbf5ff;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            min-height: 400px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .grid-2-col {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-family: 'Inter';
+            font-size: 0.95rem;
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .box-catatan {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+        }
+
+        .box-catatan h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+            color: #334155;
+        }
+
+        .box-catatan p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #3b82f6;
+            font-style: italic;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        /* TABEL SESI PERTEMUAN (TAB 5) */
+        .table-sesi {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+        }
+
+        .table-sesi th {
+            background: var(--primary-navy);
+            color: white;
+            padding: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .table-sesi td {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            vertical-align: top;
+            background: white;
+        }
+
+        .input-rps {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-family: 'Inter';
+            font-size: 0.85rem;
+            resize: none !important;
+            overflow: hidden !important;
+            background: #f8fafc;
+            transition: 0.2s;
+            display: block;
+            min-height: 60px;
+        }
+
+        .input-rps:focus {
+            border-color: var(--primary-purple);
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1);
+        }
+
+        .input-number {
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-weight: bold;
+            background: white;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .row-ujian {
+            background: #fee2e2 !important;
+            color: #991b1b;
+            font-weight: 900;
+            text-align: center;
+            padding: 15px !important;
+            letter-spacing: 1px;
+        }
+
+        .btn-action {
+            background: var(--primary-purple);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn-action:hover {
+            background: #581c87;
+            transform: translateY(-2px);
+        }
+
+        .btn-kembali {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-kembali:hover {
+            background: #f1f5f9;
+        }
+
+        .content-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 0.95rem;
+            color: #334155;
+            line-height: 1.6;
+            min-height: 100px;
+        }
+
+        .list-bullet {
+            margin-left: 20px;
+            line-height: 1.6;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .list-bullet li {
+            margin-bottom: 8px;
+        }
     </style>
 </head>
+
 <body>
 
     <nav class="navbar">
-        <div style="font-weight: 900; font-size: 1.2rem; display: flex; align-items: center; gap: 10px;">
-            <i class="fas fa-chalkboard-teacher" style="color: #10b981;"></i> OBE Panel Dosen
-        </div>
+        <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
+            style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
+            onclick="window.location.href='landing_page.html'">
         <div class="nav-links">
-            <a href="input_nilai.html">Home / Input Nilai</a>
-            <a href="#" class="active">Penyusunan RPS</a>
-            <a href="portofolio.html">Portofolio Mata Kuliah</a>
+            <a href="jadwal_mengajar.html">Jadwal Mengajar</a>
+            <a href="input_nilai.html">Input Asesmen</a>
+            <a href="rps_dosen.html" class="active">Penyusunan RPS</a>
+            <a href="../kaprodi/laporan.html">Laporan OBE</a>
         </div>
-        <div class="nav-user">
+        <div class="nav-user" id="navRightContainer">
             <div class="user-chip">
-                <i class="fas fa-user-circle" style="color: #10b981;"></i> 
+                <i class="fas fa-user-circle" style="color: #ffc561;"></i>
                 <span id="dosenName">Dosen Pengampu</span>
             </div>
-            <a href="/login/login.html" class="btn-logout" onclick="localStorage.clear()"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+            <button class="btn-logout" onclick="logout()">Log Out</button>
         </div>
     </nav>
 
     <main class="container">
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
-            <div>
-                <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a; font-weight: 800;">Penyusunan <span id="judulProdi" style="color: var(--primary-red);">RPS</span></h1>
-                <p style="margin: 0; color: #64748b;">Lengkapi rencana 16 pertemuan sebelum menyusun Rencana Tugas dan Rubrik.</p>
+
+        <div id="view-list">
+            <div class="header-section">
+                <div>
+                    <h1 class="header-title">Rencana Pembelajaran Semester (RPS)</h1>
+                    <p style="margin: 0; color: var(--text-gray);">Daftar RPS dari mata kuliah yang Anda ampu pada
+                        semester ini.</p>
+                </div>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-action" onclick="simpanRPSDosen()" id="btnSimpanRPS">
-                    <i class="fas fa-save"></i> Simpan Dokumen RPS
-                </button>
-                <button class="btn-next" onclick="keHalamanTugas()" id="btnNext" disabled title="Simpan RPS terlebih dahulu">
-                    Lanjut: Susun Tugas & Rubrik <i class="fas fa-arrow-right"></i>
-                </button>
+
+            <div class="figma-card">
+                <h3 class="section-title" id="lblProdiTitle" style="border: none;">Program Studi</h3>
+
+                <table id="tabelDaftarRPS">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Mata Kuliah</th>
+                            <th style="width: 10%; text-align: center;">Semester</th>
+                            <th style="width: 30%;">Tim Dosen</th>
+                            <th style="width: 15%; text-align: center;">Persetujuan RPS</th>
+                            <th style="width: 10%; text-align: center;">Catatan</th>
+                            <th style="width: 10%; text-align: center;">Opsi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyDaftarRPS">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 40px;"><i
+                                    class="fas fa-spinner fa-spin"></i> Memuat daftar RPS...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <datalist id="cpmk_options"></datalist>
-
-        <div class="figma-card">
-            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1;">
-                <label style="font-weight: 700; color: #334155;"><i class="fas fa-book-open"></i> Pilih Mata Kuliah Anda:</label>
-                <select id="selectMK" style="width: 400px; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; font-family: 'Inter';" onchange="loadDataRPS()">
-                    <option value="" disabled selected>⏳ Memuat Mata Kuliah dari Server...</option>
-                </select>
+        <div id="view-detail">
+            <div class="header-section">
+                <div>
+                    <h1 class="header-title">Kelengkapan RPS</h1>
+                    <p style="margin: 0; color: var(--text-gray);">Susun dan lengkapi detail RPS untuk Mata Kuliah Anda.
+                    </p>
+                </div>
+                <button class="btn-kembali" onclick="kembaliKeList()">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+                </button>
             </div>
 
-            <table class="table-rps">
-                <thead>
-                    <tr>
-                        <th width="4%">MG</th>
-                        <th width="10%">ID CPMK</th>
-                        <th width="15%">DESKRIPSI SUB CPMK</th>
-                        <th width="13%">INDIKATOR KETERCAPAIAN</th>
-                        <th width="10%">BENTUK ASSESSMEN</th>
-                        <th width="12%">MATERI POKOK</th>
-                        <th width="10%">METODE</th>
-                        <th width="13%">LUAR JARINGAN (LURING)</th>
-                        <th width="13%">DALAM JARINGAN (DARING)</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyRPS">
-                    <tr>
-                        <td colspan="9" style="text-align: center; padding: 40px; color: #94a3b8; font-style: italic;">
-                            <i class="fas fa-arrow-up"></i> Silakan pilih mata kuliah di atas untuk mulai menyusun RPS.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <h3 id="lblDetailMK" style="color: var(--primary-navy); margin-bottom: 20px; font-weight: 800;">-</h3>
+
+            <div class="tabs-container" style="display: block;">
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="bukaTab(event, 'tab-detail')">Detail</button>
+                    <button class="tab-btn" onclick="bukaTab(event, 'tab-cpl')">CPL & CPMK</button>
+                    <button class="tab-btn" onclick="bukaTab(event, 'tab-deskripsi')">Deskripsi Mata Kuliah</button>
+                    <button class="tab-btn" onclick="bukaTab(event, 'tab-pustaka')">Pustaka</button>
+                    <button class="tab-btn" onclick="bukaTab(event, 'tab-sesi')"
+                        style="color: #8b0000; font-weight: 800;">Sesi Pertemuan</button>
+                    <button class="tab-btn" onclick="bukaTab(event, 'tab-teknik')">Teknik Penilaian</button>
+                    <button class="tab-btn" onclick="bukaTab(event, 'tab-prosedur')">Prosedur Penilaian</button>
+                </div>
+
+                <div id="tab-detail" class="tab-content active">
+                    <h3 class="section-title">Detail RPS</h3>
+                    <div class="grid-2-col">
+                        <div>
+                            <div class="form-group">
+                                <label>Mata Kuliah</label>
+                                <input type="text" id="dtlMk" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Rumpun</label>
+                                <input type="text" id="dtlRumpun" class="form-control" readonly>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div class="form-group">
+                                    <label>Semester</label>
+                                    <input type="text" id="dtlSem" class="form-control" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tanggal Penyusunan</label>
+                                    <input type="text" id="dtlTgl" class="form-control" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="box-catatan">
+                                <h4>Catatan Revisi RPS dari Prodi:</h4>
+                                <p>Belum/tidak ada catatan dari prodi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-cpl" class="tab-content">
+                    <div class="grid-2-col">
+                        <div>
+                            <h3 class="section-title">CPL-PRODI yang dibebankan pada MK</h3>
+                            <div id="valCpl" class="content-box">
+                                <i class="fas fa-spinner fa-spin" style="color:var(--primary-blue);"></i> Menarik
+                                pemetaan CPL...
+                            </div>
+                            <br>
+                            <h3 class="section-title">Capaian Pembelajaran Mata Kuliah (CPMK)</h3>
+                            <div id="valCpmk" class="content-box">
+                                <i class="fas fa-spinner fa-spin" style="color:var(--primary-blue);"></i> Menarik
+                                pemetaan CPMK...
+                            </div>
+                        </div>
+                        <div>
+                            <div class="box-catatan">
+                                <h4>Informasi:</h4>
+                                <p style="color:#64748b;">CPL dan CPMK ditarik otomatis berdasarkan pemetaan di relasi
+                                    Master Kurikulum oleh Kaprodi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-deskripsi" class="tab-content">
+                    <div class="grid-2-col">
+                        <div>
+                            <h3 class="section-title">Deskripsi Singkat MK</h3>
+                            <div id="valDeskripsi" class="content-box">Menarik data dari server...</div>
+
+                            <h3 class="section-title" style="margin-top: 20px;">Bahan Kajian : Materi Pembelajaran</h3>
+                            <div id="valBahanKajian" class="content-box">Menarik data dari server...</div>
+                        </div>
+                        <div>
+                            <div class="box-catatan">
+                                <h4>Informasi:</h4>
+                                <p style="color:#64748b;">Deskripsi diambil dari Master Kurikulum yang telah disetujui
+                                    Kaprodi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-pustaka" class="tab-content">
+                    <div class="grid-2-col">
+                        <div>
+                            <h3 class="section-title">Pustaka Utama</h3>
+                            <div id="valPustakaUtama" class="content-box">Menarik data dari server...</div>
+
+                            <h3 class="section-title" style="margin-top: 20px;">Pustaka Pendukung</h3>
+                            <div id="valPustakaPendukung" class="content-box">Menarik data dari server...</div>
+                        </div>
+                        <div>
+                            <div class="box-catatan">
+                                <h4>Informasi:</h4>
+                                <p style="color:#64748b;">Referensi pustaka ditetapkan berdasarkan konsorsium bidang
+                                    keilmuan prodi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-sesi" class="tab-content">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 class="section-title" style="margin: 0; border: none;">Rencana Pertemuan 1 - 16</h3>
+                        <button class="btn-action" onclick="simpanRPSDosen()" id="btnSimpanRPS">
+                            <i class="fas fa-save"></i> Simpan Sesi Pertemuan
+                        </button>
+                    </div>
+
+                    <table class="table-sesi">
+                        <thead>
+                            <tr>
+                                <th width="5%">MG</th>
+                                <th width="20%">KEMAMPUAN AKHIR (CPMK)</th>
+                                <th width="25%">BAHAN KAJIAN (MATERI)</th>
+                                <th width="15%">METODE PEMBELAJARAN</th>
+                                <th width="8%">WAKTU (MENIT)</th>
+                                <th width="19%">KRITERIA & INDIKATOR PENILAIAN</th>
+                                <th width="8%">BOBOT (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyTabelSesi">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px;"><i
+                                        class="fas fa-spinner fa-spin"></i> Menarik data pertemuan...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="tab-teknik" class="tab-content">
+                    <h3 class="section-title">Teknik Penilaian CPMK (Dibuat Otomatis)</h3>
+                    <p style="color: #64748b; margin-bottom: 20px;">Pemetaan bentuk evaluasi yang disimpulkan dari
+                        inputan Sesi Pertemuan Anda.</p>
+                    <table class="table-sesi" style="text-align: center;">
+                        <thead>
+                            <tr>
+                                <th>Mata Kuliah</th>
+                                <th>Target CPMK</th>
+                                <th>Tugas</th>
+                                <th>Tes Tulis (UTS)</th>
+                                <th>Presentasi</th>
+                                <th>Tes Tulis (UAS)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyTeknikTabel">
+                            <tr>
+                                <td colspan="6">Menyiapkan data pemetaan...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="tab-prosedur" class="tab-content">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 class="section-title" style="margin: 0; border: none;">Prosedur Penilaian CPMK (Dibuat
+                            Otomatis)</h3>
+                        <button class="btn-action" style="background: #0284c7;" onclick="keHalamanRubrik()">
+                            <i class="fas fa-list-alt"></i> Susun Rubrik & Tugas Detail
+                        </button>
+                    </div>
+                    <p style="color: #64748b; margin-bottom: 20px;">Rincian ini otomatis muncul jika Anda mengisi nilai
+                        BOBOT lebih dari 0 pada sesi pertemuan.</p>
+                    <table class="table-sesi" style="text-align: center;">
+                        <thead>
+                            <tr>
+                                <th>Pertemuan Ke-</th>
+                                <th>Target CPMK</th>
+                                <th>Kriteria Penilaian</th>
+                                <th>Bobot %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyProsedurTabel">
+                            <tr>
+                                <td colspan="4">Belum ada prosedur penilaian tercatat. Pastikan bobot > 0.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
         </div>
+
     </main>
 
     <script>
-        // PENTING: Ganti URL di bawah dengan link Cloudflare Tunnel n8n Anda!
-        const API_BASE = "https://wooden-branches-elimination-tube.trycloudflare.com/webhook";
-        const API_METADATA = `${API_BASE}/get-metadata`;
-        const API_GET_RPS = `${API_BASE}/get-rps-detail`; 
-        const API_SIMPAN_RPS = `${API_BASE}/simpan-rps`;
-        const API_CPMK_LIST = `${API_BASE}/get-cpmk-list`;
-        
-        // Identitas Dosen dari Login
-        const userNidn = localStorage.getItem("user_nidn") || "0610029301";
-        const userProdi = localStorage.getItem("prodi_aktif") || "ti";
-        let masterCPMK = [];
-        
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
-            if(userProdi === 'si') {
-                document.getElementById("judulProdi").style.color = "var(--primary-teal)";
-            }
-        });
+        const API_GET_KELAS = `${API_BASE}/get-kelas-aktif`;
+        const API_GET_MATKUL = `${ API_BASE}/get-master-matkul`;
+        const API_GET_RPS = `${API_BASE}/get-rps-detail`;
+        const API_SIMPAN_RPS = `${ API_BASE}/simpan-rps`;
+        const API_GET_INFO_MK = `${ API_BASE}/get-info-mk`;
 
-        // 1. FUNGSI LOAD MASTER CPMK UNTUK AUTOFILL
-        async function loadMasterCPMK() {
-            try {
-                const res = await fetch(`${API_CPMK_LIST}?prodi=${userProdi}`);
-                if (res.ok) {
-                    masterCPMK = await res.json();
-                    let htmlOptions = "";
-                    masterCPMK.forEach(item => {
-                        htmlOptions += `<option value="${item.kode_cpmk}">${item.deskripsi}</option>`;
-                    });
-                    document.getElementById('cpmk_options').innerHTML = htmlOptions;
+        // API BARU: Untuk menarik relasi CPL dan CPMK langsung dari 3 tabel MySQL
+        const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
+
+        const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
+        const userNidn = localStorage.getItem("user_nidn");
+        const userRoleSekarang = localStorage.getItem("user_role");
+        const userProdiSekarang = localStorage.getItem("prodi_aktif") || "ti";
+
+        document.getElementById("dosenName").innerText = userLogin;
+
+        const stringProdi = userProdiSekarang === 'si' ? 'Sistem Informasi' : 'Informatika';
+        document.getElementById("lblProdiTitle").innerText = "Program Studi " + stringProdi;
+
+        let currentMkDipilih = "";
+        let globalDaftarMK = [];
+
+        // FUNGSI EXTRAKSI ARRAY AMAN
+        function extractDBRows(obj, requiredKey) {
+            let results = [];
+            if (!obj) return results;
+
+            if (Array.isArray(obj)) {
+                obj.forEach(item => {
+                    results = results.concat(extractDBRows(item, requiredKey));
+                });
+            } else if (typeof obj === 'object') {
+                if (requiredKey in obj) {
+                    results.push(obj);
+                } else {
+                    for (let key in obj) {
+                        results = results.concat(extractDBRows(obj[key], requiredKey));
+                    }
                 }
-            } catch (e) { console.error("Gagal memuat master CPMK:", e); }
-        }
-
-        // 2. FUNGSI AUTOFILL DESKRIPSI
-        function isiOtomatisDeskripsi(indexBaris) {
-            const inputKode = document.getElementById(`id_cpmk_${indexBaris}`).value;
-            const cpmkDitemukan = masterCPMK.find(item => item.kode_cpmk === inputKode);
-            
-            if (cpmkDitemukan) {
-                const colDesc = document.getElementById(`sub_cpmk_${indexBaris}`);
-                colDesc.value = cpmkDitemukan.deskripsi;
-                colDesc.style.backgroundColor = userProdi === 'si' ? "#ccfbf1" : "#fecaca";
-                setTimeout(() => { colDesc.style.backgroundColor = "#f8fafc"; }, 600);
             }
+            return results;
         }
 
-        // 3. FUNGSI LOAD MATA KULIAH DOSEN
-        async function loadMataKuliahDosen() {
-            const selectMK = document.getElementById("selectMK");
-            try {
-                const res = await fetch(`${API_METADATA}?prodi=${userProdi}&context=dosen&nidn=${userNidn}`);
-                let data = await res.json();
-                
-                // Filter hanya yang tipenya 'mk'
-                const daftarMK = data.filter(item => item.tipe === 'mk');
+        if (userRoleSekarang === "admin") {
+            const navRightContainer = document.getElementById("navRightContainer");
+            const btnKembali = document.createElement("a");
+            btnKembali.href = userProdiSekarang === "si" ? "../kaprodi/kaprodi_si/admin_config_si.html" : "../kaprodi/kaprodi_ti/admin_config.html";
+            btnKembali.innerHTML = '<i class="fas fa-shield-alt"></i> Kembali ke Admin';
+            btnKembali.style.background = "#8b0000";
+            btnKembali.style.color = "white";
+            btnKembali.style.padding = "8px 16px";
+            btnKembali.style.borderRadius = "50px";
+            btnKembali.style.fontWeight = "bold";
+            btnKembali.style.textDecoration = "none";
+            btnKembali.style.fontSize = "0.85rem";
+            btnKembali.style.marginRight = "10px";
+            navRightContainer.insertBefore(btnKembali, navRightContainer.firstChild);
+        }
 
-                selectMK.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah Anda --</option>';
-                if(daftarMK.length === 0) {
-                    selectMK.innerHTML = '<option value="" disabled selected>Belum ada jadwal MK untuk Anda.</option>';
+        async function loadDaftarRPS() {
+            const tbody = document.getElementById("bodyDaftarRPS");
+            try {
+                const [resKelas, resMatkul] = await Promise.all([
+                    fetch(API_GET_KELAS),
+                    fetch(API_GET_MATKUL)
+                ]);
+
+                const jsonKelas = await resKelas.json();
+                const jsonMatkul = await resMatkul.json();
+
+                let dataKelasRaw = extractDBRows(jsonKelas, 'kode_mk');
+                let dataMatkulRaw = extractDBRows(jsonMatkul, 'kode_mk');
+
+                let gabunganData = dataKelasRaw.map(kelas => {
+                    const matkulCocok = dataMatkulRaw.find(m => m.kode_mk === kelas.kode_mk);
+                    return {
+                        kode_mk: kelas.kode_mk,
+                        nidn: kelas.nidn,
+                        semester: kelas.semester,
+                        nama_mk: matkulCocok ? matkulCocok.nama_mk : "MK Tidak Ditemukan",
+                        sks: matkulCocok ? matkulCocok.sks : "-",
+                        prodi: matkulCocok ? matkulCocok.prodi : "-"
+                    };
+                });
+
+                let dataJadwalGlobal = [];
+                if (userRoleSekarang === "admin") {
+                    dataJadwalGlobal = gabunganData.filter(item => item.prodi.toLowerCase() === userProdiSekarang.toLowerCase() || item.prodi === "-");
+                } else if (userNidn) {
+                    dataJadwalGlobal = gabunganData.filter(item => item.nidn === userNidn);
+                } else {
+                    dataJadwalGlobal = gabunganData;
+                }
+
+                const uniqueMKMap = new Map();
+                dataJadwalGlobal.forEach(item => {
+                    if (!uniqueMKMap.has(item.kode_mk)) {
+                        uniqueMKMap.set(item.kode_mk, item);
+                    }
+                });
+
+                globalDaftarMK = Array.from(uniqueMKMap.values());
+                tbody.innerHTML = "";
+
+                if (globalDaftarMK.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada jadwal MK untuk Anda.</td></tr>`;
                     return;
                 }
 
-                // ✨ JURUS SARINGAN ANTI-DUPLIKAT ✨
-                let mkUnik = new Set();
+                globalDaftarMK.forEach(mk => {
+                    const safeKode = mk.kode_mk.replace(/\s+/g, '-');
+                    const statusAcc = `<span class="badge-status status-pend">Belum Disetujui</span>`;
+                    const dosenHtml = `<span class="badge-dosen-blue">${userLogin}</span><br><small style="color:#64748b; font-weight:600; margin-left:5px;">Koordinator</small>`;
 
-                daftarMK.forEach(mk => {
-                    // Jika kode mata kuliah belum ada di dalam Set, maka tambahkan ke dropdown
-                    if (!mkUnik.has(mk.kode)) {
-                        mkUnik.add(mk.kode);
-                        selectMK.innerHTML += `<option value="${mk.kode}">[${mk.kode}] ${mk.label}</option>`;
-                    }
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <strong>${mk.kode_mk} - ${mk.nama_mk.toUpperCase()}</strong><br>
+                                <span style="font-size:0.8rem; color:#64748b;">S1 - ${stringProdi}</span>
+                            </td>
+                            <td style="text-align: center; font-weight:bold;">${mk.semester}</td>
+                            <td>${dosenHtml}</td>
+                            <td style="text-align: center;">${statusAcc}</td>
+                            <td style="text-align: center; color: #64748b;">-</td>
+                            <td style="text-align: center;">
+                                <div class="btn-dropdown-wrapper">
+                                    <button class="btn-opsi" onclick="toggleOpsiMenu(event, 'menu-${safeKode}')">
+                                        <i class="fas fa-cog"></i> Opsi RPS
+                                    </button>
+                                    <div class="dropdown-menu" id="menu-${safeKode}" style="text-align: left;">
+                                        <div class="dropdown-item" onclick="bukaDetailRPS('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')"><i class="fas fa-file-alt" style="width:20px;"></i> Detail RPS</div>
+                                        <div class="dropdown-item"><i class="fas fa-comment-dots" style="width:20px;"></i> Catatan Revisi</div>
+                                        <div class="dropdown-item" onclick="bukaHalamanCetak('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')"><i class="fas fa-print" style="width:20px;"></i> Cetak RPS</div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
                 });
-            } catch(e) {
-                selectMK.innerHTML = '<option value="" disabled selected>Gagal memuat data MK dari server.</option>';
+
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:red;">Gagal memuat data dari server.</td></tr>`;
             }
         }
 
-        // 4. FUNGSI LOAD DATA RPS BERDASARKAN MK
-        async function loadDataRPS() {
-            const kodeMK = document.getElementById("selectMK").value;
-            const tbody = document.getElementById("bodyRPS");
-            
-            if(!kodeMK) return;
+        async function loadInfoKelengkapanRPS(kodeMK) {
+            // Tarik Info Umum dan Relasi CPL-CPMK secara berbarengan
+            const reqInfo = fetch(`${API_GET_INFO_MK}?kode_mk=${kodeMK}`).catch(() => null);
+            const reqCplCpmk = fetch(`${API_GET_CPL_CPMK}?kode_mk=${kodeMK}`).catch(() => null);
 
-            tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 40px; color:#64748b;">Mempersiapkan Editor RPS... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
+            const [resInfo, resCplCpmk] = await Promise.all([reqInfo, reqCplCpmk]);
+
+            // === 1. PARSING INFO UMUM ===
+            try {
+                if (resInfo && resInfo.ok) {
+                    const data = await resInfo.json();
+                    document.getElementById('dtlRumpun').value = data.rumpun || "Belum diatur";
+                    document.getElementById('dtlTgl').value = data.tanggal_penyusunan || "-";
+                    document.getElementById('valDeskripsi').innerHTML = data.deskripsi || "Belum ada Deskripsi";
+                    document.getElementById('valBahanKajian').innerHTML = data.bahan_kajian || "Belum ada Bahan Kajian";
+                    document.getElementById('valPustakaUtama').innerHTML = data.pustaka_utama || "Belum ada pustaka";
+                    document.getElementById('valPustakaPendukung').innerHTML = data.pustaka_pendukung || "Belum ada pustaka";
+
+                    localStorage.setItem('cetak_koordinator', data.koordinator || "Belum Diatur");
+                    localStorage.setItem('cetak_kaprodi', data.kaprodi || "Belum Diatur");
+                }
+            } catch (e) {
+                console.warn("API Get Info MK error/tidak lengkap");
+            }
+
+            // === 2. PARSING CPL & CPMK (DARI 3 TABEL MYSQL) ===
+            try {
+                if (resCplCpmk && resCplCpmk.ok) {
+                    const jsonCpl = await resCplCpmk.json();
+                    const dataCplCpmk = extractDBRows(jsonCpl, 'kode_cpmk'); // Extract array yang punya atribut kode_cpmk
+
+                    if (dataCplCpmk.length > 0) {
+                        const cplMap = new Map();
+                        const cpmkArray = [];
+
+                        // Looping hasil JOIN dari MySQL
+                        dataCplCpmk.forEach(row => {
+                            // Masukkan CPL ke Map agar tidak terjadi duplikat jika 1 CPL membawahi banyak CPMK
+                            if (row.kode_cpl && row.deskripsi_cpl) {
+                                cplMap.set(row.kode_cpl, row.deskripsi_cpl);
+                            }
+                            // Masukkan list CPMK (Lengkap dengan referensi CPL-nya)
+                            if (row.kode_cpmk && row.deskripsi_cpmk) {
+                                cpmkArray.push(`<li><strong>${row.kode_cpmk}</strong> - ${row.deskripsi_cpmk} <em>(Ref: ${row.kode_cpl || '-'})</em></li>`);
+                            }
+                        });
+
+                        // Render CPL ke HTML
+                        let cplHtml = '<ul class="list-bullet">';
+                        cplMap.forEach((desc, kode) => {
+                            cplHtml += `<li><strong>${kode}</strong> - ${desc}</li>`;
+                        });
+                        cplHtml += '</ul>';
+
+                        // Render CPMK ke HTML
+                        let cpmkHtml = '<ul class="list-bullet">' + cpmkArray.join('') + '</ul>';
+
+                        document.getElementById('valCpl').innerHTML = cplMap.size > 0 ? cplHtml : '<span style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> Data CPL kosong.</span>';
+                        document.getElementById('valCpmk').innerHTML = cpmkArray.length > 0 ? cpmkHtml : '<span style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> Data CPMK kosong.</span>';
+                    } else {
+                        // Jika array kosong
+                        const errHtml = `<span style="color:#ef4444; font-weight:bold;"><i class="fas fa-exclamation-triangle"></i> Mata Kuliah ini belum dipetakan ke CPMK oleh Kaprodi di database.</span>`;
+                        document.getElementById('valCpl').innerHTML = errHtml;
+                        document.getElementById('valCpmk').innerHTML = errHtml;
+                    }
+                } else {
+                    throw new Error("Webhook n8n Get CPL CPMK tidak merespon 200 OK");
+                }
+            } catch (e) {
+                console.error("Gagal menarik relasi CPL CPMK:", e);
+                const errHtml = `<span style="color:#ef4444; font-weight:bold;"><i class="fas fa-exclamation-triangle"></i> Gagal terhubung ke Webhook Get CPL CPMK.</span>`;
+                document.getElementById('valCpl').innerHTML = errHtml;
+                document.getElementById('valCpmk').innerHTML = errHtml;
+            }
+        }
+
+        function bukaDetailRPS(kode_mk, nama_mk, semester, sks) {
+            currentMkDipilih = kode_mk;
+
+            document.getElementById('view-list').style.display = 'none';
+            document.getElementById('view-detail').style.display = 'block';
+
+            document.getElementById('lblDetailMK').innerText = `${kode_mk} - ${nama_mk.toUpperCase()}`;
+            document.getElementById('dtlMk').value = `${kode_mk} - ${nama_mk.toUpperCase()}`;
+            document.getElementById('dtlSem').value = semester;
+
+            loadInfoKelengkapanRPS(kode_mk);
+            loadDataRPSTable(kode_mk);
+        }
+
+        function kembaliKeList() {
+            document.getElementById('view-detail').style.display = 'none';
+            document.getElementById('view-list').style.display = 'block';
+            currentMkDipilih = "";
+        }
+
+        function bukaTab(evt, namaTab) {
+            const tabcontent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+            const tablinks = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(namaTab).style.display = "block";
+            document.getElementById(namaTab).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        async function loadDataRPSTable(kodeMK) {
+            const tbodySesi = document.getElementById("bodyTabelSesi");
+            const tbodyTeknik = document.getElementById("bodyTeknikTabel");
+            const tbodyProsedur = document.getElementById("bodyProsedurTabel");
+
+            tbodySesi.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">Menarik rencana 16 pertemuan... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
 
             try {
-                const res = await fetch(`${API_GET_RPS}?kode_mk=${kodeMK}`);
-                let rpsData = await res.json();
-                generateTabelRPS(rpsData);
-            } catch(e) {
-                // Jika error/kosong, tetap munculkan tabel kosong 16 baris
-                generateTabelRPS([]); 
+                const res = await fetch(`${API_GET_RPS}?kode=${kodeMK}`);
+                const rpsDataJSON = await res.json();
+                let rpsData = extractDBRows(rpsDataJSON, 'pertemuan');
+
+                generateSemuaTabel(rpsData, kodeMK);
+            } catch (e) {
+                generateSemuaTabel([], kodeMK);
             }
         }
 
-        // 5. GENERATE BARIS TABEL (16 PERTEMUAN)
-        function generateTabelRPS(existingData = []) {
-            const tbody = document.getElementById("bodyRPS");
-            let html = "";
-            if(!Array.isArray(existingData)) existingData = [];
+        function generateSemuaTabel(existingData = [], kodeMK) {
+            const tbodySesi = document.getElementById("bodyTabelSesi");
+            const tbodyTeknik = document.getElementById("bodyTeknikTabel");
+            const tbodyProsedur = document.getElementById("bodyProsedurTabel");
 
-            for(let i = 1; i <= 16; i++) {
-                const rowData = existingData.find(item => parseInt(item.pertemuan_ke) === i) || {};
-                
-                const warnaHighlight = userProdi === 'si' ? '#f0fdfa' : '#fef2f2';
-                const textHighlight = userProdi === 'si' ? 'var(--primary-teal)' : 'var(--primary-red)';
-                
-                // Memberikan warna khusus untuk UTS (8) dan UAS (16)
-                const bgStyle = (i === 8 || i === 16) ? `style="background: ${warnaHighlight};"` : '';
-                const placeholderHint = i === 8 ? "[UTS] " : (i === 16 ? "[UAS] " : "");
+            let htmlSesi = "";
+            let htmlTeknik = "";
+            let htmlProsedur = "";
 
-                html += `
-                    <tr ${bgStyle}>
-                        <td style="text-align: center; font-weight: 800; color: ${ (i===8 || i===16) ? textHighlight : '#475569' }; padding-top: 15px; font-size:1.1rem;">${i}</td>
-                        <td><input type="text" list="cpmk_options" class="rps-input" id="id_cpmk_${i}" value="${rowData.id_cpmk || ''}" placeholder="Pilih..." onchange="isiOtomatisDeskripsi(${i})"></td>
-                        <td><textarea class="rps-input" id="sub_cpmk_${i}" placeholder="${placeholderHint}Deskripsi...">${rowData.kemampuan_akhir || ''}</textarea></td>
-                        <td><textarea class="rps-input" id="indikator_${i}" placeholder="Indikator...">${rowData.indikator_pencapaian || ''}</textarea></td>
-                        <td><textarea class="rps-input" id="assessmen_${i}" placeholder="Asesmen...">${rowData.bentuk_pembelajaran || ''}</textarea></td>
-                        <td><textarea class="rps-input" id="materi_${i}" placeholder="Materi...">${rowData.materi_pembelajaran || ''}</textarea></td>
-                        <td><textarea class="rps-input" id="metode_${i}" placeholder="Metode...">${rowData.metode_pembelajaran || ''}</textarea></td>
-                        <td><textarea class="rps-input" id="tatap_muka_${i}" placeholder="Tatap Muka...">${rowData.tatap_muka || ''}</textarea></td>
-                        <td><textarea class="rps-input" id="daring_${i}" placeholder="Daring...">${rowData.daring || ''}</textarea></td>
+            for (let i = 1; i <= 16; i++) {
+                if (i === 8) {
+                    htmlSesi += `<tr><td colspan="7" class="row-ujian">UJIAN TENGAH SEMESTER (UTS)</td></tr>`;
+                    continue;
+                }
+                if (i === 16) {
+                    htmlSesi += `<tr><td colspan="7" class="row-ujian">UJIAN AKHIR SEMESTER (UAS)</td></tr>`;
+                    continue;
+                }
+
+                const rowData = existingData.find(item => parseInt(item.pertemuan) === i) || {};
+
+                htmlSesi += `
+                    <tr>
+                        <td style="text-align: center; font-weight: bold; padding-top: 20px;">${i}</td>
+                        <td><textarea class="input-rps cpmk-input" placeholder="Misal: CPMK081" data-minggu="${i}">${rowData.cpmk || rowData.kode_cpmk || ''}</textarea></td>
+                        <td><textarea class="input-rps materi-input" placeholder="Materi yang dibahas" data-minggu="${i}">${rowData.materi || rowData.bahan_kajian || ''}</textarea></td>
+                        <td><textarea class="input-rps metode-input" placeholder="Misal: Kuliah, Diskusi" data-minggu="${i}">${rowData.metode || rowData.metode_pembelajaran || ''}</textarea></td>
+                        <td><input type="number" class="input-number waktu-input" data-minggu="${i}" value="${rowData.waktu || rowData.estimasi_waktu || 150}"></td>
+                        <td><textarea class="input-rps kriteria-input" placeholder="Misal: Kriteria: Rubrik Analitik..." data-minggu="${i}">${rowData.kriteria || rowData.indikator_pencapaian || ''}</textarea></td>
+                        <td><input type="number" class="input-number bobot-input" data-minggu="${i}" value="${rowData.bobot || rowData.bobot_penilaian || rowData.bobot_persen || 0}" step="0.1"></td>
                     </tr>
                 `;
+
+                const valBobot = parseFloat(rowData.bobot || rowData.bobot_penilaian || rowData.bobot_persen || 0);
+
+                if (valBobot > 0) {
+                    htmlProsedur += `
+                        <tr>
+                            <td>Pertemuan ${i}</td>
+                            <td style="font-weight:bold;">${rowData.cpmk || rowData.kode_cpmk || '-'}</td>
+                            <td>${rowData.kriteria || rowData.indikator_pencapaian || 'Penilaian Tugas'}</td>
+                            <td style="font-weight:bold; color:var(--primary-blue);">${valBobot}%</td>
+                        </tr>
+                    `;
+
+                    htmlTeknik += `
+                        <tr>
+                            <td style="font-weight:bold;">${kodeMK}</td>
+                            <td>${rowData.cpmk || rowData.kode_cpmk || '-'}</td>
+                            <td><i class="fas fa-check" style="color: #10b981;"></i></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    `;
+                }
             }
-            tbody.innerHTML = html;
+
+            tbodySesi.innerHTML = htmlSesi;
+            tbodyProsedur.innerHTML = htmlProsedur || `<tr><td colspan="4" style="color:#64748b; padding:20px;">Belum ada penugasan dengan nilai bobot.</td></tr>`;
+            tbodyTeknik.innerHTML = htmlTeknik || `<tr><td colspan="6" style="color:#64748b; padding:20px;">Belum ada pemetaan teknik penilaian.</td></tr>`;
+
+            const textareas = document.querySelectorAll('.input-rps');
+            textareas.forEach(tx => {
+                tx.style.height = 'auto';
+                tx.style.height = (tx.scrollHeight) + 'px';
+                tx.addEventListener('input', function () {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            });
         }
 
-        // 6. FUNGSI SIMPAN & AKTIFKAN TOMBOL LANJUT
         async function simpanRPSDosen() {
-            const kodeMK = document.getElementById("selectMK").value;
-            if(!kodeMK) { alert("⚠️ Pilih Mata Kuliah Anda terlebih dahulu!"); return; }
+            if (!currentMkDipilih) return;
 
             const btn = document.getElementById("btnSimpanRPS");
-            const btnNext = document.getElementById("btnNext");
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             btn.disabled = true;
 
             let dataPertemuan = [];
             for (let i = 1; i <= 16; i++) {
-                dataPertemuan.push({
-                    pertemuan: i,
-                    id_cpmk: document.getElementById(`id_cpmk_${i}`).value.trim(),
-                    sub_cpmk: document.getElementById(`sub_cpmk_${i}`).value.trim(),
-                    indikator: document.getElementById(`indikator_${i}`).value.trim(),
-                    assessmen: document.getElementById(`assessmen_${i}`).value.trim(),
-                    materi: document.getElementById(`materi_${i}`).value.trim(),
-                    metode: document.getElementById(`metode_${i}`).value.trim(),
-                    tatap_muka: document.getElementById(`tatap_muka_${i}`).value.trim(),
-                    daring: document.getElementById(`daring_${i}`).value.trim()
-                });
+                if (i === 8 || i === 16) continue;
+
+                const valCpmk = document.querySelector(`.cpmk-input[data-minggu="${i}"]`).value.trim();
+                const valMateri = document.querySelector(`.materi-input[data-minggu="${i}"]`).value.trim();
+                const valMetode = document.querySelector(`.metode-input[data-minggu="${i}"]`).value.trim();
+                const valWaktu = document.querySelector(`.waktu-input[data-minggu="${i}"]`).value;
+                const valKriteria = document.querySelector(`.kriteria-input[data-minggu="${i}"]`).value.trim();
+                const valBobot = document.querySelector(`.bobot-input[data-minggu="${i}"]`).value;
+
+                if (valCpmk || valMateri) {
+                    dataPertemuan.push({
+                        pertemuan: i,
+                        cpmk: valCpmk,
+                        materi: valMateri,
+                        metode: valMetode,
+                        waktu: valWaktu,
+                        kriteria: valKriteria,
+                        bobot: valBobot
+                    });
+                }
             }
 
-            const payload = { kode_mk: kodeMK, nidn_dosen: userNidn, detail_pertemuan: dataPertemuan };
+            const payload = { kode_mk: currentMkDipilih, nidn_dosen: userNidn, detail_pertemuan: dataPertemuan };
 
             try {
-                const res = await fetch(API_SIMPAN_RPS, { 
+                const res = await fetch(API_SIMPAN_RPS, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                if(res.ok) {
-                    alert("✅ RPS Berhasil Disimpan! Anda sekarang bisa lanjut menyusun Tugas & Rubrik.");
-                    btnNext.disabled = false; // AKTIFKAN TOMBOL LANJUT
+                if (res.ok) {
+                    alert("✅ Rencana Sesi Pertemuan Berhasil Disimpan!");
+                    loadDataRPSTable(currentMkDipilih);
                 } else {
-                    alert("❌ Gagal menyimpan data. Periksa n8n Anda.");
+                    alert("❌ Gagal menyimpan. Periksa koneksi ke n8n.");
                 }
-            } catch(e) { alert("⚠️ Terjadi kesalahan jaringan saat menghubungi server N8N."); }
+            } catch (e) {
+                alert("❌ Terjadi kesalahan jaringan (Server n8n belum siap).");
+            }
 
-            btn.innerHTML = '<i class="fas fa-save"></i> Simpan Dokumen RPS';
+            btn.innerHTML = '<i class="fas fa-save"></i> Simpan Sesi Pertemuan';
             btn.disabled = false;
         }
 
-        // 7. NAVIGASI KE HALAMAN TUGAS
-        function keHalamanTugas() {
-            const kodeMK = document.getElementById("selectMK").value;
-            window.location.href = `rencana_tugas_rubrik.html?kode_mk=${kodeMK}`;
+        function toggleOpsiMenu(event, menuId) {
+            event.stopPropagation();
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.id !== menuId) menu.classList.remove('show');
+            });
+            document.getElementById(menuId).classList.toggle('show');
         }
 
-        // JALANKAN SAAT HALAMAN DIMUAT
-        window.onload = async () => {
-            await loadMataKuliahDosen();
-            await loadMasterCPMK(); 
-        };
+        document.addEventListener('click', function () {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => { menu.classList.remove('show'); });
+        });
+
+        function bukaHalamanCetak(kode_mk, nama_mk, semester, sks) {
+            localStorage.setItem('cetak_kode_mk', kode_mk);
+            localStorage.setItem('cetak_nama_mk', nama_mk);
+            localStorage.setItem('cetak_semester', semester);
+            localStorage.setItem('cetak_sks', sks);
+
+            window.open(`cetak_rps.html?mk=${kode_mk}`, '_blank');
+        }
+
+        function keHalamanRubrik() {
+            if (!currentMkDipilih) return;
+            window.location.href = `rencana_tugas_rubrik.html?kode_mk=${currentMkDipilih}`;
+        }
+
+        function logout() { localStorage.clear(); window.location.replace("../login/login.html"); }
+
+        window.onload = loadDaftarRPS;
     </script>
 </body>
+
 </html>

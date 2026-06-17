@@ -8,6 +8,7 @@
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <script src="../../../js/api_config.js"></script>
     
     <style>
         /* --- CSS STYLING UTAMA --- */
@@ -113,15 +114,13 @@
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace('/login/login.html');
 
-    const BASE_N8N_URL = 'https://toolbox-router-wyoming-definitions.trycloudflare.com'; 
-
     // 2. PENGATURAN API N8N 
     async function fetchDataRumpunBK() {
         const tableBody = document.getElementById('tableBodyRumpun');
         tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Menarik data...</td></tr>';
         
         try {
-            const API_URL = `${BASE_N8N_URL}/webhook/get-master-bk?prodi=si`;
+            const API_URL = `${API_BASE}/get-master-bk?prodi=si`;
             
             const response = await fetch(API_URL);
             const textData = await response.text();

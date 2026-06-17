@@ -29,6 +29,7 @@
             @page { size: A4 portrait; margin: 15mm; }
         }
     </style>
+     <script src="../js/api_config.js"></script>
 </head>
 <body>
 
@@ -40,7 +41,7 @@
     <div id="megaRenderContainer"></div>
 
     <script>
-        const BASE_N8N_URL = 'https://wooden-branches-elimination-tube.trycloudflare.com';
+  
 
         async function loadSemuaTugasMatkul() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -50,7 +51,7 @@
             if(!kodeMk) return alert("⚠️ Parameter Kode MK tidak ditemukan!");
 
             try {
-                const response = await fetch(`${BASE_N8N_URL}/webhook/get-rubrik-by-matkul?kode_mk=${kodeMk}`);
+                const response = await fetch(`${API_BASE}/get-rubrik-by-matkul?kode_mk=${kodeMk}`);
                 const textData = await response.text();
 
                 if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {
