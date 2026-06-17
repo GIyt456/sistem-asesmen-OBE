@@ -7,6 +7,7 @@
     <title>Data MBKM - Panel Kaprodi</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../../../js/template.js"></script>
 
     <style>
         :root {
@@ -20,8 +21,18 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-light);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Pembungkus Konten Utama */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
         }
 
         .container {
@@ -33,155 +44,103 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        .page-title {
-            font-size: 2rem;
+        h2 {
+            color: var(--primary-red);
             font-weight: 800;
             margin-bottom: 25px;
-            color: #000;
-            letter-spacing: -0.5px;
-        }
-
-        .page-title span {
-            color: var(--primary-red);
-        }
-
-        .info-box {
-            background-color: #5bc0de;
-            color: white;
-            padding: 18px 24px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        .selection-card {
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
-            margin-bottom: 20px;
+            background: #fdfdfd;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
         }
 
-        .input-group {
+        .form-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .input-group label {
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.85rem;
             font-weight: 600;
-            font-size: 0.9rem;
             color: #4b5563;
         }
 
-        .input-group input,
-        .input-group select,
-        .form-control {
-            padding: 10px 15px;
-            border: 1.5px solid #d1d5db;
+        input,
+        select,
+        textarea {
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
             border-radius: 6px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            outline: none;
-            transition: 0.2s;
-            width: 100%;
-            box-sizing: border-box;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: all 0.2s;
         }
 
-        .input-group input:focus,
-        .input-group select:focus,
-        .form-control:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
             border-color: var(--primary-red);
             box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
         }
 
-        .input-readonly {
-            background-color: #f9fafb !important;
-            cursor: not-allowed;
-            color: #4b5563;
-            font-weight: 600;
-            border-color: #e5e7eb !important;
-        }
-
-        .loading-text {
-            font-size: 0.8rem;
-            color: #0369a1;
-            font-weight: 600;
-            display: none;
-            margin-top: -5px;
-        }
-
-        /* --- STYLING CUSTOM DROPDOWN PENCARIAN (BERBENTUK TOMBOL) --- */
-        .custom-dropdown {
+        /* CUSTOM DROPDOWN MAHASISWA */
+        .dropdown-wrapper {
             position: relative;
-            width: 100%;
-            cursor: pointer;
         }
 
-        .custom-dropdown input {
-            width: 100%;
-            padding: 12px 40px 12px 15px;
-            border: 1.5px solid #d1d5db;
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1f2937;
-            outline: none;
-            transition: 0.2s;
-            box-sizing: border-box;
-            cursor: pointer;
-            background-color: #f9fafb;
-        }
-
-        .custom-dropdown input:focus,
-        .custom-dropdown.active input {
-            border-color: var(--primary-red);
-            background-color: #ffffff;
-            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
-        }
-
-        .dropdown-toggle-btn {
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            width: 45px;
+        .search-container {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: #6b7280;
-            border-radius: 0 8px 8px 0;
-            transition: 0.2s;
+            position: relative;
         }
 
-        .custom-dropdown.active .dropdown-toggle-btn {
+        .search-container input {
+            width: 100%;
+            padding-right: 40px;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            right: 12px;
+            cursor: pointer;
+            color: #6b7280;
+            transition: transform 0.2s;
+        }
+
+        .dropdown-wrapper.active .toggle-btn {
             transform: rotate(180deg);
-            color: var(--primary-red);
         }
 
         .dropdown-list {
             position: absolute;
             top: 100%;
             left: 0;
-            right: 0;
+            width: 100%;
             background: white;
             border: 1px solid #d1d5db;
-            border-radius: 8px;
-            margin-top: 5px;
+            border-radius: 6px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            max-height: 220px;
+            max-height: 200px;
             overflow-y: auto;
-            z-index: 50;
+            z-index: 10;
             display: none;
+            margin-top: 4px;
         }
 
         .dropdown-list.show {
@@ -189,15 +148,11 @@
         }
 
         .dropdown-item {
-            padding: 12px 15px;
+            padding: 10px 12px;
             cursor: pointer;
-            border-bottom: 1px solid #f3f4f6;
             font-size: 0.9rem;
-            color: #1f2937;
-            transition: 0.15s;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
+            transition: background 0.1s;
+            border-bottom: 1px solid #f3f4f6;
         }
 
         .dropdown-item:last-child {
@@ -205,587 +160,440 @@
         }
 
         .dropdown-item:hover {
-            background-color: #fef2f2;
-        }
-
-        .dropdown-item strong {
+            background: #f3f4f6;
             color: var(--primary-red);
-            font-size: 0.95rem;
+            font-weight: 600;
         }
 
-        .dropdown-item span {
-            font-size: 0.75rem;
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        /* --- MODAL POP-UP EDIT --- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-box {
-            background: white;
-            padding: 32px;
-            border-radius: 12px;
-            width: 500px;
-            max-width: 90%;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 700;
+        .no-result {
+            padding: 10px 12px;
+            color: #9ca3af;
+            font-style: italic;
+            text-align: center;
             font-size: 0.9rem;
-            margin-bottom: 8px;
-            color: var(--text-dark);
         }
 
-        /* --- Tabel --- */
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            grid-column: span 2;
             margin-top: 10px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 8px;
-            overflow: hidden;
         }
 
-        th {
-            background-color: #f3f4f6;
-            text-align: left;
-            padding: 14px 16px;
-            border-bottom: 2px solid #e5e7eb;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: #1f2937;
-        }
-
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 0.9rem;
-            color: #111827;
-        }
-
-        tr:hover {
-            background-color: #f9fafb;
-        }
-
-        /* --- Tombol --- */
-        .btn-primary {
-            background: var(--primary-red);
-            color: white;
-            border: none;
-            padding: 12px 24px;
+        button {
+            padding: 10px 20px;
             border-radius: 6px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
+            transition: all 0.2s;
+            display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .btn-primary:hover:not(:disabled) {
-            background: #6b0000;
-            transform: translateY(-2px);
-        }
-
-        .btn-primary:disabled {
-            background: #d1d5db;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #4b5563;
-            border: 1.5px solid #d1d5db;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-outline:hover {
-            background: #f3f4f6;
-            border-color: #9ca3af;
-        }
-
-        .btn-action-edit {
-            color: #f59e0b;
-            border-color: #fcd34d;
-        }
-
-        .btn-action-edit:hover {
-            background: #fef3c7;
-            border-color: #f59e0b;
-        }
-
-        .btn-action-delete {
-            color: #ef4444;
-            border-color: #fca5a5;
-        }
-
-        .btn-action-delete:hover {
-            background: #fef2f2;
-            border-color: #ef4444;
-        }
-
-        .btn-preview {
-            background: #e0f2fe;
-            color: #0369a1;
+        .btn-primary {
+            background: var(--primary-red);
+            color: white;
             border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
         }
 
-        .btn-preview:hover {
-            background: #bae6fd;
+        .btn-primary:hover {
+            background: #6b0000;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
+
+        /* TABLE STYLES */
+        .table-responsive {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: #f3f4f6;
+            color: #374151;
+            font-weight: 700;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            color: #4b5563;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f9fafb;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-table {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+        }
+
+        .btn-edit {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+        }
+
+        .btn-edit:hover {
+            background: #dbeafe;
+        }
+
+        .btn-delete {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-delete:hover {
+            background: #fee2e2;
         }
 
         .badge {
-            background: #eef2ff;
-            color: #4338ca;
-            padding: 4px 10px;
-            border-radius: 4px;
+            padding: 4px 8px;
+            border-radius: 50px;
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
+            display: inline-block;
         }
 
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
+        .badge-aktif {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-selesai {
+            background: #e0f2fe;
+            color: #0369a1;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <h1 class="page-title">Data <span>MBKM</span></h1>
+    <div id="sidebar-container"></div>
 
-        <div class="info-box">
-            <strong>Pusat Data MBKM:</strong> Kelola pendaftaran MBKM mahasiswa. Data ditarik dari
-            <code>master_mahasiswa</code> dan disimpan ke <code>master_mbkm</code>.
-        </div>
+    <div class="main-content">
+        <div class="container">
+            <h2><i class="fas fa-university"></i> Master Data Manajemen MBKM</h2>
 
-        <div class="selection-card" id="formCard">
-            <h3 style="margin: 0 0 20px 0; font-size: 1.1rem; color: #111827;">Pendaftaran MBKM Baru</h3>
-            <div class="form-grid">
-                <div class="input-group">
-                    <label>NIM Mahasiswa</label>
-                    <div class="custom-dropdown" id="dropdownWrapper">
-                        <input type="text" id="nimSearch" placeholder="Menghubungkan ke database..." autocomplete="off"
-                            disabled>
-                        <div class="dropdown-toggle-btn" id="dropdownToggleBtn">
-                            <i class="fas fa-chevron-down"></i>
+            <form id="formMBKM" onsubmit="simpanMBKM(event)">
+                <input type="hidden" id="id_mbkm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Cari Mahasiswa (NIM / Nama)</label>
+                        <div class="dropdown-wrapper" id="dropdownWrapper">
+                            <div class="search-container">
+                                <input type="text" id="searchMahasiswa" placeholder="Ketik NIM atau Nama..."
+                                    autocomplete="off">
+                                <i class="fas fa-chevron-down toggle-btn" id="toggleBtn"></i>
+                            </div>
+                            <div class="dropdown-list" id="dropdownList">
+                            </div>
                         </div>
-                        <div class="dropdown-list" id="nimList"></div>
                     </div>
-                    <span id="loadingDb" class="loading-text"><i class="fas fa-spinner fa-spin"></i> Menarik data
-                        NIM...</span>
+
+                    <div class="form-group">
+                        <label>Nama Mahasiswa Terpilih</label>
+                        <input type="text" id="inputNama" placeholder="Otomatis terisi..." readonly
+                            style="background: #f3f4f6; font-weight: bold; color: #374151;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Jenis Program MBKM</label>
+                        <select id="jenis_mbkm" required>
+                            <option value="">-- Pilih Program --</option>
+                            <option value="Magang Bersertifikat">Magang Bersertifikat</option>
+                            <option value="Studi Independen Bersertifikat">Studi Independen Bersertifikat</option>
+                            <option value="Kampus Mengajar">Kampus Mengajar</option>
+                            <option value="Pertukaran Mahasiswa Merdeka">Pertukaran Mahasiswa Merdeka</option>
+                            <option value="Wirausaha Merdeka">Wirausaha Merdeka</option>
+                            <option value="KKN Tematik">KKN Tematik</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nama Mitra / Instansi Pelaksana</label>
+                        <input type="text" id="mitra" placeholder="Contoh: PT. Telkom Indonesia" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nomor SK MBKM / Surat Tugas</label>
+                        <input type="text" id="sk_mbkm" placeholder="Contoh: 120/SK/FTI/UNAKI/2026" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Status Keaktifan Program</label>
+                        <select id="status" required>
+                            <option value="Aktif">Aktif Berjalan</option>
+                            <option value="Selesai">Selesai Program</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tanggal Mulai Kegiatan</label>
+                        <input type="date" id="tanggal_mulai" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tanggal Selesai Kegiatan</label>
+                        <input type="date" id="tanggal_selesai" required>
+                    </div>
+
+                    <div class="btn-container">
+                        <button type="button" class="btn-secondary" onclick="resetForm()"><i class="fas fa-undo"></i>
+                            Batal</button>
+                        <button type="submit" class="btn-primary" id="btnSimpan"><i class="fas fa-save"></i> Simpan Data
+                            MBKM</button>
+                    </div>
                 </div>
+            </form>
 
-                <div class="input-group">
-                    <label>Nama Lengkap</label>
-                    <input type="text" id="nama" class="input-readonly" placeholder="Otomatis terisi" readonly
-                        tabindex="-1">
-                </div>
-
-                <div class="input-group">
-                    <label>Program MBKM</label>
-                    <select id="jenis_mbkm">
-                        <option value="Magang Merdeka (MSIB)">Magang Merdeka (MSIB)</option>
-                        <option value="Studi Independen (MSIB)">Studi Independen (MSIB)</option>
-                        <option value="Kampus Mengajar">Kampus Mengajar</option>
-                        <option value="Pertukaran Mahasiswa">Pertukaran Mahasiswa</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Mitra / Tempat Magang</label>
-                    <input type="text" id="mitra" placeholder="Nama Instansi atau Perusahaan">
-                </div>
-                <div class="input-group">
-                    <label>Dosen Pembimbing Internal</label>
-                    <input type="text" id="dosen" placeholder="Nama Dosen Pembimbing">
-                </div>
-                <div class="input-group">
-                    <label>Upload Bukti MBKM (PDF)</label>
-                    <input type="file" id="bukti" accept=".pdf" style="padding: 7px 10px;">
-                </div>
-            </div>
-            <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
-                <button class="btn-primary" id="btnSimpan" onclick="simpanDataMBKM()">
-                    <i class="fas fa-save"></i> Simpan Pendaftaran
-                </button>
-            </div>
-        </div>
-
-        <div class="clearfix">
-            <h3 style="float: left; margin-bottom: 15px; font-size: 1.2rem;">Daftar Peserta MBKM Aktif</h3>
-            <button class="btn-outline" style="float: right;" onclick="loadDataMBKM()">
-                <i class="fas fa-sync-alt"></i> Refresh Tabel
-            </button>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 10%;">NIM</th>
-                    <th style="width: 18%;">Nama Mahasiswa</th>
-                    <th style="width: 15%;">Program</th>
-                    <th style="width: 17%;">Mitra</th>
-                    <th style="width: 15%;">Bukti / Sertifikat</th>
-                    <th style="width: 15%;">Pembimbing</th>
-                    <th style="width: 10%; text-align: center;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="tableBodyMBKM">
-                <tr>
-                    <td colspan="7" style="text-align: center; color: #6b7280; padding: 20px;">Memuat data registrasi...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <div id="modalEditMBKM" class="modal-overlay">
-        <div class="modal-box">
-            <h3
-                style="margin-top: 0; color: #d97706; font-size: 1.4rem; font-weight: 800; border-bottom: 2px solid #fef3c7; padding-bottom: 10px;">
-                <i class="fas fa-edit"></i> Edit Data MBKM
-            </h3>
-
-            <input type="hidden" id="editId">
-
-            <div class="form-group">
-                <label>NIM Mahasiswa</label>
-                <input type="text" id="editNim" class="form-control input-readonly" readonly>
-            </div>
-
-            <div class="form-group">
-                <label>Nama Lengkap</label>
-                <input type="text" id="editNama" class="form-control input-readonly" readonly>
-            </div>
-
-            <div class="form-group">
-                <label>Program MBKM</label>
-                <select id="editProgram" class="form-control">
-                    <option value="Magang Merdeka (MSIB)">Magang Merdeka (MSIB)</option>
-                    <option value="Studi Independen (MSIB)">Studi Independen (MSIB)</option>
-                    <option value="Kampus Mengajar">Kampus Mengajar</option>
-                    <option value="Pertukaran Mahasiswa">Pertukaran Mahasiswa</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Mitra / Tempat Magang</label>
-                <input type="text" id="editMitra" class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label>Dosen Pembimbing Internal</label>
-                <input type="text" id="editDosen" class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label>Upload Bukti Baru (Opsional)</label>
-                <input type="file" id="editBukti" class="form-control" accept=".pdf" style="padding: 7px 10px;">
-                <small style="color: #d97706; font-weight: 600; display: block; margin-top: 5px;">*Abaikan jika tidak
-                    ingin mengubah file PDF sebelumnya.</small>
-            </div>
-
-            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
-                <button onclick="tutupModalEdit()" class="btn-outline" style="padding: 10px 20px;">Batal</button>
-                <button onclick="updateDataMBKM()" class="btn-primary" id="btnUpdateModal"
-                    style="background: #f59e0b; padding: 10px 20px;">
-                    <i class="fas fa-save"></i> Update Data
-                </button>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 5%; text-align: center;">No</th>
+                            <th style="width: 12%;">NIM</th>
+                            <th style="width: 20%;">Nama Mahasiswa</th>
+                            <th style="width: 18%;">Jenis MBKM</th>
+                            <th style="width: 20%;">Mitra / Instansi</th>
+                            <th style="width: 10%; text-align: center;">Status</th>
+                            <th style="width: 15%; text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTabelMBKM">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 30px;"><i
+                                    class="fas fa-spinner fa-spin"></i> Menghubungkan ke database server...</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
     <script>
-        // URL BARU N8N
-        const BASE_N8N_URL = "https://wooden-branches-elimination-tube.trycloudflare.com";
-        const API_GET_MHS = `${BASE_N8N_URL}/webhook/get-mahasiswa-db`;
-        const API_SAVE_MBKM = `${BASE_N8N_URL}/webhook/save-mbkm-data`;
-        const API_UPDATE_MBKM = `${BASE_N8N_URL}/webhook/update-mbkm-data`;
-        const API_DELETE_MBKM = `${BASE_N8N_URL}/webhook/delete-mbkm-data`;
-        const API_LOAD_MBKM = `${BASE_N8N_URL}/webhook/get-mbkm-data`;
+        const BASE_URL = "https://playing-heath-pointed-instance.trycloudflare.com/webhook";
+        const API_GET_MHS = `${BASE_URL}/get-master-mahasiswa`;
+        const API_GET_MBKM = `${BASE_URL}/get-mbkm`;
+        const API_SIMPAN_MBKM = `${BASE_URL}/simpan-mbkm`;
+        const API_HAPUS_MBKM = `${BASE_URL}/hapus-mbkm`;
 
         let dataMahasiswa = [];
-        let listPendaftarAktif = [];
-        let oldFileData = { name: "", base64: "" };
+        let selectedNim = "";
 
-        const toBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
+        const dropdownWrapper = document.getElementById("dropdownWrapper");
+        const searchInput = document.getElementById("searchMahasiswa");
+        const dropdownList = document.getElementById("dropdownList");
+        const toggleBtn = document.getElementById("toggleBtn");
+        const inputNama = document.getElementById("inputNama");
 
-        // 1. LOAD DAFTAR MAHASISWA
+        // 1. Tarik Master Mahasiswa untuk Dropdown
         async function loadMahasiswa() {
             try {
-                const res = await fetch(API_GET_MHS);
+                const prodi = localStorage.getItem("prodi_aktif") || "ti";
+                const res = await fetch(`${API_GET_MHS}?prodi=${prodi}`);
+                if (!res.ok) throw new Error();
                 const json = await res.json();
-                dataMahasiswa = json.data || json;
-                document.getElementById("nimSearch").disabled = false;
-                document.getElementById("nimSearch").placeholder = "Pilih / Ketik NIM Mahasiswa...";
-                document.getElementById("loadingDb").style.display = "none";
+                dataMahasiswa = Array.isArray(json) ? json : (json.data || []);
                 renderDropdown(dataMahasiswa);
-            } catch (e) { console.error(e); }
-        }
-
-        // 2. LOAD DATA TABEL
-        async function loadDataMBKM() {
-            const tbody = document.getElementById("tableBodyMBKM");
-            try {
-                const res = await fetch(API_LOAD_MBKM);
-                const json = await res.json();
-                listPendaftarAktif = json.data || json;
-
-                tbody.innerHTML = "";
-                if (listPendaftarAktif.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Belum ada pendaftar MBKM.</td></tr>';
-                    return;
-                }
-
-                listPendaftarAktif.forEach(item => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td><strong>${item.nim}</strong></td>
-                        <td>${item.nama}</td>
-                        <td><span class="badge">${item.program}</span></td>
-                        <td>${item.mitra}</td>
-                        <td>
-                            ${item.file_base64 ?
-                            `<button class="btn-preview" onclick="previewPDF('${item.file_base64}')"><i class="fas fa-file-pdf"></i> Preview</button>` :
-                            '<span style="color:#9ca3af; font-size:0.8rem;">No File</span>'}
-                        </td>
-                        <td>${item.dosen_pembimbing || '-'}</td>
-                        <td style="text-align: center; display: flex; gap: 5px; justify-content: center;">
-                            <button class="btn-outline btn-action-edit" onclick="bukaModalEdit(${item.id})" title="Edit Data"><i class="fas fa-edit"></i></button>
-                            <button class="btn-outline btn-action-delete" onclick="hapusDataMBKM(${item.id})" title="Hapus Data"><i class="fas fa-trash"></i></button>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
             } catch (e) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color:red;">Gagal memuat data tabel.</td></tr>';
+                console.error("Gagal memuat master mahasiswa.");
             }
         }
 
-        function previewPDF(base64) {
-            const win = window.open();
-            win.document.write(`<iframe src="${base64}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
-        }
-
-        // ==========================================
-        // 3. LOGIKA POP-UP EDIT DATA
-        // ==========================================
-        function bukaModalEdit(id) {
-            const data = listPendaftarAktif.find(x => x.id === id);
-            if (!data) return;
-
-            oldFileData = { name: data.file_name, base64: data.file_base64 };
-
-            document.getElementById("editId").value = data.id;
-            document.getElementById("editNim").value = data.nim;
-            document.getElementById("editNama").value = data.nama;
-            document.getElementById("editProgram").value = data.program;
-            document.getElementById("editMitra").value = data.mitra;
-            document.getElementById("editDosen").value = data.dosen_pembimbing || "";
-            document.getElementById("editBukti").value = "";
-
-            document.getElementById("modalEditMBKM").style.display = "flex";
-        }
-
-        function tutupModalEdit() {
-            document.getElementById("modalEditMBKM").style.display = "none";
-        }
-
-        async function updateDataMBKM() {
-            const payload = {
-                id: document.getElementById("editId").value,
-                nim: document.getElementById("editNim").value,
-                nama: document.getElementById("editNama").value,
-                program: document.getElementById("editProgram").value,
-                mitra: document.getElementById("editMitra").value,
-                dosen_pembimbing: document.getElementById("editDosen").value,
-                file_name: oldFileData.name,
-                file_base64: oldFileData.base64
-            };
-
-            if (!payload.mitra) return alert("Mitra wajib diisi!");
-
-            const btn = document.getElementById("btnUpdateModal");
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
-            const fileInput = document.getElementById("editBukti");
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                payload.file_name = file.name;
-                payload.file_base64 = await toBase64(file);
-            }
-
-            try {
-                const response = await fetch(API_UPDATE_MBKM, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    alert("Data MBKM berhasil diperbarui!");
-                    tutupModalEdit();
-                    loadDataMBKM();
-                } else { alert("Gagal memproses data. Cek n8n."); }
-            } catch (e) { alert("Error koneksi n8n."); }
-            finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> Update Data';
-            }
-        }
-
-        async function hapusDataMBKM(id) {
-            const konfirmasi = confirm("Yakin ingin menghapus peserta ini? Data yang terhapus tidak dapat dikembalikan.");
-            if (!konfirmasi) return;
-
-            try {
-                const response = await fetch(API_DELETE_MBKM, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: id })
-                });
-
-                if (response.ok) {
-                    alert("Data berhasil dihapus!");
-                    loadDataMBKM();
-                } else {
-                    alert("Gagal menghapus data. Periksa n8n.");
-                }
-            } catch (error) {
-                alert("Gagal terhubung ke server untuk menghapus.");
-            }
-        }
-
-        // ==========================================
-        // 4. LOGIKA SIMPAN DATA BARU (FORM ATAS)
-        // ==========================================
-        async function simpanDataMBKM() {
-            const payload = {
-                nim: document.getElementById("nimSearch").value,
-                nama: document.getElementById("nama").value,
-                program: document.getElementById("jenis_mbkm").value,
-                mitra: document.getElementById("mitra").value,
-                dosen_pembimbing: document.getElementById("dosen").value,
-                file_name: "", file_base64: ""
-            };
-
-            if (!payload.nim || !payload.mitra) return alert("NIM dan Mitra wajib diisi!");
-
-            const btn = document.getElementById("btnSimpan");
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-
-            const fileInput = document.getElementById("bukti");
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                payload.file_name = file.name;
-                payload.file_base64 = await toBase64(file);
-            }
-
-            try {
-                const response = await fetch(API_SAVE_MBKM, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-
-                if (response.ok) {
-                    alert("Sukses menyimpan pendaftaran baru!");
-
-                    document.getElementById("nimSearch").value = "";
-                    document.getElementById("nama").value = "";
-                    document.getElementById("mitra").value = "";
-                    document.getElementById("dosen").value = "";
-                    document.getElementById("bukti").value = "";
-
-                    loadDataMBKM();
-                } else { alert("Gagal memproses data. Cek n8n."); }
-            } catch (e) { alert("Error koneksi n8n."); }
-            finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i> Simpan Pendaftaran';
-            }
-        }
-
-        // ==========================================
-        // 5. LOGIKA DROPDOWN PENCARIAN NIM (FITUR TOMBOL)
-        // ==========================================
-        const searchInput = document.getElementById("nimSearch");
-        const dropdownList = document.getElementById("nimList");
-        const inputNama = document.getElementById("nama");
-        const dropdownWrapper = document.getElementById("dropdownWrapper");
-        const toggleBtn = document.getElementById("dropdownToggleBtn");
-
-        function renderDropdown(dataFiltered) {
+        // Render Item Dropdown
+        function renderDropdown(array) {
             dropdownList.innerHTML = "";
-            if (dataFiltered.length === 0) {
-                dropdownList.innerHTML = '<div class="dropdown-item" style="color:#9ca3af; font-style:italic; cursor:default;">Tidak ditemukan</div>';
+            if (array.length === 0) {
+                dropdownList.innerHTML = `<div class="no-result">Mahasiswa tidak ditemukan</div>`;
                 return;
             }
-
-            dataFiltered.forEach(mhs => {
+            array.forEach(m => {
                 const div = document.createElement("div");
                 div.className = "dropdown-item";
-                div.innerHTML = `<strong>${mhs.nim}</strong> <span>${mhs.nama_mahasiswa}</span>`;
-
-                div.onclick = function (e) {
-                    e.stopPropagation();
-                    searchInput.value = mhs.nim;
-                    inputNama.value = mhs.nama_mahasiswa;
+                div.innerText = `${m.nim} - ${m.nama_mahasiswa.toUpperCase()}`;
+                div.onclick = () => {
+                    selectedNim = m.nim;
+                    searchInput.value = m.nim;
+                    inputNama.value = m.nama_mahasiswa.toUpperCase();
                     tutupDropdown();
                 };
-
                 dropdownList.appendChild(div);
             });
         }
 
+        // 2. Tarik List Data MBKM yang sudah Terdaftar
+        async function loadDataMBKM() {
+            const tbody = document.getElementById("bodyTabelMBKM");
+            try {
+                const prodi = localStorage.getItem("prodi_aktif") || "ti";
+                const res = await fetch(`${API_GET_MBKM}?prodi=${prodi}`);
+                if (!res.ok) throw new Error();
+                const json = await res.json();
+                const dataMBKM = Array.isArray(json) ? json : (json.data || []);
+
+                tbody.innerHTML = "";
+                if (dataMBKM.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px;">Belum ada mahasiswa yang mengambil program MBKM.</td></tr>`;
+                    return;
+                }
+
+                dataMBKM.forEach((item, index) => {
+                    const badgeClass = item.status === "Aktif" ? "badge-aktif" : "badge-selesai";
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td style="text-align: center; font-weight: bold;">${index + 1}</td>
+                        <td><strong>${item.nim}</strong></td>
+                        <td>${item.nama_mahasiswa.toUpperCase()}</td>
+                        <td>${item.jenis_mbkm}</td>
+                        <td>${item.mitra}</td>
+                        <td style="text-align: center;"><span class="badge ${badgeClass}">${item.status}</span></td>
+                        <td>
+                            <div class="actions" style="justify-content: center;">
+                                <button class="btn-table btn-edit" onclick="editMBKM(${item.id_mbkm}, '${item.nim}', '${item.nama_mahasiswa}', '${item.jenis_mbkm}', '${item.mitra}', '${item.sk_mbkm}', '${item.tanggal_mulai}', '${item.tanggal_selesai}', '${item.status}')"><i class="fas fa-edit"></i></button>
+                                <button class="btn-table btn-delete" onclick="hapusMBKM(${item.id_mbkm})"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:red;">Gagal memuat rekam jejak MBKM. Pastikan n8n aktif.</td></tr>`;
+            }
+        }
+
+        // 3. Simpan / Update Data ke Server N8N
+        async function simpanMBKM(e) {
+            e.preventDefault();
+            if (!selectedNim) {
+                alert("Silakan pilih mahasiswa dari sistem dropdown terlebih dahulu!");
+                return;
+            }
+
+            const id_mbkm = document.getElementById("id_mbkm").value;
+            const payload = {
+                id_mbkm: id_mbkm ? parseInt(id_mbkm) : null,
+                nim: selectedNim,
+                jenis_mbkm: document.getElementById("jenis_mbkm").value,
+                mitra: document.getElementById("mitra").value,
+                sk_mbkm: document.getElementById("sk_mbkm").value,
+                status: document.getElementById("status").value,
+                tanggal_mulai: document.getElementById("tanggal_mulai").value,
+                tanggal_selesai: document.getElementById("tanggal_selesai").value,
+                prodi: localStorage.getItem("prodi_aktif") || "ti"
+            };
+
+            try {
+                const btn = document.getElementById("btnSimpan");
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses...`;
+                btn.disabled = true;
+
+                const res = await fetch(API_SIMPAN_MBKM, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert("✅ Sukses menyimpan data registrasi MBKM!");
+                    resetForm();
+                    loadDataMBKM();
+                } else {
+                    alert("❌ Gagal memproses data.");
+                }
+            } catch (err) {
+                alert("⚠️ Masalah koneksi jaringan ke server n8n.");
+            } finally {
+                const btn = document.getElementById("btnSimpan");
+                btn.innerHTML = `<i class="fas fa-save"></i> Simpan Data MBKM`;
+                btn.disabled = false;
+            }
+        }
+
+        // 4. Set Nilai Form untuk Mode Edit
+        function editMBKM(id, nim, nama, jenis, mitra, sk, tglMulai, tglSelesai, status) {
+            document.getElementById("id_mbkm").value = id;
+            selectedNim = nim;
+            searchInput.value = nim;
+            inputNama.value = nama.toUpperCase();
+            document.getElementById("jenis_mbkm").value = jenis;
+            document.getElementById("mitra").value = mitra;
+            document.getElementById("sk_mbkm").value = sk;
+            document.getElementById("status").value = status;
+            document.getElementById("tanggal_mulai").value = tglMulai;
+            document.getElementById("tanggal_selesai").value = tglSelesai;
+            searchInput.disabled = true;
+            toggleBtn.style.pointerEvents = "none";
+            document.getElementById("btnSimpan").innerHTML = `<i class="fas fa-edit"></i> Update Data MBKM`;
+        }
+
+        // 5. Hapus Data
+        async function hapusMBKM(id) {
+            if (!confirm("Apakah Anda yakin ingin menghapus data rekam MBKM mahasiswa ini?")) return;
+            try {
+                const res = await fetch(`${API_HAPUS_MBKM}?id=${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    alert("✅ Sukses menghapus berkas MBKM!");
+                    loadDataMBKM();
+                } else {
+                    alert("❌ Gagal menghapus.");
+                }
+            } catch (e) {
+                alert("⚠️ Gangguan jaringan.");
+            }
+        }
+
+        // Reset Tampilan Form
+        function resetForm() {
+            document.getElementById("id_mbkm").value = "";
+            selectedNim = "";
+            searchInput.value = "";
+            inputNama.value = "";
+            document.getElementById("jenis_mbkm").value = "";
+            document.getElementById("mitra").value = "";
+            document.getElementById("sk_mbkm").value = "";
+            document.getElementById("status").value = "Aktif";
+            document.getElementById("tanggal_mulai").value = "";
+            document.getElementById("tanggal_selesai").value = "";
+            searchInput.disabled = false;
+            toggleBtn.style.pointerEvents = "auto";
+            document.getElementById("btnSimpan").innerHTML = `<i class="fas fa-save"></i> Simpan Data MBKM`;
+        }
+
+        // Manajemen Trigger Dropdown UI
         function bukaDropdown() {
             dropdownList.classList.add("show");
             dropdownWrapper.classList.add("active");
@@ -800,7 +608,6 @@
         function toggleDropdown(e) {
             e.stopPropagation();
             if (searchInput.disabled) return;
-
             if (dropdownList.classList.contains("show")) {
                 tutupDropdown();
             } else {
@@ -815,24 +622,38 @@
         searchInput.addEventListener("input", function (e) {
             dropdownList.classList.add("show");
             dropdownWrapper.classList.add("active");
-
             const val = e.target.value.toLowerCase();
             const filtered = dataMahasiswa.filter(m =>
-                m.nim.includes(val) ||
-                m.nama_mahasiswa.toLowerCase().includes(val)
+                m.nim.includes(val) || m.nama_mahasiswa.toLowerCase().includes(val)
             );
             renderDropdown(filtered);
-
             if (!val) inputNama.value = "";
         });
 
         document.addEventListener("click", function (event) {
-            if (!dropdownWrapper.contains(event.target)) {
-                tutupDropdown();
-            }
+            if (!dropdownWrapper.contains(event.target)) tutupDropdown();
         });
 
-        window.onload = () => { loadMahasiswa(); loadDataMBKM(); };
+        // KENDALI PENYUNTIKAN MENU AKTIF (INTEGRASI TEMPLATE.JS)
+        window.onload = () => {
+            loadMahasiswa();
+            loadDataMBKM();
+
+            setTimeout(() => {
+                const navDashboard = document.getElementById('nav-home');
+                const navMbkm = document.querySelector('[data-path="/master_data/master_mbkm.html"]');
+                const menuMaster = document.getElementById('menu-master');
+                const chevronMaster = document.getElementById('chevron-master');
+
+                if (navDashboard) navDashboard.classList.remove('active');
+                if (navMbkm) navMbkm.classList.add('active');
+
+                if (menuMaster && chevronMaster) {
+                    menuMaster.style.display = 'flex';
+                    chevronMaster.style.transform = 'rotate(180deg)';
+                }
+            }, 300);
+        };
     </script>
 </body>
 

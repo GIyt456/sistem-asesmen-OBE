@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/api_config.js"></script>
 
     <style>
         :root {
@@ -393,7 +394,7 @@
             border-bottom: 2px solid #f1f5f9;
         }
 
-        /* TABEL SESI PERTEMUAN (TAB 5) */
+        /* TABEL SESI PERTEMUAN (TAB 5) - FORMAT LAMA (9 KOLOM) */
         .table-sesi {
             width: 100%;
             border-collapse: collapse;
@@ -401,20 +402,22 @@
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #cbd5e1;
+            font-size: 0.85rem;
         }
 
         .table-sesi th {
             background: var(--primary-navy);
             color: white;
-            padding: 12px;
+            padding: 12px 10px;
             font-size: 0.8rem;
             font-weight: 700;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.15);
+            text-transform: uppercase;
         }
 
         .table-sesi td {
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #cbd5e1;
             vertical-align: top;
             background: white;
@@ -427,12 +430,12 @@
             border-radius: 6px;
             font-family: 'Inter';
             font-size: 0.85rem;
-            resize: none !important;
+            resize: vertical;
             overflow: hidden !important;
             background: #f8fafc;
             transition: 0.2s;
             display: block;
-            min-height: 60px;
+            min-height: 50px;
         }
 
         .input-rps:focus {
@@ -442,33 +445,8 @@
             box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1);
         }
 
-        .input-number {
-            width: 100%;
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-weight: bold;
-            background: white;
-        }
-
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-
         .row-ujian {
-            background: #fee2e2 !important;
-            color: #991b1b;
-            font-weight: 900;
-            text-align: center;
-            padding: 15px !important;
-            letter-spacing: 1px;
+            background: #fef2f2 !important;
         }
 
         .btn-action {
@@ -532,6 +510,8 @@
 
 <body>
 
+    <datalist id="cpmk_options"></datalist>
+
     <nav class="navbar">
         <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
             style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
@@ -593,9 +573,14 @@
                     <p style="margin: 0; color: var(--text-gray);">Susun dan lengkapi detail RPS untuk Mata Kuliah Anda.
                     </p>
                 </div>
-                <button class="btn-kembali" onclick="kembaliKeList()">
-                    <i class="fas fa-arrow-left"></i> Kembali ke Daftar
-                </button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-kembali" onclick="kembaliKeList()">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Daftar
+                    </button>
+                    <button class="btn-action" style="background: #0284c7;" onclick="keHalamanRubrik()">
+                        Lanjut ke Rubrik (RTM) <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
             </div>
 
             <h3 id="lblDetailMK" style="color: var(--primary-navy); margin-bottom: 20px; font-weight: 800;">-</h3>
@@ -608,8 +593,6 @@
                     <button class="tab-btn" onclick="bukaTab(event, 'tab-pustaka')">Pustaka</button>
                     <button class="tab-btn" onclick="bukaTab(event, 'tab-sesi')"
                         style="color: #8b0000; font-weight: 800;">Sesi Pertemuan</button>
-                    <button class="tab-btn" onclick="bukaTab(event, 'tab-teknik')">Teknik Penilaian</button>
-                    <button class="tab-btn" onclick="bukaTab(event, 'tab-prosedur')">Prosedur Penilaian</button>
                 </div>
 
                 <div id="tab-detail" class="tab-content active">
@@ -673,10 +656,12 @@
                     <div class="grid-2-col">
                         <div>
                             <h3 class="section-title">Deskripsi Singkat MK</h3>
-                            <div id="valDeskripsi" class="content-box">Menarik data dari server...</div>
+                            <textarea id="valDeskripsi" class="form-control" style="height: 120px; resize: vertical;"
+                                readonly>Menarik data dari server...</textarea>
 
                             <h3 class="section-title" style="margin-top: 20px;">Bahan Kajian : Materi Pembelajaran</h3>
-                            <div id="valBahanKajian" class="content-box">Menarik data dari server...</div>
+                            <textarea id="valBahanKajian" class="form-control" style="height: 120px; resize: vertical;"
+                                readonly>Menarik data dari server...</textarea>
                         </div>
                         <div>
                             <div class="box-catatan">
@@ -716,76 +701,29 @@
                         </button>
                     </div>
 
-                    <table class="table-sesi">
-                        <thead>
-                            <tr>
-                                <th width="5%">MG</th>
-                                <th width="20%">KEMAMPUAN AKHIR (CPMK)</th>
-                                <th width="25%">BAHAN KAJIAN (MATERI)</th>
-                                <th width="15%">METODE PEMBELAJARAN</th>
-                                <th width="8%">WAKTU (MENIT)</th>
-                                <th width="19%">KRITERIA & INDIKATOR PENILAIAN</th>
-                                <th width="8%">BOBOT (%)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyTabelSesi">
-                            <tr>
-                                <td colspan="7" style="text-align: center; padding: 40px;"><i
-                                        class="fas fa-spinner fa-spin"></i> Menarik data pertemuan...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div id="tab-teknik" class="tab-content">
-                    <h3 class="section-title">Teknik Penilaian CPMK (Dibuat Otomatis)</h3>
-                    <p style="color: #64748b; margin-bottom: 20px;">Pemetaan bentuk evaluasi yang disimpulkan dari
-                        inputan Sesi Pertemuan Anda.</p>
-                    <table class="table-sesi" style="text-align: center;">
-                        <thead>
-                            <tr>
-                                <th>Mata Kuliah</th>
-                                <th>Target CPMK</th>
-                                <th>Tugas</th>
-                                <th>Tes Tulis (UTS)</th>
-                                <th>Presentasi</th>
-                                <th>Tes Tulis (UAS)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyTeknikTabel">
-                            <tr>
-                                <td colspan="6">Menyiapkan data pemetaan...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div id="tab-prosedur" class="tab-content">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 class="section-title" style="margin: 0; border: none;">Prosedur Penilaian CPMK (Dibuat
-                            Otomatis)</h3>
-                        <button class="btn-action" style="background: #0284c7;" onclick="keHalamanRubrik()">
-                            <i class="fas fa-list-alt"></i> Susun Rubrik & Tugas Detail
-                        </button>
+                    <div style="overflow-x: auto;">
+                        <table class="table-sesi">
+                            <thead>
+                                <tr>
+                                    <th width="4%">MG</th>
+                                    <th width="10%">ID CPMK</th>
+                                    <th width="15%">DESKRIPSI SUB CPMK</th>
+                                    <th width="13%">INDIKATOR</th>
+                                    <th width="10%">BENTUK ASSESSMEN</th>
+                                    <th width="12%">MATERI POKOK</th>
+                                    <th width="10%">METODE</th>
+                                    <th width="13%">LURING</th>
+                                    <th width="13%">DARING</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyTabelSesi">
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 40px;"><i
+                                            class="fas fa-spinner fa-spin"></i> Menarik data pertemuan...</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <p style="color: #64748b; margin-bottom: 20px;">Rincian ini otomatis muncul jika Anda mengisi nilai
-                        BOBOT lebih dari 0 pada sesi pertemuan.</p>
-                    <table class="table-sesi" style="text-align: center;">
-                        <thead>
-                            <tr>
-                                <th>Pertemuan Ke-</th>
-                                <th>Target CPMK</th>
-                                <th>Kriteria Penilaian</th>
-                                <th>Bobot %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bodyProsedurTabel">
-                            <tr>
-                                <td colspan="4">Belum ada prosedur penilaian tercatat. Pastikan bobot > 0.</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
 
             </div>
@@ -794,15 +732,14 @@
     </main>
 
     <script>
-        const BASE_N8N_URL = "https://wooden-branches-elimination-tube.trycloudflare.com/webhook";
-        const API_GET_KELAS = `${BASE_N8N_URL}/get-kelas-aktif`;
-        const API_GET_MATKUL = `${BASE_N8N_URL}/get-master-matkul`;
-        const API_GET_RPS = `${BASE_N8N_URL}/get-rps-detail`;
-        const API_SIMPAN_RPS = `${BASE_N8N_URL}/simpan-rps`;
-        const API_GET_INFO_MK = `${BASE_N8N_URL}/get-info-mk`;
-
-        // API BARU: Untuk menarik relasi CPL dan CPMK langsung dari 3 tabel MySQL
-        const API_GET_CPL_CPMK = `${BASE_N8N_URL}/get-cpl-cpmk`;
+        // const BASE_N8N_URL = "https://playing-heath-pointed-instance.trycloudflare.com/webhook";
+        const API_GET_KELAS = `${API_BASE}/get-kelas-aktif`;
+        const API_GET_MATKUL = `${API_BASE}/get-master-matkul`;
+        const API_GET_RPS = `${API_BASE}/get-rps-detail`;
+        const API_SIMPAN_RPS = `${API_BASE}/simpan-rps`;
+        const API_GET_INFO_MK = `${API_BASE}/get-info-mk`;
+        const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
+        const API_CPMK_LIST = `${API_BASE}/get-cpmk-list`; // API Untuk Auto-fill CPMK
 
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
         const userNidn = localStorage.getItem("user_nidn");
@@ -816,24 +753,24 @@
 
         let currentMkDipilih = "";
         let globalDaftarMK = [];
+        let masterCPMK = [];
 
         // FUNGSI EXTRAKSI ARRAY AMAN
+        function safeExtractArray(jsonObj) {
+            if (!jsonObj) return [];
+            if (Array.isArray(jsonObj)) return jsonObj.flat(Infinity);
+            if (jsonObj.data && Array.isArray(jsonObj.data)) return jsonObj.data.flat(Infinity);
+            return [];
+        }
+
         function extractDBRows(obj, requiredKey) {
             let results = [];
             if (!obj) return results;
-
             if (Array.isArray(obj)) {
-                obj.forEach(item => {
-                    results = results.concat(extractDBRows(item, requiredKey));
-                });
+                obj.forEach(item => { results = results.concat(extractDBRows(item, requiredKey)); });
             } else if (typeof obj === 'object') {
-                if (requiredKey in obj) {
-                    results.push(obj);
-                } else {
-                    for (let key in obj) {
-                        results = results.concat(extractDBRows(obj[key], requiredKey));
-                    }
-                }
+                if (requiredKey in obj) { results.push(obj); }
+                else { for (let key in obj) { results = results.concat(extractDBRows(obj[key], requiredKey)); } }
             }
             return results;
         }
@@ -854,6 +791,37 @@
             navRightContainer.insertBefore(btnKembali, navRightContainer.firstChild);
         }
 
+        // ==========================================
+        // FUNGSI LOAD MASTER CPMK UNTUK AUTOFILL
+        // ==========================================
+        async function loadMasterCPMK() {
+            try {
+                const res = await fetch(`${API_CPMK_LIST}?prodi=${userProdiSekarang}`);
+                if (res.ok) {
+                    masterCPMK = await res.json();
+                    let htmlOptions = "";
+                    masterCPMK.forEach(item => {
+                        htmlOptions += `<option value="${item.kode_cpmk}">${item.deskripsi}</option>`;
+                    });
+                    document.getElementById('cpmk_options').innerHTML = htmlOptions;
+                }
+            } catch (e) { console.error("Gagal memuat master CPMK:", e); }
+        }
+
+        function isiOtomatisDeskripsi(indexBaris) {
+            const inputKode = document.getElementById(`id_cpmk_${indexBaris}`).value;
+            const cpmkDitemukan = masterCPMK.find(item => item.kode_cpmk === inputKode);
+
+            if (cpmkDitemukan) {
+                const colDesc = document.getElementById(`sub_cpmk_${indexBaris}`);
+                colDesc.value = cpmkDitemukan.deskripsi;
+                colDesc.style.backgroundColor = "#ccfbf1";
+                setTimeout(() => {
+                    colDesc.style.backgroundColor = (indexBaris === 8 || indexBaris === 16) ? "#fef2f2" : "#f8fafc";
+                }, 600);
+            }
+        }
+
         async function loadDaftarRPS() {
             const tbody = document.getElementById("bodyDaftarRPS");
             try {
@@ -865,8 +833,8 @@
                 const jsonKelas = await resKelas.json();
                 const jsonMatkul = await resMatkul.json();
 
-                let dataKelasRaw = extractDBRows(jsonKelas, 'kode_mk');
-                let dataMatkulRaw = extractDBRows(jsonMatkul, 'kode_mk');
+                let dataKelasRaw = safeExtractArray(jsonKelas);
+                let dataMatkulRaw = safeExtractArray(jsonMatkul);
 
                 let gabunganData = dataKelasRaw.map(kelas => {
                     const matkulCocok = dataMatkulRaw.find(m => m.kode_mk === kelas.kode_mk);
@@ -942,72 +910,63 @@
         }
 
         async function loadInfoKelengkapanRPS(kodeMK) {
-            // Tarik Info Umum dan Relasi CPL-CPMK secara berbarengan
+            document.getElementById('valCpl').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--primary-blue);"></i> Menarik pemetaan CPL...';
+            document.getElementById('valCpmk').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--primary-blue);"></i> Menarik pemetaan CPMK...';
+
             const reqInfo = fetch(`${API_GET_INFO_MK}?kode_mk=${kodeMK}`).catch(() => null);
             const reqCplCpmk = fetch(`${API_GET_CPL_CPMK}?kode_mk=${kodeMK}`).catch(() => null);
 
             const [resInfo, resCplCpmk] = await Promise.all([reqInfo, reqCplCpmk]);
 
-            // === 1. PARSING INFO UMUM ===
             try {
                 if (resInfo && resInfo.ok) {
-                    const data = await resInfo.json();
+                    const infoData = safeExtractArray(await resInfo.json());
+                    const data = infoData[0] || {};
                     document.getElementById('dtlRumpun').value = data.rumpun || "Belum diatur";
                     document.getElementById('dtlTgl').value = data.tanggal_penyusunan || "-";
-                    document.getElementById('valDeskripsi').innerHTML = data.deskripsi || "Belum ada Deskripsi";
-                    document.getElementById('valBahanKajian').innerHTML = data.bahan_kajian || "Belum ada Bahan Kajian";
+                    document.getElementById('valDeskripsi').value = data.deskripsi || "";
+                    document.getElementById('valBahanKajian').value = data.bahan_kajian || "";
                     document.getElementById('valPustakaUtama').innerHTML = data.pustaka_utama || "Belum ada pustaka";
                     document.getElementById('valPustakaPendukung').innerHTML = data.pustaka_pendukung || "Belum ada pustaka";
 
                     localStorage.setItem('cetak_koordinator', data.koordinator || "Belum Diatur");
                     localStorage.setItem('cetak_kaprodi', data.kaprodi || "Belum Diatur");
                 }
-            } catch (e) {
-                console.warn("API Get Info MK error/tidak lengkap");
-            }
+            } catch (e) { console.warn("API Get Info MK error/tidak lengkap"); }
 
-            // === 2. PARSING CPL & CPMK (DARI 3 TABEL MYSQL) ===
             try {
                 if (resCplCpmk && resCplCpmk.ok) {
                     const jsonCpl = await resCplCpmk.json();
-                    const dataCplCpmk = extractDBRows(jsonCpl, 'kode_cpmk'); // Extract array yang punya atribut kode_cpmk
+                    const dataCplCpmk = safeExtractArray(jsonCpl);
 
-                    if (dataCplCpmk.length > 0) {
+                    const filteredData = dataCplCpmk.filter(row => row.kode_cpmk);
+
+                    if (filteredData.length > 0) {
                         const cplMap = new Map();
                         const cpmkArray = [];
 
-                        // Looping hasil JOIN dari MySQL
-                        dataCplCpmk.forEach(row => {
-                            // Masukkan CPL ke Map agar tidak terjadi duplikat jika 1 CPL membawahi banyak CPMK
+                        filteredData.forEach(row => {
                             if (row.kode_cpl && row.deskripsi_cpl) {
                                 cplMap.set(row.kode_cpl, row.deskripsi_cpl);
                             }
-                            // Masukkan list CPMK (Lengkap dengan referensi CPL-nya)
                             if (row.kode_cpmk && row.deskripsi_cpmk) {
                                 cpmkArray.push(`<li><strong>${row.kode_cpmk}</strong> - ${row.deskripsi_cpmk} <em>(Ref: ${row.kode_cpl || '-'})</em></li>`);
                             }
                         });
 
-                        // Render CPL ke HTML
                         let cplHtml = '<ul class="list-bullet">';
-                        cplMap.forEach((desc, kode) => {
-                            cplHtml += `<li><strong>${kode}</strong> - ${desc}</li>`;
-                        });
+                        cplMap.forEach((desc, kode) => { cplHtml += `<li><strong>${kode}</strong> - ${desc}</li>`; });
                         cplHtml += '</ul>';
 
-                        // Render CPMK ke HTML
                         let cpmkHtml = '<ul class="list-bullet">' + cpmkArray.join('') + '</ul>';
 
                         document.getElementById('valCpl').innerHTML = cplMap.size > 0 ? cplHtml : '<span style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> Data CPL kosong.</span>';
                         document.getElementById('valCpmk').innerHTML = cpmkArray.length > 0 ? cpmkHtml : '<span style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> Data CPMK kosong.</span>';
                     } else {
-                        // Jika array kosong
                         const errHtml = `<span style="color:#ef4444; font-weight:bold;"><i class="fas fa-exclamation-triangle"></i> Mata Kuliah ini belum dipetakan ke CPMK oleh Kaprodi di database.</span>`;
                         document.getElementById('valCpl').innerHTML = errHtml;
                         document.getElementById('valCpmk').innerHTML = errHtml;
                     }
-                } else {
-                    throw new Error("Webhook n8n Get CPL CPMK tidak merespon 200 OK");
                 }
             } catch (e) {
                 console.error("Gagal menarik relasi CPL CPMK:", e);
@@ -1052,17 +1011,18 @@
             evt.currentTarget.classList.add("active");
         }
 
+        // ==========================================
+        // RENDER TABEL 16 MINGGU (BISA DIISI UTS/UAS)
+        // ==========================================
         async function loadDataRPSTable(kodeMK) {
             const tbodySesi = document.getElementById("bodyTabelSesi");
-            const tbodyTeknik = document.getElementById("bodyTeknikTabel");
-            const tbodyProsedur = document.getElementById("bodyProsedurTabel");
 
-            tbodySesi.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;">Menarik rencana 16 pertemuan... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
+            tbodySesi.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 40px;">Menarik rencana 16 pertemuan... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
 
             try {
                 const res = await fetch(`${API_GET_RPS}?kode=${kodeMK}`);
                 const rpsDataJSON = await res.json();
-                let rpsData = extractDBRows(rpsDataJSON, 'pertemuan');
+                let rpsData = safeExtractArray(rpsDataJSON);
 
                 generateSemuaTabel(rpsData, kodeMK);
             } catch (e) {
@@ -1072,65 +1032,42 @@
 
         function generateSemuaTabel(existingData = [], kodeMK) {
             const tbodySesi = document.getElementById("bodyTabelSesi");
-            const tbodyTeknik = document.getElementById("bodyTeknikTabel");
-            const tbodyProsedur = document.getElementById("bodyProsedurTabel");
-
             let htmlSesi = "";
-            let htmlTeknik = "";
-            let htmlProsedur = "";
 
             for (let i = 1; i <= 16; i++) {
-                if (i === 8) {
-                    htmlSesi += `<tr><td colspan="7" class="row-ujian">UJIAN TENGAH SEMESTER (UTS)</td></tr>`;
-                    continue;
-                }
-                if (i === 16) {
-                    htmlSesi += `<tr><td colspan="7" class="row-ujian">UJIAN AKHIR SEMESTER (UAS)</td></tr>`;
-                    continue;
-                }
-
                 const rowData = existingData.find(item => parseInt(item.pertemuan) === i) || {};
 
+                // Warna background dan placeholder khusus minggu ujian
+                let bgRowClass = '';
+                let bgInput = '#f8fafc'; // Abu terang
+                let hint = '';
+
+                if (i === 8) {
+                    bgRowClass = 'row-ujian';
+                    bgInput = '#fef2f2'; // Merah sangat terang untuk inputnya
+                    hint = '[UTS] ';
+                } else if (i === 16) {
+                    bgRowClass = 'row-ujian';
+                    bgInput = '#fef2f2';
+                    hint = '[UAS] ';
+                }
+
                 htmlSesi += `
-                    <tr>
-                        <td style="text-align: center; font-weight: bold; padding-top: 20px;">${i}</td>
-                        <td><textarea class="input-rps cpmk-input" placeholder="Misal: CPMK081" data-minggu="${i}">${rowData.cpmk || rowData.kode_cpmk || ''}</textarea></td>
-                        <td><textarea class="input-rps materi-input" placeholder="Materi yang dibahas" data-minggu="${i}">${rowData.materi || rowData.bahan_kajian || ''}</textarea></td>
-                        <td><textarea class="input-rps metode-input" placeholder="Misal: Kuliah, Diskusi" data-minggu="${i}">${rowData.metode || rowData.metode_pembelajaran || ''}</textarea></td>
-                        <td><input type="number" class="input-number waktu-input" data-minggu="${i}" value="${rowData.waktu || rowData.estimasi_waktu || 150}"></td>
-                        <td><textarea class="input-rps kriteria-input" placeholder="Misal: Kriteria: Rubrik Analitik..." data-minggu="${i}">${rowData.kriteria || rowData.indikator_pencapaian || ''}</textarea></td>
-                        <td><input type="number" class="input-number bobot-input" data-minggu="${i}" value="${rowData.bobot || rowData.bobot_penilaian || rowData.bobot_persen || 0}" step="0.1"></td>
+                    <tr class="${bgRowClass}">
+                        <td style="text-align: center; font-weight: bold; padding-top: 15px; font-size:1.1rem; color: ${(i === 8 || i === 16) ? 'var(--primary-red)' : '#475569'};">${i}</td>
+                        <td><input type="text" list="cpmk_options" class="input-rps id_cpmk-input" id="id_cpmk_${i}" value="${rowData.id_cpmk || ''}" placeholder="Pilih..." onchange="isiOtomatisDeskripsi(${i})" style="min-height:40px; background:${bgInput};"></td>
+                        <td><textarea class="input-rps sub_cpmk-input" id="sub_cpmk_${i}" placeholder="${hint}Deskripsi..." style="background:${bgInput};">${rowData.sub_cpmk || rowData.kemampuan_akhir || ''}</textarea></td>
+                        <td><textarea class="input-rps indikator-input" id="indikator_${i}" placeholder="Indikator..." style="background:${bgInput};">${rowData.indikator || rowData.indikator_pencapaian || ''}</textarea></td>
+                        <td><textarea class="input-rps assessmen-input" id="assessmen_${i}" placeholder="Asesmen..." style="background:${bgInput};">${rowData.assessmen || rowData.bentuk_pembelajaran || ''}</textarea></td>
+                        <td><textarea class="input-rps materi-input" id="materi_${i}" placeholder="Materi..." style="background:${bgInput};">${rowData.materi || rowData.materi_pembelajaran || ''}</textarea></td>
+                        <td><textarea class="input-rps metode-input" id="metode_${i}" placeholder="Metode..." style="background:${bgInput};">${rowData.metode || rowData.metode_pembelajaran || ''}</textarea></td>
+                        <td><textarea class="input-rps tatap_muka-input" id="tatap_muka_${i}" placeholder="Tatap Muka..." style="background:${bgInput};">${rowData.tatap_muka || ''}</textarea></td>
+                        <td><textarea class="input-rps daring-input" id="daring_${i}" placeholder="Daring..." style="background:${bgInput};">${rowData.daring || ''}</textarea></td>
                     </tr>
                 `;
-
-                const valBobot = parseFloat(rowData.bobot || rowData.bobot_penilaian || rowData.bobot_persen || 0);
-
-                if (valBobot > 0) {
-                    htmlProsedur += `
-                        <tr>
-                            <td>Pertemuan ${i}</td>
-                            <td style="font-weight:bold;">${rowData.cpmk || rowData.kode_cpmk || '-'}</td>
-                            <td>${rowData.kriteria || rowData.indikator_pencapaian || 'Penilaian Tugas'}</td>
-                            <td style="font-weight:bold; color:var(--primary-blue);">${valBobot}%</td>
-                        </tr>
-                    `;
-
-                    htmlTeknik += `
-                        <tr>
-                            <td style="font-weight:bold;">${kodeMK}</td>
-                            <td>${rowData.cpmk || rowData.kode_cpmk || '-'}</td>
-                            <td><i class="fas fa-check" style="color: #10b981;"></i></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    `;
-                }
             }
 
             tbodySesi.innerHTML = htmlSesi;
-            tbodyProsedur.innerHTML = htmlProsedur || `<tr><td colspan="4" style="color:#64748b; padding:20px;">Belum ada penugasan dengan nilai bobot.</td></tr>`;
-            tbodyTeknik.innerHTML = htmlTeknik || `<tr><td colspan="6" style="color:#64748b; padding:20px;">Belum ada pemetaan teknik penilaian.</td></tr>`;
 
             const textareas = document.querySelectorAll('.input-rps');
             textareas.forEach(tx => {
@@ -1143,6 +1080,9 @@
             });
         }
 
+        // ==========================================
+        // SIMPAN KE DATABASE (TIDAK ADA LAGI `CONTINUE` 8 & 16)
+        // ==========================================
         async function simpanRPSDosen() {
             if (!currentMkDipilih) return;
 
@@ -1152,26 +1092,18 @@
 
             let dataPertemuan = [];
             for (let i = 1; i <= 16; i++) {
-                if (i === 8 || i === 16) continue;
-
-                const valCpmk = document.querySelector(`.cpmk-input[data-minggu="${i}"]`).value.trim();
-                const valMateri = document.querySelector(`.materi-input[data-minggu="${i}"]`).value.trim();
-                const valMetode = document.querySelector(`.metode-input[data-minggu="${i}"]`).value.trim();
-                const valWaktu = document.querySelector(`.waktu-input[data-minggu="${i}"]`).value;
-                const valKriteria = document.querySelector(`.kriteria-input[data-minggu="${i}"]`).value.trim();
-                const valBobot = document.querySelector(`.bobot-input[data-minggu="${i}"]`).value;
-
-                if (valCpmk || valMateri) {
-                    dataPertemuan.push({
-                        pertemuan: i,
-                        cpmk: valCpmk,
-                        materi: valMateri,
-                        metode: valMetode,
-                        waktu: valWaktu,
-                        kriteria: valKriteria,
-                        bobot: valBobot
-                    });
-                }
+                // Hapus continue, agar baris 8 dan 16 tetap tersimpan ke DB
+                dataPertemuan.push({
+                    pertemuan: i,
+                    id_cpmk: document.getElementById(`id_cpmk_${i}`).value.trim(),
+                    sub_cpmk: document.getElementById(`sub_cpmk_${i}`).value.trim(),
+                    indikator: document.getElementById(`indikator_${i}`).value.trim(),
+                    assessmen: document.getElementById(`assessmen_${i}`).value.trim(),
+                    materi: document.getElementById(`materi_${i}`).value.trim(),
+                    metode: document.getElementById(`metode_${i}`).value.trim(),
+                    tatap_muka: document.getElementById(`tatap_muka_${i}`).value.trim(),
+                    daring: document.getElementById(`daring_${i}`).value.trim()
+                });
             }
 
             const payload = { kode_mk: currentMkDipilih, nidn_dosen: userNidn, detail_pertemuan: dataPertemuan };
@@ -1215,6 +1147,11 @@
             localStorage.setItem('cetak_semester', semester);
             localStorage.setItem('cetak_sks', sks);
 
+            const tglPenyusunan = document.getElementById('dtlTgl') ? document.getElementById('dtlTgl').value : '2026-02-15';
+            const rumpun = document.getElementById('dtlRumpun') ? document.getElementById('dtlRumpun').value : 'Software Development Fundamentals';
+            localStorage.setItem('cetak_tgl', tglPenyusunan);
+            localStorage.setItem('cetak_rumpun', rumpun);
+
             window.open(`cetak_rps.html?mk=${kode_mk}`, '_blank');
         }
 
@@ -1225,7 +1162,10 @@
 
         function logout() { localStorage.clear(); window.location.replace("../login/login.html"); }
 
-        window.onload = loadDaftarRPS;
+        window.onload = async () => {
+            await loadDaftarRPS();
+            await loadMasterCPMK();
+        };
     </script>
 </body>
 
