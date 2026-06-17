@@ -1,36 +1,135 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Cetak Semua RTM - Sistem OBE UNAKI</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.4; color: black; background: #e5e7eb; margin: 0; padding: 20px; }
-        .no-print { text-align: center; margin-bottom: 20px; }
-        .btn-print { background: #8b0000; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; }
-        .btn-back { background: #4b5563; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; margin-left: 10px; }
-        
-        .kertas-a4 { width: 210mm; min-height: 297mm; background: white; margin: auto; padding: 15mm 20mm; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        
-        .main-title { text-align: center; font-size: 16pt; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
-        table.rtm-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; border: 1.5px solid black; }
-        table.rtm-table th, table.rtm-table td { border: 1px solid black; padding: 8px; vertical-align: top; }
-        .bg-blue { background-color: #dbe5f1; font-weight: bold; text-align: center; }
-        .bg-blue-left { background-color: #dbe5f1; font-weight: bold; text-align: left; }
-        .text-center { text-align: center; }
-        .font-bold { font-weight: bold; }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: black;
+            background: #e5e7eb;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .no-print {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-print {
+            background: #8b0000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .btn-back {
+            background: #4b5563;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .kertas-a4 {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: auto;
+            padding: 15mm 20mm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .main-title {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        table.rtm-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1.5px solid black;
+        }
+
+        table.rtm-table th,
+        table.rtm-table td {
+            border: 1px solid black;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        .bg-blue {
+            background-color: #dbe5f1;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .bg-blue-left {
+            background-color: #dbe5f1;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
 
         /* Pengaturan Ukuran Logo */
-        .logo-print { max-width: 160px; height: auto; display: block; margin: 0 auto; }
+        .logo-print {
+            max-width: 160px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
 
-        @media print { 
-            body { background: white; padding: 0; }
-            .kertas-a4 { box-shadow: none; padding: 0; width: 100%; margin: 0; page-break-after: always; }
-            .no-print { display: none !important; } 
-            @page { size: A4 portrait; margin: 15mm; }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .kertas-a4 {
+                box-shadow: none;
+                padding: 0;
+                width: 100%;
+                margin: 0;
+                page-break-after: always;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            @page {
+                size: A4 portrait;
+                margin: 15mm;
+            }
         }
     </style>
      <script src="../js/api_config.js"></script>
 </head>
+
 <body>
 
     <div class="no-print">
@@ -48,7 +147,7 @@
             const kodeMk = urlParams.get('kode_mk');
             const container = document.getElementById('megaRenderContainer');
 
-            if(!kodeMk) return alert("⚠️ Parameter Kode MK tidak ditemukan!");
+            if (!kodeMk) return alert("⚠️ Parameter Kode MK tidak ditemukan!");
 
             try {
                 const response = await fetch(`${API_BASE}/get-rubrik-by-matkul?kode_mk=${kodeMk}`);
@@ -69,7 +168,7 @@
                 // GROUPING DATA TUGAS
                 const tugasGrouped = {};
                 data.forEach(row => {
-                    if(!tugasGrouped[row.id_tugas]) {
+                    if (!tugasGrouped[row.id_tugas]) {
                         tugasGrouped[row.id_tugas] = {
                             judul: row.judul_tugas,
                             metode: row.metode,
@@ -84,19 +183,19 @@
                             kriteriaList: []
                         };
                     }
-                    if(row.kriteria) {
+                    if (row.kriteria) {
                         tugasGrouped[row.id_tugas].kriteriaList.push(row);
                     }
                 });
 
-                container.innerHTML = ''; 
-                
+                container.innerHTML = '';
+
                 // CETAK LEMBARAN KERTAS PER TUGAS
                 Object.keys(tugasGrouped).forEach((idTugas, index) => {
                     const t = tugasGrouped[idTugas];
-                    
+
                     let kriteriaRows = '';
-                    if(t.kriteriaList.length === 0) {
+                    if (t.kriteriaList.length === 0) {
                         kriteriaRows = `<tr><td colspan="6" style="text-align:center; color:red;">Kriteria rubrik belum diisi.</td></tr>`;
                     } else {
                         t.kriteriaList.forEach(k => {
@@ -210,4 +309,5 @@
         window.onload = loadSemuaTugasMatkul;
     </script>
 </body>
+
 </html>

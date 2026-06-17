@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../../../js/api_config.js"></script>
     
     <style>
         :root { 
@@ -93,10 +94,7 @@
     // 1. DEKLARASI API (KTP) HARUS ADA DI BARIS PALING ATAS
     // ========================================================================
     const PRODI = localStorage.getItem("prodi_aktif") || "ti";
-    
-    // 👇👇 JANGAN LUPA GANTI LINK INI DENGAN LINK CLOUDFLARE-MU YANG BARU 👇👇
-    const API_BASE = "https://eco-monkey-gentleman-pipeline.trycloudflare.com/webhook"; 
-    
+        
     const API_MATKUL = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`; 
     const API_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
     const API_MAPPING = `${API_BASE}/get-mapping-mk?prodi=${PRODI}`;

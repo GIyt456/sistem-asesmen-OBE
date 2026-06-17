@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="../../../js/api_config.js"></script>
+
     <style>
         :root { 
             --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
@@ -121,9 +122,7 @@
 <script>
     // --- 1. VARIABEL API & STATE ---
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
-    
-    const API_BASE = "https://recommend-promised-nasa-robinson.trycloudflare.com/webhook"; 
-    
+        
     const API_METADATA = `${API_BASE}/get-metadata`;
     const API_GET_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
     const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;

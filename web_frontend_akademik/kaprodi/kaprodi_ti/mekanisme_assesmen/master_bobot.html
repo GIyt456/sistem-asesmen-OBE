@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../../../js/api_config.js"></script>
     
     <style>
         :root { 
@@ -66,11 +67,14 @@
         </div>
 
         <div class="table-container">
-            <div class="toolbar">
-                <select class="select-filter" id="filterTahun">
-                    <option value="2024">Kurikulum 2020</option>
-                    <option value="2023">Kurikulum 2025</option>
-                </select>
+           <div class="control-panel" style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; display: flex; gap: 15px; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="font-weight: 600; color: #475569;">Pilih Mata Kuliah:</div>
+                    <select id="selectMk" onchange="loadDataBobot()" style="padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 8px; outline: none; font-size: 0.95rem; flex: 1; cursor: pointer; background: #f8fafc; font-weight: 500;">
+                        <option value="" disabled selected>-- Memuat Daftar Mata Kuliah... --</option>
+                    </select>
+                <button id="btnTambahAttitude" onclick="munculkanAttitude()" style="display: none; background: #0d9488; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;">
+                    <i class="fas fa-plus"></i> Tambah Attitude
+                </button>
                 <button class="btn-save" onclick="simpanBobot()">
                     <i class="fas fa-save"></i> Simpan Perubahan
                 </button>
@@ -93,6 +97,7 @@
                         <th>UTS</th>
                         <th>Presentasi</th>
                         <th>UAS</th>
+                        <th class="col-attitude" style="display: none; background-color: #f0fdf4; color: #166534;">Attitude</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -108,7 +113,6 @@
 <script>
     const PRODI = localStorage.getItem("prodi_aktif") || "ti";
     
-    const API_BASE = "https://copies-groups-outcomes-democrats.trycloudflare.com/webhook";
     const API_GET_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
 
     const userLogin = localStorage.getItem("user_login");
@@ -122,80 +126,86 @@
     // 1. FUNGSI MEMUAT TABEL (4 INPUT, 1 TOTAL PER MK)
     // =========================================================
     async function loadDataBobot() {
-        // Sesuaikan ID dengan tbody milikmu (bisa 'tableBody' atau 'bodyMasterBobot')
-        const tbody = document.querySelector('tbody'); 
+        // Sesuaikan dengan ID tbody tabel kamu (misal: 'tableBody' atau 'bodyMasterBobot')
+        const tbody = document.getElementById('tableBody') || document.querySelector('tbody'); 
+        const kodeMkTerpilih = document.getElementById('selectMk').value;
+
+        // 🚀 KUNCI PERTAMA: Jika belum pilih matkul, kunci tabel dan beri instruksi
+        if (!kodeMkTerpilih) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px; font-weight: 500; color: #64748b;"><i class="fas fa-arrow-up"></i> Silakan pilih Mata Kuliah terlebih dahulu untuk mengatur master bobot.</td></tr>';
+            return;
+        }
+
         try {
-            const res = await fetch(API_GET_BOBOT); // Pastikan nama API_GET_BOBOT sesuai dengan yang ada di kodemu
-            const data = await res.json();
+            const res = await fetch(API_GET_BOBOT);
+            const allData = await res.json();
+            
+            // 🚀 KUNCI KEDUA: Saring data hanya yang sesuai dengan pilihan dropdown Kaprodi
+            const data = allData.filter(row => row.kode_mk === kodeMkTerpilih);
             
             tbody.innerHTML = ''; 
             
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Belum ada pemetaan MK-CPMK di database.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #dc2626;">Belum ada pemetaan CPMK untuk Mata Kuliah ini di database.</td></tr>';
                 return;
             }
 
-            // --- HITUNG ROWSPAN & TOTAL AWAL PER MATA KULIAH ---
-            let mkCount = {};
+            // --- HITUNG ROWSPAN CPL & TOTAL VERTIKAL MATKUL ---
             let cplCount = {};
-            let mkTotal = {};
+            let totalMK = 0;
 
             data.forEach((row) => {
-                if (!mkCount[row.kode_mk]) mkCount[row.kode_mk] = 0;
-                mkCount[row.kode_mk]++; // Hitung ada berapa baris untuk MK ini
-
                 let cplKey = row.kode_mk + '_' + row.cpl;
                 if (!cplCount[cplKey]) cplCount[cplKey] = 0;
                 cplCount[cplKey]++;
 
-                // Jumlahkan ke-4 komponen untuk total awal Mata Kuliah
                 let t = parseInt(row.tugas) || 0;
                 let u = parseInt(row.uts) || 0;
                 let p = parseInt(row.presentasi) || 0;
                 let a = parseInt(row.uas) || 0;
-
-                if (!mkTotal[row.kode_mk]) mkTotal[row.kode_mk] = 0;
-                mkTotal[row.kode_mk] += (t + u + p + a); // Akumulasikan seluruh CPMK
+                totalMK += (t + u + p + a);
             });
 
-            // --- GAMBAR TABELNYA ---
-            let renderedMk = {};
+            // --- RENDER BARIS TABEL ---
             let renderedCpl = {};
-            let renderedMkTotal = {};
+            let renderedMkTotal = false;
             let html = '';
 
             data.forEach((row, index) => {
                 let cplKey = row.kode_mk + '_' + row.cpl;
 
-                // Sisipkan data-mk di <tr> agar bisa dilacak oleh tombol simpan
                 let tr = `<tr data-rowid="${index}" data-mk="${row.kode_mk}" data-cpmk="${row.cpmk || row.kode_cpmk}">`;
 
+                // 1. Kolom CPL
                 if (!renderedCpl[cplKey]) {
                     tr += `<td class="text-left col-cpl" rowspan="${cplCount[cplKey]}" style="vertical-align: middle;">${row.cpl}</td>`;
                     renderedCpl[cplKey] = true;
                 }
 
-                if (!renderedMk[row.kode_mk]) {
-                    tr += `<td class="text-left col-mk" rowspan="${mkCount[row.kode_mk]}" style="vertical-align: middle;">${row.kode_mk}</td>`;
-                    tr += `<td class="text-left" rowspan="${mkCount[row.kode_mk]}" style="vertical-align: middle;">${row.nama_mk}</td>`;
-                    renderedMk[row.kode_mk] = true;
+                // 2. Kolom Kode MK & Nama MK (Otomatis menyatu sepanjang jumlah baris data karena hanya 1 MK)
+                if (index === 0) {
+                    tr += `<td class="text-left col-mk" rowspan="${data.length}" style="vertical-align: middle;">${row.kode_mk}</td>`;
+                    tr += `<td class="text-left" rowspan="${data.length}" style="vertical-align: middle;">${row.nama_mk}</td>`;
                 }
 
-                // 4 KOLOM INPUT (Tugas, UTS, Presentasi, UAS) MUNCUL DI SETIAP BARIS CPMK
+                // 3. Kolom CPMK & 4 Input Komponen
                 tr += `
                     <td class="col-cpmk"><strong>${row.cpmk || row.kode_cpmk}</strong></td>
                     <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="tugas" value="${row.tugas || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
                     <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="uts" value="${row.uts || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
                     <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="presentasi" value="${row.presentasi || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
                     <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="uas" value="${row.uas || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
+                    
+                    <td class="col-attitude" style="display: none; background-color: #f0fdf4;">
+                        <input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="attitude" value="${row.attitude || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')">
+                    </td>
                 `;
 
-                // 1 KOTAK TOTAL SPESIAL (Digabung / Rowspan sebesar jumlah CPMK di MK tersebut)
-                if (!renderedMkTotal[row.kode_mk]) {
-                    const total = mkTotal[row.kode_mk];
-                    const warnawarna = total === 100 ? '#16a34a' : '#dc2626'; // Hijau jika 100, Merah jika belum
-                    tr += `<td id="total-mk-${row.kode_mk}" rowspan="${mkCount[row.kode_mk]}" style="vertical-align: middle; text-align: center; font-weight: 800; font-size: 1.1rem; color: ${warnawarna};">${total}%</td>`;
-                    renderedMkTotal[row.kode_mk] = true;
+                // 4. Kolom Total Akhir Tunggal Per MK (Menjadi 1 Kotak Rowspan Besar di ujung kanan!)
+                if (!renderedMkTotal) {
+                    const warnaWarna = totalMK === 100 ? '#16a34a' : '#dc2626';
+                    tr += `<td id="total-mk-${row.kode_mk}" rowspan="${data.length}" style="vertical-align: middle; text-align: center; font-weight: 800; font-size: 1.1rem; color: ${warnaWarna};">${totalMK}%</td>`;
+                    renderedMkTotal = true;
                 }
 
                 tr += `</tr>`;
@@ -204,11 +214,60 @@
 
             tbody.innerHTML = html;
 
+            // Cek apakah Mata Kuliah ini sudah memiliki nilai Attitude di database
+            let pakaiAttitude = data.some(r => (parseInt(r.attitude) || 0) > 0);
+            if (pakaiAttitude) {
+                munculkanAttitude(); // Jika ada, otomatis buka kolomnya
+            } else {
+                sembunyikanAttitude(); // Jika tidak ada, sembunyikan kolom & munculkan tombol Tambah
+            }
+
         } catch (error) {
             console.error(error);
             tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Gagal memuat data dari API.</td></tr>';
         }
     }
+
+    // =========================================================
+    // FUNGSI AWAL: Mengisi Dropdown Mata Kuliah Saat Web Dibuka
+    // =========================================================
+    async function initMatkulDropdown() {
+        const selectMk = document.getElementById('selectMk');
+        try {
+            // Tarik data relasi untuk disaring mata kuliah uniknya
+            const res = await fetch(API_GET_BOBOT);
+            const data = await res.json();
+            
+            let uniqueMk = [];
+            let seen = new Set();
+            
+            data.forEach(row => {
+                if (!seen.has(row.kode_mk)) {
+                    seen.add(row.kode_mk);
+                    uniqueMk.push({ kode_mk: row.kode_mk, nama_mk: row.nama_mk });
+                }
+            });
+
+            // Isi ke dalam elemen select
+            selectMk.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah --</option>';
+            uniqueMk.forEach(mk => {
+                selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
+            });
+
+            // Panggil tampilan default tabel kosong
+            loadDataBobot();
+
+        } catch (error) {
+            console.error("Gagal memuat dropdown matkul:", error);
+            if(selectMk) selectMk.innerHTML = '<option value="">Gagal memuat daftar matkul</option>';
+        }
+    }
+
+    // Pastikan fungsi di atas dipanggil saat halaman selesai dimuat (window.onload)
+    window.onload = () => {
+        initMatkulDropdown();
+        // ... kode window.onload kamu yang lain jika ada ...
+    };
 
     // =========================================================
     // 2. FUNGSI PENJUMLAH OTOMATIS SAAT DIKETIK
@@ -228,6 +287,18 @@
             totalCell.innerText = sum + "%";
             totalCell.style.color = (sum === 100) ? "#16a34a" : "#dc2626"; 
         }
+    }
+
+    function munculkanAttitude() {
+        document.querySelectorAll('.col-attitude').forEach(el => el.style.display = 'table-cell');
+        const btn = document.getElementById('btnTambahAttitude');
+        if(btn) btn.style.display = 'none'; // Hilangkan tombol saat kolom terbuka
+    }
+
+    function sembunyikanAttitude() {
+        document.querySelectorAll('.col-attitude').forEach(el => el.style.display = 'none');
+        const btn = document.getElementById('btnTambahAttitude');
+        if(btn) btn.style.display = 'block'; // Tampilkan tombol untuk dipencet
     }
 
     // =========================================================
@@ -264,6 +335,7 @@
                     const u = parseInt(row.querySelector('input[data-field="uts"]')?.value) || 0;
                     const p = parseInt(row.querySelector('input[data-field="presentasi"]')?.value) || 0;
                     const a = parseInt(row.querySelector('input[data-field="uas"]')?.value) || 0;
+                    const at = parseInt(row.querySelector('input[data-field="attitude"]')?.value) || 0;
 
                     dataBobotData.push({
                         kode_mk: kodeMk,
@@ -272,7 +344,8 @@
                         tugas: t,
                         uts: u,
                         presentasi: p,
-                        uas: a
+                        uas: a,
+                        attitude: at
                     });
                 });
             } else if (totalMK > 0 && totalMK !== 100) {

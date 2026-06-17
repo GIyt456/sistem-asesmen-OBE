@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../../../js/api_config.js"></script>
     
     <style>
         :root { 
@@ -93,7 +94,6 @@
     const PRODI = localStorage.getItem("prodi_aktif") || "ti";
     
     // 👇👇 GANTI DENGAN LINK CLOUDFLARE TERBARU KAMU 👇👇
-    const API_BASE = "https://wooden-branches-elimination-tube.trycloudflare.com/webhook"; 
     const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
     const API_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
     const API_METADATA = `${API_BASE}/get-metadata`;

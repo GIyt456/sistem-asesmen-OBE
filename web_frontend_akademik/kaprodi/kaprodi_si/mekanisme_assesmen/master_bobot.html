@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../../../js/api_config.js"></script>
     
     <style>
         :root { 
@@ -108,7 +109,6 @@
 <script>
     const PRODI = localStorage.getItem("prodi_aktif") || "si";
 
-    const API_BASE = "https://recommend-promised-nasa-robinson.trycloudflare.com/webhook";
     const API_GET_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
 
     const userLogin = localStorage.getItem("user_login");
