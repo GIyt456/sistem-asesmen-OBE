@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-     <script src="../js/api_config.js"></script>
+    <script src="/js/api_config.js"></script>
 
     <style>
         :root {
@@ -521,6 +521,7 @@
             <a href="input_nilai.html">Input Asesmen</a>
             <a href="rps_dosen.html" class="active">Penyusunan RPS</a>
             <a href="../kaprodi/laporan.html">Laporan OBE</a>
+            <a href="portofolio.html">Portofolio</a>
         </div>
         <div class="nav-user" id="navRightContainer">
             <div class="user-chip">
@@ -707,7 +708,7 @@
                                 <tr>
                                     <th width="4%">MG</th>
                                     <th width="10%">ID CPMK</th>
-                                    <th width="15%">DESKRIPSI SUB CPMK</th>
+                                    <th width="15%">DESKRIPSI CPMK</th>
                                     <th width="13%">INDIKATOR</th>
                                     <th width="10%">BENTUK ASSESSMEN</th>
                                     <th width="12%">MATERI POKOK</th>
@@ -732,14 +733,14 @@
     </main>
 
     <script>
-        const API_GET_KELAS = `${API_BASE}/get-kelas-aktif`;
-        const API_GET_MATKUL = `${ API_BASE}/get-master-matkul`;
-        const API_GET_RPS = `${API_BASE}/get-rps-detail`;
-        const API_SIMPAN_RPS = `${ API_BASE}/simpan-rps`;
-        const API_GET_INFO_MK = `${ API_BASE}/get-info-mk`;
 
-        // API BARU: Untuk menarik relasi CPL dan CPMK langsung dari 3 tabel MySQL
+        const API_GET_KELAS = `${API_BASE}/get-kelas-aktif`;
+        const API_GET_MATKUL = `${API_BASE}/get-master-matkul`;
+        const API_GET_RPS = `${API_BASE}/get-rps-sesi`;
+        const API_SIMPAN_RPS = `${API_BASE}/simpan-rps`;
+        const API_GET_INFO_MK = `${API_BASE}/get-info-mk`;
         const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
+        const API_CPMK_LIST = `${API_BASE}/get-cpmk-list`; // API Untuk Auto-fill CPMK
 
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
         const userNidn = localStorage.getItem("user_nidn");
@@ -755,12 +756,15 @@
         let globalDaftarMK = [];
         let masterCPMK = [];
 
-        // FUNGSI EXTRAKSI ARRAY AMAN
+        // FUNGSI EXTRAKSI ARRAY AMAN (DIUPDATE AGAR SAMA DENGAN VERSI CETAK)
         function safeExtractArray(jsonObj) {
             if (!jsonObj) return [];
-            if (Array.isArray(jsonObj)) return jsonObj.flat(Infinity);
-            if (jsonObj.data && Array.isArray(jsonObj.data)) return jsonObj.data.flat(Infinity);
-            return [];
+            let data = jsonObj;
+            if (jsonObj.data) data = jsonObj.data;
+            if (!Array.isArray(data)) data = [data];
+            data = data.flat(Infinity);
+            // Bagian terpenting: membongkar bungkus "json" bawaan n8n
+            return data.map(item => item.json ? item.json : item);
         }
 
         function extractDBRows(obj, requiredKey) {
@@ -1056,7 +1060,7 @@
                     <tr class="${bgRowClass}">
                         <td style="text-align: center; font-weight: bold; padding-top: 15px; font-size:1.1rem; color: ${(i === 8 || i === 16) ? 'var(--primary-red)' : '#475569'};">${i}</td>
                         <td><input type="text" list="cpmk_options" class="input-rps id_cpmk-input" id="id_cpmk_${i}" value="${rowData.id_cpmk || ''}" placeholder="Pilih..." onchange="isiOtomatisDeskripsi(${i})" style="min-height:40px; background:${bgInput};"></td>
-                        <td><textarea class="input-rps sub_cpmk-input" id="sub_cpmk_${i}" placeholder="${hint}Deskripsi..." style="background:${bgInput};">${rowData.sub_cpmk || rowData.kemampuan_akhir || ''}</textarea></td>
+                        <td><textarea class="input-rps sub_cpmk-input" id="sub_cpmk_${i}" placeholder="${hint}Deskripsi..." style="background:${bgInput};">${rowData.deskripsi_cpmk || rowData.sub_cpmk || rowData.kemampuan_akhir || ''}</textarea></td>
                         <td><textarea class="input-rps indikator-input" id="indikator_${i}" placeholder="Indikator..." style="background:${bgInput};">${rowData.indikator || rowData.indikator_pencapaian || ''}</textarea></td>
                         <td><textarea class="input-rps assessmen-input" id="assessmen_${i}" placeholder="Asesmen..." style="background:${bgInput};">${rowData.assessmen || rowData.bentuk_pembelajaran || ''}</textarea></td>
                         <td><textarea class="input-rps materi-input" id="materi_${i}" placeholder="Materi..." style="background:${bgInput};">${rowData.materi || rowData.materi_pembelajaran || ''}</textarea></td>
