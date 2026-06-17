@@ -9,7 +9,8 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -79,14 +80,10 @@
         </div>
     </div>
 
-    <script src="/js/template.js"></script>
-
     <script>
         // DETEKSI PRODI DINAMIS
         const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-        
-        // PENTING: Ganti URL di bawah dengan link Cloudflare Tunnel n8n Anda!
-        const API_BASE = "https://toolbox-router-wyoming-definitions.trycloudflare.com/webhook"; 
+    
         const API_GRAFIK_CPL = `${API_BASE}/get-grafik-cpl`;
         
         let myRadarChart = null;
