@@ -6,7 +6,8 @@
     <title>Head Admin Panel - OBE System</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
     <style>
         /* --- CSS STYLING (Tema Figma Dark Navy & Gold) --- */
         :root { 
@@ -380,11 +381,11 @@
     </div>
 
 <script>
-    const API_METADATA = "https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-metadata";
-    const API_LOG = "https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/ambil-log-login";
-    const API_CRUD = "https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/head-admin-crud";
-    const API_GET_USERS = "https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/get-users";
-    const API_ADD_USER = "https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/tambah-user"; 
+    const API_METADATA = `${API_BASE}/get-metadata`;
+    const API_LOG = `${API_BASE}/ambil-log-login`;
+    const API_CRUD = `${API_BASE}/head-admin-crud`;
+    const API_GET_USERS = `${API_BASE}/get-users`;
+    const API_ADD_USER = `${API_BASE}/tambah-user`; 
 
     let currentLoginLogs = [];
     let currentPageMonitoring = 1;
@@ -478,7 +479,7 @@
         if (!confirm(`Apakah yakin mengganti password untuk "${username}"?`)) return;
 
         try {
-            const res = await fetch("https://expenditure-draws-profiles-apply.trycloudflare.com/webhook/reset-password", {
+            const res = await fetch(`${API_BASE}/reset-password`, {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username: username, new_password: newPassword })
             });
