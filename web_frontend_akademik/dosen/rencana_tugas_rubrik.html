@@ -191,12 +191,9 @@
 
     </main>
 
+    <script src="api_config.js"></script>
+
     <script>
-        // ==========================================
-        // KONFIGURASI URL SERVER N8N
-        // ==========================================
-        const BASE_N8N_URL = 'https://wooden-branches-elimination-tube.trycloudflare.com';
-        
         document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
 
         // ==========================================
@@ -204,6 +201,7 @@
         // ==========================================
         let daftarTugasDraft = []; // Array keranjang tugas
         let modeEditIndex = -1; // Penanda jika sedang mode mengedit
+        let tugasCounter = 1; // Variabel penghitung urutan tugas
 
         window.onload = async () => {
             tambahKriteria(); 
@@ -213,11 +211,12 @@
             const kodeMk = urlParams.get('kode_mk');
             if(!kodeMk) { alert("⚠️ Kode Mata Kuliah tidak ditemukan."); return; }
 
-            // 1. Tarik Data CPMK
+            // 1. Tarik Data CPMK Menggunakan API_CONFIG
             try {
                 const selectCpmk = document.getElementById('selectCPMK');
-                const resCpmk = await fetch(`${BASE_N8N_URL}/webhook/get-matkul-cpmk?kode_mk=${kodeMk}`);
+                const resCpmk = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_CPMK}?kode_mk=${kodeMk}`);
                 const dataCpmk = await resCpmk.json();
+                
                 selectCpmk.innerHTML = '<option value="">-- Pilih CPMK / Sub-CPMK Terkait --</option>';
                 if (dataCpmk && dataCpmk.length > 0 && dataCpmk[0].kode_cpmk) {
                     dataCpmk.forEach(item => {
@@ -226,13 +225,17 @@
                         selectCpmk.innerHTML += `<option value="${item.kode_cpmk}">${item.kode_cpmk} - ${singkatan}</option>`;
                     });
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error("Gagal menarik data CPMK:", e);
+                document.getElementById('selectCPMK').innerHTML = '<option value="">Gagal memuat CPMK dari server</option>';
+            }
 
-            // 2. Tarik Data CPL
+            // 2. Tarik Data CPL Menggunakan API_CONFIG
             try {
                 const selectCpl = document.getElementById('selectCPL');
-                const resCpl = await fetch(`${BASE_N8N_URL}/webhook/get-matkul-cpl?kode_mk=${kodeMk}`);
+                const resCpl = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.GET_CPL}?kode_mk=${kodeMk}`);
                 const dataCpl = await resCpl.json();
+                
                 selectCpl.innerHTML = '<option value="">-- Pilih CPL Terkait --</option>';
                 if (dataCpl && dataCpl.length > 0 && dataCpl[0].kode_cpl) {
                     dataCpl.forEach(item => {
@@ -240,7 +243,10 @@
                         selectCpl.innerHTML += `<option value="${item.kode_cpl}">${item.kode_cpl} - ${singkatan}</option>`;
                     });
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error("Gagal menarik data CPL:", e);
+                document.getElementById('selectCPL').innerHTML = '<option value="">Gagal memuat CPL dari server</option>';
+            }
         };
 
         function updateSum() {
@@ -255,7 +261,6 @@
             const container = document.getElementById('rubricContainer');
             const row = document.createElement('div');
             row.className = 'rubric-grid';
-            // Pastikan textarea mengambil nilai dari data.s1 dll dengan benar
             row.innerHTML = `
                 <div><input type="text" class="input-field r-nama" placeholder="Kriteria" value="${data.kriteria || ''}" style="font-weight: 700;"></div>
                 <div><input type="number" class="input-field input-bobot r-bobot" placeholder="%" value="${data.bobot || ''}" oninput="updateSum()"></div>
@@ -409,10 +414,10 @@
 
         function resetFormInput() {
             // Hitung urutan tugas secara dinamis berdasarkan isi draft
-            let urutanBaru = daftarTugasDraft.length + 1;
-            document.getElementById('badgeTugasKe').innerText = `Input Tugas Ke-${urutanBaru}`;
+            tugasCounter = daftarTugasDraft.length + 1;
+            document.getElementById('badgeTugasKe').innerText = `Input Tugas Ke-${tugasCounter}`;
             document.getElementById('badgeTugasKe').style.background = "var(--primary-red)";
-            document.getElementById('judulTugas').value = `Tugas ${urutanBaru}: `;
+            document.getElementById('judulTugas').value = `Tugas ${tugasCounter}: `;
             
             document.getElementById('selectCPMK').value = '';
             document.getElementById('selectCPL').value = '';
@@ -430,7 +435,7 @@
         }
 
         // ==========================================
-        // FUNGSI 4: SIMPAN PERMANEN KE SERVER (LOOP)
+        // FUNGSI 4: SIMPAN PERMANEN KE SERVER MENGGUNAKAN API_CONFIG
         // ==========================================
         async function simpanSemuaPermanen() {
             if(!confirm(`Anda akan menyimpan ${daftarTugasDraft.length} tugas secara PERMANEN ke database. Pastikan semua data sudah benar. Lanjutkan?`)) return;
@@ -440,9 +445,9 @@
             btnBottom.disabled = true;
 
             try {
-                const URL_N8N_POST = `${BASE_N8N_URL}/webhook/simpan-tugas-rubrik`;
+                // Mengambil Base URL dan Endpoint dari api_config.js
+                const URL_N8N_POST = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.SIMPAN_TUGAS_RUBRIK}`;
                 
-                // Melakukan looping (mengirim data satu per satu secara berurutan agar aman di database)
                 for (let i = 0; i < daftarTugasDraft.length; i++) {
                     const response = await fetch(URL_N8N_POST, {
                         method: 'POST',
