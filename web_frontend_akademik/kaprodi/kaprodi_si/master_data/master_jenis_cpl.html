@@ -8,6 +8,7 @@
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <script src="../../../js/api_config.js"></script>
     
     <style>
         /* --- VARIABEL WARNA KHUSUS SI --- */
@@ -147,7 +148,7 @@
 
 <script>
     const userLogin = localStorage.getItem("user_login");
-    const BASE_N8N_URL = 'https://toolbox-router-wyoming-definitions.trycloudflare.com';
+
 
     if (!userLogin) window.location.replace('/login/login.html');
 
@@ -159,7 +160,7 @@
         tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
 
         try {
-            const response = await fetch(`${BASE_N8N_URL}/webhook/get-jenis-cpl?prodi=si`);
+            const response = await fetch(`${API_BASE}/get-jenis-cpl?prodi=si`);
             const textData = await response.text();
 
             if (!textData || textData.includes('<!DOCTYPE html>')) {
@@ -223,7 +224,7 @@
         const payload = { id: id, nama_jenis: nama, prodi: 'si' };
 
         try {
-            const response = await fetch(`${BASE_N8N_URL}/webhook/simpan-jenis-cpl`, {
+            const response = await fetch(`${API_BASE}/simpan-jenis-cpl`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -247,7 +248,7 @@
         if(!confirm("Yakin ingin menghapus jenis CPL ini?")) return;
         
         try {
-            const response = await fetch(`${BASE_N8N_URL}/webhook/hapus-jenis-cpl`, {
+            const response = await fetch(`${API_BASE}/hapus-jenis-cpl`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: id })

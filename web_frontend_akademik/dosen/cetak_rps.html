@@ -282,7 +282,7 @@
                 <tr class="bg-blue text-center">
                     <th width="4%" class="text-center">MG</th>
                     <th width="10%" class="text-center">ID CPMK</th>
-                    <th width="15%" class="text-center">DESKRIPSI SUB CPMK</th>
+                    <th width="15%" class="text-center">DESKRIPSI CPMK</th>
                     <th width="13%" class="text-center">INDIKATOR</th>
                     <th width="10%" class="text-center">BENTUK ASSESSMEN</th>
                     <th width="12%" class="text-center">MATERI POKOK</th>
@@ -312,7 +312,7 @@
         // ==========================================
         const API_GET_MATKUL = `${API_BASE}/get-master-matkul`;
         const API_GET_INFO_MK = `${API_BASE}/get-info-mk`;
-        const API_GET_RPS = `${API_BASE}/get-rps-detail`;
+        const API_GET_RPS = `${API_BASE}/get-rps-sesi`;
         const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
         const API_GET_TUGAS = `${API_BASE}/get-tugas-matkul`;
 
@@ -468,7 +468,7 @@
                         <tr class="${bgRowClass}">
                             <td class="text-center" style="${(i === 8 || i === 16) ? 'color: #8b0000; font-weight: bold;' : ''}">${i}</td>
                             <td>${(rowData.id_cpmk || '').replace(/\n/g, '<br>')}</td>
-                            <td>${hint}${(rowData.sub_cpmk || rowData.kemampuan_akhir || '').replace(/\n/g, '<br>')}</td>
+                            <td>${hint}${(rowData.deskripsi_cpmk || rowData.sub_cpmk || rowData.kemampuan_akhir || '').replace(/\n/g, '<br>')}</td>
                             <td>${(rowData.indikator || rowData.indikator_pencapaian || '').replace(/\n/g, '<br>')}</td>
                             <td>${(rowData.assessmen || rowData.bentuk_pembelajaran || '').replace(/\n/g, '<br>')}</td>
                             <td>${(rowData.materi || rowData.materi_pembelajaran || '').replace(/\n/g, '<br>')}</td>

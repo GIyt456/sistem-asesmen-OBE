@@ -8,6 +8,7 @@
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <script src="../../../js/api_config.js"></script>
     
     <style>
         /* --- VARIABEL WARNA KHUSUS TI --- */
@@ -135,8 +136,7 @@
 <script>
     // 1. PENGATURAN API N8N (Filter Khusus TI)
     const PRODI = 'ti'; 
-    const BASE_N8N_URL = 'https://willing-robot-ministry-reported.trycloudflare.com';
-    const API_URL = `${BASE_N8N_URL}/webhook/get-periksa-data?prodi=${PRODI}&jenis=rps_duplikat`; 
+    const API_URL = `${API_BASE}/get-periksa-data?prodi=${PRODI}&jenis=rps_duplikat`; 
 
     // 2. SISTEM KEAMANAN
     const userLogin = localStorage.getItem("user_login");

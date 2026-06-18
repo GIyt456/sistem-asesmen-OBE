@@ -8,6 +8,7 @@
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <script src="../../../js/api_config.js"></script>
     
     <style>
         /* --- VARIABEL WARNA KHUSUS SI --- */
@@ -138,9 +139,8 @@
 <script>
     // 1. PENGATURAN API N8N UNTUK SI
     const PRODI = 'si'; 
-    const BASE_N8N_URL = 'https://toolbox-router-wyoming-definitions.trycloudflare.com'; 
-    const API_GET = `${BASE_N8N_URL}/webhook/get-metadata?prodi=${PRODI}`; 
-    const API_UPDATE = `${BASE_N8N_URL}/webhook/update-metadata`; 
+    const API_GET = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
+    const API_UPDATE = `${API_BASE}/update-metadata`; 
 
     // 2. SISTEM KEAMANAN
     const userLogin = localStorage.getItem("user_login");

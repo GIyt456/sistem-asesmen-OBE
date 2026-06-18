@@ -9,7 +9,7 @@
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <script src="../../../js/api_config.js"></script>
     <style>
         /* --- VARIABEL WARNA KHUSUS TI --- */
         :root {
@@ -330,8 +330,8 @@
             // 1. SISTEM KEAMANAN & PENGATURAN API
             const userLogin = localStorage.getItem("user_login");
 
-            // Pastikan URL ini sesuai dengan tunnel n8n Anda yang sedang aktif
-            const BASE_N8N_URL = 'https://playing-heath-pointed-instance.trycloudflare.com';
+    // Pastikan URL ini sesuai dengan tunnel n8n Anda yang sedang aktif
+
 
             // ==========================================
             // 2. FUNGSI MENARIK DATA DARI DATABASE (N8N)
@@ -342,7 +342,7 @@
                 if (!tableBody) return;
 
                 try {
-                    const URL_API = `${BASE_N8N_URL}/webhook/get-master-rubrik`;
+                    const URL_API = `${API_BASE}/get-master-rubrik`;
 
                     const response = await fetch(URL_API);
                     const textData = await response.text();
@@ -446,7 +446,7 @@
                 document.getElementById('modalDetailRubrik').style.display = "flex";
 
                 try {
-                    const response = await fetch(`${BASE_N8N_URL}/webhook/get-detail-rubrik?id_tugas=${idTugas}`);
+                    const response = await fetch(`${BASE_N8N_URL}/get-detail-rubrik?id_tugas=${idTugas}`);
                     const textData = await response.text();
 
                     if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {

@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel TI - Sistem OBE</title>
     <link rel="stylesheet" href="../../css/style.css">
-    <script src="../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -157,7 +158,6 @@
     <script>
         // 1. KONFIGURASI API KHUSUS TI
         const PRODI = 'ti'; 
-        const API_BASE = "https://encounter-system-products-globe.trycloudflare.com/webhook";
         const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
         const API_MAP_MK = `${API_BASE}/admin-map-mk-cpmk`;
         const API_GET_USERS = `${API_BASE}/get-users`;
