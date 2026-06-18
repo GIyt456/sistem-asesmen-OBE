@@ -8,13 +8,12 @@
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-     <script src="../../../js/api_config.js"></script>
+    <script src="../../../js/api_config.js"></script>
     
     <style>
-        /* --- VARIABEL WARNA KHUSUS SI --- */
+        /* --- VARIABEL WARNA SEPERTI SEMULA --- */
         :root { 
-            /* Background sidebar dihapus agar mengikuti theme-si dari style.css global */
-            --primary-teal: #01626d; 
+              --primary-teal: #01626d; 
             --primary-teal-dark: #006064; 
             --bg-main: #ffffff; 
             --text-dark: #111827;
@@ -29,54 +28,23 @@
             animation: transitionIn 0.3s ease-in-out; 
         }
         
-        @keyframes transitionIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- GAYA KONTEN UTAMA --- */
         .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
 
         .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
-        .header-title span { color: var(--primary-teal); }
+        .header-title span { color: var(--primary-red); }
         
-        /* --- UPDATE GAYA BADGE & TOMBOL KHUSUS SI --- */
-        .badge-prodi { 
-            background: var(--primary-teal-dark); 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 30px; 
-            font-size: 0.9rem; 
-            font-weight: 600; 
-            box-shadow: 0 4px 6px rgba(0, 96, 100, 0.2); 
-        }
+        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2); }
 
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
         .btn-dark:hover { background: #000000; transform: translateY(-2px); }
         
-        .btn-primary-si { 
-            background: linear-gradient(to right, var(--primary-teal), var(--primary-teal-dark)); 
-            color: white; 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 8px; 
-            font-weight: 600; 
-            font-size: 0.95rem; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            transition: 0.2s; 
-            box-shadow: 0 4px 6px rgba(0, 96, 100, 0.2);
-        }
-        .btn-primary-si:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 12px rgba(0, 96, 100, 0.3);
-        }
+        .btn-primary-ti { background: linear-gradient(to right, var(--primary-red), var(--primary-red-dark)); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2); }
+        .btn-primary-ti:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3); }
 
-        /* --- GAYA TABEL --- */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
         th { background: #f3f4f6; color: var(--text-dark); padding: 14px 16px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
         td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; }
@@ -88,18 +56,12 @@
         .btn-delete { background: #ef4444; }
         .btn-delete:hover { background: #dc2626; }
 
-        .badge-status { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-block; }
-        .status-aktif { background: #d1fae5; color: #065f46; }
-        .status-cuti { background: #fef08a; color: #854d0e; }
-        .status-lulus { background: #dbeafe; color: #1e40af; }
-
-        /* --- MODAL POP-UP STYLES --- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; animation: fadeIn 0.2s ease; }
         .modal-box { background: white; padding: 32px; border-radius: 16px; width: 450px; max-width: 90%; border: 2.5px solid var(--border-dark); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
         .form-control { width: 100%; padding: 12px 16px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
-        .form-control:focus { border-color: var(--primary-teal); }
+        .form-control:focus { border-color: var(--border-dark); }
     </style>
 </head>
 <body>
@@ -110,7 +72,7 @@
         
         <div class="header-container">
             <div class="header-title-area">
-                <div class="header-subtitle">KELOLA KURIKULUM</div>
+                <div class="header-subtitle">KELOLA MAHASISWA</div>
                 <h1 class="header-title">DATA <span>MAHASISWA</span></h1>
             </div>
             <div class="badge-prodi"><i class="fas fa-users"></i> Sistem Informasi</div>
@@ -119,10 +81,11 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <div>
                 <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mahasiswa (SI)</h3>
-                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk mahasiswa Sistem Informasi.</p>
+                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk mahasiswa Program Studi Sistem Informasi.</p>
             </div>
             <div style="display: flex; gap: 12px;">
-                <button class="btn-primary-si" onclick="bukaModalMahasiswa()"><i class="fas fa-plus"></i> Tambah</button>
+                <button class="btn-primary-ti" onclick="bukaModalMahasiswa()"><i class="fas fa-plus"></i> Tambah</button>
+                <button class="btn-primary-ti" style="background: linear-gradient(to right, #047857, #064e3b);" onclick="alert('Fitur Upload Excel sedang disiapkan!')"><i class="fas fa-file-excel"></i> Upload Excel</button>
                 <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
         </div>
@@ -148,14 +111,13 @@
                 <tr>
                     <th width="5%" style="text-align: center;">No</th>
                     <th width="15%">NIM</th>
-                    <th>Nama Mahasiswa</th>
+                    <th width="45%">Nama Lengkap</th>
                     <th width="15%" style="text-align: center;">Angkatan</th>
-                    <th width="15%" style="text-align: center;">Status</th>
                     <th width="20%" style="text-align: center;">Opsi</th>
                 </tr>
             </thead>
             <tbody id="bodyMahasiswa">
-                </tbody>
+            </tbody>
         </table>
 
         <div id="pagination-mahasiswa" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.85rem; color: #6b7280;">
@@ -165,54 +127,41 @@
 
     <div id="modalMahasiswa" class="modal-overlay">
         <div class="modal-box">
-            <h3 id="modalTitleMahasiswa" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Tambah Mahasiswa</h3>
-            
-            <input type="hidden" id="idMahasiswa">
+            <h3 id="modalTitleMahasiswa" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Form Mahasiswa SI</h3>
             
             <div class="form-group">
-                <label>NIM</label>
-                <input type="text" id="inputNIM" class="form-control" placeholder="Contoh: 223220036">
+                <label>NIM Mahasiswa</label>
+                <input type="text" id="inputNIM" class="form-control" placeholder="Contoh: 222250004">
             </div>
             
             <div class="form-group">
                 <label>Nama Lengkap</label>
-                <input type="text" id="inputNamaMahasiswa" class="form-control" placeholder="Nama lengkap mahasiswa">
-            </div>
-            
-            <div class="form-group">
-                <label>Angkatan (Tahun)</label>
-                <input type="number" id="inputAngkatan" class="form-control" placeholder="Otomatis dari NIM" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
-                <small style="color: #6b7280; font-size: 0.75rem;">Terisi otomatis berdasarkan digit NIM saat disimpan.</small>
+                <input type="text" id="inputNamaMahasiswa" class="form-control" placeholder="Ketikkan nama lengkap...">
             </div>
 
             <div class="form-group" style="margin-bottom: 30px;">
-                <label>Status</label>
-                <select id="inputStatusMahasiswa" class="form-control" style="cursor: pointer;">
-                    <option value="aktif">Aktif</option>
-                    <option value="cuti">Cuti</option>
-                    <option value="lulus">Lulus</option>
-                </select>
+                <label>Angkatan</label>
+                <input type="text" id="inputAngkatan" class="form-control" placeholder="Otomatis terisi dari NIM" readonly style="background-color: #f3f4f6;">
             </div>
             
             <div style="display: flex; justify-content: flex-end; gap: 12px;">
                 <button onclick="tutupModalMahasiswa()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanMahasiswa()" class="btn-primary-si"><i class="fas fa-save"></i> Simpan Data</button>
+                <button onclick="simpanMahasiswa()" class="btn-primary-ti"><i class="fas fa-save"></i> Simpan Data</button>
             </div>
         </div>
     </div>
 
 <script>
-    // 1. PENGATURAN API N8N
+    // 1. PENGATURAN API DIARAHKAN KE SI
     const PRODI = 'si'; 
     const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
 
-    // 2. SISTEM KEAMANAN
     const userLogin = localStorage.getItem("user_login");
+    const userRole = localStorage.getItem("user_role");
+    const userProdi = localStorage.getItem("prodi_aktif");
+
     if (!userLogin) window.location.replace('/login/login.html');
 
-    // ==========================================
-    // 3. LOGIKA DATA, PAGINASI, & PENCARIAN MAHASISWA
-    // ==========================================
     let allDataMahasiswa = []; 
     let currentPage = 1;
     let rowsPerPage = 10;
@@ -220,13 +169,12 @@
 
     async function loadData() {
         const tbody = document.getElementById("bodyMahasiswa");
-        tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding: 20px;'><i class='fas fa-spinner fa-spin'></i> Sedang memuat data dari database...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px;'><i class='fas fa-spinner fa-spin'></i> Sedang memuat data dari database n8n...</td></tr>";
 
         try {
             const res = await fetch(API_URL);
             const fullData = await res.json();
             
-            // Filter hanya data mahasiswa
             allDataMahasiswa = fullData.filter(i => i.tipe === 'mahasiswa');
             currentPage = 1;
             
@@ -234,7 +182,7 @@
             
         } catch (error) {
             console.error("Gagal menarik data:", error);
-            tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:red; padding: 20px;'>❌ Gagal memuat data dari server n8n.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; color:red; padding: 20px;'>❌ Gagal memuat data dari server n8n.</td></tr>";
         }
     }
 
@@ -249,7 +197,7 @@
         });
 
         if(filteredData.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding: 20px;'>Data mahasiswa tidak ditemukan.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding: 20px;'>Data mahasiswa SI tidak ditemukan.</td></tr>";
             document.getElementById('pagination-mahasiswa').innerHTML = `<div>Showing 0 entries</div>`;
             return;
         }
@@ -258,30 +206,27 @@
         const endIndex = startIndex + rowsPerPage;
         const dataToShow = filteredData.slice(startIndex, endIndex);
 
-        // Eksekusi Rumus Ekstrak Angkatan dari NIM
         dataToShow.forEach((item, index) => {
             const noUrut = startIndex + index + 1;
-            
-            const parts = item.label ? item.label.split('||') : ['Tidak Diketahui', '-'];
-            const namaMhs = parts[0];
+            const namaMhs = item.label || '-';
             
             let angkatanOtomatis = '-';
             const nim = item.kode;
             if (nim && nim.length >= 5) {
-                const kodeTahun = nim.substring(3, 5); 
-                angkatanOtomatis = "20" + kodeTahun;   
+                const kodeTahun = nim.substring(3, 5);
+                angkatanOtomatis = "20" + kodeTahun; 
             }
 
             tbody.innerHTML += `
             <tr>
                 <td style="text-align: center;">${noUrut}</td>
                 <td><strong>${item.kode}</strong></td>
-                <td style="font-weight: 600;">${namaMhs}</td>
-                <td style="text-align: center;"><span style="background:#f3f4f6; padding: 4px 10px; border-radius:6px; font-weight:600; color:#4b5563;">${angkatanOtomatis}</span></td>
-                <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
-                <td style="text-align: center;">
-                    <button class="btn-action btn-edit" onclick="bukaModalMahasiswa('${item.kode}')"><i class="fas fa-edit"></i> Ubah</button>
-                    <button class="btn-action btn-delete" onclick="alert('Fitur hapus disiapkan')"><i class="fas fa-trash"></i> Hapus</button>
+                <td style="font-weight: 600; color: var(--text-dark);">${namaMhs}</td>
+                <td style="text-align: center;"><span style="background:#f3f4f6; padding: 6px 12px; border-radius:6px; font-weight:600; color:#4b5563;">${angkatanOtomatis}</span></td>
+                <td style="text-align: center; display: flex; gap: 6px; justify-content: center; border-bottom: none;">
+                    <button class="btn-action btn-edit" onclick="bukaModalMahasiswa('${item.kode}', '${namaMhs.replace(/'/g, "\\'")}')" title="Ubah"><i class="fas fa-edit"></i></button>
+                    <button class="btn-action btn-delete" onclick="konfirmasiHapus('${item.kode}', '${namaMhs.replace(/'/g, "\\'")}')" title="Hapus"><i class="fas fa-trash"></i></button>
+                    <button class="btn-action" style="background: white; color: var(--primary-red); border: 1.5px solid var(--primary-red); font-weight: 700;" onmouseover="this.style.background='var(--primary-red)'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='var(--primary-red)'" onclick="alert('Masuk mode Rasuk untuk NIM: ${item.kode}')" title="Rasuk Akun"><i class="fas fa-user-secret"></i></button>
                 </td>
             </tr>`;
         });
@@ -296,13 +241,10 @@
         
         let html = `<div>Showing ${startIndex + 1} to ${actualEndIndex} of ${totalFilteredData} entries</div>`;
         html += `<div style="display: flex; gap: 5px;">`;
-        
         const prevDisabled = currentPage === 1;
-        html += `<button class="btn" style="background: ${prevDisabled ? '#e5e7eb' : 'var(--text-dark)'}; color: ${prevDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${prevDisabled ? 'not-allowed' : 'pointer'};" ${prevDisabled ? 'disabled' : `onclick="changePage(-1)"`}><i class="fas fa-chevron-left"></i> Prev</button>`;
-        
+        html += `<button class="btn" style="background: ${prevDisabled ? '#e5e7eb' : 'var(--border-dark)'}; color: ${prevDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${prevDisabled ? 'not-allowed' : 'pointer'};" ${prevDisabled ? 'disabled' : `onclick="changePage(-1)"`}><i class="fas fa-chevron-left"></i> Prev</button>`;
         const nextDisabled = currentPage === totalPages || totalPages === 0;
-        html += `<button class="btn" style="background: ${nextDisabled ? '#e5e7eb' : 'var(--text-dark)'}; color: ${nextDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${nextDisabled ? 'not-allowed' : 'pointer'};" ${nextDisabled ? 'disabled' : `onclick="changePage(1)"`}>Next <i class="fas fa-chevron-right"></i></button>`;
-        
+        html += `<button class="btn" style="background: ${nextDisabled ? '#e5e7eb' : 'var(--border-dark)'}; color: ${nextDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${nextDisabled ? 'not-allowed' : 'pointer'};" ${nextDisabled ? 'disabled' : `onclick="changePage(1)"`}>Next <i class="fas fa-chevron-right"></i></button>`;
         html += `</div>`;
         paginationContainer.innerHTML = html;
     }
@@ -312,23 +254,40 @@
         renderTablePaginated();
     }
 
-    // ==========================================
-    // 4. FUNGSI MODAL POP-UP MAHASISWA
-    // ==========================================
-    function bukaModalMahasiswa(nim = '') {
-        if(nim) {
-            document.getElementById('modalTitleMahasiswa').innerText = "Ubah Data Mahasiswa";
-            document.getElementById('inputNIM').value = nim;
-            document.getElementById('inputNIM').readOnly = true; 
+    // FUNGSI MODAL DAN OTOMATISASI ANGKATAN
+    document.getElementById('inputNIM').addEventListener('input', function(e) {
+        const nimInput = e.target.value;
+        if (nimInput.length >= 5) {
+            const kodeTahun = nimInput.substring(3, 5);
+            document.getElementById('inputAngkatan').value = "20" + kodeTahun;
         } else {
-            document.getElementById('modalTitleMahasiswa').innerText = "Tambah Mahasiswa";
-            document.getElementById('inputNIM').value = "";
-            document.getElementById('inputNIM').readOnly = false;
+            document.getElementById('inputAngkatan').value = "";
+        }
+    });
+
+    function bukaModalMahasiswa(nim = '', nama = '') {
+        const title = document.getElementById('modalTitleMahasiswa');
+        const inputNIM = document.getElementById('inputNIM');
+        const inputNama = document.getElementById('inputNamaMahasiswa');
+        const inputAngkatan = document.getElementById('inputAngkatan');
+
+        if(nim) {
+            title.innerText = "Ubah Data Mahasiswa SI";
+            inputNIM.value = nim;
+            inputNIM.readOnly = true; 
+            inputNIM.style.backgroundColor = "#f3f4f6";
+            inputNama.value = nama;
+            
+            if (nim.length >= 5) inputAngkatan.value = "20" + nim.substring(3, 5);
+        } else {
+            title.innerText = "Tambah Mahasiswa SI";
+            inputNIM.value = "";
+            inputNIM.readOnly = false;
+            inputNIM.style.backgroundColor = "#ffffff";
+            inputNama.value = "";
+            inputAngkatan.value = "";
         }
         
-        document.getElementById('idMahasiswa').value = "";
-        document.getElementById('inputNamaMahasiswa').value = "";
-        document.getElementById('inputAngkatan').value = "";
         document.getElementById('modalMahasiswa').style.display = "flex";
     }
 
@@ -336,50 +295,78 @@
         document.getElementById('modalMahasiswa').style.display = "none";
     }
 
-    function simpanMahasiswa() {
-        alert("Sistem pop-up siap! Endpoint simpan ke webhook n8n belum diatur.");
-        tutupModalMahasiswa();
+    async function simpanMahasiswa() {
+        const nim = document.getElementById('inputNIM').value.trim();
+        const nama = document.getElementById('inputNamaMahasiswa').value.trim();
+
+        if(!nim || !nama) { alert("⚠️ NIM dan Nama Lengkap wajib diisi!"); return; }
+
+        const isEdit = document.getElementById('inputNIM').readOnly;
+        const actionType = isEdit ? "UBAH" : "TAMBAH";
+
+        const btnSimpan = document.querySelector("#modalMahasiswa .btn-primary-ti");
+        const originalText = btnSimpan.innerHTML;
+        btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btnSimpan.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE}/post-data-mahasiswa`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    aksi: actionType,
+                    nim: nim,
+                    nama: nama,
+                    prodi: PRODI 
+                })
+            });
+
+            if(response.ok) {
+                alert(`✅ Data mahasiswa SI berhasil di${actionType.toLowerCase()}!`);
+                tutupModalMahasiswa();
+                loadData(); 
+            } else { alert("❌ Gagal menyimpan data ke server n8n."); }
+        } catch(e) {
+            alert("❌ Terjadi kesalahan jaringan saat menghubungi server.");
+        } finally {
+            btnSimpan.innerHTML = originalText;
+            btnSimpan.disabled = false;
+        }
     }
 
-    // ==========================================
-    // 5. EVENT LISTENER SAAT HALAMAN DIBUKA
-    // ==========================================
+    async function konfirmasiHapus(nim, nama) {
+        if(confirm(`⚠️ Peringatan Berbahaya!\n\nApakah Anda yakin ingin MENGHAPUS mahasiswa berikut secara permanen?\n\nNIM: ${nim}\nNama: ${nama}`)) {
+            try {
+                const response = await fetch(`${API_BASE}/post-data-mahasiswa`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ aksi: "HAPUS", nim: nim, prodi: PRODI })
+                });
+
+                if(response.ok) { alert("✅ Data mahasiswa berhasil dihapus!"); loadData(); } 
+                else { alert("❌ Gagal menghapus data di server n8n."); }
+            } catch(e) { alert("❌ Terjadi kesalahan jaringan."); }
+        }
+    }
+
     window.onload = () => { 
         loadData(); 
         
         const selectBox = document.getElementById('showEntries');
-        if(selectBox) {
-            selectBox.onchange = (e) => {
-                rowsPerPage = parseInt(e.target.value);
-                currentPage = 1; 
-                renderTablePaginated();
-            }
-        }
+        if(selectBox) { selectBox.onchange = (e) => { rowsPerPage = parseInt(e.target.value); currentPage = 1; renderTablePaginated(); } }
 
         const searchBox = document.getElementById('searchBox');
-        if(searchBox) {
-            searchBox.oninput = (e) => {
-                searchQuery = e.target.value.toLowerCase();
-                currentPage = 1; 
-                renderTablePaginated();
-            }
-        }
+        if(searchBox) { searchBox.oninput = (e) => { searchQuery = e.target.value.toLowerCase(); currentPage = 1; renderTablePaginated(); } }
 
-        // Jeda agar template.js selesai menyusun sidebar sebelum kita ubah menu aktifnya
         setTimeout(() => {
-            const navDashboard = document.getElementById('nav-home');
-            // Jika ID nav mahasiswa Anda berbeda di sidebar, silakan sesuaikan
-            const navMahasiswa = document.querySelector('[data-path="/master_data/master_mahasiswa.html"]') || document.getElementById('nav-mahasiswa'); 
+            const navDashboard = document.querySelector('[data-path="/admin_config.html"]');
+            const navMahasiswa = document.querySelector('[data-path="/master_data/master_mahasiswa_si.html"]'); 
             const menuMaster = document.getElementById('menu-master');
             const chevronMaster = document.getElementById('chevron-master');
 
             if(navDashboard) navDashboard.classList.remove('active');
             if(navMahasiswa) navMahasiswa.classList.add('active'); 
-            
-            if(menuMaster && chevronMaster) {
-                menuMaster.style.display = 'flex';
-                chevronMaster.style.transform = 'rotate(180deg)';
-            }
+            if(menuMaster && chevronMaster) { menuMaster.style.display = 'flex'; chevronMaster.style.transform = 'rotate(180deg)'; }
         }, 300);
     };
 </script>
