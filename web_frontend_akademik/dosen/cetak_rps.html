@@ -149,7 +149,8 @@
         @media print {
             @page {
                 size: landscape;
-                margin: 10mm;
+                /* Set margin 0 untuk memaksa browser membuang Header (Judul Web) & Footer (URL) otomatisnya */
+                margin: 0mm;
             }
 
             body {
@@ -162,8 +163,10 @@
                 box-shadow: none;
                 width: 100%;
                 max-width: 100%;
-                padding: 0;
+                /* Pindahkan margin kertas ke dalam padding agar konten tidak menabrak ujung kertas */
+                padding: 15mm 15mm;
                 margin: 0;
+                box-sizing: border-box;
             }
 
             .no-print {
@@ -197,15 +200,21 @@
     <div class="document-container" id="rps-section">
         <table class="header-table">
             <tr>
-                <td width="20%" class="text-center">
+                <!-- Kolom Kiri: Logo (20%) -->
+                <td width="20%" class="text-center" style="vertical-align: middle;">
                     <img src="../gambar/LogoUnaki.png" style="max-width: 120px; filter: grayscale(100%);">
                 </td>
-                <td width="80%" class="text-center">
+
+                <!-- Kolom Tengah: Teks Judul (60%) -->
+                <td width="60%" class="text-center" style="vertical-align: middle;">
                     <h2 style="margin: 0; font-size: 16pt;">UNIVERSITAS AKI</h2>
                     <h3 style="margin: 5px 0 0 0; font-size: 12pt; font-weight: normal;">FAKULTAS TEKNIK DAN
                         INFORMATIKA<br>PROGRAM STUDI <span id="printProdi" style="font-weight: bold;">INFORMATIKA</span>
                     </h3>
                 </td>
+
+                <!-- Kolom Kanan: Kosong/Bayangan (20%) untuk menyeimbangkan -->
+                <td width="20%"></td>
             </tr>
         </table>
 
@@ -265,13 +274,78 @@
                 <td class="bg-blue">Bahan Kajian / Materi Pembelajaran</td>
                 <td id="printMateri" style="text-align: justify;">...</td>
             </tr>
+
+            <tr>
+                <td colspan="2" style="padding: 0; border: none;">
+                    <table style="margin: 0; border: none; width: 100%;" id="tabelPenilaianDinamis">
+                        <tr>
+                            <td class="text-center" style="color:gray; padding: 20px;">Menarik data penilaian...</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
             <tr>
                 <td class="bg-blue">Pustaka Utama</td>
-                <td id="printPustakaUtama" style="text-align: justify;">...</td>
+                <td id="printPustakaUtama" style="text-align: justify; padding: 10px;">
+                    <ul style="list-style-type: none; padding-left: 0; margin: 0;">
+                        <li>[1] Computer Networking: A Top-Down Approach, James F. Kurose, Keith W. Ross, 2021</li>
+                        <li>[2] Data Communications and Networking, Behrouz A. Forouzan, 2013</li>
+                        <li>[3] Network Warrior, Gary Donahue (O"Reilly), 2022</li>
+                    </ul>
+                </td>
             </tr>
             <tr>
                 <td class="bg-blue">Pustaka Pendukung</td>
-                <td id="printPustakaPendukung" style="text-align: justify;">...</td>
+                <td id="printPustakaPendukung" style="text-align: justify; padding: 10px;">
+                    <ul style="list-style-type: none; padding-left: 0; margin: 0;">
+                        <li>[1] Top-Down Network Design, Priscilla Oppenheimer, 2011</li>
+                        <li>[2] CompTIA Security+ Guide to Network Security Fundamentals, Mark Ciampa</li>
+                        <li>[3] VPC & Networking Documentation, Amazon Web Services (AWS), Microsoft Azure, atau Google
+                            Cloud</li>
+                        <li>[4] Request For Comments (RFC), IETF (Internet Engineering Task Force)</li>
+                    </ul>
+                </td>
+            </tr>
+            <!-- BARIS MEDIA PEMBELAJARAN BARU DI DALAM TABEL UTAMA -->
+            <tr>
+                <td class="bg-blue">Media Pembelajaran</td>
+                <td style="padding: 0;">
+                    <table style="margin: 0; border: none; width: 100%; height: 100%;">
+                        <tr>
+                            <td width="20%"
+                                style="border-top: none; border-left: none; border-right: 1px solid black; border-bottom: 1px solid black; font-weight: bold;">
+                                Software:</td>
+                            <td width="80%"
+                                style="border-top: none; border-left: none; border-right: none; border-bottom: 1px solid black;"
+                                id="printMediaSoft">-</td>
+                        </tr>
+                        <tr>
+                            <td style="border: none; border-right: 1px solid black; font-weight: bold;">Hardware:</td>
+                            <td style="border: none;" id="printMediaHard">-</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <!-- TABEL BARU UNTUK INFO KELULUSAN & SYARAT -->
+        <table>
+            <tr>
+                <td width="25%" class="bg-blue">Team Teaching</td>
+                <td width="75%" id="printTeam">-</td>
+            </tr>
+            <tr>
+                <td class="bg-blue">Matakuliah Syarat</td>
+                <td id="printSyarat">-</td>
+            </tr>
+            <tr>
+                <td class="bg-blue">Ambang Batas Kelulusan Mahasiswa</td>
+                <td id="printBatasMhs">-</td>
+            </tr>
+            <tr>
+                <td class="bg-blue">Ambang Batas Kelulusan MK</td>
+                <td id="printBatasMk">-</td>
             </tr>
         </table>
 
@@ -314,7 +388,13 @@
         const API_GET_INFO_MK = `${API_BASE}/get-info-mk`;
         const API_GET_RPS = `${API_BASE}/get-rps-sesi`;
         const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
-        const API_GET_TUGAS = `${API_BASE}/get-tugas-matkul`;
+        const API_GET_TUGAS = `${API_BASE}/get-rubrik-by-matkul`;
+        const API_GET_RUMPUN = `${API_BASE}/get-rumpun-bk`; // Tambahkan baris ini
+        const API_GET_BOBOT = `${API_BASE}/get-bobot-penilaian`;
+
+        // VARIABEL GLOBAL UNTUK MENGINGAT DESKRIPSI (AGAR BISA DIPAKAI RTM)
+        let globalCplMap = new Map();
+        let globalCpmkMap = new Map();
 
         // ==========================================
         // FUNGSI PENCARI DATA AMAN (THE ULTIMATE EXTRACTOR)
@@ -365,22 +445,65 @@
                     const infoData = safeExtractN8N(await resInfo.json());
                     const info = infoData[0] || {};
 
-                    document.getElementById('printRumpun').innerText = info.rumpun || '-';
                     document.getElementById('printTgl').innerText = info.tanggal_penyusunan || '-';
                     document.getElementById('printKoorNama').innerText = info.koordinator || 'Majid Rahardi, S.Kom., M.Eng';
                     document.getElementById('printKaprodiNama').innerText = info.kaprodi || 'Eli Pujiastuti, M.Kom.';
                     document.getElementById('printDosenNama').innerText = (localStorage.getItem("user_login") || "Dosen Pengampu").toUpperCase();
 
+                    // Deskripsi awal (nanti ditimpa jika ada di rps_lainnya)
                     document.getElementById('printDeskripsi').innerHTML = (info.deskripsi || '-').replace(/\n/g, '<br>');
-                    document.getElementById('printMateri').innerHTML = (info.bahan_kajian || '-').replace(/\n/g, '<br>');
-                    document.getElementById('printPustakaUtama').innerHTML = (info.pustaka_utama || '-').replace(/\n/g, '<br>');
-                    document.getElementById('printPustakaPendukung').innerHTML = (info.pustaka_pendukung || '-').replace(/\n/g, '<br>');
                 }
             } catch (e) { console.error("Gagal load Info MK", e); }
 
-            // 3. JALANKAN PENARIKAN CPL, RPS, DAN RTM SECARA PARALEL (CEPAT)
+            // 2.5 TARIK DATA RUMPUN & BAHAN KAJIAN
+            try {
+                document.getElementById('printRumpun').innerText = "-";
+                const resRumpun = await fetch(`${API_GET_RUMPUN}?kode_mk=${kodeMk}`);
+                if (resRumpun.ok) {
+                    const jsonRumpun = await resRumpun.json();
+                    let dataRumpun = jsonRumpun.data || jsonRumpun;
+                    if (!Array.isArray(dataRumpun)) dataRumpun = [dataRumpun];
+
+                    if (dataRumpun.length > 0) {
+                        const uniqueMap = new Map();
+                        dataRumpun.forEach(item => {
+                            if (item.kode_bk && item.kode_bk !== 'undefined' && !uniqueMap.has(item.kode_bk)) {
+                                uniqueMap.set(item.kode_bk, item);
+                            }
+                        });
+                        const cleanData = Array.from(uniqueMap.values());
+                        const rawBahanKajian = cleanData.map(item => `${item.kode_bk} - ${item.nama_bk}`).filter(bk => bk && !bk.includes('undefined'));
+                        document.getElementById('printMateri').innerHTML = rawBahanKajian.join('<br>') || "-";
+                    } else {
+                        document.getElementById('printMateri').innerText = "Belum ada Bahan Kajian";
+                    }
+                }
+            } catch (e) { console.error("Gagal load Bahan Kajian", e); }
+
+            // 2.8 TARIK INFO TAMBAHAN DARI DATABASE rps_lainnya N8N
+            try {
+                const resLain = await fetch(`${API_BASE}/get-rps-lainnya?kode_mk=${kodeMk}`);
+                if (resLain.ok) {
+                    const jsonLain = safeExtractN8N(await resLain.json());
+                    const data = jsonLain[0] || {};
+
+                    if (data.deskripsi_mk) {
+                        document.getElementById('printDeskripsi').innerHTML = data.deskripsi_mk.replace(/\n/g, '<br>');
+                    }
+                    document.getElementById('printMediaSoft').innerText = data.media_software || '-';
+                    document.getElementById('printMediaHard').innerText = data.media_hardware || '-';
+                    document.getElementById('printTeam').innerText = data.team_teaching || '-';
+                    document.getElementById('printSyarat').innerText = data.matkul_syarat || '-';
+                    document.getElementById('printBatasMhs').innerText = data.batas_mhs || '50.01';
+                    document.getElementById('printBatasMk').innerText = data.batas_mk || '85.00%';
+                }
+            } catch (e) { console.error("Gagal menarik data rps_lainnya", e); }
+
+            // 3. JALANKAN PENARIKAN CPL DULU, BARU YANG LAIN
+            await loadCplCpmkDariDB(kodeMk);
+
             await Promise.all([
-                loadCplCpmkDariDB(kodeMk),
+                loadBobotPenilaian(kodeMk),
                 loadDataRPSTable(kodeMk),
                 loadSemuaTugasMatkul(kodeMk, namaMkGlobal)
             ]);
@@ -400,37 +523,101 @@
                     const dataCplCpmk = safeExtractN8N(jsonCpl).filter(item => item.kode_cpmk);
 
                     if (dataCplCpmk.length > 0) {
-                        const cplMap = new Map();
                         const cpmkArray = [];
 
                         dataCplCpmk.forEach(row => {
                             if (row.kode_cpl && row.deskripsi_cpl) {
-                                cplMap.set(row.kode_cpl, row.deskripsi_cpl);
+                                globalCplMap.set(row.kode_cpl, row.deskripsi_cpl);
                             }
                             if (row.kode_cpmk && row.deskripsi_cpmk) {
+                                globalCpmkMap.set(row.kode_cpmk, row.deskripsi_cpmk);
                                 cpmkArray.push(`<li><strong>${row.kode_cpmk}</strong> - ${row.deskripsi_cpmk} <em>(Ref: ${row.kode_cpl || '-'})</em></li>`);
                             }
                         });
 
                         let cplHtml = '<ul>';
-                        cplMap.forEach((desc, kode) => {
+                        globalCplMap.forEach((desc, kode) => {
                             cplHtml += `<li><strong>${kode}</strong> - ${desc}</li>`;
                         });
                         cplHtml += '</ul>';
 
                         let cpmkHtml = '<ul>' + cpmkArray.join('') + '</ul>';
 
-                        document.getElementById('printCpl').innerHTML = cplMap.size > 0 ? cplHtml : '<span style="font-style:italic;">Belum ada pemetaan CPL.</span>';
+                        document.getElementById('printCpl').innerHTML = globalCplMap.size > 0 ? cplHtml : '<span style="font-style:italic;">Belum ada pemetaan CPL.</span>';
                         document.getElementById('printCpmk').innerHTML = cpmkArray.length > 0 ? cpmkHtml : '<span style="font-style:italic;">Belum ada pemetaan CPMK.</span>';
-                    } else {
-                        document.getElementById('printCpl').innerHTML = "<em>Mata Kuliah belum dipetakan ke CPL/CPMK oleh Kaprodi.</em>";
-                        document.getElementById('printCpmk').innerHTML = "<em>Mata Kuliah belum dipetakan ke CPL/CPMK oleh Kaprodi.</em>";
                     }
                 }
             } catch (e) {
                 console.error("CPL Load Error:", e);
                 document.getElementById('printCpl').innerHTML = "<em>Gagal terhubung ke database.</em>";
                 document.getElementById('printCpmk').innerHTML = "<em>Gagal terhubung ke database.</em>";
+            }
+        }
+
+        async function loadBobotPenilaian(kodeMK) {
+            try {
+                const res = await fetch(`${API_GET_BOBOT}?kode_mk=${kodeMK}`);
+                if (res.ok) {
+                    const jsonBobot = await res.json();
+                    const data = safeExtractN8N(jsonBobot);
+                    const validData = data.filter(b => b.kode_cpmk && globalCpmkMap.has(b.kode_cpmk));
+
+                    const tabelDinamis = document.getElementById('tabelPenilaianDinamis');
+
+                    if (validData.length > 0) {
+                        let grandTotal = 0;
+                        let barisDataHtml = '';
+
+                        // Looping baris data CPMK
+                        validData.forEach(b => {
+                            const tgs = Number(b.tugas) || 0;
+                            const uts = Number(b.uts) || 0;
+                            const uas = Number(b.uas) || 0;
+                            const att = Number(b.attitude) || 0;
+                            const khd = Number(b.kehadiran) || 0;
+                            const total = tgs + uts + uas + att + khd;
+                            grandTotal += total;
+
+                            barisDataHtml += `
+                                <tr>
+                                    <td class="text-center font-bold">${b.kode_cpmk}</td>
+                                    <td class="text-center">${tgs}%</td>
+                                    <td class="text-center">${uts}%</td>
+                                    <td class="text-center">${uas}%</td>
+                                    <td class="text-center">${att}%</td>
+                                    <td class="text-center">${khd}%</td>
+                                    <td class="text-center font-bold">${total}%</td>
+                                </tr>
+                            `;
+                        });
+
+                        // 1 Baris Header + Jumlah Baris CPMK + 1 Baris Total
+                        const totalRowSpan = validData.length + 2;
+
+                        // RENDER SELURUH TABEL SEKALIGUS
+                        tabelDinamis.innerHTML = `
+                            <tr>
+                                <td rowspan="${totalRowSpan}" class="bg-blue text-center" style="vertical-align:middle; width:20%;">Penilaian</td>
+                                <td class="bg-blue text-center" width="15%">ID CPMK</td>
+                                <td class="bg-blue text-center">TUGAS</td>
+                                <td class="bg-blue text-center">UTS</td>
+                                <td class="bg-blue text-center">UAS</td>
+                                <td class="bg-blue text-center">ATTITUDE</td>
+                                <td class="bg-blue text-center">KEHADIRAN</td>
+                                <td class="bg-blue text-center">TOTAL</td>
+                            </tr>
+                            ${barisDataHtml}
+                            <tr class="bg-blue">
+                                <td colspan="6" style="text-align:right; font-weight:bold; padding-right: 15px;">TOTAL KESELURUHAN:</td>
+                                <td class="text-center" style="font-weight:bold; font-size:1.1rem;">${grandTotal}%</td>
+                            </tr>
+                        `;
+                    } else {
+                        tabelDinamis.innerHTML = `<tr><td class="text-center" style="color:red; padding:15px;">Data bobot belum diatur / kosong di database.</td></tr>`;
+                    }
+                }
+            } catch (e) {
+                document.getElementById('tabelPenilaianDinamis').innerHTML = `<tr><td class="text-center" style="padding:15px;">Gagal memuat bobot.</td></tr>`;
             }
         }
 
@@ -484,88 +671,85 @@
         }
 
         // ==========================================
-        // FUNGSI LOAD RTM TUGAS RUBRIK
+        // FUNGSI LOAD RTM TUGAS RUBRIK (UPDATE KOLOM)
         // ==========================================
         async function loadSemuaTugasMatkul(kodeMK, namaMK) {
             const container = document.getElementById('rtm-section');
             try {
-                const response = await fetch(`${API_GET_TUGAS}?kode_mk=${kodeMK}`);
-                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                // 1. Panggil URL API secara murni tanpa tambahan cache, persis seperti cetak_rps_matkul.html
+                const response = await fetch(`${API_BASE}/get-rubrik-by-matkul?kode_mk=${kodeMK}`);
+                const textData = await response.text();
 
-                const jsonResponse = await response.json();
+                if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {
+                    container.innerHTML = '<div class="kertas-rtm"><h3 style="text-align:center; color:red;">Gagal menarik data atau URL n8n terputus.</h3></div>';
+                    return;
+                }
 
-                // Gunakan the ultimate extractor
-                const allData = safeExtractN8N(jsonResponse);
+                // 2. Parse data langsung (Tanpa ekstrak N8N yang berlebihan)
+                const data = JSON.parse(textData);
 
-                if (!allData || allData.length === 0) {
+                if (data.length === 0) {
                     container.innerHTML = '<div class="kertas-rtm"><h3 style="text-align:center; color:#6b7280; padding-top: 50px;">Belum ada Rencana Tugas Mahasiswa (RTM) yang perlu dicetak untuk matkul ini.</h3></div>';
                     return;
                 }
 
-                // Pengelompokan Data Tugas dan Rubriknya
-                const uniqueTasksMap = new Map();
-                allData.forEach(item => {
-                    if (!item.id_tugas) return; // Lewati jika tidak ada ID tugas
+                // 3. Grouping Data Tugas & Rubrik (Persis dengan cetak_rps_matkul)
+                // Di dalam loadSemuaTugasMatkul, saat grouping:
+                const tugasGrouped = {};
+                data.forEach(row => {
+                    let item = row.json ? row.json : row;
 
-                    if (!uniqueTasksMap.has(item.id_tugas)) {
-                        uniqueTasksMap.set(item.id_tugas, {
-                            id_tugas: item.id_tugas,
-                            pertemuan: item.pertemuan,
-                            cpmk: item.cpmk,
-                            judul: item.judul_tugas,
-                            uraian: item.uraian_tugas,
-                            metode: item.metode_pengerjaan,
-                            luaran: item.luaran_tugas,
-                            rubrik: []
-                        });
+                    if (!tugasGrouped[item.id_tugas]) {
+                        tugasGrouped[item.id_tugas] = {
+                            judul: item.judul_tugas || item.judul || '-',
+                            metode: item.metode || '-',
+                            waktu: item.waktu_pengerjaan || item.waktu || '-',
+                            luaran: item.luaran_tugas || item.luaran || '-',
+
+                            // TRIK: Jika item.deskripsi tidak ditarik oleh N8N, kita ambil dari nama kolom alternatif yang mungkin
+                            deskripsi: item.deskripsi || item.deskripsi_tugas || '-',
+
+                            cpmk: item.kode_cpmk || item.cpmk || '-',
+                            cpl: item.kode_cpl || item.cpl || '-',
+                            kriteriaList: []
+                        };
                     }
-
-                    // Masukkan ke dalam array rubrik HANYA jika ada kriteria
-                    if (item.kriteria_penilaian) {
-                        uniqueTasksMap.get(item.id_tugas).rubrik.push({
-                            kriteria: item.kriteria_penilaian,
-                            bobot: item.bobot_kriteria,
-                            skala1: item.skala1,
-                            skala2: item.skala2,
-                            skala3: item.skala3,
-                            skala4: item.skala4
-                        });
+                    if (item.kriteria) {
+                        tugasGrouped[item.id_tugas].kriteriaList.push(item);
                     }
                 });
 
-                const tasks = Array.from(uniqueTasksMap.values()).sort((a, b) => parseInt(a.pertemuan) - parseInt(b.pertemuan));
+                container.innerHTML = '';
 
-                if (tasks.length === 0) {
-                    container.innerHTML = '<div class="kertas-rtm"><h3 style="text-align:center; color:#6b7280; padding-top: 50px;">Belum ada Rencana Tugas Mahasiswa (RTM) yang perlu dicetak untuk matkul ini.</h3></div>';
-                    return;
-                }
+                // 4. Render ke HTML
+                Object.keys(tugasGrouped).forEach((idTugas, index) => {
+                    const t = tugasGrouped[idTugas];
+                    // AMBIL DESKRIPSI DARI INGATAN GLOBAL
+                    const descCpl = globalCplMap.get(t.cpl) ? `<br>${globalCplMap.get(t.cpl)}` : '';
+                    const descCpmk = globalCpmkMap.get(t.cpmk) ? `<br>${globalCpmkMap.get(t.cpmk)}` : '';
 
-                container.innerHTML = "";
-
-                tasks.forEach((t) => {
-                    let kriteriaRows = "";
-                    if (t.rubrik.length === 0) {
-                        kriteriaRows = `<tr><td colspan="6" class="text-center" style="font-style:italic;">Belum ada rubrik penilaian.</td></tr>`;
+                    let kriteriaRows = '';
+                    if (t.kriteriaList.length === 0) {
+                        kriteriaRows = `<tr><td colspan="6" style="text-align:center; color:red; font-style:italic;">Kriteria rubrik belum diisi.</td></tr>`;
                     } else {
-                        t.rubrik.forEach(r => {
+                        t.kriteriaList.forEach(k => {
                             kriteriaRows += `
                                 <tr>
-                                    <td>${r.kriteria}</td>
-                                    <td class="text-center"><strong>${r.bobot}%</strong></td>
-                                    <td>${r.skala1 || '-'}</td>
-                                    <td>${r.skala2 || '-'}</td>
-                                    <td>${r.skala3 || '-'}</td>
-                                    <td>${r.skala4 || '-'}</td>
+                                    <td style="font-weight:bold;">${k.kriteria}</td>
+                                    <td style="text-align:center; font-weight:bold;">${k.bobot_persen || k.bobot}%</td>
+                                    <td>${k.skala_1 || '-'}</td>
+                                    <td>${k.skala_2 || '-'}</td>
+                                    <td>${k.skala_3 || '-'}</td>
+                                    <td>${k.skala_4 || '-'}</td>
                                 </tr>
                             `;
                         });
                     }
 
-                    // Setiap Tugas dibuat dalam 1 Kertas RTM baru
                     container.innerHTML += `
                         <div class="kertas-rtm">
                             <h1 class="main-title-rtm">RENCANA TUGAS MAHASISWA (RTM)</h1>
-                            <h2 class="sub-title-rtm">${(namaMK || '-').toUpperCase()} - PERTEMUAN ${t.pertemuan}</h2>
+                            <h2 class="sub-title-rtm">${(namaMK || '-').toUpperCase()} - TUGAS KE-${index + 1}</h2>
 
                             <table>
                                 <tr>
@@ -573,23 +757,31 @@
                                     <td width="80%"><strong>${kodeMK}</strong> - ${(namaMK || '-').toUpperCase()}</td>
                                 </tr>
                                 <tr>
-                                    <td class="bg-blue">CPMK</td>
-                                    <td>${t.cpmk || '-'}</td>
+                                    <td class="bg-blue">CPL</td>
+                                    <td><strong>${t.cpl || '-'}</strong> ${descCpl}</td>
                                 </tr>
                                 <tr>
-                                    <td class="bg-blue">BENTUK TUGAS</td>
+                                    <td class="bg-blue">CPMK</td>
+                                    <td><strong>${t.cpmk || '-'}</strong> ${descCpmk}</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-blue">NAMA TUGAS</td>
                                     <td>${t.judul || '-'}</td>
                                 </tr>
                                 <tr>
-                                    <td class="bg-blue">URAIAN TUGAS</td>
-                                    <td style="text-align: justify;">${(t.uraian || '-').replace(/\n/g, '<br>')}</td>
+                                    <td class="bg-blue">WAKTU PENGERJAAN</td>
+                                    <td>${t.waktu || '-'}</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-blue">DESKRIPSI TUGAS</td>
+                                    <td style="text-align: justify;">${(t.deskripsi || '-').replace(/\n/g, '<br>')}</td>
                                 </tr>
                                 <tr>
                                     <td class="bg-blue">METODE / CARA PENGERJAAN</td>
                                     <td style="text-align: justify;">${(t.metode || '-').replace(/\n/g, '<br>')}</td>
                                 </tr>
                                 <tr>
-                                    <td class="bg-blue">LUARAN TUGAS</td>
+                                    <td class="bg-blue">BENTUK DAN FORMAT LUARAN</td>
                                     <td style="text-align: justify;">${t.luaran || '-'}</td>
                                 </tr>
                             </table>
