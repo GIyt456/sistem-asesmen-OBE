@@ -505,6 +505,30 @@
         .list-bullet li {
             margin-bottom: 8px;
         }
+
+        /* TOMBOL KECIL TAMBAH CPMK */
+        .select-cpmk-kecil {
+            background: transparent;
+            color: #64748b;
+            border: 1px dashed #cbd5e1;
+            border-radius: 4px;
+            padding: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            transition: 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+
+        .select-cpmk-kecil:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: #f8fafc;
+        }
     </style>
 </head>
 
@@ -515,7 +539,7 @@
     <nav class="navbar">
         <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
             style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
-            onclick="window.location.href='landing_page.html'">
+            onclick="window.location.href='index.html'">
         <div class="nav-links">
             <a href="jadwal_mengajar.html">Jadwal Mengajar</a>
             <a href="input_nilai.html">Input Asesmen</a>
@@ -591,9 +615,11 @@
                     <button class="tab-btn active" onclick="bukaTab(event, 'tab-detail')">Detail</button>
                     <button class="tab-btn" onclick="bukaTab(event, 'tab-cpl')">CPL & CPMK</button>
                     <button class="tab-btn" onclick="bukaTab(event, 'tab-deskripsi')">Deskripsi Mata Kuliah</button>
+                    <button class="tab-btn" onclick="bukaTab(event, 'tab-info')">Info Tambahan</button>
                     <button class="tab-btn" onclick="bukaTab(event, 'tab-pustaka')">Pustaka</button>
                     <button class="tab-btn" onclick="bukaTab(event, 'tab-sesi')"
                         style="color: #8b0000; font-weight: 800;">Sesi Pertemuan</button>
+                    <button class="tab-btn" onclick="bukaTab(event, 'tab-penilaian')">Penilaian (Bobot)</button>
                 </div>
 
                 <div id="tab-detail" class="tab-content active">
@@ -606,7 +632,8 @@
                             </div>
                             <div class="form-group">
                                 <label>Rumpun</label>
-                                <input type="text" id="dtlRumpun" class="form-control" readonly>
+                                <textarea id="dtlRumpun" class="form-control" readonly
+                                    style="resize: vertical; min-height: 80px;"></textarea>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                 <div class="form-group">
@@ -653,22 +680,76 @@
                     </div>
                 </div>
 
+                <!-- TAB DESKRIPSI -->
                 <div id="tab-deskripsi" class="tab-content">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 class="section-title" style="margin: 0; border: none;">Deskripsi & Bahan Kajian</h3>
+                        <button class="btn-action" onclick="simpanRpsLainnya()" id="btnSimpanDeskripsi">
+                            <i class="fas fa-save"></i> Simpan Deskripsi
+                        </button>
+                    </div>
                     <div class="grid-2-col">
                         <div>
-                            <h3 class="section-title">Deskripsi Singkat MK</h3>
+                            <h3 class="section-title" style="font-size: 1rem;">Deskripsi Singkat MK</h3>
                             <textarea id="valDeskripsi" class="form-control" style="height: 120px; resize: vertical;"
-                                readonly>Menarik data dari server...</textarea>
+                                placeholder="Ketik deskripsi singkat mata kuliah di sini..."></textarea>
 
-                            <h3 class="section-title" style="margin-top: 20px;">Bahan Kajian : Materi Pembelajaran</h3>
+                            <h3 class="section-title" style="margin-top: 20px; font-size: 1rem;">Bahan Kajian : Materi
+                                Pembelajaran</h3>
                             <textarea id="valBahanKajian" class="form-control" style="height: 120px; resize: vertical;"
                                 readonly>Menarik data dari server...</textarea>
                         </div>
                         <div>
                             <div class="box-catatan">
                                 <h4>Informasi:</h4>
-                                <p style="color:#64748b;">Deskripsi diambil dari Master Kurikulum yang telah disetujui
-                                    Kaprodi.</p>
+                                <p style="color:#64748b;">Deskripsi disimpan ke database n8n. Bahan Kajian otomatis
+                                    ditarik dari Master Kurikulum Kaprodi.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB INFO TAMBAHAN BARU -->
+                <div id="tab-info" class="tab-content">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 class="section-title" style="margin: 0; border: none;">Informasi Tambahan RPS</h3>
+                        <button class="btn-action" onclick="simpanRpsLainnya()" id="btnSimpanInfo">
+                            <i class="fas fa-save"></i> Simpan Info Tambahan
+                        </button>
+                    </div>
+                    <div class="grid-2-col">
+                        <div>
+                            <div class="form-group">
+                                <label>Media Pembelajaran (Software)</label>
+                                <input type="text" id="valMediaSoft" class="form-control"
+                                    placeholder="Contoh: VS Code, XAMPP...">
+                            </div>
+                            <div class="form-group">
+                                <label>Media Pembelajaran (Hardware)</label>
+                                <input type="text" id="valMediaHard" class="form-control"
+                                    placeholder="Contoh: PC/Laptop, Proyektor...">
+                            </div>
+                            <div class="form-group">
+                                <label>Team Teaching</label>
+                                <input type="text" id="valTeam" class="form-control"
+                                    placeholder="Contoh: Sinta Tridian Galih, S.T., M.Kom.">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="form-group">
+                                <label>Mata Kuliah Syarat</label>
+                                <input type="text" id="valSyarat" class="form-control"
+                                    placeholder="Contoh: Algoritma Pemrograman">
+                            </div>
+                            <div class="form-group">
+                                <label>Ambang Batas Kelulusan Mahasiswa</label>
+                                <input type="text" id="valBatasMhs" class="form-control" placeholder="Contoh: 50.01">
+                            </div>
+                            <div class="form-group">
+                                <label>Ambang Batas Kelulusan MK</label>
+                                <input type="text" id="valBatasMk" class="form-control" placeholder="Contoh: 85.00%">
                             </div>
                         </div>
                     </div>
@@ -678,18 +759,63 @@
                     <div class="grid-2-col">
                         <div>
                             <h3 class="section-title">Pustaka Utama</h3>
-                            <div id="valPustakaUtama" class="content-box">Menarik data dari server...</div>
+                            <div class="content-box">
+                                <ul class="list-bullet" style="list-style-type: none; margin-left: 0;">
+                                    <li>[1] Computer Networking: A Top-Down Approach, James F. Kurose, Keith W. Ross,
+                                        2021</li>
+                                    <li>[2] Data Communications and Networking, Behrouz A. Forouzan, 2013</li>
+                                    <li>[3] Network Warrior, Gary Donahue (O"Reilly), 2022</li>
+                                </ul>
+                            </div>
 
                             <h3 class="section-title" style="margin-top: 20px;">Pustaka Pendukung</h3>
-                            <div id="valPustakaPendukung" class="content-box">Menarik data dari server...</div>
+                            <div class="content-box">
+                                <ul class="list-bullet" style="list-style-type: none; margin-left: 0;">
+                                    <li>[1] Top-Down Network Design, Priscilla Oppenheimer, 2011</li>
+                                    <li>[2] CompTIA Security+ Guide to Network Security Fundamentals, Mark Ciampa</li>
+                                    <li>[3] VPC & Networking Documentation, Amazon Web Services (AWS), Microsoft Azure,
+                                        atau Google Cloud</li>
+                                    <li>[4] Request For Comments (RFC), IETF (Internet Engineering Task Force)</li>
+                                </ul>
+                            </div>
                         </div>
                         <div>
                             <div class="box-catatan">
                                 <h4>Informasi:</h4>
-                                <p style="color:#64748b;">Referensi pustaka ditetapkan berdasarkan konsorsium bidang
-                                    keilmuan prodi.</p>
+                                <p style="color:#64748b;">Referensi pustaka telah ditetapkan secara permanen berdasarkan
+                                    konsorsium bidang keilmuan prodi.</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div id="tab-penilaian" class="tab-content">
+                    <h3 class="section-title">Bobot per Bentuk Penilaian</h3>
+                    <div class="box-catatan" style="margin-bottom: 20px;">
+                        <h4>Informasi:</h4>
+                        <p style="color:#64748b;">Data bobot penilaian ini ditarik otomatis dari database Master Bobot
+                            Kurikulum Prodi.</p>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="table-sesi">
+                            <thead>
+                                <tr>
+                                    <th width="15%">ID CPMK</th>
+                                    <th width="15%">TUGAS (%)</th>
+                                    <th width="15%">UTS (%)</th>
+                                    <th width="15%">UAS (%)</th>
+                                    <th width="15%">ATTITUDE (%)</th>
+                                    <th width="15%">KEHADIRAN (%)</th>
+                                    <th width="10%">TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody id="valBobotPenilaian">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 20px;"><i
+                                            class="fas fa-spinner fa-spin"></i> Menarik data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -740,6 +866,7 @@
         const API_SIMPAN_RPS = `${API_BASE}/simpan-rps`;
         const API_GET_INFO_MK = `${API_BASE}/get-info-mk`;
         const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
+        const API_GET_BOBOT = `${API_BASE}/get-bobot-penilaian`;
         const API_CPMK_LIST = `${API_BASE}/get-cpmk-list`; // API Untuk Auto-fill CPMK
 
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
@@ -763,7 +890,7 @@
             if (jsonObj.data) data = jsonObj.data;
             if (!Array.isArray(data)) data = [data];
             data = data.flat(Infinity);
-            // Bagian terpenting: membongkar bungkus "json" bawaan n8n
+            // Ini yang membedakan: Membongkar bungkus "json" dari n8n
             return data.map(item => item.json ? item.json : item);
         }
 
@@ -812,18 +939,87 @@
             } catch (e) { console.error("Gagal memuat master CPMK:", e); }
         }
 
-        function isiOtomatisDeskripsi(indexBaris) {
-            const inputKode = document.getElementById(`id_cpmk_${indexBaris}`).value;
-            const cpmkDitemukan = masterCPMK.find(item => item.kode_cpmk === inputKode);
+        // ==========================================
+        // SISTEM BADGE MULTI-CPMK
+        // ==========================================
 
-            if (cpmkDitemukan) {
-                const colDesc = document.getElementById(`sub_cpmk_${indexBaris}`);
-                colDesc.value = cpmkDitemukan.deskripsi;
-                colDesc.style.backgroundColor = "#ccfbf1";
-                setTimeout(() => {
-                    colDesc.style.backgroundColor = (indexBaris === 8 || indexBaris === 16) ? "#fef2f2" : "#f8fafc";
-                }, 600);
+        function tambahCpmkKeSesi(indexBaris) {
+            const selectEl = document.getElementById(`select_cpmk_${indexBaris}`);
+            const kodeDipilih = selectEl.value;
+            if (!kodeDipilih) return;
+
+            const hiddenInput = document.getElementById(`id_cpmk_${indexBaris}`);
+            let currentArray = hiddenInput.value.split(',').map(k => k.trim()).filter(k => k !== '');
+
+            if (!currentArray.includes(kodeDipilih)) {
+                currentArray.push(kodeDipilih);
+                hiddenInput.value = currentArray.join(', ');
+                renderBadgeCpmk(indexBaris, true);
             }
+
+            selectEl.value = ""; // Reset kembali ke placeholder kosong
+        }
+
+        function hapusCpmkDariSesi(indexBaris, kodeDihapus) {
+            const hiddenInput = document.getElementById(`id_cpmk_${indexBaris}`);
+            let currentArray = hiddenInput.value.split(',').map(k => k.trim()).filter(k => k !== '');
+
+            // Buang kode yang diklik silang
+            currentArray = currentArray.filter(kode => kode !== kodeDihapus);
+            hiddenInput.value = currentArray.join(', ');
+
+            renderBadgeCpmk(indexBaris, true);
+        }
+
+        function renderBadgeCpmk(indexBaris, isUpdateDeskripsi = true) {
+            const hiddenInput = document.getElementById(`id_cpmk_${indexBaris}`);
+            const badgeContainer = document.getElementById(`badge_container_${indexBaris}`);
+            const selectEl = document.getElementById(`select_cpmk_${indexBaris}`);
+
+            let currentArray = hiddenInput.value.split(',').map(k => k.trim()).filter(k => k !== '');
+
+            // 1. Cetak ulang HTML Stiker/Badge di Atas
+            badgeContainer.innerHTML = "";
+            currentArray.forEach(kode => {
+                badgeContainer.innerHTML += `
+                    <div style="background:var(--primary-blue); color:white; font-size:0.75rem; padding:6px 10px; border-radius:4px; display:flex; justify-content:space-between; align-items:center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <span style="font-weight:bold;">${kode}</span> 
+                        <i class="fas fa-times" style="cursor:pointer; color:#fca5a5; transition:0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#fca5a5'" onclick="hapusCpmkDariSesi(${indexBaris}, '${kode}')"></i>
+                    </div>
+                `;
+            });
+
+            // 2. Logika Animasi Dropdown (Besar jika Kosong, Kecil jika Ada isinya)
+            if (currentArray.length === 0) {
+                selectEl.className = "input-rps";
+                selectEl.options[0].text = "+ Pilih CPMK...";
+            } else {
+                selectEl.className = "select-cpmk-kecil";
+                selectEl.options[0].text = "+ Tambah Lagi";
+            }
+
+            if (isUpdateDeskripsi) isiOtomatisDeskripsi(indexBaris);
+        }
+
+        function isiOtomatisDeskripsi(indexBaris) {
+            const inputKodeStr = document.getElementById(`id_cpmk_${indexBaris}`).value;
+            const kodeArray = inputKodeStr.split(',').map(k => k.trim()).filter(k => k !== '');
+
+            let combinedDesc = [];
+
+            kodeArray.forEach(kode => {
+                const cpmkDitemukan = masterCPMK.find(item => item.kode_cpmk === kode);
+                if (cpmkDitemukan) combinedDesc.push(`[${kode}]\n${cpmkDitemukan.deskripsi}`);
+            });
+
+            const colDesc = document.getElementById(`sub_cpmk_${indexBaris}`);
+            colDesc.value = combinedDesc.length > 0 ? combinedDesc.join('\n\n') : '';
+
+            colDesc.style.backgroundColor = "#ccfbf1";
+            setTimeout(() => { colDesc.style.backgroundColor = (indexBaris === 8 || indexBaris === 16) ? "#fef2f2" : "#f8fafc"; }, 600);
+
+            colDesc.style.height = 'auto';
+            colDesc.style.height = (colDesc.scrollHeight) + 'px';
         }
 
         async function loadDaftarRPS() {
@@ -917,32 +1113,76 @@
             document.getElementById('valCpl').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--primary-blue);"></i> Menarik pemetaan CPL...';
             document.getElementById('valCpmk').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--primary-blue);"></i> Menarik pemetaan CPMK...';
 
-            const reqInfo = fetch(`${API_GET_INFO_MK}?kode_mk=${kodeMK}`).catch(() => null);
-            const reqCplCpmk = fetch(`${API_GET_CPL_CPMK}?kode_mk=${kodeMK}`).catch(() => null);
+            // Rumpun dikosongkan sementara sesuai permintaan
+            document.getElementById('dtlRumpun').value = "-";
 
-            const [resInfo, resCplCpmk] = await Promise.all([reqInfo, reqCplCpmk]);
+            // 1. SET TANGGAL & JAM OTOMATIS SAAT INI (LIVE)
+            const now = new Date();
+            const formatTgl = now.toLocaleString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            document.getElementById('dtlTgl').value = formatTgl;
 
+            // 2. TARIK DATA BAHAN KAJIAN DARI WORKFLOW BARU (Rumpun dinonaktifkan sementara)
             try {
-                if (resInfo && resInfo.ok) {
+                const resRumpun = await fetch(`${API_BASE}/get-rumpun-bk?kode_mk=${kodeMK}`);
+                if (resRumpun.ok) {
+                    const jsonRumpun = await resRumpun.json();
+                    let dataRumpun = jsonRumpun.data || jsonRumpun;
+                    if (!Array.isArray(dataRumpun)) dataRumpun = [dataRumpun];
+
+                    if (dataRumpun.length > 0) {
+
+                        // Saring murni berdasarkan 'kode_bk' untuk Bahan Kajian
+                        const uniqueMap = new Map();
+                        dataRumpun.forEach(item => {
+                            if (item.kode_bk && item.kode_bk !== 'undefined' && !uniqueMap.has(item.kode_bk)) {
+                                uniqueMap.set(item.kode_bk, item);
+                            }
+                        });
+                        const cleanData = Array.from(uniqueMap.values());
+
+                        // A. Rumpun: Tetap dibiarkan kosong/strip
+                        const elRumpun = document.getElementById('dtlRumpun');
+                        elRumpun.value = "-";
+                        elRumpun.style.height = 'auto';
+
+                        // B. Bahan Kajian: Tetap menarik format "kode_bk - nama_bk"
+                        const rawBahanKajian = cleanData
+                            .map(item => `${item.kode_bk} - ${item.nama_bk}`)
+                            .filter(bk => bk && !bk.includes('undefined'));
+
+                        document.getElementById('valBahanKajian').value = rawBahanKajian.join('\n') || "Tidak ada data Bahan Kajian.";
+
+                    } else {
+                        document.getElementById('valBahanKajian').value = "MK belum direlasikan dengan BK.";
+                    }
+                }
+            } catch (e) {
+                document.getElementById('valBahanKajian').value = "Gagal terhubung ke N8N.";
+            }
+
+            // 3. TARIK INFO LAMA (Hanya Pustaka - Bahan Kajian sudah diurus di atas)
+            try {
+                const resInfo = await fetch(`${API_GET_INFO_MK}?kode_mk=${kodeMK}`);
+                if (resInfo.ok) {
                     const infoData = safeExtractArray(await resInfo.json());
                     const data = infoData[0] || {};
-                    document.getElementById('dtlRumpun').value = data.rumpun || "Belum diatur";
-                    document.getElementById('dtlTgl').value = data.tanggal_penyusunan || "-";
-                    document.getElementById('valDeskripsi').value = data.deskripsi || "";
-                    document.getElementById('valBahanKajian').value = data.bahan_kajian || "";
-                    document.getElementById('valPustakaUtama').innerHTML = data.pustaka_utama || "Belum ada pustaka";
-                    document.getElementById('valPustakaPendukung').innerHTML = data.pustaka_pendukung || "Belum ada pustaka";
+
+                    // HAPUS ATAU KOMENTARI 2 BARIS INI:
+                    // document.getElementById('valPustakaUtama').innerHTML = data.pustaka_utama || "Belum ada pustaka";
+                    // document.getElementById('valPustakaPendukung').innerHTML = data.pustaka_pendukung || "Belum ada pustaka";
 
                     localStorage.setItem('cetak_koordinator', data.koordinator || "Belum Diatur");
                     localStorage.setItem('cetak_kaprodi', data.kaprodi || "Belum Diatur");
                 }
             } catch (e) { console.warn("API Get Info MK error/tidak lengkap"); }
 
+            // 4. TARIK CPL & CPMK
+            let validCpmkKodes = []; // Variabel penampung CPMK yang sah
             try {
-                if (resCplCpmk && resCplCpmk.ok) {
+                const resCplCpmk = await fetch(`${API_GET_CPL_CPMK}?kode_mk=${kodeMK}`);
+                if (resCplCpmk.ok) {
                     const jsonCpl = await resCplCpmk.json();
                     const dataCplCpmk = safeExtractArray(jsonCpl);
-
                     const filteredData = dataCplCpmk.filter(row => row.kode_cpmk);
 
                     if (filteredData.length > 0) {
@@ -950,12 +1190,9 @@
                         const cpmkArray = [];
 
                         filteredData.forEach(row => {
-                            if (row.kode_cpl && row.deskripsi_cpl) {
-                                cplMap.set(row.kode_cpl, row.deskripsi_cpl);
-                            }
-                            if (row.kode_cpmk && row.deskripsi_cpmk) {
-                                cpmkArray.push(`<li><strong>${row.kode_cpmk}</strong> - ${row.deskripsi_cpmk} <em>(Ref: ${row.kode_cpl || '-'})</em></li>`);
-                            }
+                            if (row.kode_cpmk) validCpmkKodes.push(row.kode_cpmk); // Simpan daftar CPMK sah
+                            if (row.kode_cpl && row.deskripsi_cpl) cplMap.set(row.kode_cpl, row.deskripsi_cpl);
+                            if (row.kode_cpmk && row.deskripsi_cpmk) cpmkArray.push(`<li><strong>${row.kode_cpmk}</strong> - ${row.deskripsi_cpmk} <em>(Ref: ${row.kode_cpl || '-'})</em></li>`);
                         });
 
                         let cplHtml = '<ul class="list-bullet">';
@@ -973,11 +1210,90 @@
                     }
                 }
             } catch (e) {
-                console.error("Gagal menarik relasi CPL CPMK:", e);
-                const errHtml = `<span style="color:#ef4444; font-weight:bold;"><i class="fas fa-exclamation-triangle"></i> Gagal terhubung ke Webhook Get CPL CPMK.</span>`;
-                document.getElementById('valCpl').innerHTML = errHtml;
-                document.getElementById('valCpmk').innerHTML = errHtml;
+                document.getElementById('valCpl').innerHTML = "Gagal terhubung ke Webhook Get CPL CPMK.";
+                document.getElementById('valCpmk').innerHTML = "Gagal terhubung ke Webhook Get CPL CPMK.";
             }
+
+            // 5. TARIK DATA BOBOT PENILAIAN (Dengan Filter Cerdas)
+            try {
+                const resBobot = await fetch(`${API_GET_BOBOT}?kode_mk=${kodeMK}`);
+                if (resBobot.ok) {
+                    const jsonBobot = await resBobot.json();
+                    const dataBobot = safeExtractArray(jsonBobot);
+
+                    // FILTER: Hanya ambil bobot yang kodenya ADA di dalam daftar validCpmkKodes tadi
+                    const validData = dataBobot.filter(b => b.kode_cpmk && validCpmkKodes.includes(b.kode_cpmk));
+
+                    const tbodyBobot = document.getElementById('valBobotPenilaian');
+
+                    if (validData.length > 0) {
+                        tbodyBobot.innerHTML = "";
+                        let grandTotal = 0;
+
+                        validData.forEach(b => {
+                            const tgs = Number(b.tugas) || 0;
+                            const uts = Number(b.uts) || 0;
+                            const uas = Number(b.uas) || 0;
+                            const att = Number(b.attitude) || 0;
+                            const khd = Number(b.kehadiran) || 0;
+                            const total = tgs + uts + uas + att + khd;
+
+                            grandTotal += total;
+
+                            tbodyBobot.innerHTML += `
+                                <tr>
+                                    <td style="font-weight:bold; text-align:center;">${b.kode_cpmk}</td>
+                                    <td style="text-align:center;">${tgs}%</td>
+                                    <td style="text-align:center;">${uts}%</td>
+                                    <td style="text-align:center;">${uas}%</td>
+                                    <td style="text-align:center;">${att}%</td>
+                                    <td style="text-align:center;">${khd}%</td>
+                                    <td style="text-align:center; font-weight:bold; color:var(--primary-navy);">${total}%</td>
+                                </tr>
+                            `;
+                        });
+
+                        const warnaTotal = grandTotal === 100 ? "#10b981" : "#ef4444";
+                        tbodyBobot.innerHTML += `
+                            <tr style="background-color: #f8fafc; border-top: 2px solid #cbd5e1;">
+                                <td colspan="6" style="text-align:right; font-weight:900; color:var(--primary-navy); padding-right:20px;">TOTAL KESELURUHAN:</td>
+                                <td style="text-align:center; font-weight:900; color:${warnaTotal}; font-size:1.1rem;">${grandTotal}%</td>
+                            </tr>
+                        `;
+                    } else {
+                        tbodyBobot.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b;">Bobot penilaian belum diatur oleh Kaprodi di database.</td></tr>`;
+                    }
+                }
+            } catch (e) {
+                document.getElementById('valBobotPenilaian').innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Gagal terhubung ke N8N Bobot. Pastikan CORS sudah diaktifkan.</td></tr>`;
+            }
+
+            // 6. TARIK DATA RPS LAINNYA (Info Tambahan) DARI N8N
+            try {
+                const resLain = await fetch(`${API_BASE}/get-rps-lainnya?kode_mk=${kodeMK}`);
+                if (resLain.ok) {
+                    const jsonLain = safeExtractArray(await resLain.json());
+                    const data = jsonLain[0];
+                    if (data) {
+                        document.getElementById('valDeskripsi').value = data.deskripsi_mk || '';
+                        document.getElementById('valMediaSoft').value = data.media_software || '';
+                        document.getElementById('valMediaHard').value = data.media_hardware || '';
+                        document.getElementById('valTeam').value = data.team_teaching || '';
+                        document.getElementById('valSyarat').value = data.matkul_syarat || '';
+                        document.getElementById('valBatasMhs').value = data.batas_mhs || '50.01';
+                        document.getElementById('valBatasMk').value = data.batas_mk || '85.00%';
+                    } else {
+                        // Kosongkan jika belum pernah diisi
+                        document.getElementById('valDeskripsi').value = '';
+                        document.getElementById('valMediaSoft').value = '';
+                        document.getElementById('valMediaHard').value = '';
+                        document.getElementById('valTeam').value = '';
+                        document.getElementById('valSyarat').value = '';
+                        document.getElementById('valBatasMhs').value = '50.01';
+                        document.getElementById('valBatasMk').value = '85.00%';
+                    }
+                }
+            } catch (e) { console.warn("Belum ada data di rps_lainnya"); }
         }
 
         function bukaDetailRPS(kode_mk, nama_mk, semester, sks) {
@@ -1024,12 +1340,29 @@
             tbodySesi.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 40px;">Menarik rencana 16 pertemuan... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
 
             try {
-                const res = await fetch(`${API_GET_RPS}?kode=${kodeMK}`);
-                const rpsDataJSON = await res.json();
-                let rpsData = safeExtractArray(rpsDataJSON);
+                // TRIK ANTI-CACHE: Menambahkan waktu agar URL selalu dianggap baru
+                const timeCache = new Date().getTime();
+                const res = await fetch(`${API_GET_RPS}?kode=${kodeMK}&t=${timeCache}`);
+
+                let rpsDataJSON = [];
+                if (res.ok) {
+                    try { rpsDataJSON = await res.json(); } catch (e) { }
+                }
+
+                // PERBAIKAN: Gunakan method map/flat langsung di sini jika safeExtractArray masih gagal membongkar n8n
+                let rawData = rpsDataJSON.data || rpsDataJSON;
+                if (!Array.isArray(rawData)) rawData = [rawData];
+                rawData = rawData.flat(Infinity);
+
+                // Ekstrak properti .json jika data dibungkus oleh n8n
+                const extractedData = rawData.map(item => item.json ? item.json : item);
+
+                // Saring hanya data yang memiliki nomor pertemuan valid
+                const rpsData = extractedData.filter(item => item.pertemuan);
 
                 generateSemuaTabel(rpsData, kodeMK);
             } catch (e) {
+                console.error("Gagal load tabel:", e);
                 generateSemuaTabel([], kodeMK);
             }
         }
@@ -1038,17 +1371,22 @@
             const tbodySesi = document.getElementById("bodyTabelSesi");
             let htmlSesi = "";
 
+            // Buat daftar dropdown dinamis dengan opsi pertama disabled
+            let optCpmk = '<option value="" disabled selected>+ Pilih CPMK...</option>';
+            masterCPMK.forEach(c => {
+                optCpmk += `<option value="${c.kode_cpmk}">${c.kode_cpmk}</option>`;
+            });
+
             for (let i = 1; i <= 16; i++) {
                 const rowData = existingData.find(item => parseInt(item.pertemuan) === i) || {};
 
-                // Warna background dan placeholder khusus minggu ujian
                 let bgRowClass = '';
-                let bgInput = '#f8fafc'; // Abu terang
+                let bgInput = '#f8fafc';
                 let hint = '';
 
                 if (i === 8) {
                     bgRowClass = 'row-ujian';
-                    bgInput = '#fef2f2'; // Merah sangat terang untuk inputnya
+                    bgInput = '#fef2f2';
                     hint = '[UTS] ';
                 } else if (i === 16) {
                     bgRowClass = 'row-ujian';
@@ -1059,8 +1397,19 @@
                 htmlSesi += `
                     <tr class="${bgRowClass}">
                         <td style="text-align: center; font-weight: bold; padding-top: 15px; font-size:1.1rem; color: ${(i === 8 || i === 16) ? 'var(--primary-red)' : '#475569'};">${i}</td>
-                        <td><input type="text" list="cpmk_options" class="input-rps id_cpmk-input" id="id_cpmk_${i}" value="${rowData.id_cpmk || ''}" placeholder="Pilih..." onchange="isiOtomatisDeskripsi(${i})" style="min-height:40px; background:${bgInput};"></td>
-                        <td><textarea class="input-rps sub_cpmk-input" id="sub_cpmk_${i}" placeholder="${hint}Deskripsi..." style="background:${bgInput};">${rowData.deskripsi_cpmk || rowData.sub_cpmk || rowData.kemampuan_akhir || ''}</textarea></td>
+                        
+                        <td style="vertical-align: top;">
+                            <div id="badge_container_${i}" style="display:flex; flex-direction:column; gap:5px; margin-bottom:5px;"></div>
+                            
+                            <select class="input-rps" id="select_cpmk_${i}" onchange="tambahCpmkKeSesi(${i})" style="background:${bgInput}; cursor:pointer; font-weight:600;">
+                                ${optCpmk}
+                            </select>
+                            
+                            <input type="hidden" id="id_cpmk_${i}" value="${rowData.id_cpmk || ''}">
+                        </td>
+                        
+                        <td><textarea class="input-rps sub_cpmk-input" id="sub_cpmk_${i}" placeholder="${hint}Deskripsi otomatis..." style="background:${bgInput}; cursor:not-allowed; font-size:0.8rem;" readonly>${rowData.deskripsi_cpmk || rowData.sub_cpmk || rowData.kemampuan_akhir || ''}</textarea></td>
+                        
                         <td><textarea class="input-rps indikator-input" id="indikator_${i}" placeholder="Indikator..." style="background:${bgInput};">${rowData.indikator || rowData.indikator_pencapaian || ''}</textarea></td>
                         <td><textarea class="input-rps assessmen-input" id="assessmen_${i}" placeholder="Asesmen..." style="background:${bgInput};">${rowData.assessmen || rowData.bentuk_pembelajaran || ''}</textarea></td>
                         <td><textarea class="input-rps materi-input" id="materi_${i}" placeholder="Materi..." style="background:${bgInput};">${rowData.materi || rowData.materi_pembelajaran || ''}</textarea></td>
@@ -1072,6 +1421,10 @@
             }
 
             tbodySesi.innerHTML = htmlSesi;
+
+            for (let i = 1; i <= 16; i++) {
+                renderBadgeCpmk(i, false);
+            }
 
             const textareas = document.querySelectorAll('.input-rps');
             textareas.forEach(tx => {
@@ -1133,6 +1486,39 @@
             btn.disabled = false;
         }
 
+        async function simpanRpsLainnya() {
+            if (!currentMkDipilih) return;
+            const btn1 = document.getElementById("btnSimpanDeskripsi");
+            const btn2 = document.getElementById("btnSimpanInfo");
+            if (btn1) btn1.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            if (btn2) btn2.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+            const payload = {
+                kode_mk: currentMkDipilih,
+                deskripsi_mk: document.getElementById('valDeskripsi').value,
+                media_software: document.getElementById('valMediaSoft').value,
+                media_hardware: document.getElementById('valMediaHard').value,
+                team_teaching: document.getElementById('valTeam').value,
+                matkul_syarat: document.getElementById('valSyarat').value,
+                batas_mhs: document.getElementById('valBatasMhs').value,
+                batas_mk: document.getElementById('valBatasMk').value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/simpan-rps-lainnya`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) alert("✅ Data berhasil disimpan ke Database!");
+            } catch (e) {
+                alert("❌ Gagal menyimpan. Cek koneksi N8N Anda.");
+            }
+
+            if (btn1) btn1.innerHTML = '<i class="fas fa-save"></i> Simpan Deskripsi';
+            if (btn2) btn2.innerHTML = '<i class="fas fa-save"></i> Simpan Info Tambahan';
+        }
+
         function toggleOpsiMenu(event, menuId) {
             event.stopPropagation();
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
@@ -1169,6 +1555,21 @@
         window.onload = async () => {
             await loadDaftarRPS();
             await loadMasterCPMK();
+
+            // === ALGORITMA BARU: AUTO-OPEN MATA KULIAH ===
+            // 1. Cek apakah ada parameter '?mk=' di URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const autoMk = urlParams.get('mk');
+            
+            if (autoMk && globalDaftarMK) {
+                // 2. Cari data detail Mata Kuliah tersebut dari daftar yang sudah diload
+                const matkulTarget = globalDaftarMK.find(m => m.kode_mk === autoMk);
+                
+                if (matkulTarget) {
+                    // 3. Eksekusi fungsi buka detail (Klik Otomatis)
+                    bukaDetailRPS(matkulTarget.kode_mk, matkulTarget.nama_mk, matkulTarget.semester, matkulTarget.sks);
+                }
+            }
         };
     </script>
 </body>

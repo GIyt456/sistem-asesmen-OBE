@@ -14,7 +14,6 @@
             --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
             --primary-red: #8b0000; --bg-main: #ffffff; --text-dark: #111827; --border-dark: #161923;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { display: flex; animation: transitionIn 0.3s ease-in-out; background: #f9fafb; height: 100vh; overflow: hidden; color: var(--text-dark); }
         @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -25,29 +24,24 @@
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
         .header-title span { color: var(--primary-red); }
 
-        /* GAYA TABEL BOBOT */
         .table-container { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow-x: auto; }
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .select-filter { padding: 10px 15px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 0.95rem; font-weight: 600; outline: none; background: #f9fafb; }
         
         table { width: 100%; border-collapse: collapse; white-space: nowrap; }
         th { background: var(--sidebar-bg); color: white; text-align: center; padding: 12px 10px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; border: 1px solid #374151; position: sticky; top: 0; z-index: 10; }
         td { padding: 10px; border: 1px solid #e5e7eb; font-size: 0.85rem; text-align: center; vertical-align: middle; }
         
-        /* Kolom Teks (Kiri) */
         td.text-left { text-align: left; font-weight: 500; }
         .col-cpl { color: var(--primary-red); font-weight: 700; }
         .col-mk { font-weight: 700; }
         .col-cpmk { background: #f3f4f6; font-weight: 600; }
 
-        /* Input Angka */
         .input-bobot { width: 60px; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; text-align: center; font-size: 0.85rem; transition: 0.2s; background: #f8fafc; }
         .input-bobot:focus { border-color: var(--primary-red); outline: none; box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1); background: white; }
         
-        /* Highlight Total */
         .col-total { font-weight: 800; font-size: 1rem; }
-        .total-ok { color: #059669; } /* Hijau 100% */
-        .total-warn { color: #dc2626; } /* Merah != 100% */
+        .total-ok { color: #059669; } 
+        .total-warn { color: #dc2626; } 
 
         .btn-save { background: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
         .btn-save:hover { background: #6b0000; }
@@ -112,9 +106,6 @@
         initMatkulDropdown();
     };
 
-    // =========================================================
-    // 1. FUNGSI AWAL: Mengisi Dropdown Mata Kuliah
-    // =========================================================
     async function initMatkulDropdown() {
         const selectMk = document.getElementById('selectMk');
         try {
@@ -137,16 +128,11 @@
             });
 
             loadDataBobot();
-
         } catch (error) {
-            console.error("Gagal memuat dropdown matkul:", error);
             if(selectMk) selectMk.innerHTML = '<option value="">Gagal memuat daftar matkul</option>';
         }
     }
 
-    // =========================================================
-    // 2. FUNGSI MEMUAT TABEL (5 INPUT, 1 TOTAL PER MK)
-    // =========================================================
     async function loadDataBobot() {
         const tbody = document.getElementById('tableBody'); 
         const kodeMkTerpilih = document.getElementById('selectMk').value;
@@ -159,7 +145,6 @@
         try {
             const res = await fetch(API_GET_BOBOT);
             const allData = await res.json();
-            
             const data = allData.filter(row => row.kode_mk === kodeMkTerpilih);
             tbody.innerHTML = ''; 
             
@@ -168,7 +153,6 @@
                 return;
             }
 
-            // Hitung rowspan vertikal CPL & Total
             let cplCount = {};
             let totalMK = 0;
 
@@ -225,21 +209,14 @@
             tbody.innerHTML = html;
 
         } catch (error) {
-            console.error(error);
             tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: red;">Gagal memuat data dari API.</td></tr>';
         }
     }
 
-    // =========================================================
-    // 3. FUNGSI PENJUMLAH OTOMATIS SAAT DIKETIK
-    // =========================================================
     function hitungTotalMK(kodeMk) {
         const inputs = document.querySelectorAll(`input[data-mk="${kodeMk}"]`);
         let sum = 0;
-        
-        inputs.forEach(input => {
-            sum += (parseInt(input.value) || 0);
-        });
+        inputs.forEach(input => { sum += (parseInt(input.value) || 0); });
 
         const totalCell = document.getElementById(`total-mk-${kodeMk}`);
         if (totalCell) {
@@ -254,9 +231,6 @@
         }
     }
 
-    // =========================================================
-    // 4. FUNGSI SIMPAN KE DATABASE
-    // =========================================================
     async function simpanBobot() {
         const btnSave = document.querySelector('.btn-save');
         const oriText = btnSave.innerHTML;
@@ -330,7 +304,6 @@
             loadDataBobot(); 
 
         } catch (error) {
-            console.error(error);
             alert("❌ Gagal terhubung ke server n8n.");
         } finally {
             btnSave.innerHTML = oriText;
