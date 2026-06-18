@@ -1555,6 +1555,21 @@
         window.onload = async () => {
             await loadDaftarRPS();
             await loadMasterCPMK();
+
+            // === ALGORITMA BARU: AUTO-OPEN MATA KULIAH ===
+            // 1. Cek apakah ada parameter '?mk=' di URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const autoMk = urlParams.get('mk');
+            
+            if (autoMk && globalDaftarMK) {
+                // 2. Cari data detail Mata Kuliah tersebut dari daftar yang sudah diload
+                const matkulTarget = globalDaftarMK.find(m => m.kode_mk === autoMk);
+                
+                if (matkulTarget) {
+                    // 3. Eksekusi fungsi buka detail (Klik Otomatis)
+                    bukaDetailRPS(matkulTarget.kode_mk, matkulTarget.nama_mk, matkulTarget.semester, matkulTarget.sks);
+                }
+            }
         };
     </script>
 </body>
