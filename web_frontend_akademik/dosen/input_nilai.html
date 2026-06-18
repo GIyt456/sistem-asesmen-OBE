@@ -275,6 +275,16 @@
             max-width: 500px;
             line-height: 1.5;
         }
+        
+        /* GAYA DASHBOARD KUOTA (BARU) */
+        .quota-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
+        .quota-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; text-align: center; transition: 0.3s; }
+        .quota-box.valid { background: #f0fdf4; border-color: #86efac; }
+        .quota-box.invalid { background: #fef2f2; border-color: #fca5a5; }
+        .quota-lbl { font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
+        .quota-val { font-size: 1.5rem; font-weight: 900; color: #0f172a; }
+        .quota-box.valid .quota-val { color: #16a34a; }
+        .quota-box.invalid .quota-val { color: #dc2626; }
 
         /* =========================================
            5. FOOTER
@@ -382,39 +392,21 @@
                 <table style="width: 100%; border-collapse: collapse; text-align: center;">
                     <thead style="background: #f8fafc; color: var(--text-dark); border-bottom: 2px solid #e5e7eb;">
                         <tr>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                CPL</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                MATA KULIAH</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                CPMK</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                TUGAS</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                TES TULIS (UTS)</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                PRESENTASI</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                TES TULIS (UAS)</th>
-                            <th
-                                style="padding: 15px; font-size: 0.85rem; font-weight: 800; background: #e0f2fe; color: #0369a1;">
-                                TOTAL</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">CPL</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">MATA KULIAH</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">CPMK</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">TUGAS</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">TES TULIS (UTS)</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">PRESENTASI</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">TES TULIS (UAS)</th>
+                            <th style="padding: 15px; font-size: 0.85rem; font-weight: 800; background: #e0f2fe; color: #0369a1;">TOTAL</th>
                         </tr>
                     </thead>
                     <tbody id="bodyMasterBobot" style="font-size: 0.95rem;">
                     </tbody>
                     <tfoot>
                         <tr style="background: #f1f5f9; font-weight: 800; border-top: 2px solid #e5e7eb;">
-                            <td colspan="7"
-                                style="text-align: right; padding: 15px; border-right: 1px solid #e5e7eb; color: #334155;">
-                                TOTAL KESELURUHAN:</td>
+                            <td colspan="7" style="text-align: right; padding: 15px; border-right: 1px solid #e5e7eb; color: #334155;">TOTAL KESELURUHAN:</td>
                             <td id="grandTotalMaster" style="padding: 15px; font-size: 1.1rem;">0%</td>
                         </tr>
                     </tfoot>
@@ -449,6 +441,17 @@
                     onclick="tambahBarisAsesmen()" id="btnTambahAsesmen" disabled>
                     <i class="fas fa-plus"></i> Tambah Baris Asesmen
                 </button>
+            </div>
+
+            <!-- DASHBOARD ANGGARAN BOBOT (BARU - Disisipkan) -->
+            <div id="card-quota" style="display: none; margin-bottom: 20px; padding: 20px; border: 1px dashed #cbd5e1; border-radius: 12px;">
+                <div style="font-weight: 800; font-size: 1.1rem; color: #1e3a8a; margin-bottom: 10px;">
+                    <i class="fas fa-chart-pie"></i> Anggaran Bobot Kaprodi
+                </div>
+                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Target persentase yang harus dipenuhi Dosen.</p>
+                <div id="quotaContainer" class="quota-grid">
+                    <!-- Diisi otomatis oleh JavaScript -->
+                </div>
             </div>
 
             <table id="configTable">
@@ -567,13 +570,12 @@
     </footer>
 
     <script>
-        // PASTIKAN MENGGUNAKAN URL TERBARU ANDA
-        // const API_BASE = "https://playing-heath-pointed-instance.trycloudflare.com/webhook";
         const API_SIMPAN = `${API_BASE}/simpan-konfigurasi`;
         const API_GET_MAPPING = `${API_BASE}/get-mapping-mk`;
         const API_METADATA = `${API_BASE}/get-metadata`;
         const API_GET_STUDENTS = `${API_BASE}/get-mahasiswa-mk`;
-        const API_GET_MASTER_BOBOT = `${API_BASE}/get-master-bobot`;
+        const PRODI = localStorage.getItem("prodi_aktif") || "ti";
+        const API_GET_MASTER_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
 
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
         const userNidn = localStorage.getItem("user_nidn");
@@ -585,6 +587,10 @@
         let studentData = [];
         let mkSudahInput = [];
         let templateAktif = "Template_Nilai_Mahasiswa.xlsx";
+
+        let cpmkTersedia = [];
+        let kaprodiQuotas = []; // Menyimpan Anggaran Master (Disisipkan)
+        let trackingQuotas = []; // Melacak Input Dosen vs Target (Disisipkan)
 
         if (!userLogin) window.location.replace("../login/login.html");
         document.getElementById("dosenName").innerText = userLogin;
@@ -613,7 +619,7 @@
         });
 
         // =====================================
-        // FUNGSI UTAMA (SAMA SEPERTI SEBELUMNYA)
+        // FUNGSI UTAMA 
         // =====================================
         function recalculateRow(rowIndex) {
             const inputs = document.querySelectorAll(`input[data-mhs="${rowIndex}"]`);
@@ -655,10 +661,12 @@
                 const res = await fetch(API_GET_MASTER_BOBOT);
                 const allData = await res.json();
                 const dataMk = allData.filter(d => d.kode_mk === mkKode);
+                kaprodiQuotas = dataMk; // (DISISIPKAN UNTUK KUOTA)
 
                 if (dataMk.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color: #ef4444; font-weight: bold;"><i class="fas fa-exclamation-circle"></i> Kaprodi belum mengatur Master Bobot untuk Mata Kuliah ini.</td></tr>';
                     gTotal.innerText = "0%"; gTotal.className = "status-err";
+                    kaprodiQuotas = []; // (DISISIPKAN UNTUK KUOTA)
                     return;
                 }
 
@@ -668,7 +676,7 @@
                 dataMk.forEach(row => { if (!cplCount[row.cpl]) cplCount[row.cpl] = 0; cplCount[row.cpl]++; });
 
                 dataMk.forEach((row, index) => {
-                    let totalBaris = parseInt(row.tugas) + parseInt(row.uts) + parseInt(row.presentasi) + parseInt(row.uas);
+                    let totalBaris = parseInt(row.tugas || 0) + parseInt(row.uts || 0) + parseInt(row.uas || 0) + parseInt(row.attitude || 0) + parseInt(row.kehadiran || 0);
                     totalSeluruh += totalBaris;
                     let tr = `<tr>`;
 
@@ -679,10 +687,10 @@
                     if (index === 0) tr += `<td rowspan="${dataMk.length}" style="border: 1px solid #e5e7eb; padding: 15px; vertical-align: middle; font-weight: 700; color: #1e3a8a;">${namaMk}</td>`;
 
                     tr += `<td style="border: 1px solid #e5e7eb; padding: 15px; font-weight: 600; color: #334155;">${row.cpmk}</td>
-                        <td style="border: 1px solid #e5e7eb; padding: 15px;">${row.tugas}%</td>
-                        <td style="border: 1px solid #e5e7eb; padding: 15px;">${row.uts}%</td>
-                        <td style="border: 1px solid #e5e7eb; padding: 15px;">${row.presentasi}%</td>
-                        <td style="border: 1px solid #e5e7eb; padding: 15px;">${row.uas}%</td>
+                        <td style="border: 1px solid #e5e7eb; padding: 15px;">${row.tugas || 0}%</td>
+                        <td style="border: 1px solid #e5e7eb; padding: 15px;">${row.uts || 0}%</td>
+                        <td style="border: 1px solid #e5e7eb; padding: 15px;">-</td>
+                        <td style="border: 1px solid #e5e7eb; padding: 15px;">${row.uas || 0}%</td>
                         <td style="border: 1px solid #e5e7eb; padding: 15px; font-weight: 800; background: #f8fafc;">${totalBaris}%</td></tr>`;
                     html += tr;
                 });
@@ -772,6 +780,7 @@
             if (!mkKode) {
                 btnTambah.disabled = true;
                 document.getElementById("card-master-bobot").style.display = "none";
+                document.getElementById("card-quota").style.display = "none";
                 renderTableAsesmen(); return;
             }
 
@@ -793,30 +802,43 @@
                 }
             } catch (e) { }
 
+            // -- MENYIAPKAN ARRAY PELACAK KUOTA (DISISIPKAN) --
+            trackingQuotas = [];
+            kaprodiQuotas.forEach(row => {
+                if(parseInt(row.attitude) > 0) trackingQuotas.push({ cpmk: row.cpmk, kategori: 'Attitude', target: parseInt(row.attitude), current: 0 });
+                if(parseInt(row.kehadiran) > 0) trackingQuotas.push({ cpmk: row.cpmk, kategori: 'Kehadiran', target: parseInt(row.kehadiran), current: 0 });
+                if(parseInt(row.tugas) > 0) trackingQuotas.push({ cpmk: row.cpmk, kategori: 'Tugas', target: parseInt(row.tugas), current: 0 });
+                if(parseInt(row.uts) > 0) trackingQuotas.push({ cpmk: row.cpmk, kategori: 'UTS', target: parseInt(row.uts), current: 0 });
+                if(parseInt(row.uas) > 0) trackingQuotas.push({ cpmk: row.cpmk, kategori: 'UAS', target: parseInt(row.uas), current: 0 });
+            });
+            document.getElementById("card-quota").style.display = "block";
+            // ----------------------------------------------------
+
             const savedDraft = localStorage.getItem("draft_bobot_" + mkKode);
             if (savedDraft) { configData = JSON.parse(savedDraft); }
             else {
                 for (let i = 1; i <= 16; i++) {
-                    configData.push({ pertemuan: i, cpl: (cpmkTersedia.length > 0) ? cpmkTersedia[0].cpl : "-", cpmk: (cpmkTersedia.length > 0) ? cpmkTersedia[0].cpmk : "", bentuk: i === 8 ? 'UTS' : (i === 16 ? 'UAS' : 'Tugas'), bobot: 0 });
+                    configData.push({ pertemuan: i, cpl: (cpmkTersedia.length > 0) ? cpmkTersedia[0].cpl : "-", cpmk: (cpmkTersedia.length > 0) ? cpmkTersedia[0].cpmk : "", bentuk: "", bobot: 0 });
                 }
             }
             renderTableAsesmen();
+            hitungDanValidasiKuota(); // Update UI Dashboard Kuota awal
         }
 
         function tambahBarisAsesmen() {
             if (cpmkTersedia.length === 0) return;
-            configData.push({ pertemuan: 1, cpl: cpmkTersedia[0].cpl, cpmk: cpmkTersedia[0].cpmk, bentuk: 'Tugas', bobot: 0 });
+            configData.push({ pertemuan: 1, cpl: cpmkTersedia[0].cpl, cpmk: cpmkTersedia[0].cpmk, bentuk: '', bobot: 0 });
             renderTableAsesmen();
         }
 
-        function hapusBaris(i) { configData.splice(i, 1); renderTableAsesmen(); }
+        function hapusBaris(i) { configData.splice(i, 1); renderTableAsesmen(); hitungDanValidasiKuota(); }
 
         function renderTableAsesmen() {
             const tbody = document.getElementById("tableBody");
             tbody.innerHTML = ""; let totalBobot = 0;
 
             if (configData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="padding:30px; color:#94a3b8; font-style:italic; text-align: center;">Belum ada rencana asesmen. Silakan pilih Mata Kuliah.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="padding:30px; color:#94a3b8; font-style:italic; text-align: center;">Belum ada rencana asesmen. Silakan klik Mata Kuliah di atas.</td></tr>`;
                 document.getElementById("grandTotal").innerText = "0%"; return;
             }
 
@@ -825,6 +847,19 @@
             configData.forEach((row, i) => {
                 totalBobot += row.bobot;
                 let currentOpt = optCPMK.replace(`value="${row.cpmk}"`, `value="${row.cpmk}" selected`);
+
+                // -- KEAJAIBAN DROPDOWN DINAMIS (DISISIPKAN) --
+                const kategoriDiizinkan = trackingQuotas.filter(q => q.cpmk === row.cpmk).map(q => q.kategori);
+                let optBentukHTML = `<option value="" disabled ${row.bentuk === "" ? 'selected' : ''}>Pilih Kategori</option>`;
+                kategoriDiizinkan.forEach(k => {
+                    optBentukHTML += `<option value="${k}" ${row.bentuk === k ? 'selected' : ''}>${k}</option>`;
+                });
+                if (row.bentuk !== "" && !kategoriDiizinkan.includes(row.bentuk)) {
+                    row.bentuk = "";
+                    optBentukHTML = optBentukHTML.replace('selected', '');
+                    optBentukHTML = optBentukHTML.replace('Pilih Kategori', 'Pilih Kategori" selected');
+                }
+                // ---------------------------------------------
 
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
@@ -837,11 +872,7 @@
                     <td><select style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" onchange="updateCPMK(${i}, this)">${currentOpt}</select></td>
                     <td>
                         <select style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" onchange="updateRow(${i}, 'bentuk', this.value)">
-                            <option value="Tugas" ${row.bentuk === 'Tugas' ? 'selected' : ''}>Tugas</option>
-                            <option value="Kuis" ${row.bentuk === 'Kuis' ? 'selected' : ''}>Kuis</option>
-                            <option value="Presentasi" ${row.bentuk === 'Presentasi' ? 'selected' : ''}>Presentasi</option>
-                            <option value="UTS" ${row.bentuk === 'UTS' ? 'selected' : ''}>Tes Tulis (UTS)</option>
-                            <option value="UAS" ${row.bentuk === 'UAS' ? 'selected' : ''}>Tes Tulis (UAS)</option>
+                            ${optBentukHTML}
                         </select>
                     </td>
                     <td><input type="number" value="${row.bobot}" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" oninput="updateRow(${i}, 'bobot', this.value)"></td>
@@ -857,13 +888,72 @@
             if (mkKode && configData.length > 0) localStorage.setItem("draft_bobot_" + mkKode, JSON.stringify(configData));
         }
 
-        function updateRow(i, field, val) { if (field === 'bobot') val = parseFloat(val) || 0; configData[i][field] = val; renderTableAsesmen(); }
-        function updateCPMK(i, selectEl) { const selectedOpt = selectEl.options[selectEl.selectedIndex]; configData[i].cpmk = selectedOpt.value; configData[i].cpl = selectedOpt.getAttribute("data-cpl"); renderTableAsesmen(); }
+        // -- FUNGSI VALIDASI DAN PENGUNCI (DISISIPKAN) --
+        function hitungDanValidasiKuota() {
+            trackingQuotas.forEach(q => q.current = 0);
+            
+            configData.forEach(row => {
+                if (row.cpmk && row.bentuk && row.bobot > 0) {
+                    let match = trackingQuotas.find(q => q.cpmk === row.cpmk && q.kategori === row.bentuk);
+                    if (match) match.current += row.bobot;
+                }
+            });
+
+            const qContainer = document.getElementById("quotaContainer");
+            qContainer.innerHTML = "";
+            let semuaValid = true;
+
+            trackingQuotas.forEach(q => {
+                const isValid = q.current === q.target;
+                if (!isValid) semuaValid = false;
+                const boxClass = isValid ? "valid" : "invalid";
+                const icon = isValid ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+
+                qContainer.innerHTML += `
+                    <div class="quota-box ${boxClass}">
+                        <div class="quota-lbl">${q.cpmk} - ${q.kategori}</div>
+                        <div class="quota-val">${q.current}% / ${q.target}%</div>
+                        <div style="font-size: 0.8rem; margin-top: 5px;">${icon}</div>
+                    </div>
+                `;
+            });
+
+            const btnSimpan = document.getElementById("btnSimpan");
+            if (semuaValid && trackingQuotas.length > 0) {
+                btnSimpan.disabled = false;
+                btnSimpan.innerHTML = '<i class="fas fa-save"></i> Simpan Nilai ke Database';
+                btnSimpan.style.background = "#16a34a"; // Hijau Asli
+            } else {
+                btnSimpan.disabled = true;
+                btnSimpan.innerHTML = '<i class="fas fa-lock"></i> Penuhi Kuota Bobot Dulu';
+                btnSimpan.style.background = "#0f172a"; 
+            }
+        }
+        // -----------------------------------------------
+
+        function updateRow(i, field, val) { 
+            if (field === 'bobot') val = parseFloat(val) || 0; 
+            configData[i][field] = val; 
+            renderTableAsesmen(); 
+            hitungDanValidasiKuota(); //(DISISIPKAN)
+        }
+
+        function updateCPMK(i, selectEl) { 
+            const selectedOpt = selectEl.options[selectEl.selectedIndex]; 
+            configData[i].cpmk = selectedOpt.value; 
+            configData[i].cpl = selectedOpt.getAttribute("data-cpl"); 
+            renderTableAsesmen(); 
+            hitungDanValidasiKuota(); //(DISISIPKAN)
+        }
 
         async function downloadTemplateExcel() {
+            // (DISISIPKAN VALIDASI)
+            let semuaValid = trackingQuotas.every(q => q.current === q.target);
+            if(!semuaValid) return alert("⚠️ Anda belum memenuhi target Anggaran Bobot dari Kaprodi! Silakan paskan persentasenya hingga kotak Dashboard Kuota menjadi HIJAU semua.");
+
             if (configData.length === 0) { alert("Buat minimal 1 rencana asesmen terlebih dahulu!"); return; }
             const total = document.getElementById("grandTotal").innerText;
-            if (total !== "100%") { alert("Total bobot harus 100% sebelum mendownload template!"); return; }
+            if (total !== "100%") { alert("Total bobot keseluruhan harus 100% sebelum mendownload template!"); return; }
 
             const mkKode = document.getElementById("pilihMK").value;
             let listMahasiswa = [];
@@ -956,7 +1046,7 @@
                 configData.forEach((config, colIndex) => {
                     let nilaiMentah = parseFloat(m[colIndex + 2]) || 0;
                     htmlNilaiInputs += `<td style="padding: 8px; text-align: center; border-bottom: 1px solid #e5e7eb;">
-                        <input type="number" value="${nilaiMentah}" oninput="recalculateRow(${rowIndex})" class="cell-input" data-mhs="${rowIndex}" data-col="${colIndex}" style="width:55px; text-align:center; border:1px solid #cbd5e1; border-radius:4px; padding:4px;">
+                        <input type="number" value="${nilaiMentah}" oninput="recalculateRow(${rowIndex})" class="input-tbl" data-mhs="${rowIndex}" data-col="${colIndex}" style="width:55px; text-align:center; border:1px solid #cbd5e1; border-radius:4px; padding:4px;">
                     </td>`;
                 });
 
