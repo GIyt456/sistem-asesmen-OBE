@@ -8,14 +8,13 @@
     <script src="../../../js/template.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-     <script src="../../../js/api_config.js"></script>
+    <script src="../../../js/api_config.js"></script>
     
     <style>
-        /* --- VARIABEL WARNA KHUSUS SI --- */
+        /* --- VARIABEL WARNA KHUSUS SI (BIRU KEHIJAUAN) --- */
         :root { 
-            /* Background sidebar dihapus agar mengikuti theme-si dari style.css global */
             --primary-teal: #01626d; 
-            --primary-teal-dark: #006064; 
+            --primary-teal-dark: #004d56; 
             --bg-main: #ffffff; 
             --text-dark: #111827;
             --border-light: #e5e7eb;
@@ -42,15 +41,15 @@
         .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
         .header-title span { color: var(--primary-teal); }
         
-        /* --- UPDATE GAYA BADGE & TOMBOL KHUSUS SI --- */
+        /* --- GAYA BADGE & TOMBOL KHUSUS SI --- */
         .badge-prodi { 
-            background: var(--primary-teal-dark); 
+            background: var(--primary-teal); 
             color: white; 
             padding: 10px 20px; 
             border-radius: 30px; 
             font-size: 0.9rem; 
             font-weight: 600; 
-            box-shadow: 0 4px 6px rgba(0, 96, 100, 0.2); 
+            box-shadow: 0 4px 6px rgba(1, 98, 109, 0.2); 
         }
 
         .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
@@ -69,11 +68,11 @@
             align-items: center; 
             gap: 10px; 
             transition: 0.2s; 
-            box-shadow: 0 4px 6px rgba(0, 96, 100, 0.2);
+            box-shadow: 0 4px 6px rgba(1, 98, 109, 0.2);
         }
         .btn-primary-si:hover { 
             transform: translateY(-2px); 
-            box-shadow: 0 6px 12px rgba(0, 96, 100, 0.3);
+            box-shadow: 0 6px 12px rgba(1, 98, 109, 0.3);
         }
 
         /* --- GAYA TABEL --- */
@@ -82,9 +81,15 @@
         td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; }
         tbody tr:hover { background-color: #f9fafb; }
         
+        /* --- MODAL POP-UP STYLES --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; animation: fadeIn 0.2s ease; }
+        .modal-box { background: white; padding: 32px; border-radius: 16px; width: 500px; max-width: 90%; border: 2.5px solid var(--border-dark); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
         .form-control { width: 100%; padding: 12px 16px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
-        .form-control:focus { border-color: var(--border-dark); }
+        .form-control:focus { border-color: var(--primary-teal); }
         
+        /* Tombol Aksi Tabel */
         .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; }
         .btn-delete { background: #ef4444; }
         .btn-delete:hover { background: #dc2626; }
@@ -101,20 +106,20 @@
                 <div class="header-subtitle">KELOLA KURIKULUM</div>
                 <h1 class="header-title">DATA <span>MENGAJAR</span></h1>
             </div>
-            <div class="badge-prodi"><i class="fas fa-chalkboard"></i> Teknik Informatika</div>
+            <div class="badge-prodi"><i class="fas fa-chalkboard"></i> Sistem Informasi</div>
         </div>
 
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <div>
-                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Data Mengajar (TI)</h3>
-                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola plotting dosen mengajar per mata kuliah dan kelas Teknik Informatika.</p>
+                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Data Mengajar (SI)</h3>
+                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola plotting dosen mengajar per mata kuliah dan kelas Sistem Informasi.</p>
             </div>
             <div style="display: flex; gap: 10px;">
-                <button class="btn-primary-ti" onclick="bukaModalMengajar()"><i class="fas fa-plus"></i> Tambah</button>
+                <button class="btn-primary-si" onclick="bukaModalMengajar()"><i class="fas fa-plus"></i> Tambah</button>
                 <button class="btn-dark" onclick="alert('Fitur Import dari server pusat sedang disiapkan')"><i class="fas fa-cloud-download-alt"></i> Import</button>
                 
                 <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display:none;" onchange="prosesUploadExcel(event)">
-                <button id="btnUploadExcel" class="btn-primary-ti" style="background: linear-gradient(to right, #047857, #064e3b);" onclick="document.getElementById('fileExcel').click()">
+                <button id="btnUploadExcel" class="btn-primary-si" style="background: linear-gradient(to right, #00897b, #006064);" onclick="document.getElementById('fileExcel').click()">
                     <i class="fas fa-file-excel"></i> Upload Excel
                 </button>
                 
@@ -190,7 +195,7 @@
 
             <div class="form-group">
                 <label>Kelas</label>
-                <input type="text" id="inputKelas" class="form-control" placeholder="Contoh: TI-A / Gabungan">
+                <input type="text" id="inputKelas" class="form-control" placeholder="Contoh: SI-A / Gabungan">
             </div>
 
             <div class="form-group" style="margin-bottom: 30px;">
@@ -200,25 +205,43 @@
             
             <div style="display: flex; justify-content: flex-end; gap: 12px;">
                 <button onclick="tutupModalMengajar()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanMengajar()" class="btn-primary-ti"><i class="fas fa-save"></i> Simpan Data</button>
+                <button onclick="simpanMengajar()" class="btn-primary-si"><i class="fas fa-save"></i> Simpan Data</button>
             </div>
         </div>
     </div>
 
 <script>
+    // ==========================================
+    // 1. PENGATURAN API N8N & URL (ANTI-ERROR)
+    // ==========================================
     const PRODI = 'si'; 
-    const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
+    
+    // Secara otomatis mengambil dari api_config.js.
+    const N8N_URL = typeof API_BASE !== 'undefined' ? API_BASE : 'https://URL-N8N-ANDA.com/webhook';
 
+    const API_GET_MENGAJAR  = `${N8N_URL}/get-metadata?prodi=${PRODI}`; 
+    const API_POST_MENGAJAR = `${N8N_URL}/post-data-mengajar`;
+    const API_POST_EXCEL    = `${N8N_URL}/post-excel-mengajar`;
+
+    // ==========================================
+    // 2. SISTEM KEAMANAN & CEK LOGIN
+    // ==========================================
     const userLogin = localStorage.getItem("user_login");
     const userRole = localStorage.getItem("user_role");
     const userProdi = localStorage.getItem("prodi_aktif");
 
+    // Jika belum login, lempar ke halaman login
     if (!userLogin) window.location.replace('/login/login.html');
-    if (userRole !== 'head_admin') {
-        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
-        else if (userRole === 'admin' && userProdi === 'si') window.location.replace("../kaprodi_si/admin_config_si.html");
+    
+    // Jika dosen nyasar ke sini, lempar ke halaman input nilai
+    if (userRole === 'dosen') {
+        window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
     }
+    // Admin SI diizinkan menetap di halaman ini tanpa di-redirect!
 
+    // ==========================================
+    // 3. LOGIKA DATA, PAGINASI, & PENCARIAN
+    // ==========================================
     let allDataMengajar = []; 
     let currentPage = 1;
     let rowsPerPage = 10;
@@ -226,10 +249,10 @@
 
     async function loadData() {
         const tbody = document.getElementById("bodyMengajar");
-        tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding: 20px;'><i class='fas fa-spinner fa-spin'></i> Sedang memuat data dari database...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding: 20px;'><i class='fas fa-spinner fa-spin'></i> Sedang memuat data dari database n8n...</td></tr>";
 
         try {
-            const res = await fetch(API_URL);
+            const res = await fetch(API_GET_MENGAJAR);
             const fullData = await res.json();
             
             allDataMengajar = fullData.filter(i => i.tipe === 'mengajar');
@@ -272,7 +295,6 @@
             const namaKelas = parts[5] || '-';
             const idData = item.kode || '';
 
-            // Menghindari karakter kutip yang merusak parameter fungsi
             const safeNamaMk = namaMk.replace(/'/g, "\\'");
             const safeNamaDosen = namaDosen.replace(/'/g, "\\'");
 
@@ -285,7 +307,7 @@
                 </td>
                 <td style="text-align:center; vertical-align: top; padding-top: 18px; font-weight:600;">${tahun}</td>
                 <td style="text-align:center; vertical-align: top; padding-top: 18px;">${semester}</td>
-                <td style="vertical-align: top; font-size: 0.85rem; color: #4338ca; padding-top: 18px; line-height: 1.6; font-weight: 600;">
+                <td style="vertical-align: top; font-size: 0.85rem; color: var(--primary-teal); padding-top: 18px; line-height: 1.6; font-weight: 600;">
                     ${namaDosen !== '-' ? namaDosen : '<a href="#" style="color: #ef4444; font-weight: 600; text-decoration: none;">Belum Diplot</a>'}
                 </td>
                 <td style="vertical-align: top; font-size: 0.8rem; color: #6b7280; padding-top: 18px;">${namaKelas}</td>
@@ -317,7 +339,7 @@
     function changePage(direction) { currentPage += direction; renderTablePaginated(); }
 
     // ==========================================
-    // FUNGSI MODAL MANUAL (TAMBAH / UBAH)
+    // 4. FUNGSI MODAL MANUAL (TAMBAH / UBAH)
     // ==========================================
     function bukaModalMengajar(id = '', kode = '', namaMk = '', tahun = '', semester = 'Ganjil', kelas = '', dosen = '') {
         document.getElementById('inputIdMengajar').value = id;
@@ -328,7 +350,6 @@
         document.getElementById('inputKelas').value = kelas;
         document.getElementById('inputNamaDosen').value = dosen === '-' ? '' : dosen;
 
-        // Kunci Kode MK jika mode Edit
         if(id) {
             document.getElementById('inputKodeMk').readOnly = true;
             document.getElementById('inputKodeMk').style.backgroundColor = "#f3f4f6";
@@ -356,18 +377,18 @@
         if(!kodeMk || !namaMk || !kelas || !dosen) { alert("⚠️ Harap isi Kode MK, Nama MK, Kelas, dan Dosen!"); return; }
 
         const actionType = id ? "UBAH" : "TAMBAH";
-        const btnSimpan = document.querySelector("#modalMengajar .btn-primary-ti");
+        const btnSimpan = document.querySelector("#modalMengajar .btn-primary-si");
         const originalText = btnSimpan.innerHTML;
         btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btnSimpan.disabled = true;
 
         try {
-            const response = await fetch(`${API_BASE}/post-data-mengajar`, {
+            const response = await fetch(API_POST_MENGAJAR, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     aksi: actionType, 
-                    id_mengajar: id, // Berguna untuk klausa WHERE saat update
+                    id_mengajar: id,
                     kode_mk: kodeMk, nama_mk: namaMk, tahun: tahun, 
                     semester: semester, kelas: kelas, dosen: dosen, prodi: PRODI 
                 })
@@ -384,7 +405,7 @@
     async function konfirmasiHapusMengajar(id, kodeMk, kelas) {
         if(confirm(`⚠️ Peringatan!\n\nAnda akan MENGHAPUS plotting kelas:\nKode MK: ${kodeMk}\nKelas: ${kelas}\n\nLanjutkan?`)) {
             try {
-                const response = await fetch(`${API_BASE}/post-data-mengajar`, {
+                const response = await fetch(API_POST_MENGAJAR, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ aksi: "HAPUS", id_mengajar: id, prodi: PRODI })
@@ -397,7 +418,7 @@
     }
 
     // ==========================================
-    // FUNGSI UPLOAD EXCEL DATA MENGAJAR
+    // 5. FUNGSI UPLOAD EXCEL DATA MENGAJAR
     // ==========================================
     async function prosesUploadExcel(event) {
         const file = event.target.files[0];
@@ -435,7 +456,7 @@
 
                 btnUpload.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan ${arraySiapKirim.length} Data...`;
 
-                const response = await fetch(`${API_BASE}/post-excel-mengajar`, {
+                const response = await fetch(API_POST_EXCEL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data: arraySiapKirim, prodi: PRODI })
@@ -455,7 +476,7 @@
     }
 
     // ==========================================
-    // INIT
+    // 6. INIT & EVENT LISTENER
     // ==========================================
     window.onload = () => { 
         loadData(); 
@@ -467,7 +488,11 @@
 
         setTimeout(() => {
             const navDashboard = document.getElementById('nav-home');
-            const navMengajar = document.querySelector('[data-path="/master_data/master_mengajar.html"]'); 
+            
+            // Perbaikan logic selector untuk active menu
+            let navMengajar = document.querySelector('[data-path="/master_data/master_mengajar_si.html"]'); 
+            if (!navMengajar) navMengajar = document.querySelector('[data-path="/master_data/master_mengajar.html"]');
+            
             const menuMaster = document.getElementById('menu-master');
             const chevronMaster = document.getElementById('chevron-master');
 

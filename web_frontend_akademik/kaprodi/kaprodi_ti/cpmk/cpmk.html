@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="../../../js/api_config.js"></script>
-    
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
     <style>
         :root { 
             --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
@@ -102,11 +102,8 @@
         </div>
     </div>
 
-<script src="/js/template.js"></script>
-
 <script>
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
-    
     const API_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_UPLOAD = `${API_BASE}/upload-master-cpmk`;

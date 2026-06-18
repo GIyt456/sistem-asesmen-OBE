@@ -326,36 +326,46 @@
             </div>
         </div>
 
-        <script>
-            // 1. SISTEM KEAMANAN & PENGATURAN API
-            const userLogin = localStorage.getItem("user_login");
-
-    // Pastikan URL ini sesuai dengan tunnel n8n Anda yang sedang aktif
-
+    <script>
+            // ==========================================
+            // 1. PENGATURAN API N8N & URL (YANG DIPERBAIKI)
+            // ==========================================
+            const PRODI = 'ti'; 
+            
+            // Mengamankan URL agar tidak error meski folder berbeda
+            const N8N_URL = typeof API_BASE !== 'undefined' ? API_BASE : 'https://URL-N8N-ANDA.com/webhook';
 
             // ==========================================
-            // 2. FUNGSI MENARIK DATA DARI DATABASE (N8N)
+            // 2. SISTEM KEAMANAN
+            // ==========================================
+            const userLogin = localStorage.getItem("user_login");
+            if (!userLogin) window.location.replace('/login/login.html');
+
+            // ==========================================
+            // 3. FUNGSI MENARIK DATA MASTER (N8N)
             // ==========================================
             async function loadMasterRubrik() {
                 const tableBody = document.getElementById('tabelDataTugas');
-
                 if (!tableBody) return;
 
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:#64748b;"><i class="fas fa-spinner fa-spin"></i> Menarik data dari n8n...</td></tr>';
+
                 try {
-                    const URL_API = `${API_BASE}/get-master-rubrik`;
+                    // PERBAIKAN: MENGIRIM PARAMETER prodi=ti AGAR N8N TIDAK CRASH
+                    const URL_API = `${N8N_URL}/get-master-rubrik?prodi=${PRODI}`;
 
                     const response = await fetch(URL_API);
                     const textData = await response.text();
 
                     if (!textData || textData.includes('<!DOCTYPE html>')) {
-                        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red; padding:20px;">Gagal terhubung ke Database. Periksa URL n8n!</td></tr>';
+                        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red; padding:20px;">Gagal terhubung ke Database n8n.</td></tr>';
                         return;
                     }
 
                     const data = JSON.parse(textData);
 
                     if (data.length === 0) {
-                        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Belum ada rencana tugas.</td></tr>';
+                        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Belum ada rencana tugas untuk prodi ini.</td></tr>';
                         return;
                     }
 
@@ -417,7 +427,7 @@
             }
 
             // ==========================================
-            // 3. FUNGSI MENAMPILKAN DETAIL RUBRIK 
+            // 4. FUNGSI MENAMPILKAN DETAIL RUBRIK 
             // ==========================================
             async function bukaModalDetailRubrik(idTugas, judulTugas, kodeMk, kodeCpmk) {
                 document.getElementById('modalRubrikJudul').innerText = judulTugas;
@@ -446,7 +456,8 @@
                 document.getElementById('modalDetailRubrik').style.display = "flex";
 
                 try {
-                    const response = await fetch(`${BASE_N8N_URL}/get-detail-rubrik?id_tugas=${idTugas}`);
+                    // PERBAIKAN: MENGGUNAKAN N8N_URL alih-alih BASE_N8N_URL yang membuat detail error
+                    const response = await fetch(`${N8N_URL}/get-detail-rubrik?id_tugas=${idTugas}`);
                     const textData = await response.text();
 
                     if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {
@@ -498,7 +509,7 @@
             }
 
             // ==========================================
-            // 4. JALANKAN SAAT HALAMAN DIBUKA
+            // 5. JALANKAN SAAT HALAMAN DIBUKA
             // ==========================================
             window.onload = () => {
                 loadMasterRubrik();

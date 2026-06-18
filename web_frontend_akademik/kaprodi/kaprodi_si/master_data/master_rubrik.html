@@ -155,68 +155,80 @@
     </div>
 
 <script>
-    // 1. PENGATURAN API N8N
-    const userLogin = localStorage.getItem("user_login");
-
-    if (!userLogin) window.location.replace('/login/login.html');
-
-    // ==========================================
-    // 2. FUNGSI MENARIK DATA DARI DATABASE (N8N)
-    // ==========================================
-    async function loadMasterRubrik() {
-        const tableBody = document.getElementById('tabelDataTugas');
-        if (!tableBody) return;
-
-        try {
-            const URL_API = `${API_BASE}/get-master-rubrik?prodi=si`;
+            // ==========================================
+            // 1. PENGATURAN API N8N & URL (YANG DIPERBAIKI)
+            // ==========================================
+            const PRODI = 'si'; 
             
-            const response = await fetch(URL_API);
-            const textData = await response.text();
+            // Mengamankan URL agar tidak error meski folder berbeda
+            const N8N_URL = typeof API_BASE !== 'undefined' ? API_BASE : 'https://URL-N8N-ANDA.com/webhook';
 
-            if (!textData || textData.includes('<!DOCTYPE html>')) {
-                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red; padding:20px;">Gagal terhubung ke Database. Periksa URL n8n!</td></tr>';
-                return;
-            }
+            // ==========================================
+            // 2. SISTEM KEAMANAN
+            // ==========================================
+            const userLogin = localStorage.getItem("user_login");
+            if (!userLogin) window.location.replace('/login/login.html');
 
-            const data = JSON.parse(textData);
+            // ==========================================
+            // 3. FUNGSI MENARIK DATA MASTER (N8N)
+            // ==========================================
+            async function loadMasterRubrik() {
+                const tableBody = document.getElementById('tabelDataTugas');
+                if (!tableBody) return;
 
-            if (data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Belum ada rencana tugas untuk prodi SI.</td></tr>';
-                return;
-            }
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px; color:#64748b;"><i class="fas fa-spinner fa-spin"></i> Menarik data dari n8n...</td></tr>';
 
-            tableBody.innerHTML = ''; 
+                try {
+                    // MENGIRIM PARAMETER prodi=si AGAR N8N TIDAK CRASH
+                    const URL_API = `${N8N_URL}/get-master-rubrik?prodi=${PRODI}`;
 
-            const groupedData = {};
-            data.forEach(item => {
-                if (!groupedData[item.kode_mk]) {
-                    groupedData[item.kode_mk] = {
-                        nama_mk: item.nama_mk || 'Mata Kuliah Tidak Terdaftar',
-                        tugasList: []
-                    };
-                }
-                groupedData[item.kode_mk].tugasList.push(item);
-            });
+                    const response = await fetch(URL_API);
+                    const textData = await response.text();
 
-            Object.keys(groupedData).forEach(kodeMk => {
-                const matkul = groupedData[kodeMk];
-                
-                tableBody.innerHTML += `
+                    if (!textData || textData.includes('<!DOCTYPE html>')) {
+                        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red; padding:20px;">Gagal terhubung ke Database n8n.</td></tr>';
+                        return;
+                    }
+
+                    const data = JSON.parse(textData);
+
+                    if (data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Belum ada rencana tugas untuk prodi ini.</td></tr>';
+                        return;
+                    }
+
+                    tableBody.innerHTML = '';
+
+                    const groupedData = {};
+                    data.forEach(item => {
+                        if (!groupedData[item.kode_mk]) {
+                            groupedData[item.kode_mk] = {
+                                nama_mk: item.nama_mk || 'Mata Kuliah Tidak Terdaftar',
+                                tugasList: []
+                            };
+                        }
+                        groupedData[item.kode_mk].tugasList.push(item);
+                    });
+
+                    Object.keys(groupedData).forEach(kodeMk => {
+                        const matkul = groupedData[kodeMk];
+
+                        tableBody.innerHTML += `
                     <tr style="background-color: #f1f5f9; font-weight: bold;">
                         <td colspan="6" style="padding: 12px 15px; color: #0f172a; border-bottom: 2px solid #e5e7eb; text-align: left;">
-                            <i class="fas fa-book" style="color: var(--primary-teal); margin-right: 8px;"></i> 
+                            <i class="fas fa-book" style="color: #047857; margin-right: 8px;"></i> 
                             ${matkul.nama_mk} (${kodeMk}) — <span style="color: #64748b;">Total: ${matkul.tugasList.length} Tugas</span>
                         </td>
                         <td style="text-align: center; background-color: #f1f5f9; border-bottom: 2px solid #e5e7eb;">
-                            <button class="btn-primary-si" onclick="window.open('/dosen/cetak_rps_matkul.html?kode_mk=${kodeMk}', '_blank')">
-                                <i class="fas fa-file-pdf"></i> Cetak Semua
+                            <button style="background: linear-gradient(to right, #047857, #064e3b); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer;" onclick="window.open('/dosen/cetak_rps_matkul.html?kode_mk=${kodeMk}', '_blank')">
+                                <i class="fas fa-file-pdf"></i> Cetak
                             </button>
                         </td>
                     </tr>
                 `;
 
-                matkul.tugasList.forEach((tugas, index) => {
-                    tableBody.innerHTML += `
+                        matkul.tugasList.forEach((tugas, index) => {
+                            tableBody.innerHTML += `
                         <tr>
                             <td style="padding-left: 30px; font-weight: 700; color: #4b5563;">
                                 <i class="fas fa-tasks" style="font-size: 11px; margin-right: 5px; color: #94a3b8;"></i> Tugas ${index + 1}
@@ -224,38 +236,40 @@
                             <td style="font-weight: 500;">${tugas.judul_tugas}</td>
                             <td style="text-align:center;"><span style="background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">${tugas.kode_cpl || '-'}</span></td>
                             <td style="text-align:center;"><span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">${tugas.kode_cpmk || '-'}</span></td>
-                            <td style="font-weight: 500; color: #4b5563;">${tugas.teknik_evaluasi || '-'}</td>
+                            <td style="font-weight: 500; color: #4b5563;">${tugas.metode || tugas.teknik_evaluasi || '-'}</td>
                             <td>${tugas.waktu_pengerjaan || '-'}</td>
                             <td style="text-align:center;">
-                                <button class="btn-action" onclick="bukaModalDetailRubrik('${tugas.id_tugas}', '${tugas.judul_tugas}', '${tugas.kode_mk}', '${tugas.kode_cpmk}')">
+                                <button class="btn-dark" style="background: #0f172a; padding: 6px 12px; font-size: 12px; border-radius: 6px; color: white; border: none; cursor: pointer;" 
+                                    onclick="bukaModalDetailRubrik('${tugas.id_tugas}', '${tugas.judul_tugas}', '${tugas.kode_mk}', '${tugas.kode_cpmk}')">
                                     <i class="fas fa-eye"></i> Detail
                                 </button>
                             </td>
                         </tr>
                     `;
-                });
-            });
+                        });
+                    });
 
-        } catch (error) {
-            tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red; padding:20px;">Terjadi Kesalahan Sistem: ${error.message}</td></tr>`;
-        }
-    }
+                } catch (error) {
+                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red; padding:20px;">Terjadi Kesalahan Sistem: ${error.message}</td></tr>`;
+                }
+            }
 
-    // ==========================================
-    // 3. FUNGSI MENAMPILKAN DETAIL RUBRIK MODAL
-    // ==========================================
-    async function bukaModalDetailRubrik(idTugas, judulTugas, kodeMk, kodeCpmk) {
-        document.getElementById('modalRubrikJudul').innerText = judulTugas;
-        document.getElementById('modalRubrikSubtitle').innerText = `Mata Kuliah: ${kodeMk} | Sub-CPMK: ${kodeCpmk}`;
-        
-        const headerModal = document.querySelector('.modal-header');
-        headerModal.innerHTML = `
+            // ==========================================
+            // 4. FUNGSI MENAMPILKAN DETAIL RUBRIK 
+            // ==========================================
+            async function bukaModalDetailRubrik(idTugas, judulTugas, kodeMk, kodeCpmk) {
+                document.getElementById('modalRubrikJudul').innerText = judulTugas;
+                document.getElementById('modalRubrikSubtitle').innerText = `Mata Kuliah: ${kodeMk} | Sub-CPMK: ${kodeCpmk}`;
+
+                const headerModal = document.querySelector('.modal-header');
+                headerModal.innerHTML = `
             <div>
                 <h3 style="margin: 0 0 4px 0; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">${judulTugas}</h3>
                 <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Mata Kuliah: ${kodeMk} | Sub-CPMK: ${kodeCpmk}</p>
             </div>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <button class="btn-primary-si" onclick="window.open('/dosen/cetak_rps.html?id_tugas=${idTugas}', '_blank')">
+                <button style="background: linear-gradient(to right, #047857, #064e3b); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;" 
+                    onclick="window.open('/dosen/cetak_rps.html?id_tugas=${idTugas}', '_blank')">
                     <i class="fas fa-file-pdf"></i> Cetak PDF
                 </button>
                 <button onclick="tutupModalDetailRubrik()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #6b7280;">
@@ -264,85 +278,86 @@
             </div>
         `;
 
-        const konten = document.getElementById('modalRubrikKonten');
-        konten.innerHTML = `<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Mengambil matriks rubrik...</div>`;
-        
-        document.getElementById('modalDetailRubrik').style.display = "flex";
+                const konten = document.getElementById('modalRubrikKonten');
+                konten.innerHTML = `<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Mengambil matriks rubrik...</div>`;
 
-        try {
-            const response = await fetch(`${API_BASE}/get-detail-rubrik?id_tugas=${idTugas}`);
-            const textData = await response.text(); 
+                document.getElementById('modalDetailRubrik').style.display = "flex";
 
-            if (!textData || textData.trim() === '') {
-                konten.innerHTML = `<p style="text-align:center; color:#ef4444; font-weight:bold;">Matriks kriteria untuk tugas ini belum masuk ke database.</p>`;
-                return;
-            }
+                try {
+                    // MENGGUNAKAN N8N_URL, BUKAN BASE_N8N_URL YANG BIKIN ERROR
+                    const response = await fetch(`${N8N_URL}/get-detail-rubrik?id_tugas=${idTugas}`);
+                    const textData = await response.text();
 
-            const rubrikData = JSON.parse(textData);
+                    if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {
+                        konten.innerHTML = `<p style="text-align:center; color:#ef4444; font-weight:bold;">Matriks kriteria untuk tugas ini belum masuk ke database atau koneksi terputus.</p>`;
+                        return;
+                    }
 
-            let htmlTabel = `
-                <table style="width:100%; border-collapse: collapse; margin-top:10px;">
+                    const rubrikData = JSON.parse(textData);
+
+                    let htmlTabel = `
+                <table class="rubric-table" style="width:100%; border-collapse: collapse; margin-top:10px;">
                     <thead>
-                        <tr style="background:#f3f4f6;">
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Kriteria</th>
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Bobot</th>
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Skala 1</th>
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Skala 2</th>
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Skala 3</th>
-                            <th style="border:1px solid #e5e7eb; padding:12px;">Skala 4</th>
+                        <tr style="background:#1f2937;">
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Kriteria</th>
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Bobot</th>
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Skala 1</th>
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Skala 2</th>
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Skala 3</th>
+                            <th style="border:1px solid #374151; padding:12px; color:white;">Skala 4</th>
                         </tr>
                     </thead>
                     <tbody>
             `;
 
-            rubrikData.forEach(item => {
-                htmlTabel += `
+                    rubrikData.forEach(item => {
+                        htmlTabel += `
                     <tr>
-                        <td style="border:1px solid #e5e7eb; padding:10px; font-weight:bold;">${item.kriteria}</td>
-                        <td style="border:1px solid #e5e7eb; padding:10px; text-align:center;">${item.bobot_persen}%</td>
-                        <td style="border:1px solid #e5e7eb; padding:10px;">${item.skala_1}</td>
-                        <td style="border:1px solid #e5e7eb; padding:10px;">${item.skala_2}</td>
-                        <td style="border:1px solid #e5e7eb; padding:10px;">${item.skala_3}</td>
-                        <td style="border:1px solid #e5e7eb; padding:10px;">${item.skala_4}</td>
+                        <td style="border:1px solid #d1d5db; padding:10px; font-weight:bold;">${item.kriteria}</td>
+                        <td style="border:1px solid #d1d5db; padding:10px; text-align:center;">${item.bobot_persen}%</td>
+                        <td style="border:1px solid #d1d5db; padding:10px;">${item.skala_1}</td>
+                        <td style="border:1px solid #d1d5db; padding:10px;">${item.skala_2}</td>
+                        <td style="border:1px solid #d1d5db; padding:10px;">${item.skala_3}</td>
+                        <td style="border:1px solid #d1d5db; padding:10px;">${item.skala_4}</td>
                     </tr>
                 `;
-            });
+                    });
 
-            htmlTabel += `</tbody></table>`;
-            konten.innerHTML = htmlTabel;
+                    htmlTabel += `</tbody></table>`;
+                    konten.innerHTML = htmlTabel;
 
-        } catch (error) {
-            console.error("Gagal memuat:", error);
-            konten.innerHTML = `<p style="text-align:center; color:red;">Gagal memuat detail rubrik. Periksa koneksi n8n.</p>`;
-        }
-    }
-
-    function tutupModalDetailRubrik() {
-        document.getElementById('modalDetailRubrik').style.display = "none";
-    }
-
-    // ==========================================
-    // 4. EVENT LISTENER SAAT HALAMAN DIBUKA
-    // ==========================================
-    window.onload = function() {
-        loadMasterRubrik();
-
-        // Jeda agar template.js selesai menyusun sidebar sebelum kita ubah menu aktifnya
-        setTimeout(() => {
-            const navDashboard = document.getElementById('nav-home');
-            const navRubrik = document.querySelector('[data-path="/master_data/master_rubrik.html"]');
-            const menuMaster = document.getElementById('menu-master');
-            const chevronMaster = document.getElementById('chevron-master');
-
-            if(navDashboard) navDashboard.classList.remove('active');
-            if(navRubrik) navRubrik.classList.add('active'); 
-            
-            if(menuMaster && chevronMaster) {
-                menuMaster.style.display = 'flex';
-                chevronMaster.style.transform = 'rotate(180deg)';
+                } catch (error) {
+                    console.error("Gagal memuat:", error);
+                    konten.innerHTML = `<p style="text-align:center; color:red;">Gagal memuat detail rubrik. Periksa koneksi n8n.</p>`;
+                }
             }
-        }, 300);
-    };
-</script>
+
+            function tutupModalDetailRubrik() {
+                document.getElementById('modalDetailRubrik').style.display = "none";
+            }
+
+            // ==========================================
+            // 5. JALANKAN SAAT HALAMAN DIBUKA
+            // ==========================================
+            window.onload = () => {
+                loadMasterRubrik();
+
+                // Memberikan jeda agar template.js selesai memuat sidebar sebelum menyorot menu
+                setTimeout(() => {
+                    const navDashboard = document.getElementById('nav-home');
+                    const navRubrik = document.querySelector('[data-path="/master_data/master_rubrik_si.html"]');
+                    const menuMaster = document.getElementById('menu-master');
+                    const chevronMaster = document.getElementById('chevron-master');
+
+                    if (navDashboard) navDashboard.classList.remove('active');
+                    if (navRubrik) navRubrik.classList.add('active');
+
+                    if (menuMaster && chevronMaster) {
+                        menuMaster.style.display = 'flex';
+                        chevronMaster.style.transform = 'rotate(180deg)';
+                    }
+                }, 300);
+            };
+        </script>
 </body>
 </html>

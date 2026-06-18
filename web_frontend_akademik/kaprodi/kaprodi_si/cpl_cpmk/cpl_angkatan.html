@@ -9,7 +9,9 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
+
     <style>
         .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
         .table-responsive { overflow-x: auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
@@ -81,14 +83,9 @@
         </div>
     </div>
 
-    <script src="/js/template.js"></script>
-
     <script>
         // DETEKSI PRODI DINAMIS
         const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-        
-        // PENTING: Ganti URL di bawah dengan link Cloudflare Tunnel n8n Anda!
-        const API_BASE = "https://principal-sorted-pharmacies-wine.trycloudflare.com/webhook"; 
         const API_GET_CPL = `${API_BASE}/get-cpl-angkatan`;
 
         // SATPAM HALAMAN

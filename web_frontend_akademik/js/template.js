@@ -4,9 +4,8 @@
 
 async function loadComponent(elementId, fileUrl) {
     try {
-        console.log(`[Sistem OBE] Memuat komponen: ${fileUrl}...`); // Pelacak Proses
+        console.log(`[Sistem OBE] Memuat komponen: ${fileUrl}...`); 
         
-        // Trik anti-cache agar selalu memuat file terbaru
         const clearCacheUrl = fileUrl + "?v=" + new Date().getTime(); 
         const response = await fetch(clearCacheUrl);
         
@@ -21,9 +20,7 @@ async function loadComponent(elementId, fileUrl) {
             targetElement.innerHTML = html;
             console.log(`[Sistem OBE] ✅ Berhasil memuat ke dalam #${elementId}`);
             
-            // JIKA SIDEBAR BERHASIL DIMUAT, LANGSUNG JALANKAN INISIALISASINYA
             if (fileUrl.includes("sidebar.html") && typeof window.initSmartSidebar === "function") {
-                // Jeda sedikit untuk memastikan DOM benar-benar sudah di-render browser
                 setTimeout(window.initSmartSidebar, 200); 
             }
         }
@@ -33,9 +30,6 @@ async function loadComponent(elementId, fileUrl) {
 }
 
 function inisialisasiKomponenGlobal() {
-    // Tidak perlu lagi mengecek prodi untuk path file HTML-nya,
-    // karena kita menggunakan SATU file sidebar bersama di root/luar.
-    
     if (document.getElementById("sidebar-container")) {
         loadComponent("sidebar-container", "/components/sidebar.html");
     }
@@ -45,7 +39,6 @@ function inisialisasiKomponenGlobal() {
     }
 }
 
-// Jalankan perakitan saat DOM siap
 document.addEventListener("DOMContentLoaded", inisialisasiKomponenGlobal);
 
 // =========================================================
@@ -84,7 +77,6 @@ window.toggleDropdownPlus = function(element) {
 window.logout = function() {
     if(confirm("Apakah Anda yakin ingin keluar dari Sistem OBE?")) {
         localStorage.clear();
-        // Pastikan path ke halaman login ini sesuai dengan struktur root web Anda
         window.location.replace('/login/login.html'); 
     }
 };
@@ -99,34 +91,47 @@ window.initSmartSidebar = function() {
     const avatarEl = document.getElementById("sidebarAvatar");
     const sidebarEl = document.querySelector('.sidebar');
     
-    // Sisipkan gaya warna jika ini SI
     if (sidebarEl && prodi === 'si') {
         sidebarEl.classList.add('theme-si');
     }
 
-    // Atur Profil
     if(adminNameEl) adminNameEl.innerText = loginName;
     if(adminRoleEl) adminRoleEl.innerText = prodi === 'si' ? "PRODI SISTEM INFORMASI" : "PRODI TEKNIK INFORMATIKA";
     if(avatarEl) {
-        // ✨ PERBAIKAN WARNA AVATAR SI MENJADI TEAL
         const avatarColor = prodi === 'si' ? '0097a7' : '8b0000'; 
         avatarEl.src = `https://ui-avatars.com/api/?name=${loginName}&background=${avatarColor}&color=fff&bold=true`;
     }
 
-    // Atur Link Dinamis & SPA Router
     document.querySelectorAll('.sidebar [data-path]').forEach(el => {
         let path = el.getAttribute('data-path');
         
-        // Jika Kaprodi SI klik Home, otomatis ganti rutenya ke file "_si"
         if (path === '/admin_config.html' && prodi === 'si') {
             path = '/admin_config_si.html';
         }
 
+        // ==============================================================
+        // 🔥 SOLUSI ANTI-DOBEL URL (PERBAIKAN ERROR 404) 🔥
+        // ==============================================================
+        let cleanPath = path;
+        
+        // Membersihkan kata 'kaprodi' atau 'kaprodi_si' jika sudah terlanjur ada di HTML
+        cleanPath = cleanPath.replace(/^\/?kaprodi\//, '/'); 
+        cleanPath = cleanPath.replace(new RegExp(`^\\/?kaprodi_${prodi}\\/`), '/');
+        
+        // Memastikan rute diawali dengan garis miring (slash)
+        if (!cleanPath.startsWith('/')) cleanPath = '/' + cleanPath;
+
+        // Gabungkan Base Path dengan rute yang sudah dibersihkan
+        let finalUrl = basePath + cleanPath;
+        
+        // Sapu bersih garis miring dobel (//) yang tidak disengaja
+        finalUrl = finalUrl.replace(/\/\//g, '/');
+        // ==============================================================
+
         if(el.tagName.toLowerCase() === 'a') {
-            el.href = basePath + path; 
+            el.href = finalUrl; 
         } else {
             el.onclick = (e) => {
-                // Peta rute "Tanpa Loading" (Single Page Application)
                 const ruteInternal = {
                     '/cpl.html': 'cpl',
                     '/cpmk.html': 'cpmk',
@@ -138,21 +143,19 @@ window.initSmartSidebar = function() {
                     '/admin_config.html': 'dashboard'
                 };
 
-                const namaTab = ruteInternal[path];
+                const namaTab = ruteInternal[path]; // Gunakan path asli untuk lookup
                 
-                // Cek apakah elemen target beneran ADA di file HTML ini?
                 let elemenTargetAda = false;
                 if (namaTab) {
                     elemenTargetAda = document.getElementById('content-' + namaTab) || document.getElementById(namaTab);
                 }
 
-                // Jika fungsi pindah tab tersedia DAN elemennya memang ada di file ini...
                 if (typeof window.switchTab === "function" && elemenTargetAda) {
                     e.preventDefault();
-                    window.switchTab(namaTab); // Pindah tab dengan mulus tanpa loading web
+                    window.switchTab(namaTab); 
                 } else {
-                    // Jika elemennya tidak ada, berarti itu file terpisah. Lakukan pindah halaman normal!
-                    window.location.href = basePath + path; 
+                    // Gunakan finalUrl yang sudah anti-error
+                    window.location.href = finalUrl; 
                 }
             };
         }
