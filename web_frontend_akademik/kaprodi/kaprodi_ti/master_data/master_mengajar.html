@@ -85,13 +85,8 @@
                 <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola plotting dosen mengajar per mata kuliah dan kelas Teknik Informatika.</p>
             </div>
             <div style="display: flex; gap: 10px;">
-                <button class="btn-primary-ti" onclick="bukaModalMengajar()"><i class="fas fa-plus"></i> Tambah</button>
-                <button class="btn-dark" onclick="alert('Fitur Import dari server pusat sedang disiapkan')"><i class="fas fa-cloud-download-alt"></i> Import</button>
                 
                 <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display:none;" onchange="prosesUploadExcel(event)">
-                <button id="btnUploadExcel" class="btn-primary-ti" style="background: linear-gradient(to right, #047857, #064e3b);" onclick="document.getElementById('fileExcel').click()">
-                    <i class="fas fa-file-excel"></i> Upload Excel
-                </button>
                 
                 <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
@@ -122,7 +117,6 @@
                     <th width="8%" style="text-align: center;">Semester</th>
                     <th width="20%">Dosen Koordinator</th>
                     <th width="15%">Kelas</th>
-                    <th width="10%" style="text-align: center;">Opsi</th>
                 </tr>
             </thead>
             <tbody id="bodyMengajar">
@@ -264,9 +258,6 @@
                     ${namaDosen !== '-' ? namaDosen : '<a href="#" style="color: #ef4444; font-weight: 600; text-decoration: none;">Belum Diplot</a>'}
                 </td>
                 <td style="vertical-align: top; font-size: 0.8rem; color: #6b7280; padding-top: 18px;">${namaKelas}</td>
-                <td style="text-align: center; vertical-align: top; padding-top: 18px;">
-                    <button class="btn-action" style="background: var(--border-dark); color: white; width: 100%; justify-content: center; margin-bottom: 6px;" onclick="bukaModalMengajar('${idData}', '${kodeMk}', '${safeNamaMk}', '${tahun}', '${semester}', '${namaKelas}', '${safeNamaDosen}')">Detail / Edit</button>
-                    <button class="btn-action btn-delete" style="width: 100%; justify-content: center;" onclick="konfirmasiHapusMengajar('${idData}', '${kodeMk}', '${namaKelas}')">Hapus</button>
                 </td>
             </tr>`;
         });
