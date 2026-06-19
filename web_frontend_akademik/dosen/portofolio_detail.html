@@ -199,7 +199,7 @@
                 </tbody>
             </table>
             <div style="text-align: right; margin-top: 15px;">
-                <button id="btnSimpanLintas" class="btn-back" style="background: #0f172a;" onclick="simpanLintasKelas()"><i class="fas fa-save"></i> Simpan Lintas Evaluasi</button>
+                <button id="btnSimpanLintas" class="btn-back" style="background: #0f172a;" onclick="simpanLintasKelas()"><i class="fas fa-save"></i> Simpan Catatan Lintas Kelas</button>
             </div>
         </div>
 
@@ -216,204 +216,271 @@
                 </div>
             </div>
             <div style="text-align: right; margin-top: 20px; border-top: 1px solid #f1f5f9; padding-top: 15px;">
-                <button id="btnSimpanCQI" class="btn-back" style="background: var(--primary-red);" onclick="simpanCQI()"><i class="fas fa-check-circle"></i> Simpan Semua Rekomendasi</button>
+                <button id="btnSimpanCQI" class="btn-back" style="background: var(--primary-red);" onclick="simpanCQI()"><i class="fas fa-check-circle"></i> Simpan Rekomendasi (CQI)</button>
             </div>
         </div>
     </div>
 
     <script>
-        // FUNGSI HELPER UNTUK PARSING AMAN
-        // Mengubah text response menjadi JSON, jika kosong akan me-return Array Kosong []
+        // PELINDUNG DATA JSON
         async function fetchSafeJSON(url) {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-            const text = await response.text();
-            if (!text || text.trim() === "") return [];
-            let data = JSON.parse(text);
-            return Array.isArray(data) ? data : (data.data || Object.values(data));
+            try {
+                if (typeof API_BASE === 'undefined') return [];
+                const response = await fetch(url);
+                if (!response.ok) return []; 
+                const text = await response.text();
+                if (!text || text.trim() === "") return []; 
+                let data;
+                try { data = JSON.parse(text); } catch (e) { return []; }
+                let finalData = Array.isArray(data) ? data : (data.data || Object.values(data));
+                if (finalData.length === 1 && Object.keys(finalData[0]).length === 0) return []; 
+                return finalData;
+            } catch (err) { return []; }
         }
 
         async function loadPortofolioDetailData() {
             const urlParams = new URLSearchParams(window.location.search);
             const kodeMk = urlParams.get('kode_mk');
             const namaMk = urlParams.get('nama_mk');
+            const userRole = localStorage.getItem("user_role") || "dosen"; 
             
             if(!kodeMk) { alert("Parameter Mata Kuliah tidak valid!"); return; }
             document.getElementById('titleMatkul').innerHTML = `PORTOFOLIO <span>${namaMk.toUpperCase()}</span>`;
 
-            // Setup Textarea berdasarkan Role
-            const userRole = localStorage.getItem("user_role") || "dosen"; 
+            // 1. IDENTITAS MATAKULIAH
+            const dataMatkul = await fetchSafeJSON(`${API_BASE}/get-matkul-detail?kode_mk=${kodeMk}`);
+            if (dataMatkul.length > 0 && dataMatkul[0].kode_mk) {
+                const mk = dataMatkul[0];
+                document.getElementById('valNamaMk').innerText = mk.nama_mk || '-';
+                document.getElementById('valKodeMk').innerText = mk.kode_mk || '-';
+                document.getElementById('valSksMk').innerText = (mk.sks || '3') + ' SKS';
+                document.getElementById('valSemesterMk').innerText = mk.semester || 'Semester Ganjil';
+                document.getElementById('valProdiMk').innerText = (mk.prodi && mk.prodi.toLowerCase() === 'si') ? 'S1 Sistem Informasi' : 'Teknik Informatika';
+                document.getElementById('valDosenMk').innerText = mk.dosen_pengampu || 'Dosen Pengampu, M.Kom.';
+            }
+
+            // 1.5 CPL
+            const dataCpl = await fetchSafeJSON(`${API_BASE}/get-matkul-cpl?kode_mk=${kodeMk}`);
+            const containerCpl = document.getElementById('containerCplMk');
+            if (dataCpl.length > 0 && dataCpl[0].kode_cpl) {
+                containerCpl.innerHTML = ''; 
+                dataCpl.forEach(item => {
+                    let rawItem = item.json ? item.json : item;
+                    containerCpl.innerHTML += `
+                        <div style="display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;">
+                            <div style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; border: 1px solid #bae6fd;">
+                                <i class="fas fa-shield-alt"></i> ${rawItem.kode_cpl}
+                            </div>
+                            <div style="font-size: 13px; color: #4b5563; line-height: 1.5;">${rawItem.deskripsi || 'Tidak ada deskripsi'}</div>
+                        </div>`;
+                });
+            } else {
+                containerCpl.innerHTML = "<div style='font-size: 13px; color: #ef4444;'><i class='fas fa-exclamation-circle'></i> Belum ada relasi CPL di database.</div>";
+            }
+
+            // 2. CPMK
+            const dataCpmk = await fetchSafeJSON(`${API_BASE}/get-matkul-cpmk?kode_mk=${kodeMk}`);
+            const tableCpmk = document.getElementById('tabelCpmkDetail');
+            tableCpmk.innerHTML = "";
+            if (dataCpmk.length === 0 || !dataCpmk[0].kode_cpmk) {
+                tableCpmk.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#ef4444;"><i class="fas fa-exclamation-circle"></i> Belum ada relasi CPMK di database.</td></tr>';
+            } else {
+                let dummyBobotCpmk = Math.round(100 / dataCpmk.length); 
+                dataCpmk.forEach((item, index) => {
+                    let rawItem = item.json ? item.json : item;
+                    let valKode = rawItem.kode_cpmk || rawItem.cpmk || '-';
+                    tableCpmk.innerHTML += `<tr><td style="text-align:center; font-weight:bold;">${index + 1}</td><td style="font-weight:700; color:var(--primary-red);">${valKode}</td><td>${rawItem.deskripsi || 'Tidak ada deskripsi.'}</td><td style="text-align:center; font-weight:bold;">${dummyBobotCpmk}%</td></tr>`;
+                });
+            }
+
+            // 3. METODE PENILAIAN
+            const dataPenilaian = await fetchSafeJSON(`${API_BASE}/get-metode-penilaian?kode_mk=${kodeMk}`);
+            const tbodyPenilaian = document.getElementById('tabelMetodePenilaian');
+            tbodyPenilaian.innerHTML = "";
+            if (dataPenilaian.length > 0 && dataPenilaian[0].komponen) {
+                let totalBobotKeseluruhan = 0;
+                dataPenilaian.forEach(item => {
+                    let rawItem = item.json ? item.json : item;
+                    const persenBobot = rawItem.bobot ? parseFloat(rawItem.bobot) : 0;
+                    totalBobotKeseluruhan += persenBobot;
+                    let cleanCpmk = rawItem.cpmk ? [...new Set(rawItem.cpmk.split(',').map(str => str.trim()))].join(', ') : '-';
+                    
+                    tbodyPenilaian.innerHTML += `
+                        <tr>
+                            <td style="font-weight: 500;">${rawItem.komponen || '-'}</td>
+                            <td style="text-align:center; font-weight:bold; color:var(--primary-red);">${persenBobot.toFixed(0)}%</td>
+                            <td style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:12px; font-weight:700;">${cleanCpmk}</span></td>
+                            <td>${rawItem.instrumen || '-'}</td>
+                        </tr>`;
+                });
+                const isTotalValid = totalBobotKeseluruhan === 100;
+                tbodyPenilaian.innerHTML += `
+                    <tr style="background-color: #f8fafc; border-top: 2px solid #cbd5e1;">
+                        <td style="text-align: right; font-weight: 800; color: #1e293b;">TOTAL BOBOT:</td>
+                        <td style="text-align: center; font-weight: 800; font-size: 14px; color: ${isTotalValid ? '#166534' : '#ef4444'};"><span style="background: ${isTotalValid ? '#dcfce7' : '#fee2e2'}; padding: 4px 10px; border-radius: 6px;">${totalBobotKeseluruhan.toFixed(0)}%</span></td>
+                        <td colspan="2" style="font-weight: 700; color: ${isTotalValid ? '#166534' : '#ef4444'}; font-size: 13px;">${isTotalValid ? '<i class="fas fa-check-circle"></i> Valid' : '<i class="fas fa-exclamation-triangle"></i> Tidak 100%'}</td>
+                    </tr>`;
+            } else {
+                tbodyPenilaian.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Belum ada data penilaian di database.</td></tr>";
+            }
+
+            // 4. STATISTIK REKAP
+            const tbodyRekapStats = document.getElementById('tabelRekapCapaianCpmk');
+            tbodyRekapStats.innerHTML = "";
+            if (dataCpmk.length > 0 && dataCpmk[0].kode_cpmk) {
+                let shareBobot = Math.round(100 / dataCpmk.length);
+                const templateScores = [{ avg: 85.2, min: 65, max: 98, pass: 92.5 }, { avg: 64.1, min: 40, max: 88, pass: 45.8 }, { avg: 78.4, min: 55, max: 95, pass: 84.2 }, { avg: 82.1, min: 60, max: 100, pass: 89.0 }];
+
+                dataCpmk.forEach((item, index) => {
+                    let rawItem = item.json ? item.json : item;
+                    let valKode = rawItem.kode_cpmk || rawItem.cpmk || '-';
+                    let score = templateScores[index % templateScores.length];
+                    
+                    if(valKode !== '-') {
+                        tbodyRekapStats.innerHTML += `
+                            <tr>
+                                <td style="text-align:center;">${index + 1}</td>
+                                <td style="font-weight:700; color:var(--primary-red);">${valKode}</td> <td style="text-align:center; font-weight:600;">Max 100 (${shareBobot}%)</td>
+                                <td style="text-align:center; font-weight:bold; color:${score.avg < 75 ? '#dc2626' : '#1f2937'};">${score.avg.toFixed(2)}</td>
+                                <td style="text-align:center; color:#64748b;">${score.min}</td>
+                                <td style="text-align:center; color:#64748b;">${score.max}</td>
+                                <td style="text-align:center; font-weight:600;">${score.pass.toFixed(2)}%</td>
+                                <td style="text-align:center;">${score.avg >= 75 ? '<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tercapai</span>' : '<span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tidak Tercapai</span>'}</td>
+                            </tr>`;
+                    }
+                });
+            } else {
+                tbodyRekapStats.innerHTML = "<tr><td colspan='8' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Belum ada data statistik CPMK.</td></tr>";
+            }
+
+            // 5. EVALUASI LINTAS (FITUR EDIT AKTIF)
+            const dataLintas = await fetchSafeJSON(`${API_BASE}/get-evaluasi-lintas-kelas?kode_mk=${kodeMk}`);
+            const tbodyLintasKelas = document.getElementById('tabelEvaluasiLintasKelas');
+            tbodyLintasKelas.innerHTML = "";
+            
+            if(dataLintas.length > 0 && dataLintas[0].nama_mk) {
+                dataLintas.forEach((item, index) => {
+                    let rawItem = item.json ? item.json : item;
+                    let textProdi = (rawItem.prodi && rawItem.prodi.toUpperCase() === "TI") ? "Teknik Informatika" : "S1 Sistem Informasi";
+                    // Sedot catatan yang sudah ada di database (jika ada)
+                    let catatanExisting = rawItem.catatan || ""; 
+                    
+                    tbodyLintasKelas.innerHTML += `
+                        <tr data-kodemk="${rawItem.kode_mk}">
+                            <td style="text-align:center; font-weight:700;">${index + 1}</td>
+                            <td><strong style="color:var(--text-dark);">${rawItem.nama_mk}</strong><p style="font-size:11px; color:#64748b; margin-top:2px;">Kode: ${rawItem.kode_mk} (${textProdi})</p></td>
+                            <td style="font-weight:600; color:#374151;">${rawItem.nama_dosen || 'Belum diplot'}</td>
+                            <td style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">${rawItem.daftar_cpmk || '-'}</span></td>
+                            <td><textarea class="textarea-inline">${catatanExisting}</textarea></td>
+                        </tr>`;
+                });
+            } else {
+                tbodyLintasKelas.innerHTML = "<tr><td colspan='5' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Tidak ada relasi lintas kelas untuk mata kuliah ini.</td></tr>";
+                document.getElementById('btnSimpanLintas').disabled = true; // Matikan tombol jika kosong
+            }
+
+            // 6. CQI REKOMENDASI (FITUR EDIT AKTIF)
+            const dataCqi = await fetchSafeJSON(`${API_BASE}/get-cqi?kode_mk=${kodeMk}`);
+            const inputDosen = document.getElementById("areaRekomendasiDosen");
             const inputKaprodi = document.getElementById("areaRekomendasiKaprodi");
+            
+            // Penguncian Akses Role
             if (userRole !== "admin") {
                 inputKaprodi.setAttribute("readonly", true);
-                inputKaprodi.value = "Materi review evaluasi kurikulum berkala dari Kaprodi belum diisi.";
             } else {
                 inputKaprodi.removeAttribute("readonly");
             }
 
-            // 1. IDENTITAS MATAKULIAH
-            try {
-                const dataMatkul = await fetchSafeJSON(`${API_BASE}/get-matkul-detail?kode_mk=${kodeMk}`);
-                if (dataMatkul.length > 0) {
-                    const mk = dataMatkul[0];
-                    document.getElementById('valNamaMk').innerText = mk.nama_mk || '-';
-                    document.getElementById('valKodeMk').innerText = mk.kode_mk || '-';
-                    document.getElementById('valSksMk').innerText = (mk.sks || '3') + ' SKS';
-                    document.getElementById('valSemesterMk').innerText = mk.semester || 'Semester Ganjil';
-                    document.getElementById('valProdiMk').innerText = (mk.prodi && mk.prodi.toLowerCase() === 'si') ? 'S1 Sistem Informasi' : 'Teknik Informatika';
-                    document.getElementById('valDosenMk').innerText = mk.dosen_pengampu || 'Dosen Pengampu, M.Kom.';
-                }
-            } catch (err) { console.error("Error Matkul:", err); }
-
-            // 1.5 CPL
-            try {
-                const dataCpl = await fetchSafeJSON(`${API_BASE}/get-matkul-cpl?kode_mk=${kodeMk}`);
-                const containerCpl = document.getElementById('containerCplMk');
-                if (dataCpl.length > 0 && dataCpl[0].kode_cpl) {
-                    containerCpl.innerHTML = ''; 
-                    dataCpl.forEach(item => {
-                        let rawItem = item.json ? item.json : item;
-                        containerCpl.innerHTML += `
-                            <div style="display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;">
-                                <div style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; border: 1px solid #bae6fd;">
-                                    <i class="fas fa-shield-alt"></i> ${rawItem.kode_cpl}
-                                </div>
-                                <div style="font-size: 13px; color: #4b5563; line-height: 1.5;">${rawItem.deskripsi || 'Tidak ada deskripsi'}</div>
-                            </div>`;
-                    });
-                } else {
-                    containerCpl.innerHTML = "<div style='font-size: 13px; color: #ef4444;'><i class='fas fa-exclamation-circle'></i> Belum ada relasi CPL di database.</div>";
-                }
-            } catch (err) { document.getElementById('containerCplMk').innerHTML = "<div style='color:red;font-size:13px;'>Gagal memuat CPL.</div>"; }
-
-            // 2. CPMK
-            try {
-                const dataCpmk = await fetchSafeJSON(`${API_BASE}/get-matkul-cpmk?kode_mk=${kodeMk}`);
-                const tableCpmk = document.getElementById('tabelCpmkDetail');
-                tableCpmk.innerHTML = "";
-                if (dataCpmk.length === 0) {
-                    tableCpmk.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px;">Belum ada relasi CPMK.</td></tr>';
-                } else {
-                    let dummyBobotCpmk = Math.round(100 / dataCpmk.length); 
-                    dataCpmk.forEach((item, index) => {
-                        let rawItem = item.json ? item.json : item;
-                        let valKode = rawItem.kode_cpmk || rawItem.cpmk || '-';
-                        let valDeskripsi = rawItem.deskripsi || rawItem.deskripsi_cpmk || rawItem.rumusan || 'Tidak ada deskripsi.';
-                        tableCpmk.innerHTML += `<tr><td style="text-align:center; font-weight:bold;">${index + 1}</td><td style="font-weight:700; color:var(--primary-red);">${valKode}</td><td>${valDeskripsi}</td><td style="text-align:center; font-weight:bold;">${dummyBobotCpmk}%</td></tr>`;
-                    });
-                }
-            } catch (err) { document.getElementById('tabelCpmkDetail').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red;">Gagal memuat CPMK.</td></tr>'; }
-
-            // 3. METODE PENILAIAN (YANG ERROR TADI)
-            try {
-                const dataPenilaian = await fetchSafeJSON(`${API_BASE}/get-metode-penilaian?kode_mk=${kodeMk}`);
-                const tbodyPenilaian = document.getElementById('tabelMetodePenilaian');
-                tbodyPenilaian.innerHTML = "";
+            // Tampilkan isi lama dari database jika ada
+            if (dataCqi.length > 0 && (dataCqi[0].rekomendasi_dosen !== undefined)) {
+                let rawCqi = dataCqi[0].json ? dataCqi[0].json : dataCqi[0];
+                inputDosen.value = rawCqi.rekomendasi_dosen || "";
                 
-                if (dataPenilaian.length > 0 && dataPenilaian[0].komponen) {
-                    let totalBobotKeseluruhan = 0;
-                    dataPenilaian.forEach(item => {
-                        let rawItem = item.json ? item.json : item;
-                        const persenBobot = rawItem.bobot ? parseFloat(rawItem.bobot) : 0;
-                        totalBobotKeseluruhan += persenBobot;
-                        
-                        let cleanCpmk = rawItem.cpmk ? [...new Set(rawItem.cpmk.split(',').map(str => str.trim()))].join(', ') : '-';
-                        
-                        tbodyPenilaian.innerHTML += `
-                            <tr>
-                                <td style="font-weight: 500;">${rawItem.komponen || '-'}</td>
-                                <td style="text-align:center; font-weight:bold; color:var(--primary-red);">${persenBobot.toFixed(0)}%</td>
-                                <td style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:12px; font-weight:700;">${cleanCpmk}</span></td>
-                                <td>${rawItem.instrumen || '-'}</td>
-                            </tr>`;
-                    });
-
-                    const isTotalValid = totalBobotKeseluruhan === 100;
-                    const colorPeringatan = isTotalValid ? '#166534' : '#ef4444';
-                    const bgPeringatan = isTotalValid ? '#dcfce7' : '#fee2e2';
-                    const iconPeringatan = isTotalValid ? '<i class="fas fa-check-circle"></i> Valid' : '<i class="fas fa-exclamation-triangle"></i> Tidak 100%';
-
-                    tbodyPenilaian.innerHTML += `
-                        <tr style="background-color: #f8fafc; border-top: 2px solid #cbd5e1;">
-                            <td style="text-align: right; font-weight: 800; color: #1e293b;">TOTAL BOBOT:</td>
-                            <td style="text-align: center; font-weight: 800; font-size: 14px; color: ${colorPeringatan};"><span style="background: ${bgPeringatan}; padding: 4px 10px; border-radius: 6px;">${totalBobotKeseluruhan.toFixed(0)}%</span></td>
-                            <td colspan="2" style="font-weight: 700; color: ${colorPeringatan}; font-size: 13px;">${iconPeringatan}</td>
-                        </tr>`;
+                if (userRole === "admin") {
+                    inputKaprodi.value = rawCqi.rekomendasi_kaprodi || "";
                 } else {
-                    tbodyPenilaian.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Belum ada data penilaian di database.</td></tr>";
+                    inputKaprodi.value = rawCqi.rekomendasi_kaprodi || "Belum ada review dari Kaprodi.";
                 }
-            } catch (err) { 
-                console.error("Gagal Penilaian:", err);
-                document.getElementById('tabelMetodePenilaian').innerHTML = "<tr><td colspan='4' style='text-align:center; color:red; padding:15px;'>Gagal memuat data penilaian.</td></tr>"; 
+            } else {
+                inputDosen.value = "";
+                if (userRole !== "admin") inputKaprodi.value = "Menunggu review Kaprodi...";
             }
-
-            // 4. STATISTIK REKAP
-            try {
-                const dataCpmkStats = await fetchSafeJSON(`${API_BASE}/get-matkul-cpmk?kode_mk=${kodeMk}`);
-                const tbodyRekapStats = document.getElementById('tabelRekapCapaianCpmk');
-                tbodyRekapStats.innerHTML = "";
-                
-                if (dataCpmkStats.length > 0) {
-                    let shareBobot = Math.round(100 / dataCpmkStats.length);
-                    const templateScores = [
-                        { avg: 85.20, min: 65, max: 98, pass: 92.50 }, { avg: 64.15, min: 40, max: 88, pass: 45.80 },
-                        { avg: 78.40, min: 55, max: 95, pass: 84.20 }, { avg: 82.10, min: 60, max: 100, pass: 89.00 }
-                    ];
-
-                    dataCpmkStats.forEach((item, index) => {
-                        let rawItem = item.json ? item.json : item;
-                        let valKode = rawItem.kode_cpmk || rawItem.cpmk || '-';
-                        let score = templateScores[index % templateScores.length];
-                        let statusBadge = score.avg >= 75 ? '<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tercapai</span>' : '<span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tidak Tercapai</span>';
-                        
-                        if(valKode !== '-') {
-                            tbodyRekapStats.innerHTML += `
-                                <tr>
-                                    <td style="text-align:center;">${index + 1}</td>
-                                    <td style="font-weight:700; color:var(--primary-red);">${valKode}</td> <td style="text-align:center; font-weight:600;">Max 100 (${shareBobot}%)</td>
-                                    <td style="text-align:center; font-weight:bold; color:${score.avg < 75 ? '#dc2626' : '#1f2937'};">${score.avg.toFixed(2)}</td>
-                                    <td style="text-align:center; color:#64748b;">${score.min}</td>
-                                    <td style="text-align:center; color:#64748b;">${score.max}</td>
-                                    <td style="text-align:center; font-weight:600;">${score.pass.toFixed(2)}%</td>
-                                    <td style="text-align:center;">${statusBadge}</td>
-                                </tr>`;
-                        }
-                    });
-                } else {
-                    tbodyRekapStats.innerHTML = "<tr><td colspan='8' style='text-align:center; color:#ef4444; padding:15px;'>Belum ada data statistik.</td></tr>";
-                }
-            } catch (err) { document.getElementById('tabelRekapCapaianCpmk').innerHTML = "<tr><td colspan='8' style='text-align:center; color:red;'>Gagal terhubung ke server.</td></tr>"; }
-
-            // 5. EVALUASI LINTAS
-            try {
-                const dataLintas = await fetchSafeJSON(`${API_BASE}/get-evaluasi-lintas-kelas?kode_mk=${kodeMk}`);
-                const tbodyLintasKelas = document.getElementById('tabelEvaluasiLintasKelas');
-                tbodyLintasKelas.innerHTML = "";
-                
-                if(dataLintas.length > 0 && dataLintas[0].nama_mk) {
-                    dataLintas.forEach((item, index) => {
-                        let rawItem = item.json ? item.json : item;
-                        let textProdi = (rawItem.prodi && rawItem.prodi.toUpperCase() === "TI") ? "Teknik Informatika" : "S1 Sistem Informasi";
-                        tbodyLintasKelas.innerHTML += `
-                            <tr>
-                                <td style="text-align:center; font-weight:700;">${index + 1}</td>
-                                <td><strong style="color:var(--text-dark);">${rawItem.nama_mk}</strong><p style="font-size:11px; color:#64748b; margin-top:2px;">Kode: ${rawItem.kode_mk} (${textProdi})</p></td>
-                                <td style="font-weight:600; color:#374151;">${rawItem.nama_dosen || 'Belum diplot'}</td>
-                                <td style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">${rawItem.daftar_cpmk || '-'}</span></td>
-                                <td><textarea class="textarea-inline">${rawItem.kode_mk !== kodeMk ? "Penyelarasan sebaran tingkat kesulitan instrumen tugas besar perlu dikoordinasikan kembali." : "Metode pengajaran praktikum berjalan kondusif."}</textarea></td>
-                            </tr>`;
-                    });
-                } else {
-                    // Fallback Dummy Data
-                    tbodyLintasKelas.innerHTML = `
-                        <tr><td style="text-align:center; font-weight:700;">1</td><td><strong>${namaMk}</strong><p style="font-size:11px; color:#64748b; margin-top:2px;">Kode: ${kodeMk} (TI)</p></td><td style="font-weight:600; color:#374151;">Dosen Pengampu TI</td><td style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">CPMK-01, CPMK-02</span></td><td><textarea class="textarea-inline">Metode praktikum simulator jaringan lab berjalan kondusif.</textarea></td></tr>
-                        <tr><td style="text-align:center; font-weight:700;">2</td><td><strong>${namaMk}</strong><p style="font-size:11px; color:#64748b; margin-top:2px;">Kode: ${kodeMk}-SI (SI)</p></td><td style="font-weight:600; color:#374151;">Dosen Mitra SI</td><td style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">CPMK-01, CPMK-02</span></td><td><textarea class="textarea-inline">Sebaran tingkat kelulusan kelas SI terpantau setara, disepakati modul ujian disamakan.</textarea></td></tr>`;
-                }
-            } catch (err) { console.error(err); }
         }
 
-        async function simpanLintasKelas() { /* Fungsi simpan tetap sama */ }
-        async function simpanCQI() { /* Fungsi simpan tetap sama */ }
+        // =====================================
+        // FUNGSI SIMPAN LINTAS KELAS (DIPERBAIKI)
+        // =====================================
+        async function simpanLintasKelas() { 
+            const btn = document.getElementById('btnSimpanLintas');
+            const originalText = btn.innerHTML;
+            const kodeMkUtama = new URLSearchParams(window.location.search).get('kode_mk');
+            const username = localStorage.getItem("user_login") || "Dosen";
+
+            // Kumpulkan data per-baris menggunakan atribut data-kodemk
+            const arrayCatatan = [];
+            document.querySelectorAll('#tabelEvaluasiLintasKelas tr').forEach(tr => {
+                const kodeLintas = tr.getAttribute('data-kodemk');
+                const textarea = tr.querySelector('.textarea-inline');
+                if(kodeLintas && textarea) {
+                    arrayCatatan.push({
+                        kode_mk_target: kodeLintas,
+                        catatan: textarea.value
+                    });
+                }
+            });
+
+            try {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+                btn.disabled = true;
+
+                const response = await fetch(`${API_BASE}/post-evaluasi-lintas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        kode_mk_sumber: kodeMkUtama, 
+                        user: username, 
+                        evaluasi_lintas: arrayCatatan // Terkirim rapi dalam bentuk Array object
+                    })
+                });
+
+                if (response.ok) alert('✅ Catatan evaluasi lintas kelas berhasil diperbarui!');
+                else alert('❌ Gagal menyimpan data ke server n8n.');
+            } catch (error) { alert('❌ Terjadi kesalahan jaringan saat mencoba menyimpan.');
+            } finally { btn.innerHTML = originalText; btn.disabled = false; }
+        }
+
+        // =====================================
+        // FUNGSI SIMPAN CQI
+        // =====================================
+        async function simpanCQI() { 
+            const btn = document.getElementById('btnSimpanCQI');
+            const originalText = btn.innerHTML;
+            const kodeMk = new URLSearchParams(window.location.search).get('kode_mk');
+            const username = localStorage.getItem("user_login") || "Dosen";
+
+            const rekoDosen = document.getElementById("areaRekomendasiDosen").value;
+            const rekoKaprodi = document.getElementById("areaRekomendasiKaprodi").value;
+
+            try {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+                btn.disabled = true;
+
+                const response = await fetch(`${API_BASE}/post-cqi`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        kode_mk: kodeMk, 
+                        user: username, 
+                        rekomendasi_dosen: rekoDosen, 
+                        rekomendasi_kaprodi: rekoKaprodi 
+                    })
+                });
+
+                if (response.ok) alert('✅ Rekomendasi (CQI) berhasil tersimpan/diedit!');
+                else alert('❌ Gagal menyinkronkan data.');
+            } catch (error) { alert('❌ Terjadi gangguan jaringan.');
+            } finally { btn.innerHTML = originalText; btn.disabled = false; }
+        }
 
         window.onload = loadPortofolioDetailData;
     </script>

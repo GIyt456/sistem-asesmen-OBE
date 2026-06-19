@@ -144,39 +144,48 @@
         let dataTersaring = [];
         let halamanSaatIni = 1;
         const barisPerHalaman = 5; 
+        
+        // Mengambil data sesi pengguna dari Local Storage
+        const userRole = localStorage.getItem("user_role");
+        const userLogin = localStorage.getItem("user_login"); // Asumsi user_login berisi NIDN jika login sebagai dosen
 
-        // 1. Fungsi Tarik Data dari Database Khusus Prodi TI
+        // 1. Fungsi Tarik Data dari Database
+       // 1. Fungsi Tarik Data dari Database Khusus Prodi TI
         async function loadDaftarMatkulPortofolio() {
             const tableBody = document.getElementById('tabelMatkulDosen');
+            // Tampilkan loading muter-muter
+            tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Menarik data mata kuliah...</td></tr>';
 
             try {
-                // Semak jika fail api_config.js berjaya dimuatkan
-                if (typeof API_BASE === 'undefined') {
-                    throw new Error("Variabel API_BASE tidak dijumpai. Sila semak pautan fail api_config.js!");
-                }
+                if (typeof API_BASE === 'undefined') throw new Error("Variabel API_BASE tidak dijumpai.");
 
-                // Gunakan pemboleh ubah API_BASE secara dinamik
-                const URL_API = `${API_BASE}/get-matkul-portofolio?prodi=ti`;
+                let URL_API = `${API_BASE}/get-matkul-portofolio?prodi=ti`;
+                
+                // Jika Dosen, kirim NIDN-nya
+                if (userRole === 'dosen' && userLogin) {
+                    URL_API += `&nidn=${userLogin}`;
+                }
                 
                 const response = await fetch(URL_API);
                 
-                if (!response.ok) {
-                    throw new Error(`Pelayan n8n menolak permintaan dengan status ${response.status}`);
+                // JURUS ANTI-ERROR: Baca sebagai teks dulu, jangan langsung di-JSON-kan
+                const textData = await response.text(); 
+                
+                // Jika n8n membalas kosong (0 baris) atau membalas HTML error
+                if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {
+                    dataSemuaMatkul = [];
+                } else {
+                    dataSemuaMatkul = JSON.parse(textData); // Baru diubah ke JSON jika isinya valid
                 }
 
-                dataSemuaMatkul = await response.json();
-
-                // Jika data kosong atau terdapat ralat dari n8n
-                if (!dataSemuaMatkul || dataSemuaMatkul.length === 0 || dataSemuaMatkul.message) {
-                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px;">Tidak ada mata kuliah aktif untuk prodi TI di pangkalan data.</td></tr>';
+                // Jika datanya memang kosong di database
+                if (dataSemuaMatkul.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#6b7280; font-weight: 600;">Mata kuliah belum diplot untuk Anda di semester ini.</td></tr>';
                     document.getElementById('areaPaginasi').innerHTML = '';
                     return;
                 }
 
-                // Pada permulaan, data tersaring = semua data
                 dataTersaring = [...dataSemuaMatkul];
-                
-                // Kembalikan ke halaman 1 lalu papar jadual
                 halamanSaatIni = 1;
                 renderTabelMatkul();
 
@@ -186,22 +195,18 @@
                 document.getElementById('areaPaginasi').innerHTML = '';
             }
         }
-
         // 2. Fungsi Carian (Masa Nyata)
         function jalankanPencarian() {
             const kataKunci = document.getElementById('searchInput').value.toLowerCase();
-            
-            // Saring data berdasarkan kod MK atau nama MK
             dataTersaring = dataSemuaMatkul.filter(item => 
                 (item.kode_mk && item.kode_mk.toLowerCase().includes(kataKunci)) || 
                 (item.nama_mk && item.nama_mk.toLowerCase().includes(kataKunci))
             );
-            
             halamanSaatIni = 1; 
             renderTabelMatkul();
         }
 
-        // 3. Fungsi Lukis Jadual Berdasarkan Halaman & Hasil Penapisan
+        // 3. Fungsi Lukis Jadual
         function renderTabelMatkul() {
             const tableBody = document.getElementById('tabelMatkulDosen');
             tableBody.innerHTML = '';
@@ -212,12 +217,9 @@
                 return;
             }
 
-            // Kira indeks mula dan akhir untuk pemotongan data
             const totalHalaman = Math.ceil(dataTersaring.length / barisPerHalaman);
             const indexAwal = (halamanSaatIni - 1) * barisPerHalaman;
             const indexAkhir = indexAwal + barisPerHalaman;
-            
-            // Ambil data spesifik untuk halaman ini
             const dataHalamanIni = dataTersaring.slice(indexAwal, indexAkhir);
 
             dataHalamanIni.forEach(item => {
@@ -242,7 +244,6 @@
         // 4. Fungsi Lukis Butang Paginasi
         function renderPaginasi(totalHalaman, indexAwal, jumlahSaatIni, totalData) {
             const areaPaginasi = document.getElementById('areaPaginasi');
-            
             let htmlPaginasi = `
                 <div class="pagination-info">
                     Menampilkan <strong>${indexAwal + 1} - ${indexAwal + jumlahSaatIni}</strong> daripada <strong>${totalData}</strong> mata kuliah
@@ -259,17 +260,14 @@
                     <button class="page-btn" ${halamanSaatIni === totalHalaman ? 'disabled' : ''} onclick="gantiHalaman(${halamanSaatIni + 1})">Next</button>
                 </div>
             `;
-
             areaPaginasi.innerHTML = htmlPaginasi;
         }
 
-        // 5. Fungsi Tukar Halaman
         function gantiHalaman(halamanTujuan) {
             halamanSaatIni = halamanTujuan;
             renderTabelMatkul();
         }
 
-        // Jalankan fungsi saat web mula-mula dimuatkan
         window.onload = loadDaftarMatkulPortofolio;
     </script>
 </body>

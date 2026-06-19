@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="../../../js/api_config.js"></script>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <style>
         /* --- VARIABEL WARNA KHUSUS TI --- */
         :root { 
@@ -114,7 +116,14 @@
                 <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk tenaga pengajar Teknik Informatika.</p>
             </div>
             <div style="display: flex; gap: 12px;">
-                <button class="btn-primary-ti" onclick="alert('Fitur Upload Excel sedang disiapkan!')"><i class="fas fa-file-excel"></i> Upload Excel</button>
+                <button class="btn-primary-ti" onclick="bukaModalDosen()"><i class="fas fa-plus"></i> Tambah</button>
+                
+                <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display:none;" onchange="prosesUploadExcel(event)">
+                
+                <button id="btnUploadExcel" class="btn-primary-ti" style="background: linear-gradient(to right, #047857, #064e3b);" onclick="document.getElementById('fileExcel').click()">
+                    <i class="fas fa-file-excel"></i> Upload Excel
+                </button>
+                
                 <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
             </div>
         </div>
@@ -160,11 +169,10 @@
         <div class="modal-box">
             <h3 id="modalTitleDosen" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Edit Data Dosen</h3>
             
-            <input type="hidden" id="idDosenDatabase"> 
             <div class="form-group">
                 <label>NIDN</label>
-                <input type="text" id="inputNIDNDosen" class="form-control" placeholder="Nomor Induk Dosen Nasional" readonly style="background-color: #f3f4f6; cursor: not-allowed;">
-                <small style="color: #6b7280; font-size: 0.8rem;">*NIDN adalah kunci utama dan tidak dapat diubah.</small>
+                <input type="text" id="inputNIDNDosen" class="form-control" placeholder="Nomor Induk Dosen Nasional">
+                <small style="color: #6b7280; font-size: 0.8rem;">*NIDN adalah kunci utama.</small>
             </div>
             
             <div class="form-group">
@@ -184,17 +192,15 @@
             
             <div style="display: flex; justify-content: flex-end; gap: 12px;">
                 <button onclick="tutupModalDosen()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanDosen()" class="btn-primary-ti"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                <button onclick="simpanDosen()" class="btn-primary-ti"><i class="fas fa-save"></i> Simpan Data</button>
             </div>
         </div>
     </div>
 
 <script>
-    // 1. PENGATURAN API N8N (Diset untuk TI)
     const PRODI = 'ti'; 
     const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
 
-    // 2. SISTEM KEAMANAN
     const userLogin = localStorage.getItem("user_login");
     const userRole = localStorage.getItem("user_role");
     const userProdi = localStorage.getItem("prodi_aktif");
@@ -205,9 +211,6 @@
         else if (userRole === 'admin' && userProdi === 'si') window.location.replace("../kaprodi_si/admin_config_si.html");
     }
 
-    // ==========================================
-    // 3. LOGIKA DATA, PAGINASI, & PENCARIAN DOSEN
-    // ==========================================
     let allDataDosen = []; 
     let currentPage = 1;
     let rowsPerPage = 10;
@@ -221,14 +224,12 @@
             const res = await fetch(API_URL);
             const fullData = await res.json();
             
-            // Simpan hanya data tipe dosen
             allDataDosen = fullData.filter(i => i.tipe === 'dosen');
             currentPage = 1;
-            
             renderTablePaginated(); 
             
         } catch (error) {
-            console.error("Gagal menarik data:", error);
+            console.error(error);
             tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:red; padding: 20px;'>❌ Gagal memuat data dari server n8n.</td></tr>";
         }
     }
@@ -237,7 +238,6 @@
         const tbody = document.getElementById("bodyDosen");
         tbody.innerHTML = ""; 
 
-        // Filter berdasarkan pencarian (NIDN atau Nama Dosen)
         const filteredData = allDataDosen.filter(item => {
             const nidnContent = item.kode ? item.kode.toLowerCase() : "";
             const nameContent = item.label ? item.label.toLowerCase() : "";
@@ -254,15 +254,12 @@
         const endIndex = startIndex + rowsPerPage;
         const dataToShow = filteredData.slice(startIndex, endIndex);
 
-        // Render Data Dosen ke dalam Tabel
         dataToShow.forEach((item, index) => {
             const noUrut = startIndex + index + 1;
             const nidn = item.kode;
-            // Jika nama dari database kosong, tampilkan peringatan merah
             const namaDosenRaw = item.label || '';
             const namaDosenDisplay = namaDosenRaw ? namaDosenRaw : '<span style="color:#ef4444; font-style:italic;">- Belum Ada Nama -</span>';
 
-            // Data ID, Homebase, dan Email menggunakan placeholder "-" karena dari n8n hanya mengembalikan NIDN dan Nama
             tbody.innerHTML += `
             <tr>
                 <td style="text-align: center;">${noUrut}</td>
@@ -271,13 +268,13 @@
                 <td style="color: #6b7280;">-</td> 
                 <td><strong>${nidn}</strong></td>
                 <td style="color: #6b7280;">-</td> 
-                <td style="text-align: center; display: flex; justify-content: center; gap: 8px; border-bottom: none;">
-                    <button class="btn-action btn-edit" onclick="bukaModalDosen('${nidn}', '${namaDosenRaw.replace(/'/g, "\\'")}')"><i class="fas fa-edit"></i> Ubah</button>
-                    <button class="btn-action" style="background: white; color: var(--primary-red); border: 1.5px solid var(--primary-red); font-weight: 700; transition: 0.2s;" onmouseover="this.style.background='var(--primary-red)'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='var(--primary-red)'" onclick="alert('Masuk mode Rasuk untuk NIDN: ${nidn}')">Rasuk</button>
+                <td style="text-align: center; display: flex; justify-content: center; gap: 6px; border-bottom: none;">
+                    <button class="btn-action btn-edit" onclick="bukaModalDosen('${nidn}', '${namaDosenRaw.replace(/'/g, "\\'")}')" title="Ubah"><i class="fas fa-edit"></i></button>
+                    <button class="btn-action" style="background: #ef4444;" onclick="konfirmasiHapusDosen('${nidn}', '${namaDosenRaw.replace(/'/g, "\\'")}')" title="Hapus"><i class="fas fa-trash"></i></button>
+                    <button class="btn-action" style="background: white; color: var(--primary-red); border: 1.5px solid var(--primary-red); font-weight: 700;" onmouseover="this.style.background='var(--primary-red)'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='var(--primary-red)'" onclick="alert('Masuk mode Rasuk untuk NIDN: ${nidn}')" title="Rasuk Akun"><i class="fas fa-user-secret"></i></button>
                 </td>
             </tr>`;
         });
-
         renderPaginationUI(filteredData.length, startIndex, endIndex);
     }
 
@@ -288,13 +285,10 @@
         
         let html = `<div>Showing ${startIndex + 1} to ${actualEndIndex} of ${totalFilteredData} entries</div>`;
         html += `<div style="display: flex; gap: 5px;">`;
-        
         const prevDisabled = currentPage === 1;
         html += `<button class="btn" style="background: ${prevDisabled ? '#e5e7eb' : 'var(--border-dark)'}; color: ${prevDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${prevDisabled ? 'not-allowed' : 'pointer'};" ${prevDisabled ? 'disabled' : `onclick="changePage(-1)"`}><i class="fas fa-chevron-left"></i> Prev</button>`;
-        
         const nextDisabled = currentPage === totalPages || totalPages === 0;
         html += `<button class="btn" style="background: ${nextDisabled ? '#e5e7eb' : 'var(--border-dark)'}; color: ${nextDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; border:none; border-radius:8px; cursor:${nextDisabled ? 'not-allowed' : 'pointer'};" ${nextDisabled ? 'disabled' : `onclick="changePage(1)"`}>Next <i class="fas fa-chevron-right"></i></button>`;
-        
         html += `</div>`;
         paginationContainer.innerHTML = html;
     }
@@ -305,33 +299,148 @@
     }
 
     // ==========================================
-    // 4. FUNGSI MODAL POP-UP DOSEN
+    // FUNGSI MODAL MANUAL (UBAH/TAMBAH SATUAN)
     // ==========================================
-    function bukaModalDosen(nidn, nama = '') {
-        document.getElementById('inputNIDNDosen').value = nidn;
-        document.getElementById('inputNamaDosen').value = nama;
+    function bukaModalDosen(nidn = '', nama = '') {
+        const inputNIDN = document.getElementById('inputNIDNDosen');
+        const title = document.getElementById('modalTitleDosen');
+
+        if(nidn) {
+            title.innerText = "Ubah Data Dosen";
+            inputNIDN.value = nidn;
+            inputNIDN.readOnly = true;
+            inputNIDN.style.backgroundColor = "#f3f4f6";
+        } else {
+            title.innerText = "Tambah Dosen Baru";
+            inputNIDN.value = "";
+            inputNIDN.readOnly = false;
+            inputNIDN.style.backgroundColor = "#ffffff";
+        }
         
-        // Kosongkan form yang belum ada datanya dari DB
-        document.getElementById('inputHomebaseDosen').value = "";
-        document.getElementById('inputEmailDosen').value = "";
+        document.getElementById('inputNamaDosen').value = nama;
+        document.getElementById('inputHomebaseDosen').value = ""; 
+        document.getElementById('inputEmailDosen').value = ""; 
         
         document.getElementById('modalDosen').style.display = "flex";
     }
 
-    function tutupModalDosen() {
-        document.getElementById('modalDosen').style.display = "none";
+    function tutupModalDosen() { document.getElementById('modalDosen').style.display = "none"; }
+
+    async function simpanDosen() {
+        const nidn = document.getElementById('inputNIDNDosen').value.trim();
+        const nama = document.getElementById('inputNamaDosen').value.trim();
+        
+        if(!nidn || !nama) { alert("⚠️ NIDN dan Nama wajib diisi!"); return; }
+
+        const isEdit = document.getElementById('inputNIDNDosen').readOnly;
+        const actionType = isEdit ? "UBAH" : "TAMBAH";
+
+        const btnSimpan = document.querySelector("#modalDosen .btn-primary-ti");
+        const originalText = btnSimpan.innerHTML;
+        btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btnSimpan.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE}/post-data-dosen`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ aksi: actionType, nidn: nidn, nama: nama, prodi: PRODI })
+            });
+
+            if(response.ok) {
+                alert(`✅ Data dosen berhasil di${actionType.toLowerCase()}!`);
+                tutupModalDosen(); loadData();
+            } else { alert("❌ Gagal menyimpan data ke server n8n."); }
+        } catch(e) { alert("❌ Terjadi kesalahan jaringan saat menghubungi server.");
+        } finally { btnSimpan.innerHTML = originalText; btnSimpan.disabled = false; }
     }
 
-    function simpanDosen() {
-        const nidn = document.getElementById('inputNIDNDosen').value;
-        const nama = document.getElementById('inputNamaDosen').value;
-        
-        alert(`Sistem berhasil menangkap perubahan untuk NIDN: ${nidn}. Data siap dikirim ke n8n!`);
-        tutupModalDosen();
+    async function konfirmasiHapusDosen(nidn, nama) {
+        if(confirm(`⚠️ Peringatan Berbahaya!\n\nApakah Anda yakin ingin MENGHAPUS dosen berikut secara permanen?\n\nNIDN: ${nidn}\nNama: ${nama}`)) {
+            try {
+                const response = await fetch(`${API_BASE}/post-data-dosen`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ aksi: "HAPUS", nidn: nidn, prodi: PRODI })
+                });
+
+                if(response.ok) { alert("✅ Data dosen berhasil dihapus!"); loadData(); } 
+                else { alert("❌ Gagal menghapus data di server n8n."); }
+            } catch(e) { alert("❌ Terjadi kesalahan jaringan saat mencoba menghapus."); }
+        }
     }
 
     // ==========================================
-    // 5. EVENT LISTENER SAAT HALAMAN DIBUKA
+    // FUNGSI UPLOAD EXCEL DOSEN
+    // ==========================================
+    async function prosesUploadExcel(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+
+        const btnUpload = document.getElementById('btnUploadExcel');
+        const originalText = btnUpload.innerHTML;
+        btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membaca File...';
+        btnUpload.disabled = true;
+
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheet = workbook.SheetNames[0];
+                const excelData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+
+                if(excelData.length === 0) {
+                    alert("⚠️ File Excel kosong atau tidak terbaca!");
+                    resetButton(); return;
+                }
+
+                // Format data: Deteksi kolom NIDN dan Nama (Case Insensitive)
+                const arraySiapKirim = excelData.map(row => {
+                    const nidn = row['NIDN'] || row['nidn'] || row['Nidn'] || '';
+                    const nama = row['NAMA'] || row['Nama'] || row['nama'] || row['Nama Dosen'] || row['nama_dosen'] || '';
+                    return { nidn: String(nidn).trim(), nama: String(nama).trim() };
+                }).filter(item => item.nidn !== ''); // Abaikan baris kosong tanpa NIDN
+
+                if(arraySiapKirim.length === 0) {
+                    alert("⚠️ Format tidak sesuai! Pastikan Excel Anda memiliki judul kolom 'NIDN' dan 'Nama'.");
+                    resetButton(); return;
+                }
+
+                btnUpload.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan ${arraySiapKirim.length} Data...`;
+
+                // Kirim Array ke Webhook n8n
+                const response = await fetch(`${API_BASE}/post-excel-dosen`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: arraySiapKirim, prodi: PRODI })
+                });
+
+                if(response.ok) {
+                    alert(`✅ BERHASIL! Sebanyak ${arraySiapKirim.length} data dosen telah diproses.`);
+                    loadData(); // Refresh tabel
+                } else {
+                    alert("❌ Gagal mengirim data ke server n8n.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("❌ Terjadi kesalahan saat membaca file Excel.");
+            } finally {
+                resetButton();
+            }
+        };
+        
+        reader.readAsArrayBuffer(file);
+
+        function resetButton() {
+            btnUpload.innerHTML = originalText;
+            btnUpload.disabled = false;
+            document.getElementById('fileExcel').value = ""; // Kosongkan input file
+        }
+    }
+
+    // ==========================================
+    // INIT
     // ==========================================
     window.onload = () => { 
         loadData(); 
@@ -340,8 +449,7 @@
         if(selectBox) {
             selectBox.onchange = (e) => {
                 rowsPerPage = parseInt(e.target.value);
-                currentPage = 1; 
-                renderTablePaginated();
+                currentPage = 1; renderTablePaginated();
             }
         }
 
@@ -349,12 +457,10 @@
         if(searchBox) {
             searchBox.oninput = (e) => {
                 searchQuery = e.target.value.toLowerCase();
-                currentPage = 1; 
-                renderTablePaginated();
+                currentPage = 1; renderTablePaginated();
             }
         }
 
-        // Jeda agar template.js selesai menyusun sidebar sebelum kita ubah menu aktifnya
         setTimeout(() => {
             const navDashboard = document.getElementById('nav-home');
             const navDosen = document.querySelector('[data-path="/master_data/master_dosen.html"]'); 

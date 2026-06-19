@@ -264,21 +264,16 @@
         const endIndex = startIndex + rowsPerPage;
         const dataToShow = filteredData.slice(startIndex, endIndex);
 
-        // EKSEKUSI RUMUS EKSTRAK ANGKATAN DARI NIM
         dataToShow.forEach((item, index) => {
             const noUrut = startIndex + index + 1;
-            
-            // Ambil nama dari database (biasanya dipisah || oleh n8n)
             const parts = item.label ? item.label.split('||') : ['Tidak Diketahui', '-'];
             const namaMhs = parts[0];
             
-            // LOGIKA OTOMATISASI ANGKATAN
             let angkatanOtomatis = '-';
             const nim = item.kode;
             if (nim && nim.length >= 5) {
-                // Potong digit ke-4 dan ke-5 (index 3 dan 4) dari NIM
                 const kodeTahun = nim.substring(3, 5);
-                angkatanOtomatis = "20" + kodeTahun; // Tambahkan "20" di depan
+                angkatanOtomatis = "20" + kodeTahun; 
             }
 
             tbody.innerHTML += `
@@ -290,7 +285,7 @@
                 <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
                 <td style="text-align: center;">
                     <button class="btn-action btn-edit" onclick="bukaModalMahasiswa('${item.kode}')"><i class="fas fa-edit"></i> Ubah</button>
-                    <button class="btn-action btn-delete" onclick="alert('Fitur hapus disiapkan')"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn-action btn-delete" onclick="konfirmasiHapus('${item.kode}', '${namaMhs}')"><i class="fas fa-trash"></i> Hapus</button>
                 </td>
             </tr>`;
         });
@@ -322,22 +317,56 @@
     }
 
     // ==========================================
-    // 4. FUNGSI MODAL POP-UP MAHASISWA
+    // 4. FUNGSI MODAL POP-UP (UBAH & TAMBAH)
     // ==========================================
-    function bukaModalMahasiswa(nim = '') {
-        if(nim) {
-            document.getElementById('modalTitleMahasiswa').innerText = "Ubah Data Mahasiswa";
-            document.getElementById('inputNIM').value = nim;
-            document.getElementById('inputNIM').readOnly = true; 
+    
+    // Fitur: Ketik NIM langsung muncul Angkatan
+    document.getElementById('inputNIM').addEventListener('input', function(e) {
+        const nimInput = e.target.value;
+        if (nimInput.length >= 5) {
+            const kodeTahun = nimInput.substring(3, 5);
+            document.getElementById('inputAngkatan').value = "20" + kodeTahun;
         } else {
-            document.getElementById('modalTitleMahasiswa').innerText = "Tambah Mahasiswa";
-            document.getElementById('inputNIM').value = "";
-            document.getElementById('inputNIM').readOnly = false;
+            document.getElementById('inputAngkatan').value = "";
+        }
+    });
+
+    function bukaModalMahasiswa(nim = '') {
+        const title = document.getElementById('modalTitleMahasiswa');
+        const inputNIM = document.getElementById('inputNIM');
+        const inputNama = document.getElementById('inputNamaMahasiswa');
+        const inputAngkatan = document.getElementById('inputAngkatan');
+        const inputStatus = document.getElementById('inputStatusMahasiswa');
+
+        if(nim) {
+            // MODE UBAH DATA (EDIT)
+            title.innerText = "Ubah Data Mahasiswa";
+            inputNIM.value = nim;
+            inputNIM.readOnly = true; // Kunci agar NIM tidak bisa diubah
+            inputNIM.style.backgroundColor = "#f3f4f6";
+
+            // Cari data di memori
+            const mhsTerpilih = allDataMahasiswa.find(m => m.kode === nim);
+            if(mhsTerpilih) {
+                const parts = mhsTerpilih.label ? mhsTerpilih.label.split('||') : [''];
+                inputNama.value = parts[0];
+                
+                // Kalkulasi angkatan untuk form edit
+                if (nim.length >= 5) {
+                    inputAngkatan.value = "20" + nim.substring(3, 5);
+                }
+            }
+        } else {
+            // MODE TAMBAH DATA BARU
+            title.innerText = "Tambah Mahasiswa";
+            inputNIM.value = "";
+            inputNIM.readOnly = false;
+            inputNIM.style.backgroundColor = "#ffffff";
+            inputNama.value = "";
+            inputAngkatan.value = "";
+            inputStatus.value = "aktif";
         }
         
-        document.getElementById('idMahasiswa').value = "";
-        document.getElementById('inputNamaMahasiswa').value = "";
-        document.getElementById('inputAngkatan').value = "";
         document.getElementById('modalMahasiswa').style.display = "flex";
     }
 
@@ -345,9 +374,83 @@
         document.getElementById('modalMahasiswa').style.display = "none";
     }
 
-    function simpanMahasiswa() {
-        alert("Sistem pop-up siap! Data siap dikirim ke webhook n8n.");
-        tutupModalMahasiswa();
+   async function simpanMahasiswa() {
+        const nim = document.getElementById('inputNIM').value.trim();
+        const nama = document.getElementById('inputNamaMahasiswa').value.trim();
+        const angkatan = document.getElementById('inputAngkatan').value;
+        const status = document.getElementById('inputStatusMahasiswa').value;
+
+        if(!nim || !nama) {
+            alert("⚠️ Peringatan: NIM dan Nama Lengkap wajib diisi!");
+            return;
+        }
+
+        const isEdit = document.getElementById('inputNIM').readOnly;
+        const actionType = isEdit ? "UBAH" : "TAMBAH";
+
+        // Mengubah tombol menjadi mode loading
+        const btnSimpan = document.querySelector("#modalMahasiswa .btn-primary-ti");
+        const originalText = btnSimpan.innerHTML;
+        btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btnSimpan.disabled = true;
+
+        try {
+            // Mengirim data ke n8n
+            const response = await fetch(`${API_BASE}/post-data-mahasiswa`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    aksi: actionType,
+                    nim: nim,
+                    nama: nama,
+                    angkatan: angkatan,
+                    status: status,
+                    prodi: PRODI // Terisi otomatis 'ti' dari variabel global
+                })
+            });
+
+            if(response.ok) {
+                alert(`✅ Data mahasiswa berhasil di${actionType.toLowerCase()}!`);
+                tutupModalMahasiswa();
+                loadData(); // Tarik ulang data terbaru dari database untuk merender tabel
+            } else {
+                alert("❌ Gagal menyimpan data ke server n8n.");
+            }
+        } catch(e) {
+            console.error("Error Simpan:", e);
+            alert("❌ Terjadi kesalahan jaringan saat menghubungi server.");
+        } finally {
+            // Kembalikan tombol ke kondisi semula
+            btnSimpan.innerHTML = originalText;
+            btnSimpan.disabled = false;
+        }
+    }
+
+    async function konfirmasiHapus(nim, nama) {
+        if(confirm(`⚠️ Peringatan Berbahaya!\n\nApakah Anda yakin ingin MENGHAPUS mahasiswa berikut secara permanen?\n\nNIM: ${nim}\nNama: ${nama}`)) {
+            try {
+                // Memberikan efek visual baris sedang diproses (opsional)
+                const response = await fetch(`${API_BASE}/post-data-mahasiswa`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        aksi: "HAPUS", 
+                        nim: nim, 
+                        prodi: PRODI 
+                    })
+                });
+
+                if(response.ok) {
+                    alert("✅ Data mahasiswa berhasil dihapus secara permanen!");
+                    loadData(); // Tarik ulang data terbaru dari database
+                } else {
+                    alert("❌ Gagal menghapus data di server n8n.");
+                }
+            } catch(e) {
+                console.error("Error Hapus:", e);
+                alert("❌ Terjadi kesalahan jaringan saat mencoba menghapus.");
+            }
+        }
     }
 
     // ==========================================
