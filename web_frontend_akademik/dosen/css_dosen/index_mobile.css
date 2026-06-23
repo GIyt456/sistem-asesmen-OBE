@@ -1,0 +1,97 @@
+/* ========================================================================
+   FILE CSS KHUSUS RESPONSIVITAS MOBILE & TABLET (MAKSIMAL LEBAR 768px)
+   ======================================================================== */
+
+@media screen and (max-width: 768px) {
+    
+    /* 1. BUKA GEMBOK SCROLL YANG DIKUNCI OLEH DESKTOP */
+    body, html {
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow-y: auto !important; /* Izinkan scroll ke bawah */
+        overflow-x: hidden !important;
+    }
+
+    /* 2. BONGKAR LAYOUT UTAMA */
+    .main-wrapper {
+        display: flex !important;
+        flex-direction: column !important; /* Susun dari atas ke bawah */
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow-y: auto !important;
+        position: relative !important;
+    }
+
+    /* 3. SESUAIKAN KONTEN DAN PADDING */
+    .content-section {
+        width: 100% !important;
+        padding: 20px 15px !important;
+        height: auto !important;
+        position: relative !important;
+    }
+
+    /* 4. RAPIKAN HEADER & PROFIL DOSEN */
+    .header-dashboard {
+        display: flex !important;
+        flex-direction: column !important;
+        text-align: center !important;
+        align-items: center !important;
+        gap: 15px !important;
+        padding: 20px 15px !important;
+    }
+
+    .user-profile-info {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* 5. SUSUN KOTAK MENU JADI 1 BARIS KE BAWAH */
+    .grid-menu-container,
+    .cards-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important; /* Paksa jadi 1 kolom! */
+        gap: 15px !important;
+        width: 100% !important;
+    }
+
+    .card-item {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+
+    /* 6. TOMBOL JANGAN MENYAMPING, BUAT FULL WIDTH */
+    .action-buttons-container,
+    .button-group {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 10px !important;
+    }
+
+    .action-buttons-container button,
+    .button-group button,
+    .btn {
+        width: 100% !important;
+        padding: 15px 20px !important;
+        justify-content: center !important;
+    }
+
+    /* 7. POP-UP TUTORIAL AGAR TIDAK KELUAR LAYAR HP */
+    .modal-content-box {
+        width: 95% !important;
+        max-width: 95% !important;
+        margin: 20px auto !important;
+        padding: 20px 15px !important;
+    }
+
+    /* 8. JIKA ADA GAMBAR BACKGROUND, JADIKAN COVER AGAR TIDAK PECAH */
+    .bg-image, 
+    .background-overlay {
+        position: fixed !important;
+        height: 100vh !important;
+        width: 100vw !important;
+        object-fit: cover !important;
+        z-index: -1 !important;
+    }
+}
