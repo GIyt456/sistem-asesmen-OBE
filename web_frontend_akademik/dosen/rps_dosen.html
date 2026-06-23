@@ -695,8 +695,7 @@
                             <textarea id="valDeskripsi" class="form-control" style="height: 120px; resize: vertical;"
                                 placeholder="Ketik deskripsi singkat mata kuliah di sini..."></textarea>
 
-                            <h3 class="section-title" style="margin-top: 20px; font-size: 1rem;">Bahan Kajian : Materi
-                                Pembelajaran</h3>
+                            <h3 class="section-title" style="margin-top: 20px; font-size: 1rem;">Bahan Kajian</h3>
                             <textarea id="valBahanKajian" class="form-control" style="height: 120px; resize: vertical;"
                                 readonly>Menarik data dari server...</textarea>
                         </div>
@@ -800,18 +799,19 @@
                         <table class="table-sesi">
                             <thead>
                                 <tr>
+                                    <th width="10%">CPL</th>
                                     <th width="15%">ID CPMK</th>
-                                    <th width="15%">TUGAS (%)</th>
-                                    <th width="15%">UTS (%)</th>
-                                    <th width="15%">UAS (%)</th>
-                                    <th width="15%">ATTITUDE (%)</th>
-                                    <th width="15%">KEHADIRAN (%)</th>
+                                    <th width="12%">TUGAS (%)</th>
+                                    <th width="12%">UTS (%)</th>
+                                    <th width="12%">UAS (%)</th>
+                                    <th width="12%">ATTITUDE (%)</th>
+                                    <th width="12%">KEHADIRAN (%)</th>
                                     <th width="10%">TOTAL</th>
                                 </tr>
                             </thead>
                             <tbody id="valBobotPenilaian">
                                 <tr>
-                                    <td colspan="7" style="text-align: center; padding: 20px;"><i
+                                    <td colspan="8" style="text-align: center; padding: 20px;"><i
                                             class="fas fa-spinner fa-spin"></i> Menarik data...</td>
                                 </tr>
                             </tbody>
@@ -1145,12 +1145,13 @@
                         elRumpun.value = "-";
                         elRumpun.style.height = 'auto';
 
-                        // B. Bahan Kajian: Tetap menarik format "kode_bk - nama_bk"
+                        // B. Bahan Kajian: Hanya menarik "kode_bk" saja
                         const rawBahanKajian = cleanData
-                            .map(item => `${item.kode_bk} - ${item.nama_bk}`)
-                            .filter(bk => bk && !bk.includes('undefined'));
+                            .map(item => item.kode_bk)
+                            .filter(bk => bk && bk !== 'undefined');
 
-                        document.getElementById('valBahanKajian').value = rawBahanKajian.join('\n') || "Tidak ada data Bahan Kajian.";
+                        // Digabung menyamping menggunakan koma agar lebih rapi
+                        document.getElementById('valBahanKajian').value = rawBahanKajian.join(', ') || "Tidak ada data Bahan Kajian.";
 
                     } else {
                         document.getElementById('valBahanKajian').value = "MK belum direlasikan dengan BK.";
@@ -1176,8 +1177,9 @@
                 }
             } catch (e) { console.warn("API Get Info MK error/tidak lengkap"); }
 
-            // 4. TARIK CPL & CPMK
-            let validCpmkKodes = []; // Variabel penampung CPMK yang sah
+            // 4. TARIK CPL & CPMK (Sambil menyimpan memori relasi CPL ke CPMK)
+            let validCpmkKodes = [];
+            let mapCpmkToCpl = {}; // <-- Wadah memori relasi baru
             try {
                 const resCplCpmk = await fetch(`${API_GET_CPL_CPMK}?kode_mk=${kodeMK}`);
                 if (resCplCpmk.ok) {
@@ -1190,7 +1192,10 @@
                         const cpmkArray = [];
 
                         filteredData.forEach(row => {
-                            if (row.kode_cpmk) validCpmkKodes.push(row.kode_cpmk); // Simpan daftar CPMK sah
+                            if (row.kode_cpmk) {
+                                validCpmkKodes.push(row.kode_cpmk);
+                                if (row.kode_cpl) mapCpmkToCpl[row.kode_cpmk] = row.kode_cpl; // Simpan relasinya di sini
+                            }
                             if (row.kode_cpl && row.deskripsi_cpl) cplMap.set(row.kode_cpl, row.deskripsi_cpl);
                             if (row.kode_cpmk && row.deskripsi_cpmk) cpmkArray.push(`<li><strong>${row.kode_cpmk}</strong> - ${row.deskripsi_cpmk} <em>(Ref: ${row.kode_cpl || '-'})</em></li>`);
                         });
@@ -1214,16 +1219,14 @@
                 document.getElementById('valCpmk').innerHTML = "Gagal terhubung ke Webhook Get CPL CPMK.";
             }
 
-            // 5. TARIK DATA BOBOT PENILAIAN (Dengan Filter Cerdas)
+            // 5. TARIK DATA BOBOT PENILAIAN
             try {
                 const resBobot = await fetch(`${API_GET_BOBOT}?kode_mk=${kodeMK}`);
                 if (resBobot.ok) {
                     const jsonBobot = await resBobot.json();
                     const dataBobot = safeExtractArray(jsonBobot);
 
-                    // FILTER: Hanya ambil bobot yang kodenya ADA di dalam daftar validCpmkKodes tadi
                     const validData = dataBobot.filter(b => b.kode_cpmk && validCpmkKodes.includes(b.kode_cpmk));
-
                     const tbodyBobot = document.getElementById('valBobotPenilaian');
 
                     if (validData.length > 0) {
@@ -1240,8 +1243,12 @@
 
                             grandTotal += total;
 
+                            // Tarik CPL dari memori relasi yang dibuat di Nomor 4 tadi
+                            const cplKode = mapCpmkToCpl[b.kode_cpmk] || '-';
+
                             tbodyBobot.innerHTML += `
                                 <tr>
+                                    <td style="font-weight:bold; text-align:center; color:var(--primary-red);">${cplKode}</td>
                                     <td style="font-weight:bold; text-align:center;">${b.kode_cpmk}</td>
                                     <td style="text-align:center;">${tgs}%</td>
                                     <td style="text-align:center;">${uts}%</td>
@@ -1256,16 +1263,16 @@
                         const warnaTotal = grandTotal === 100 ? "#10b981" : "#ef4444";
                         tbodyBobot.innerHTML += `
                             <tr style="background-color: #f8fafc; border-top: 2px solid #cbd5e1;">
-                                <td colspan="6" style="text-align:right; font-weight:900; color:var(--primary-navy); padding-right:20px;">TOTAL KESELURUHAN:</td>
+                                <td colspan="7" style="text-align:right; font-weight:900; color:var(--primary-navy); padding-right:20px;">TOTAL KESELURUHAN:</td>
                                 <td style="text-align:center; font-weight:900; color:${warnaTotal}; font-size:1.1rem;">${grandTotal}%</td>
                             </tr>
                         `;
                     } else {
-                        tbodyBobot.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b;">Bobot penilaian belum diatur oleh Kaprodi di database.</td></tr>`;
+                        tbodyBobot.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#64748b;">Bobot penilaian belum diatur oleh Kaprodi di database.</td></tr>`;
                     }
                 }
             } catch (e) {
-                document.getElementById('valBobotPenilaian').innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Gagal terhubung ke N8N Bobot. Pastikan CORS sudah diaktifkan.</td></tr>`;
+                document.getElementById('valBobotPenilaian').innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">Gagal terhubung ke N8N Bobot.</td></tr>`;
             }
 
             // 6. TARIK DATA RPS LAINNYA (Info Tambahan) DARI N8N
@@ -1560,11 +1567,11 @@
             // 1. Cek apakah ada parameter '?mk=' di URL
             const urlParams = new URLSearchParams(window.location.search);
             const autoMk = urlParams.get('mk');
-            
+
             if (autoMk && globalDaftarMK) {
                 // 2. Cari data detail Mata Kuliah tersebut dari daftar yang sudah diload
                 const matkulTarget = globalDaftarMK.find(m => m.kode_mk === autoMk);
-                
+
                 if (matkulTarget) {
                     // 3. Eksekusi fungsi buka detail (Klik Otomatis)
                     bukaDetailRPS(matkulTarget.kode_mk, matkulTarget.nama_mk, matkulTarget.semester, matkulTarget.sks);

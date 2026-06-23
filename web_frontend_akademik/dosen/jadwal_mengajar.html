@@ -523,8 +523,8 @@
         <div style="margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
             <h1 style="font-size: 2.2rem; font-weight: 900; color: var(--primary-navy); margin-bottom: 5px;">Jadwal
                 Mengajar</h1>
-            <p style="color: var(--text-gray); font-size: 1rem;">Daftar mata kuliah dan kelas yang Anda ampu pada
-                semester ini.</p>
+            <p style="color: var(--text-gray); font-size: 1rem;">Daftar mata kuliah dan kelas yang ditarik dari Metadata
+                Anda pada semester ini.</p>
         </div>
 
         <div class="figma-card">
@@ -634,8 +634,8 @@
     </footer>
 
     <script>
-
-        const API_GET_KELAS = `${API_BASE}/get-kelas-aktif`;
+        // API CONFIG (Mengikuti sumber data yang sama dengan input_nilai.html)
+        const API_METADATA = `${API_BASE}/get-metadata`;
         const API_GET_MATKUL = `${API_BASE}/get-master-matkul`;
 
         // Sesi Login
@@ -647,6 +647,7 @@
         document.getElementById("dosenName").innerText = userLogin;
         document.getElementById("lblProdiTitle").innerText = userProdiSekarang === "si" ? "Sistem Informasi" : "Teknik Informatika";
 
+        // Tambah Tombol Admin Jika Diperlukan
         if (userRoleSekarang === "admin") {
             const navRightContainer = document.getElementById("navRightContainer");
             const btnKembali = document.createElement("a");
@@ -678,47 +679,52 @@
         async function loadJadwalMengajar() {
             const tbody = document.getElementById("tableBodyJadwal");
             try {
-                // 1. Tarik Data
-                const resKelas = await fetch(API_GET_KELAS);
-                const jsonKelas = await resKelas.json();
-                let dataKelasRaw = safeExtractArray(jsonKelas);
+                let prodiArray = userProdiSekarang.split(',');
+                let allMetadata = [];
 
-                // Filter Anti Duplikat id_kelas (jaga-jaga jika n8n looping)
-                const uniqueKelasMap = new Map();
-                dataKelasRaw.forEach(kelas => {
-                    if (kelas && kelas.id_kelas) {
-                        uniqueKelasMap.set(String(kelas.id_kelas), kelas);
-                    }
-                });
-                dataKelasRaw = Array.from(uniqueKelasMap.values());
+                // 1. TARIK METADATA SEPERTI DI HALAMAN INPUT NILAI
+                for (let p of prodiArray) {
+                    let prodiBersih = p.trim().toLowerCase();
+                    const res = await fetch(`${API_METADATA}?prodi=${prodiBersih}&context=dosen&nidn=${userNidn}`);
+                    let textData = await res.text();
+                    if (textData.startsWith('=')) textData = textData.substring(1);
+                    let data = JSON.parse(textData);
+                    data = data.map(item => ({ ...item, prodi_asal: prodiBersih }));
+                    allMetadata = allMetadata.concat(data);
+                }
 
-                // 2. Tarik Data Master Matkul
+                // Hapus duplikat metadata berdasarkan kode
+                const uniqueMeta = []; const mapMeta = new Map();
+                for (const item of allMetadata) {
+                    if (!mapMeta.has(item.kode)) { mapMeta.set(item.kode, true); uniqueMeta.push(item); }
+                }
+                const daftarMK = uniqueMeta.filter(item => item.tipe === 'mk');
+
+                // 2. TARIK DATA MASTER MATKUL UNTUK SKS DAN SEMESTER
                 const resMatkul = await fetch(API_GET_MATKUL);
                 const jsonMatkul = await resMatkul.json();
                 let dataMatkulRaw = safeExtractArray(jsonMatkul);
 
-                // 3. Cocokkan data
-                let gabunganData = dataKelasRaw.map(kelas => {
-                    const matkulCocok = dataMatkulRaw.find(m => m.kode_mk === kelas.kode_mk);
+                // 3. COCOKKAN DATA DAN BENTUK LIST JADWAL
+                let gabunganData = daftarMK.map(mk => {
+                    const matkulCocok = dataMatkulRaw.find(m => m.kode_mk === mk.kode);
                     return {
-                        id_kelas: kelas.id_kelas,
-                        kode_mk: kelas.kode_mk,
-                        nidn: kelas.nidn,
-                        semester: kelas.semester,
-                        kelompok: kelas.kelompok,
-                        nama_mk: matkulCocok ? matkulCocok.nama_mk : "Nama MK Tidak Ditemukan",
+                        id_kelas: "KL-" + mk.kode,
+                        kode_mk: mk.kode,
+                        nidn: userNidn,
+                        semester: matkulCocok ? matkulCocok.semester : "-",
+                        kelompok: "A",
+                        nama_mk: mk.label,
                         sks: matkulCocok ? matkulCocok.sks : "-",
-                        prodi: matkulCocok ? matkulCocok.prodi : "-"
+                        prodi: matkulCocok ? matkulCocok.prodi : mk.prodi_asal
                     };
                 });
 
-                // 4. FILTERING BERDASARKAN ROLE
+                // 4. FILTER ADMIN JIKA DIPERLUKAN
                 if (userRoleSekarang === "admin") {
                     dataJadwalGlobal = gabunganData.filter(item =>
                         item.prodi.toLowerCase() === userProdiSekarang.toLowerCase() || item.prodi === "-"
                     );
-                } else if (userNidn) {
-                    dataJadwalGlobal = gabunganData.filter(item => item.nidn === userNidn);
                 } else {
                     dataJadwalGlobal = gabunganData;
                 }
@@ -728,10 +734,17 @@
 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan=\"6\" style=\"text-align:center; padding:30px; color: red;\">Gagal memuat atau mencocokkan data. Pastikan n8n menyala.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color: red;">Gagal memuat data dari Metadata n8n.</td></tr>`;
             }
         }
 
+        function bukaRPS(kodeMk) {
+            window.location.href = "rps_dosen.html?mk=" + kodeMk;
+        }
+
+        // ==========================================
+        // RENDER TABEL & PAGINATION
+        // ==========================================
         function changeRowsPerPage() {
             rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value);
             currentPage = 1;
@@ -743,7 +756,7 @@
             tbody.innerHTML = "";
 
             if (filteredDataGlobal.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada jadwal kelas yang ditemukan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada jadwal mengajar yang ditemukan.</td></tr>`;
                 document.getElementById("dataCountInfo").innerText = "Showing 0 entries";
                 document.getElementById("paginationControls").innerHTML = "";
                 return;
@@ -754,12 +767,11 @@
 
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = Math.min(startIndex + rowsPerPage, filteredDataGlobal.length);
-
             const currentDataPage = filteredDataGlobal.slice(startIndex, endIndex);
 
             currentDataPage.forEach((kelas) => {
                 const tr = document.createElement("tr");
-                const safeId = kelas.id_kelas;
+                const safeId = kelas.kode_mk.replace(/\s+/g, '-');
 
                 tr.innerHTML = `
                     <td>2025/2026</td>
@@ -775,10 +787,11 @@
                             <button class="btn-detail" onclick="bukaModalDetail('${kelas.kode_mk}', '${kelas.nama_mk}', '${kelas.sks}', '${kelas.semester}', '${kelas.id_kelas}', '${kelas.prodi}')">Detail</button>
                             <div class="btn-dropdown-wrapper">
                                 <button class="btn-penilaian" onclick="toggleActionMenu(event, 'menu-${safeId}')">
-                                    Penilaian <i class="fas fa-caret-down"></i>
+                                    Aksi <i class="fas fa-caret-down"></i>
                                 </button>
                                 <div class="dropdown-menu" id="menu-${safeId}">
-                                    <a href="penilaian_kelas.html?id_kelas=${kelas.id_kelas}&mk=${kelas.kode_mk}" class="dropdown-item">Input Nilai (Kelas ${kelas.id_kelas})</a>
+                                    <a href="penilaian_kelas.html?id_kelas=${kelas.id_kelas}&mk=${kelas.kode_mk}" class="dropdown-item"><i class="fas fa-edit" style="margin-right:8px;"></i> Input Nilai (Kelas ${kelas.id_kelas})</a>
+                                    <a href="#" onclick="bukaRPS('${kelas.kode_mk}')" class="dropdown-item"><i class="fas fa-book" style="margin-right:8px;"></i> Penyusunan RPS</a>
                                 </div>
                             </div>
                         </div>
@@ -788,44 +801,33 @@
             });
 
             document.getElementById("dataCountInfo").innerText = `Showing ${startIndex + 1} to ${endIndex} of ${filteredDataGlobal.length} entries`;
-
             renderSmartPagination(totalPages);
         }
 
-        // ==================================================
-        // SMART PAGINATION LOGIC (ANTI OVERFLOW)
-        // ==================================================
         function renderSmartPagination(totalPages) {
             const paginationEl = document.getElementById("paginationControls");
             let html = "";
 
-            // Tombol Previous
             html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
 
-            // Hitung batasan tombol yang tampil (Maksimal 5 tombol berurutan)
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, currentPage + 2);
 
-            // Tampilkan angka 1 dan Elipsis Kiri jika startPage terlalu jauh
             if (startPage > 1) {
                 html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
                 if (startPage > 2) html += `<span class="page-dots">...</span>`;
             }
 
-            // Looping tombol halaman yang aktif
             for (let i = startPage; i <= endPage; i++) {
                 html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
             }
 
-            // Tampilkan Elipsis Kanan dan Halaman Terakhir jika endPage belum mencapai akhir
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) html += `<span class="page-dots">...</span>`;
                 html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
             }
 
-            // Tombol Next
             html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
-
             paginationEl.innerHTML = html;
         }
 
@@ -849,6 +851,9 @@
             renderTable();
         }
 
+        // ==========================================
+        // UI & DROPDOWN CONTROLS
+        // ==========================================
         function toggleActionMenu(event, menuId) {
             event.stopPropagation();
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
