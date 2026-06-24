@@ -33,16 +33,43 @@
     /* 4. RAPIKAN HEADER & PROFIL DOSEN */
     .header-dashboard {
         display: flex !important;
-        flex-direction: column !important;
-        text-align: center !important;
-        align-items: center !important;
-        gap: 15px !important;
-        padding: 20px 15px !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        /* Ubah padding di sini agar mentok atas dan kiri */
+        padding: 12px 15px !important; 
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .header-dashboard img {
+        height: 28px !important; /* Dikecilkan sedikit lagi supaya proporsional */
+        margin-top: 0 !important; /* Pastikan tidak ada margin atas tambahan */
     }
 
     .user-profile-info {
-        width: 100% !important;
-        justify-content: center !important;
+        width: auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        flex-wrap: wrap !important; 
+        gap: 6px !important; /* Jarak antar tombol dirapatkan sedikit */
+    }
+
+    /* Penyesuaian agar nama yang panjang bisa dipotong otomatis (opsional tapi disarankan) */
+    .user-profile-info .user-chip {
+        max-width: 140px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important; /* Memunculkan '...' jika nama terlalu panjang */
+    }
+
+    .user-profile-info .user-chip,
+    .user-profile-info .btn-logout,
+    .user-profile-info a {
+        font-size: 0.75rem !important; /* Dikecilkan sedikit lagi */
+        padding: 6px 10px !important;
+        margin: 0 !important;
     }
 
     /* 5. SUSUN KOTAK MENU JADI 1 BARIS KE BAWAH */
@@ -94,4 +121,5 @@
         object-fit: cover !important;
         z-index: -1 !important;
     }
+   
 }

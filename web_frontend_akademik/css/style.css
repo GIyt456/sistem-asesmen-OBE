@@ -81,3 +81,65 @@ td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size
 /* 9. UTILITIES */
 .status-aktif { background: #d1fae5; color: #065f46; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
 .status-nonaktif { background: #fee2e2; color: #991b1b; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+
+/* =======================================================
+   📱 PENGATURAN TAMPILAN MOBILE (SMARTPHONE & TABLET)
+   ======================================================= */
+@media screen and (max-width: 768px) {
+    /* 1. Ruang Konten Lebih Rapat agar Layar HP Tidak Penuh Ruang Kosong */
+    .main-content {
+        padding: 20px 15px !important;
+    }
+
+    /* 2. Header & Judul Menumpuk ke Bawah */
+    .header-container {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start !important;
+    }
+
+    .header-title {
+        font-size: 1.5rem !important;
+    }
+
+    /* 3. Grid / Kartu (Card) Menjadi 1 Kolom (Atas-Bawah) */
+    .grid-2, .settings-grid, .grid-top, .cqi-box {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+
+    /* 4. Tabel Bisa Digeser ke Samping (Scroll Horizontal Anti-Terpotong) */
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Biar scroll di HP mulus */
+        white-space: nowrap;
+    }
+
+    /* 5. Modifikasi Tombol & Form agar Nyaman Ditekan Jari */
+    .btn-primary-si, .btn-dark, .btn-back {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 8px;
+    }
+    
+    .search-container {
+        width: 100%;
+    }
+
+    /* 6. Penyesuaian Modal Pop-up di Layar Kecil */
+    .modal-box {
+        width: 95% !important;
+        padding: 20px !important;
+        margin: 10px;
+    }
+    
+    /* 7. Sembunyikan Pagination Info yang Terlalu Panjang di HP */
+    .pagination-info {
+        display: none;
+    }
+    .pagination-container {
+        justify-content: center !important;
+    }
+}
