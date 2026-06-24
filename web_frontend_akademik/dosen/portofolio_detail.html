@@ -324,33 +324,115 @@
                 tbodyPenilaian.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Belum ada data penilaian di database.</td></tr>";
             }
 
-            // 4. STATISTIK REKAP
+            // 4. STATISTIK REKAP (DIAMBIL DARI API GET REPORT OBE)
             const tbodyRekapStats = document.getElementById('tabelRekapCapaianCpmk');
             tbodyRekapStats.innerHTML = "";
+            
             if (dataCpmk.length > 0 && dataCpmk[0].kode_cpmk) {
-                let shareBobot = Math.round(100 / dataCpmk.length);
-                const templateScores = [{ avg: 85.2, min: 65, max: 98, pass: 92.5 }, { avg: 64.1, min: 40, max: 88, pass: 45.8 }, { avg: 78.4, min: 55, max: 95, pass: 84.2 }, { avg: 82.1, min: 60, max: 100, pass: 89.0 }];
+                // Tampilkan pesan loading
+                tbodyRekapStats.innerHTML = "<tr><td colspan='8' style='text-align:center; padding:20px;'><i class='fas fa-spinner fa-spin'></i> Menghitung Capaian Kelas dari Database Laporan...</td></tr>";
 
+                // Tarik data evaluasi dari workflow laporan (n8n)
+                const dataReport = await fetchSafeJSON(`${API_BASE}/get-report-obe?mk=${kodeMk}`);
+                
+                // Variabel bantu untuk kalkulasi
+                const cpmkWeights = {}; // Menyimpan bobot maksimal tiap pertemuan per CPMK
+                const cpmkStudents = {}; // Menyimpan total nilai (poin) yang didapat per mahasiswa per CPMK
+                const TARGET_PASS = 75; // Batas standar kelulusan nilai mahasiswa
+
+                if(dataReport && dataReport.length > 0) {
+                    dataReport.forEach(row => {
+                        const cpmk = row.kode_cpmk;
+                        if(!cpmk) return;
+                        
+                        const pNum = row.pertemuan;
+                        const bobot = parseFloat(row.bobot_maks_pertemuan) || 0;
+                        const poin = parseFloat(row.poin_pertemuan) || 0;
+                        const nim = row.nim;
+
+                        // Simpan bobot pertemuan unik (agar tidak terakumulasi dobel jika datanya banyak mahasiswa)
+                        if(!cpmkWeights[cpmk]) cpmkWeights[cpmk] = {};
+                        cpmkWeights[cpmk][pNum] = bobot;
+
+                        // Akumulasi total poin yang diraih oleh mahasiswa pada CPMK ini
+                        if(!cpmkStudents[cpmk]) cpmkStudents[cpmk] = {};
+                        if(!cpmkStudents[cpmk][nim]) cpmkStudents[cpmk][nim] = 0;
+                        cpmkStudents[cpmk][nim] += poin;
+                    });
+                }
+
+                // Melakukan proses kalkulasi akhir per CPMK
+                const finalStats = {};
+                for(const cpmk in cpmkStudents) {
+                    // 1. Hitung total bobot maksimal yang tersedia untuk CPMK ini
+                    let totalWeight = 0;
+                    for(const p in cpmkWeights[cpmk]) {
+                        totalWeight += cpmkWeights[cpmk][p];
+                    }
+
+                    // 2. Hitung persentase nilai akhir masing-masing mahasiswa di kelas
+                    const studentScores = [];
+                    for(const nim in cpmkStudents[cpmk]) {
+                        const totalPoin = cpmkStudents[cpmk][nim];
+                        const score = totalWeight > 0 ? (totalPoin / totalWeight) * 100 : 0;
+                        studentScores.push(score);
+                    }
+
+                    // 3. Cari rata-rata, min, max, dan persen kelulusan
+                    let avg = 0, min = 0, max = 0, passCount = 0;
+                    if(studentScores.length > 0) {
+                        min = Math.min(...studentScores);
+                        max = Math.max(...studentScores);
+                        avg = studentScores.reduce((a,b) => a+b, 0) / studentScores.length;
+                        passCount = studentScores.filter(s => s >= TARGET_PASS).length; 
+                    }
+                    const passPct = studentScores.length > 0 ? (passCount / studentScores.length) * 100 : 0;
+
+                    // Simpan hasilnya
+                    finalStats[cpmk] = { bobotTotal: totalWeight, avg, min, max, passPct };
+                }
+
+                // Bersihkan tampilan loading
+                tbodyRekapStats.innerHTML = ""; 
+
+                // Tampilkan data kalkulasi ke dalam tabel HTML
                 dataCpmk.forEach((item, index) => {
                     let rawItem = item.json ? item.json : item;
                     let valKode = rawItem.kode_cpmk || rawItem.cpmk || '-';
-                    let score = templateScores[index % templateScores.length];
-                    
+                    let score = finalStats[valKode];
+
                     if(valKode !== '-') {
-                        tbodyRekapStats.innerHTML += `
-                            <tr>
-                                <td style="text-align:center;">${index + 1}</td>
-                                <td style="font-weight:700; color:var(--primary-red);">${valKode}</td> <td style="text-align:center; font-weight:600;">Max 100 (${shareBobot}%)</td>
-                                <td style="text-align:center; font-weight:bold; color:${score.avg < 75 ? '#dc2626' : '#1f2937'};">${score.avg.toFixed(2)}</td>
-                                <td style="text-align:center; color:#64748b;">${score.min}</td>
-                                <td style="text-align:center; color:#64748b;">${score.max}</td>
-                                <td style="text-align:center; font-weight:600;">${score.pass.toFixed(2)}%</td>
-                                <td style="text-align:center;">${score.avg >= 75 ? '<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tercapai</span>' : '<span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tidak Tercapai</span>'}</td>
-                            </tr>`;
+                        if(!score || score.bobotTotal === 0) {
+                            // Skenario jika dosen belum menginputkan nilai sama sekali
+                            tbodyRekapStats.innerHTML += `
+                                <tr>
+                                    <td style="text-align:center;">${index + 1}</td>
+                                    <td style="font-weight:700; color:var(--primary-red);">${valKode}</td>
+                                    <td style="text-align:center; font-weight:600; color:#64748b;">Belum ada nilai</td>
+                                    <td style="text-align:center; font-weight:bold; color:#64748b;">0.00</td>
+                                    <td style="text-align:center; color:#64748b;">0.00</td>
+                                    <td style="text-align:center; color:#64748b;">0.00</td>
+                                    <td style="text-align:center; font-weight:600; color:#64748b;">0.00%</td>
+                                    <td style="text-align:center;"><span style="background:#f1f5f9; color:#64748b; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Data Kosong</span></td>
+                                </tr>`;
+                        } else {
+                            // Skenario jika sudah ada data nilai
+                            tbodyRekapStats.innerHTML += `
+                                <tr>
+                                    <td style="text-align:center;">${index + 1}</td>
+                                    <td style="font-weight:700; color:var(--primary-red);">${valKode}</td>
+                                    <td style="text-align:center; font-weight:600;">Max 100 (${score.bobotTotal.toFixed(0)}%)</td>
+                                    <td style="text-align:center; font-weight:bold; color:${score.avg < TARGET_PASS ? '#dc2626' : '#1f2937'};">${score.avg.toFixed(2)}</td>
+                                    <td style="text-align:center; color:#64748b;">${score.min.toFixed(2)}</td>
+                                    <td style="text-align:center; color:#64748b;">${score.max.toFixed(2)}</td>
+                                    <td style="text-align:center; font-weight:600;">${score.passPct.toFixed(2)}%</td>
+                                    <td style="text-align:center;">${score.avg >= TARGET_PASS ? '<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tercapai</span>' : '<span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tidak Tercapai</span>'}</td>
+                                </tr>`;
+                        }
                     }
                 });
             } else {
-                tbodyRekapStats.innerHTML = "<tr><td colspan='8' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Belum ada data statistik CPMK.</td></tr>";
+                tbodyRekapStats.innerHTML = "<tr><td colspan='8' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Belum ada data CPMK di kurikulum.</td></tr>";
             }
 
             // 5. EVALUASI LINTAS (FITUR EDIT AKTIF)
@@ -408,7 +490,7 @@
         }
 
         // =====================================
-        // FUNGSI SIMPAN LINTAS KELAS (DIPERBAIKI)
+        // FUNGSI SIMPAN LINTAS KELAS
         // =====================================
         async function simpanLintasKelas() { 
             const btn = document.getElementById('btnSimpanLintas');
@@ -416,7 +498,6 @@
             const kodeMkUtama = new URLSearchParams(window.location.search).get('kode_mk');
             const username = localStorage.getItem("user_login") || "Dosen";
 
-            // Kumpulkan data per-baris menggunakan atribut data-kodemk
             const arrayCatatan = [];
             document.querySelectorAll('#tabelEvaluasiLintasKelas tr').forEach(tr => {
                 const kodeLintas = tr.getAttribute('data-kodemk');
@@ -439,7 +520,7 @@
                     body: JSON.stringify({ 
                         kode_mk_sumber: kodeMkUtama, 
                         user: username, 
-                        evaluasi_lintas: arrayCatatan // Terkirim rapi dalam bentuk Array object
+                        evaluasi_lintas: arrayCatatan
                     })
                 });
 

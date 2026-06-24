@@ -882,14 +882,14 @@
 
     </div>
     <script>
-        const BASE_N8N_URL = "https://contained-reply-followed-integrate.trycloudflare.com/webhook";
-        const API_MBKM_LIST = `${BASE_N8N_URL}/get-mbkm-data`;
-        const API_MK_MASTER = `${BASE_N8N_URL}/get-master-matkul`;
-        const API_CHECK_NILAI = `${BASE_N8N_URL}/get-nilai-mhs`;
-        const API_SAVE_REKAP = `${BASE_N8N_URL}/save-nilai-mbkm`;
 
-        const API_GET_BOBOT = `${BASE_N8N_URL}/get-bobot-mbkm`;
-        const API_GET_NILAI_DETAIL = `${BASE_N8N_URL}/get-nilai-mbkm-detail`;
+        const API_MBKM_LIST = `${API_BASE}/get-mbkm-data`;
+        const API_MK_MASTER = `${API_BASE}/get-master-matkul`;
+        const API_CHECK_NILAI = `${API_BASE}/get-nilai-mhs`;
+        const API_SAVE_REKAP = `${API_BASE}/save-nilai-mbkm`;
+
+        const API_GET_BOBOT = `${API_BASE}/get-bobot-mbkm`;
+        const API_GET_NILAI_DETAIL = `${API_BASE}/get-nilai-mbkm-detail`;
 
         let dataPendaftarMBKM = [];
         let allDataMK = [];

@@ -10,8 +10,10 @@
     <script src="../js/api_config.js"></script>
     
     <style>
+        /* --- VARIABEL WARNA DINAMIS (BUNGLON) --- */
         :root { 
-            --primary-red: #8b0000; 
+            --primary-color: #8b0000; 
+            --primary-color-dark: #5c0000;
             --bg-main: #f8fafc; 
             --text-dark: #111827;
             --border-light: #e5e7eb;
@@ -24,163 +26,171 @@
             background-color: var(--bg-main); 
             min-height: 100vh; 
             justify-content: center; 
+            padding: 40px 20px;
         }
 
         .main-content { 
             width: 100%; 
-            max-width: 1200px; 
-            padding: 40px 20px; 
+            max-width: 1100px; 
+            background: white; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); 
+            padding: 40px; 
         }
 
+        /* --- GAYA HEADER BARU (DENGAN TOMBOL KEMBALI) --- */
         .header-container {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 30px; border-bottom: 2px solid var(--border-light); padding-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-light);
         }
-        .header-title h1 { font-size: 24px; font-weight: 800; color: var(--text-dark); }
-        .header-title span { color: var(--primary-red); }
-
-        .btn-back {
-            background: #64748b; color: white; border: none; padding: 10px 20px;
-            border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; 
-            display: inline-flex; align-items: center; gap: 8px; font-size: 14px;
-        }
-        .btn-back:hover { background: #475569; }
-
-        .table-card {
-            background: white; border-radius: 12px; border: 1px solid var(--border-light);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow: hidden;
-        }
-
-        /* --- STYLING BARU UNTUK SEARCH & FILTER --- */
-        .table-controls {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px; border-bottom: 1px solid var(--border-light); background: #f8fafc;
-        }
-        .table-controls h2 { font-size: 16px; font-weight: 700; color: var(--text-dark); }
         
-        .search-box { position: relative; width: 320px; }
-        .search-box input {
-            width: 100%; padding: 10px 15px 10px 38px; border-radius: 8px;
-            border: 1px solid #cbd5e1; font-size: 13px; outline: none; transition: all 0.3s ease;
+        .header-title { font-size: 2rem; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; text-transform: uppercase; }
+        .header-title span { color: var(--primary-color); }
+        .header-subtitle { color: #6b7280; font-size: 1rem; }
+
+        /* Gaya Tombol Kembali */
+        .btn-back {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            border: 1.5px solid #e2e8f0;
         }
-        .search-box input:focus { border-color: var(--primary-red); box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1); }
-        .search-box i {
-            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            color: #94a3b8; font-size: 14px;
+        .btn-back:hover {
+            background-color: #e2e8f0;
+            color: #0f172a;
         }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #ffffff; padding: 15px; text-align: left; font-size: 12px; font-weight: 700; color: #4b5563; text-transform: uppercase; border-bottom: 1px solid var(--border-light); }
-        td { padding: 15px; border-bottom: 1px solid var(--border-light); font-size: 14px; color: #1f2937; }
-
-        .btn-detail {
-            background: #161923; color: white; border: none; padding: 8px 16px;
-            border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px;
-            display: inline-flex; align-items: center; gap: 6px; text-decoration: none; transition: 0.2s;
+        .search-container { margin-bottom: 25px; position: relative; }
+        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #9ca3af; }
+        .search-box { 
+            width: 100%; 
+            padding: 14px 16px 14px 45px; 
+            border: 1.5px solid var(--border-light); 
+            border-radius: 10px; 
+            font-size: 0.95rem; 
+            outline: none; 
+            transition: 0.2s; 
+            background-color: #f9fafb;
         }
-        .btn-detail:hover { background: #262936; }
+        .search-box:focus { border-color: var(--primary-color); background-color: white; box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.05); }
 
-        /* --- STYLING BARU UNTUK PAGINASI --- */
-        .pagination-container {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px; background: white;
+        table { width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-light); }
+        th { background: #f1f5f9; color: var(--text-dark); padding: 16px; text-align: left; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; border-bottom: 2px solid var(--border-light); }
+        td { padding: 16px; border-bottom: 1px solid var(--border-light); font-size: 0.95rem; vertical-align: middle; }
+        tbody tr:hover { background-color: #f8fafc; }
+
+        .btn-detail { 
+            background: linear-gradient(to right, var(--primary-color), var(--primary-color-dark)); 
+            color: white; 
+            padding: 10px 16px; 
+            border-radius: 8px; 
+            text-decoration: none; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: 0.2s; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .pagination-info { font-size: 13px; color: #64748b; font-weight: 500; }
+        .btn-detail:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+
+        .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+        .pagination-info { font-size: 0.9rem; color: #6b7280; }
         .pagination-buttons { display: flex; gap: 6px; }
-        .page-btn {
-            padding: 8px 14px; border: 1px solid #e2e8f0; background: white;
-            border-radius: 6px; cursor: pointer; font-size: 13px; color: #475569; font-weight: 600; transition: 0.2s;
-        }
-        .page-btn:hover:not(:disabled) { background: #f1f5f9; color: var(--text-dark); }
-        .page-btn.active { background: var(--primary-red); color: white; border-color: var(--primary-red); }
-        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .page-btn { padding: 8px 14px; border: none; border-radius: 8px; background: #e5e7eb; cursor: pointer; font-weight: 600; color: #4b5563; transition: 0.2s; }
+        .page-btn:hover:not(:disabled) { background: #d1d5db; color: black; }
+        .page-btn.active { background: var(--primary-color); color: white; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
     <div class="main-content">
         <div class="header-container">
-            <div class="header-title">
-                <p style="color: #64748b; font-weight: 600; font-size: 12px; margin-bottom: 4px;">MONITORING & EVALUASI</p>
-                <h1>PORTOFOLIO <span>MATA KULIAH</span></h1>
+            <div>
+                <div class="header-title">PORTOFOLIO <span id="teks-prodi">MATA KULIAH</span></div>
+                <div class="header-subtitle">Daftar seluruh mata kuliah Program Studi yang terdaftar di pangkalan data semester ini.</div>
             </div>
-            
             <a href="rps_dosen.html" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Kembali ke Halaman Dosen
+                <i class="fas fa-arrow-left"></i> Kembali ke RPS
             </a>
         </div>
 
-        <div class="table-card">
-            <div class="table-controls">
-                <h2>Mata Kuliah Yang Diampu Semester Ini</h2>
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Cari Kode atau Nama MK..." onkeyup="jalankanPencarian()">
-                </div>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th width="20%">Kode MK</th>
-                        <th width="50%">Nama Mata Kuliah</th>
-                        <th width="15%">Semester</th>
-                        <th width="15%" style="text-align: center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelMatkulDosen">
-                    <tr><td colspan="4" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Menarik data mata kuliah...</td></tr>
-                </tbody>
-            </table>
-
-            <div class="pagination-container" id="areaPaginasi">
-                </div>
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" class="search-box" placeholder="Cari Kode atau Nama Mata Kuliah..." oninput="jalankanPencarian()">
         </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th width="15%">Kode MK</th>
+                    <th width="45%">Nama Mata Kuliah</th>
+                    <th width="20%">Semester</th>
+                    <th width="20%" style="text-align: center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="tabelMatkulDosen">
+                <tr><td colspan="4" style="text-align:center; padding:40px; color:#6b7280;"><i class="fas fa-spinner fa-spin"></i> Menghubungkan ke database n8n...</td></tr>
+            </tbody>
+        </table>
+
+        <div class="pagination-container" id="areaPaginasi"></div>
     </div>
 
     <script>
-        // Variabel Global untuk menampung data
         let dataSemuaMatkul = [];
         let dataTersaring = [];
         let halamanSaatIni = 1;
         const barisPerHalaman = 5; 
-        
-        // Mengambil data sesi pengguna dari Local Storage
-        const userRole = localStorage.getItem("user_role");
-        const userLogin = localStorage.getItem("user_login"); // Asumsi user_login berisi NIDN jika login sebagai dosen
 
-        // 1. Fungsi Tarik Data dari Database
-       // 1. Fungsi Tarik Data dari Database Khusus Prodi TI
+        // 1. CEK IDENTITAS DOSEN SAAT INI (TI ATAU SI)
+        const userProdi = localStorage.getItem("prodi_aktif") || 'ti';
+
+        // 2. FUNGSI BUNGLON (UBAH WARNA & TEKS OTOMATIS)
+        function aturTemaHalaman() {
+            if (userProdi === 'si') {
+                document.documentElement.style.setProperty('--primary-color', '#01626d');
+                document.documentElement.style.setProperty('--primary-color-dark', '#004d56');
+                document.getElementById('teks-prodi').innerText = "SISTEM INFORMASI";
+            } else {
+                document.getElementById('teks-prodi').innerText = "TEKNIK INFORMATIKA";
+            }
+        }
+
         async function loadDaftarMatkulPortofolio() {
             const tableBody = document.getElementById('tabelMatkulDosen');
-            // Tampilkan loading muter-muter
-            tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Menarik data mata kuliah...</td></tr>';
 
             try {
-                if (typeof API_BASE === 'undefined') throw new Error("Variabel API_BASE tidak dijumpai.");
-
-                let URL_API = `${API_BASE}/get-matkul-portofolio?prodi=ti`;
+                const N8N_URL = typeof API_BASE !== 'undefined' ? API_BASE : 'https://URL-N8N-ANDA.com/webhook';
                 
-                // Jika Dosen, kirim NIDN-nya
-                if (userRole === 'dosen' && userLogin) {
-                    URL_API += `&nidn=${userLogin}`;
-                }
+                // 3. API DINAMIS: Menarik data sesuai dengan Prodi yang login
+                let URL_API = `${N8N_URL}/get-matkul-portofolio?prodi=${userProdi}`;
                 
                 const response = await fetch(URL_API);
-                
-                // JURUS ANTI-ERROR: Baca sebagai teks dulu, jangan langsung di-JSON-kan
                 const textData = await response.text(); 
                 
-                // Jika n8n membalas kosong (0 baris) atau membalas HTML error
                 if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {
                     dataSemuaMatkul = [];
                 } else {
-                    dataSemuaMatkul = JSON.parse(textData); // Baru diubah ke JSON jika isinya valid
+                    dataSemuaMatkul = JSON.parse(textData);
                 }
 
-                // Jika datanya memang kosong di database
                 if (dataSemuaMatkul.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#6b7280; font-weight: 600;">Mata kuliah belum diplot untuk Anda di semester ini.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color:#6b7280;">Tidak ada mata kuliah yang terdaftar di prodi Anda.</td></tr>';
                     document.getElementById('areaPaginasi').innerHTML = '';
                     return;
                 }
@@ -191,11 +201,11 @@
 
             } catch (error) {
                 console.error("Error:", error);
-                tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red; padding:30px;">⚠️ Gagal memuatkan data. ${error.message}</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red; padding:40px;">⚠️ Gagal memuatkan data. Pastikan webhook get-matkul-portofolio aktif.</td></tr>`;
                 document.getElementById('areaPaginasi').innerHTML = '';
             }
         }
-        // 2. Fungsi Carian (Masa Nyata)
+
         function jalankanPencarian() {
             const kataKunci = document.getElementById('searchInput').value.toLowerCase();
             dataTersaring = dataSemuaMatkul.filter(item => 
@@ -206,13 +216,12 @@
             renderTabelMatkul();
         }
 
-        // 3. Fungsi Lukis Jadual
         function renderTabelMatkul() {
             const tableBody = document.getElementById('tabelMatkulDosen');
             tableBody.innerHTML = '';
             
             if (dataTersaring.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#64748b;">Carian tidak menemui hasil.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color:#6b7280;">Mata kuliah tidak ditemukan.</td></tr>';
                 document.getElementById('areaPaginasi').innerHTML = '';
                 return;
             }
@@ -226,9 +235,9 @@
                 const namaMkEncoded = encodeURIComponent(item.nama_mk || '');
                 tableBody.innerHTML += `
                     <tr>
-                        <td style="font-weight: 700; color: var(--primary-red);">${item.kode_mk || '-'}</td>
-                        <td style="font-weight: 600;">${item.nama_mk || '-'}</td>
-                        <td>Semester Ganjil</td>
+                        <td style="font-weight: 700; color: var(--primary-color);">${item.kode_mk || '-'}</td>
+                        <td style="font-weight: 600; color: var(--text-dark);">${item.nama_mk || '-'}</td>
+                        <td style="color: #4b5563;">Semester ${item.semester || 'Ganjil'}</td>
                         <td style="text-align: center;">
                             <a href="portofolio_detail.html?kode_mk=${item.kode_mk}&nama_mk=${namaMkEncoded}" class="btn-detail">
                                 <i class="fas fa-folder-open"></i> Detail Portofolio
@@ -241,12 +250,11 @@
             renderPaginasi(totalHalaman, indexAwal, dataHalamanIni.length, dataTersaring.length);
         }
 
-        // 4. Fungsi Lukis Butang Paginasi
         function renderPaginasi(totalHalaman, indexAwal, jumlahSaatIni, totalData) {
             const areaPaginasi = document.getElementById('areaPaginasi');
             let htmlPaginasi = `
                 <div class="pagination-info">
-                    Menampilkan <strong>${indexAwal + 1} - ${indexAwal + jumlahSaatIni}</strong> daripada <strong>${totalData}</strong> mata kuliah
+                    Menampilkan <strong>${indexAwal + 1} - ${indexAwal + jumlahSaatIni}</strong> dari <strong>${totalData}</strong> mata kuliah
                 </div>
                 <div class="pagination-buttons">
                     <button class="page-btn" ${halamanSaatIni === 1 ? 'disabled' : ''} onclick="gantiHalaman(${halamanSaatIni - 1})">Prev</button>
@@ -268,7 +276,11 @@
             renderTabelMatkul();
         }
 
-        window.onload = loadDaftarMatkulPortofolio;
+        // JALANKAN SAAT HALAMAN DIBUKA
+        window.onload = () => {
+            aturTemaHalaman();           
+            loadDaftarMatkulPortofolio(); 
+        };
     </script>
 </body>
 </html>
