@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengecekan RPS - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
+    <style>
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 30px; }
+        .table-master { width: 100%; border-collapse: collapse; }
+        .table-master th, .table-master td { padding: 15px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: middle; }
+        .table-master th { background: #111827; color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+        
+        /* Badge Status Khusus Pengecekan RPS */
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+        .bg-warning { background: #fef3c7; color: #b45309; } /* Menunggu Validasi */
+        .bg-success { background: #d1fae5; color: #065f46; } /* Disetujui */
+        .bg-danger { background: #fee2e2; color: #991b1b; }  /* Revisi */
+        .bg-secondary { background: #f3f4f6; color: #475569;} /* Draft */
+        
+        .text-center { text-align: center !important; }
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+    
+    <div class="main-content">
+        <div id="navbar-container"></div>
+
+        <div class="content-wrapper">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">MANAJEMEN RPS</div>
+                    <h1 class="header-title">PENGECEKAN <span>RPS</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
+                <p style="margin: 0; color: #64748b; font-size: 0.95rem;">Validasi Rencana Pembelajaran Semester yang telah dikumpulkan oleh dosen pengampu.</p>
+                <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+            </div>
+
+            <div class="card-container">
+                <table class="table-master">
+                    <thead>
+                        <tr>
+                            <th width="5%" class="text-center">NO</th>
+                            <th width="25%">MATA KULIAH</th>
+                            <th width="25%">DOSEN PENGAMPU</th>
+                            <th width="15%" class="text-center">TGL SUBMIT</th>
+                            <th width="15%" class="text-center">STATUS</th>
+                            <th width="15%" class="text-center">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTable">
+                        <tr><td colspan="6" class="text-center" style="padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Memuat data Pengecekan RPS...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalReview" class="modal-overlay">
+        <div class="modal-box" style="width: 500px;">
+            <h3 style="margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; color: #0f172a; font-weight: 800;">
+                <i class="fas fa-search"></i> Validasi RPS
+            </h3>
+            <div id="reviewInfo" style="background: #f8fafc; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; font-weight: 500; color: #475569; margin-bottom: 20px; line-height: 1.6;"></div>
+            
+            <div class="form-group">
+                <label style="font-weight: 600; color: #1e293b; margin-bottom: 8px; display: block;">Catatan / Pesan untuk Dosen (Opsional):</label>
+                <textarea id="inputCatatan" class="form-control" rows="4" placeholder="Tuliskan revisi atau komentar jika ada..."></textarea>
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
+                <button class="btn-action" style="background: #f3f4f6; color: #4b5563; font-weight: 600;" onclick="closeModal()">Batal</button>
+                <button class="btn-danger" style="display: flex; align-items: center; gap: 8px;" onclick="prosesRPS('Revisi')"><i class="fas fa-times-circle"></i> Minta Revisi</button>
+                <button class="btn-dark" style="background: #10b981; border: none; display: flex; align-items: center; gap: 8px;" onclick="prosesRPS('Disetujui')"><i class="fas fa-check-circle"></i> Setujui RPS</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DETEKSI PRODI DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+        // Menggunakan variabel PRODI agar query data dinamis
+        const API_GET_RPS = `${API_BASE}/get-rps-pengecekan?prodi=${PRODI}`;
+
+        let rpsTerpilih = null;
+
+        // SATPAM HALAMAN
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        // Set Label Prodi UI
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            
+            // Tema Khusus SI
+            if(PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+            }
+        });
+
+        // FUNGSI LOAD DATA RPS
+        async function loadData() {
+            const bodyTbl = document.getElementById("bodyTable");
+            bodyTbl.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Menarik data pengajuan RPS...</td></tr>`;
+            
+            try {
+                const res = await fetch(API_GET_RPS);
+                const data = await res.json();
+
+                if (!data || data.length === 0) {
+                    bodyTbl.innerHTML = `<tr><td colspan="6" class="text-center" style="padding: 30px;">Belum ada RPS yang disubmit untuk divalidasi.</td></tr>`;
+                    return;
+                }
+
+                let html = "";
+                data.forEach((item, index) => {
+                    // Penentuan Warna Badge yang lebih interaktif
+                    let badgeClass = "bg-secondary";
+                    let badgeIcon = "fa-clock";
+                    
+                    if(item.status === 'Menunggu Validasi') { badgeClass = "bg-warning"; badgeIcon = "fa-hourglass-half"; }
+                    if(item.status === 'Disetujui') { badgeClass = "bg-success"; badgeIcon = "fa-check-circle"; }
+                    if(item.status === 'Revisi') { badgeClass = "bg-danger"; badgeIcon = "fa-exclamation-circle"; }
+
+                    // Tanggal Format Indonesia
+                    let tgl = item.tanggal_submit ? new Date(item.tanggal_submit).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) : '-';
+
+                    html += `
+                        <tr>
+                            <td class="text-center" style="font-weight: bold; color: #475569;">${index + 1}</td>
+                            <td>
+                                <strong style="color: var(--text-dark); display: block; margin-bottom: 4px;">${item.nama_mk}</strong>
+                                <span style="font-size: 0.8rem; color: #64748b;">${item.kode_mk}</span>
+                            </td>
+                            <td style="font-weight: 600;">${item.nama_dosen || '-'}</td>
+                            <td class="text-center">${tgl}</td>
+                            <td class="text-center">
+                                <span class="status-badge ${badgeClass}"><i class="fas ${badgeIcon}"></i> ${item.status || 'Draft'}</span>
+                            </td>
+                            <td class="text-center">
+                                <button class="btn-dark" style="width: 100%; justify-content: center; background: #2563eb; border: none;" onclick="openModal('${item.kode_mk}', '${item.nama_mk}', '${item.nama_dosen}')">
+                                    <i class="fas fa-clipboard-check"></i> Periksa
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                bodyTbl.innerHTML = html;
+            } catch (e) {
+                bodyTbl.innerHTML = `<tr><td colspan="6" class="text-center" style="color: red; padding: 30px;">Gagal terhubung ke N8N.</td></tr>`;
+            }
+        }
+
+        function openModal(kode, mk, dosen) {
+            rpsTerpilih = kode;
+            document.getElementById("reviewInfo").innerHTML = `
+                Mata Kuliah: <strong style="color: #1e293b;">${kode} - ${mk}</strong><br>
+                Dosen Pengampu: <strong style="color: #1e293b;">${dosen === 'undefined' ? '-' : dosen}</strong>
+            `;
+            document.getElementById("inputCatatan").value = "";
+            document.getElementById("modalReview").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("modalReview").style.display = "none";
+        }
+
+        async function prosesRPS(keputusan) {
+            const catatan = document.getElementById("inputCatatan").value.trim();
+            
+            // Logika POST Request ke N8N untuk Update Status (Disiapkan)
+            const payload = {
+                kode_mk: rpsTerpilih,
+                status: keputusan,
+                catatan: catatan,
+                prodi: PRODI
+            };
+
+            
+            try {
+                const res = await fetch(`${API_BASE}/update-status-rps`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if(res.ok) {
+                    alert(`RPS berhasil diubah statusnya menjadi: ${keputusan}!`);
+                    loadData(); // Refresh Data
+                }
+            } catch(e) { alert("Error koneksi"); }
+        
+
+            alert(`✅ Simulasi: RPS Mata Kuliah ${rpsTerpilih} berhasil diubah statusnya menjadi: ${keputusan}!\nCatatan: ${catatan || '-'}`);
+            closeModal();
+        }
+
+        window.onload = () => {
+            // Beri jeda agar template.js menyusun Sidebar dan Navbar
+            setTimeout(loadData, 300);
+        };
+    </script>
+</body>
+</html>

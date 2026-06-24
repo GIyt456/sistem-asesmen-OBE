@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafik Rerata CPMK - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 40px;}
+        .chart-wrapper { position: relative; height: 450px; width: 100%; margin-top: 10px; }
+        
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media print {
+            #sidebar-container, #navbar-container, .filter-container, .header-container { display: none !important; }
+            .main-content { padding: 0 !important; }
+            .card-container { box-shadow: none; border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+    
+    <div class="main-content">
+        <div id="navbar-container"></div>
+
+        <div class="content-wrapper">
+            <div class="header-container" style="margin-bottom: 20px;">
+                <div class="header-title-area">
+                    <div class="header-subtitle">EVALUASI & RPS</div>
+                    <h1 class="header-title">GRAFIK RERATA <span>CPMK</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
+            <p style="margin: 0 0 20px 0; color: #64748b; font-size: 0.95rem;">Visualisasi rata-rata Capaian Pembelajaran Mata Kuliah (CPMK) per kelas dalam bentuk grafik batang.</p>
+
+            <div class="filter-container">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-filter"></i> Pilih Kelas:</label>
+                    <select id="selectMK" class="form-control" style="width: 350px; font-weight: 500;">
+                        <option value="">⏳ Memuat daftar kelas aktif...</option>
+                    </select>
+                    
+                    <button class="btn-dark" style="padding: 12px 20px; border: none; font-size: 0.95rem;" onclick="loadGrafikCPMK()">
+                        <i class="fas fa-chart-bar"></i> Tampilkan Grafik
+                    </button>
+                </div>
+
+                <button class="btn-action" style="background: #10b981; color: white; padding: 12px 20px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer;" onclick="window.print()">
+                    <i class="fas fa-print"></i> Cetak Grafik
+                </button>
+            </div>
+
+            <div class="card-container">
+                <div id="loadingMsg" style="text-align: center; color: #64748b; padding: 40px; display: none;">
+                    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 15px;"></i><br>
+                    <span style="font-weight: 600;">Memproses visualisasi data dari database...</span>
+                </div>
+                <div id="errorMsg" style="text-align: center; color: #dc2626; padding: 40px; display: none; font-weight: 600;"></div>
+                
+                <div class="chart-wrapper">
+                    <canvas id="cpmkChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DETEKSI PRODI DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+        
+        // Kita pinjam API Kelas Aktif untuk mengisi dropdown
+        const API_GET_KELAS = `${API_BASE}/get-rekap-nilai?prodi=${PRODI}`;
+        const API_GRAFIK_CPMK = `${API_BASE}/get-grafik-cpmk`;
+        
+        let myChart = null; 
+
+        // SATPAM HALAMAN
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            
+            if(PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+            }
+        });
+
+        // FUNGSI LOAD DROPDOWN (Dinamis & Anti-Duplikat)
+        async function loadPilihanKelas() {
+            const selectMk = document.getElementById("selectMK");
+            try {
+                const res = await fetch(API_GET_KELAS);
+                if (!res.ok) throw new Error("Gagal load kelas");
+                const data = await res.json();
+
+                if (!data || data.length === 0) {
+                    selectMk.innerHTML = `<option value="">Belum ada kelas aktif di prodi ini</option>`;
+                    return;
+                }
+
+                let html = "<option value=''>-- Pilih Kelas Mata Kuliah --</option>";
+                let kelasUnik = new Set();
+
+                data.forEach(item => {
+                    let kunci = `${item.kode_mk}-${item.kelas}`;
+                    if (!kelasUnik.has(kunci)) {
+                        kelasUnik.add(kunci);
+                        html += `<option value="${item.kode_mk}">[${item.kelas}] ${item.nama_mk} - ${item.dosen}</option>`;
+                    }
+                });
+                selectMk.innerHTML = html;
+            } catch (e) {
+                selectMk.innerHTML = `<option value="">Gagal memuat kelas asli dari server</option>`;
+            }
+        }
+
+        // FUNGSI LOAD GRAFIK
+        async function loadGrafikCPMK() {
+            const kodeMK = document.getElementById("selectMK").value;
+            const loadingMsg = document.getElementById("loadingMsg");
+            const errorMsg = document.getElementById("errorMsg");
+            const canvas = document.getElementById("cpmkChart");
+            
+            if(!kodeMK) {
+                alert("⚠️ Silakan pilih kelas mata kuliah terlebih dahulu.");
+                return;
+            }
+
+            loadingMsg.style.display = "block";
+            errorMsg.style.display = "none";
+            canvas.style.display = "none";
+
+            try {
+                const res = await fetch(`${API_GRAFIK_CPMK}?kode_mk=${kodeMK}`);
+                const data = await res.json();
+
+                loadingMsg.style.display = "none";
+
+                if(!data || data.length === 0 || !data[0].kode_cpmk) {
+                    errorMsg.innerHTML = `<i class="fas fa-exclamation-circle"></i> Belum ada data nilai/mapping CPMK untuk kelas ini.`;
+                    errorMsg.style.display = "block";
+                    return;
+                }
+
+                // 1. Olah Data Mentah -> Rata-rata per CPMK
+                let cpmkData = {};
+                data.forEach(item => {
+                    let cpmk = item.kode_cpmk;
+                    if (!cpmkData[cpmk]) {
+                        cpmkData[cpmk] = { totalSkor: 0, countMhs: 0 };
+                    }
+                    if(item.total_bobot_cpmk > 0) {
+                        let skorMhs = (item.total_nilai_tertimbang / item.total_bobot_cpmk) * 100;
+                        cpmkData[cpmk].totalSkor += skorMhs;
+                        cpmkData[cpmk].countMhs += 1;
+                    }
+                });
+
+                // 2. Siapkan Array untuk Chart.js
+                let labels = [];
+                let averages = [];
+                let backgroundColors = [];
+
+                Object.keys(cpmkData).sort().forEach(cpmk => {
+                    let avg = (cpmkData[cpmk].totalSkor / cpmkData[cpmk].countMhs).toFixed(2);
+                    labels.push(cpmk);
+                    averages.push(avg);
+
+                    // Hijau jika >= 60, Merah jika < 60
+                    if (avg >= 60) {
+                        backgroundColors.push('rgba(16, 185, 129, 0.85)'); 
+                    } else {
+                        backgroundColors.push('rgba(239, 68, 68, 0.85)'); 
+                    }
+                });
+
+                canvas.style.display = "block";
+                renderChart(labels, averages, backgroundColors);
+
+            } catch (e) {
+                loadingMsg.style.display = "none";
+                errorMsg.innerHTML = `<i class="fas fa-wifi"></i> Error: Gagal terhubung ke N8N.`;
+                errorMsg.style.display = "block";
+            }
+        }
+
+        function renderChart(labels, dataAvg, bgColors) {
+            const ctx = document.getElementById('cpmkChart').getContext('2d');
+            
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Rata-Rata Nilai CPMK',
+                        data: dataAvg,
+                        backgroundColor: bgColors,
+                        borderWidth: 0,
+                        borderRadius: 8, // Ujung melengkung
+                        barPercentage: 0.6 // Ketebalan batang
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100, 
+                            grid: { color: '#f1f5f9' },
+                            title: {
+                                display: true,
+                                text: 'Nilai Skala 100',
+                                font: { weight: 'bold', size: 12 },
+                                color: '#64748b'
+                            }
+                        },
+                        x: {
+                            grid: { display: false },
+                            title: {
+                                display: true,
+                                text: 'Kode CPMK',
+                                font: { weight: 'bold', size: 12 },
+                                color: '#64748b'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }, // Sembunyikan legend karena warna sudah menjelaskan
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 14, weight: 'bold' },
+                            callbacks: {
+                                label: function(context) {
+                                    return ' Rata-rata: ' + context.parsed.y + ' Poin';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        window.onload = () => {
+            setTimeout(loadPilihanKelas, 400); // Otomatis isi dropdown saat dibuka
+        };
+    </script>
+</body>
+</html>

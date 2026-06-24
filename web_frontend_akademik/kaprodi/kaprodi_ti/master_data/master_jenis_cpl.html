@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Jenis CPL TI - Sistem OBE</title>
+    <link rel="stylesheet" href="../../../css/style.css">
+    <script src="../../../js/template.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../../../js/api_config.js"></script>
+    
+    <style>
+        /* --- VARIABEL WARNA KHUSUS TI --- */
+        :root { 
+            --primary-red: #8b0000; 
+            --primary-red-dark: #5c0000; 
+            --bg-main: #ffffff; 
+            --text-dark: #111827;
+            --border-dark: #161923;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
+        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
+
+        /* HEADER */
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
+        .header-title span { color: var(--primary-red); }
+        
+        .badge-prodi { 
+            background: var(--primary-red); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 30px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2); 
+        }
+
+        /* BUTTONS */
+        .btn-primary-ti { 
+            background: linear-gradient(to right, var(--primary-red), var(--primary-red-dark)); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            font-size: 0.95rem; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            transition: 0.2s; 
+            box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2);
+        }
+        .btn-primary-ti:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3);
+        }
+
+        .btn-refresh { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s; margin-left: 8px; display: flex; align-items: center; gap: 10px; }
+        .btn-refresh:hover { background: #000000; transform: translateY(-2px); }
+        
+        .btn-edit { background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
+        .btn-edit:hover { background: #d97706; }
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; margin-left: 5px; }
+        .btn-delete:hover { background: #b91c1c; }
+
+        /* TABLE */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
+        th { background: #f3f4f6; color: #374151; padding: 14px 20px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
+        td { padding: 14px 20px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; color: #111827; font-weight: 500; }
+        tbody tr:hover { background-color: #f9fafb; }
+
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-box { background: white; border-radius: 12px; width: 500px; padding: 32px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 2.5px solid var(--border-dark); }
+        .modal-title { margin: 0 0 20px 0; font-size: 1.4rem; font-weight: 800; color: var(--text-dark); border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 700; color: #374151; margin-bottom: 8px; }
+        .form-control { width: 100%; padding: 12px 16px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+        .form-control:focus { border-color: var(--border-dark); }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        
+        <div class="header-container">
+            <div class="header-title-area">
+                <div class="header-subtitle">KELOLA KURIKULUM</div>
+                <h1 class="header-title">JENIS <span>CPL</span></h1>
+            </div>
+            <div class="badge-prodi">Teknik Informatika</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Jenis CPL SN DIKTI</h3>
+                <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 0.95rem; font-weight: 500;">Kelola kategori Capaian Pembelajaran Lulusan untuk TI.</p>
+            </div>
+            <div style="display: flex;">
+                <button class="btn-primary-ti" onclick="bukaModal()"><i class="fas fa-plus"></i> Tambah</button>
+                <button class="btn-refresh" onclick="loadJenisCPL()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%; text-align: center;">#</th>
+                    <th style="width: 70%;">JENIS</th>
+                    <th style="width: 25%; text-align: center;">OPSI</th>
+                </tr>
+            </thead>
+            <tbody id="tabelJenisCPL">
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 30px; color: #6b7280;">
+                        <i class="fas fa-spinner fa-spin"></i> Memuat data dari database n8n...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <div id="modalJenisCPL" class="modal-overlay">
+        <div class="modal-box">
+            <h3 class="modal-title" id="modalTitle">Tambah Jenis CPL</h3>
+            <input type="hidden" id="idJenis">
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label class="form-label">Nama Jenis CPL</label>
+                <input type="text" id="inputNamaJenis" class="form-control" placeholder="Contoh: SIKAP (S)">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                <button style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;" onclick="tutupModal()">Batal</button>
+                <button class="btn-primary-ti" id="btnSimpan" onclick="simpanJenisCPL()" style="padding: 12px 18px;"><i class="fas fa-save"></i> Simpan Data</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const userLogin = localStorage.getItem("user_login");
+    // URL n8n disesuaikan dengan file TI Anda sebelumnya
+
+
+    if (!userLogin) window.location.replace('/login/login.html');
+
+    // ==========================================
+    // FUNGSI CRUD JENIS CPL (Terkoneksi API)
+    // ==========================================
+    async function loadJenisCPL() {
+        const tbody = document.getElementById('tabelJenisCPL');
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
+
+        try {
+            const response = await fetch(`${API_BASE}/get-jenis-cpl?prodi=ti`);
+            const textData = await response.text();
+
+            if (!textData || textData.includes('<!DOCTYPE html>')) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:red;">Gagal terhubung ke Database n8n.</td></tr>';
+                return;
+            }
+
+            const data = JSON.parse(textData);
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Belum ada data Jenis CPL untuk TI.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = ''; 
+            data.forEach((item, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align: center;">${index + 1}</td>
+                        <td>${item.nama_jenis}</td>
+                        <td style="text-align: center;">
+                            <button class="btn-edit" onclick="bukaModalEdit('${item.id}', '${item.nama_jenis}')"><i class="fas fa-edit"></i> Ubah</button>
+                            <button class="btn-delete" onclick="hapusJenisCPL('${item.id}')"><i class="fas fa-trash"></i> Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        } catch (error) {
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Error: ${error.message}</td></tr>`;
+        }
+    }
+
+    function bukaModal() {
+        document.getElementById('modalTitle').innerText = "Tambah Jenis CPL";
+        document.getElementById('idJenis').value = '';
+        document.getElementById('inputNamaJenis').value = '';
+        document.getElementById('modalJenisCPL').style.display = 'flex';
+    }
+
+    function bukaModalEdit(id, nama) {
+        document.getElementById('modalTitle').innerText = "Ubah Jenis CPL";
+        document.getElementById('idJenis').value = id;
+        document.getElementById('inputNamaJenis').value = nama;
+        document.getElementById('modalJenisCPL').style.display = 'flex';
+    }
+
+    function tutupModal() {
+        document.getElementById('modalJenisCPL').style.display = 'none';
+    }
+
+    async function simpanJenisCPL() {
+        const id = document.getElementById('idJenis').value;
+        const nama = document.getElementById('inputNamaJenis').value.trim();
+        const btn = document.getElementById('btnSimpan');
+
+        if (!nama) return alert("⚠️ Nama jenis CPL wajib diisi!");
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btn.disabled = true;
+
+        const payload = { id: id, nama_jenis: nama, prodi: 'ti' };
+
+        try {
+            const response = await fetch(`${API_BASE}/simpan-jenis-cpl`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                tutupModal();
+                loadJenisCPL();
+            } else {
+                alert("❌ Gagal menyimpan data ke n8n.");
+            }
+        } catch (error) {
+            alert("❌ Terjadi kesalahan koneksi.");
+        } finally {
+            btn.innerHTML = '<i class="fas fa-save"></i> Simpan Data';
+            btn.disabled = false;
+        }
+    }
+
+    async function hapusJenisCPL(id) {
+        if(!confirm("Yakin ingin menghapus jenis CPL ini?")) return;
+        
+        try {
+            const response = await fetch(`${API_BASE}/hapus-jenis-cpl`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            });
+
+            if (response.ok) {
+                loadJenisCPL();
+            } else {
+                alert("❌ Gagal menghapus data.");
+            }
+        } catch (error) {
+            alert("❌ Terjadi kesalahan koneksi.");
+        }
+    }
+
+    // ==========================================
+    // EVENT LISTENER SAAT HALAMAN DIBUKA
+    // ==========================================
+    window.onload = () => {
+        loadJenisCPL();
+
+        // Memberikan jeda agar template.js selesai melakukan perakitan DOM sidebar
+        setTimeout(() => {
+            const navDashboard = document.getElementById('nav-home');
+            const navJenisCpl = document.querySelector('[data-path="/master_data/master_jenis_cpl.html"]');
+            const menuMaster = document.getElementById('menu-master');
+            const chevronMaster = document.getElementById('chevron-master');
+
+            if(navDashboard) navDashboard.classList.remove('active');
+            if(navJenisCpl) navJenisCpl.classList.add('active'); 
+            
+            if(menuMaster && chevronMaster) {
+                menuMaster.style.display = 'flex';
+                chevronMaster.style.transform = 'rotate(180deg)';
+            }
+        }, 300);
+    };
+</script>
+</body>
+</html>

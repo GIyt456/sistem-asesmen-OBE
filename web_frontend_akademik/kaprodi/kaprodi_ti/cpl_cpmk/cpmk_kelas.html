@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemenuhan CPMK per Kelas - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
+    <style>
+        .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; }
+        .table-responsive { overflow-x: auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
+        .table-cpmk { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        .table-cpmk th, .table-cpmk td { padding: 12px 10px; border: 1px solid #e5e7eb; text-align: center; font-size: 0.9rem; vertical-align: middle; }
+        .table-cpmk th { background: #111827; color: white; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; position: sticky; top: 0; z-index: 2; }
+        
+        /* Sticky Column untuk No dan Nama */
+        .table-cpmk th.sticky-col, .table-cpmk td.sticky-col { position: sticky; left: 0; background-color: white; z-index: 3; border-right: 2px solid #cbd5e1; }
+        .table-cpmk th.sticky-col { background-color: #111827; }
+        .table-cpmk th.sticky-col:nth-child(2), .table-cpmk td.sticky-col:nth-child(2) { left: 40px; }
+        
+        .badge-score { padding: 6px 12px; border-radius: 6px; font-weight: 800; font-size: 0.9rem; }
+        
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+    
+    <div class="main-content">
+        <div id="navbar-container"></div>
+
+        <div class="content-wrapper">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">EVALUASI & RPS</div>
+                    <h1 class="header-title">PEMENUHAN NILAI <span>CPMK</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
+            <p style="margin: 0 0 20px 0; color: #64748b; font-size: 0.95rem;">Pantau persentase pencapaian Capaian Pembelajaran Mata Kuliah (CPMK) mahasiswa per kelas secara spesifik.</p>
+
+            <div class="filter-container">
+                <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-filter"></i> Pilih Kelas:</label>
+                <select id="selectMK" class="form-control" style="width: 400px; font-weight: 500;">
+                    <option value="">⏳ Memuat daftar kelas aktif...</option>
+                </select>
+                <button class="btn-dark" style="padding: 12px 25px; border: none; font-size: 0.95rem;" onclick="loadDataCPMK()">
+                    <i class="fas fa-search"></i> Kalkulasi CPMK
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-cpmk">
+                    <thead id="headerTable">
+                        <tr>
+                            <th class="sticky-col" width="5%">NO</th>
+                            <th class="sticky-col text-left" width="30%" style="text-align: left;">NIM & NAMA MAHASISWA</th>
+                            <th>MENGHITUNG DATA...</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTable">
+                        <tr><td colspan="10" style="padding: 40px; color: #64748b; text-align: center;"><i class="fas fa-info-circle"></i> Silakan pilih kelas dan klik "Kalkulasi CPMK" untuk memproses data dari server.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DETEKSI PRODI DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+        
+        // Memanfaatkan ulang API Rekap Nilai untuk mengambil daftar kelas!
+        const API_GET_KELAS = `${API_BASE}/get-rekap-nilai?prodi=${PRODI}`;
+        const API_GET_CPMK = `${API_BASE}/get-cpmk-kelas`;
+
+        // SATPAM HALAMAN
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        // Tema Dinamis
+        let warnaTeksNim = '#8b0000'; // Default Merah TI
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            
+            if(PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+                warnaTeksNim = 'var(--primary-teal)';
+            }
+        });
+
+        async function loadPilihanKelas() {
+            const selectMk = document.getElementById("selectMK");
+            try {
+                const res = await fetch(API_GET_KELAS);
+                if (!res.ok) throw new Error("Gagal load kelas");
+                const data = await res.json();
+
+                if (!data || data.length === 0) {
+                    selectMk.innerHTML = `<option value="">Belum ada kelas aktif di prodi ini</option>`;
+                    return;
+                }
+
+                let html = "<option value=''>-- Pilih Kelas Mata Kuliah --</option>";
+                
+                // ✨ JURUS SARINGAN ANTI-DUPLIKAT (Menggunakan Set) ✨
+                let kelasUnik = new Set();
+
+                data.forEach(item => {
+                    // Membuat kunci identitas (Gabungan Kode MK dan Nama Kelas)
+                    let kunci = `${item.kode_mk}-${item.kelas}`;
+                    
+                    // Jika kunci ini belum pernah dimasukkan ke dropdown, maka masukkan
+                    if (!kelasUnik.has(kunci)) {
+                        kelasUnik.add(kunci);
+                        html += `<option value="${item.kode_mk}">[${item.kelas}] ${item.nama_mk} - ${item.dosen}</option>`;
+                    }
+                });
+                
+                selectMk.innerHTML = html;
+            } catch (e) {
+                console.log("Gagal memuat kelas asli, menggunakan data dummy UI");
+                // Fallback UI
+                selectMk.innerHTML = `
+                    <option value="2023W276">[TI-A] AI Programming - Harries Arizonia</option>
+                    <option value="2023P045">[TI-B] Mobile Programming - Dosen Pengampu</option>
+                `;
+            }
+        }
+
+        // FUNGSI KALKULASI CPMK
+        async function loadDataCPMK() {
+            const kodeMK = document.getElementById("selectMK").value;
+            const bodyTbl = document.getElementById("bodyTable");
+            const headTbl = document.getElementById("headerTable");
+            
+            if(!kodeMK) return alert("⚠️ Silakan pilih kelas terlebih dahulu!");
+
+            bodyTbl.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Memproses kalkulasi jutaan bobot CPMK dari database...</td></tr>`;
+
+            try {
+                const res = await fetch(`${API_GET_CPMK}?kode_mk=${kodeMK}`);
+                if(!res.ok) throw new Error("Gagal ambil data");
+                const data = await res.json();
+
+                if(!data || data.length === 0 || !data[0].nim) {
+                    bodyTbl.innerHTML = `<tr><td colspan="10" style="text-align: center; color: red; padding: 30px;"><i class="fas fa-exclamation-circle"></i> Belum ada data nilai atau mapping RPS untuk kelas ini.</td></tr>`;
+                    return;
+                }
+
+                // 1. Ekstrak Header CPMK
+                let cpmkSet = new Set();
+                data.forEach(item => { if(item.kode_cpmk) cpmkSet.add(item.kode_cpmk) });
+                let cpmkList = Array.from(cpmkSet).sort();
+
+                // Generate Header Table
+                let headHtml = `<tr>
+                                    <th class="sticky-col" width="5%">NO</th>
+                                    <th class="sticky-col" width="30%" style="text-align: left;">NIM & NAMA MAHASISWA</th>`;
+                cpmkList.forEach(cpmk => { headHtml += `<th>${cpmk}</th>`; });
+                headHtml += `</tr>`;
+                headTbl.innerHTML = headHtml;
+
+                // 2. Kelompokkan Data per Mahasiswa
+                let mhsData = {};
+                data.forEach(item => {
+                    if(!mhsData[item.nim]) {
+                        mhsData[item.nim] = { nama: item.nama_mahasiswa, nilai_cpmk: {} };
+                    }
+                    if(item.total_bobot_cpmk > 0) {
+                        let skorAsli = (item.total_nilai_tertimbang / item.total_bobot_cpmk) * 100;
+                        mhsData[item.nim].nilai_cpmk[item.kode_cpmk] = skorAsli.toFixed(2);
+                    }
+                });
+
+                // 3. Cetak Baris Tabel
+                bodyTbl.innerHTML = "";
+                let no = 1;
+                for (let nim in mhsData) {
+                    let mhs = mhsData[nim];
+                    let rowHtml = `<tr>
+                        <td class="sticky-col" style="font-weight: bold; color: #475569;">${no++}</td>
+                        <td class="sticky-col" style="text-align: left;">
+                            <div style="font-weight: 800; color: ${warnaTeksNim}; font-size: 0.95rem;">${nim}</div>
+                            <div style="font-size: 0.85rem; font-weight: 500; color: #1e293b; margin-top: 2px;">${mhs.nama || '-'}</div>
+                        </td>`;
+                    
+                    cpmkList.forEach(cpmk => {
+                        let skor = mhs.nilai_cpmk[cpmk] || 0;
+                        let color = skor >= 50 ? 'background: #dcfce7; color: #166534;' : 'background: #fee2e2; color: #991b1b;';
+                        rowHtml += `<td><span class="badge-score" style="${color}">${skor}</span></td>`;
+                    });
+                    
+                    rowHtml += `</tr>`;
+                    bodyTbl.innerHTML += rowHtml;
+                }
+
+            } catch (e) {
+                bodyTbl.innerHTML = `<tr><td colspan="10" style="text-align: center; color: red; padding: 30px;">Error: Gagal terhubung ke N8N atau data kosong.</td></tr>`;
+            }
+        }
+
+        window.onload = () => {
+            setTimeout(loadPilihanKelas, 400); // Otomatis muat dropdown
+        };
+    </script>
+</body>
+</html>

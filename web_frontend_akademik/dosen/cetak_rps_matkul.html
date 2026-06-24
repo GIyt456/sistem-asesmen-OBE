@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cetak Semua RTM - Sistem OBE UNAKI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: black;
+            background: #e5e7eb;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .no-print {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-print {
+            background: #8b0000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .btn-back {
+            background: #4b5563;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .kertas-a4 {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: auto;
+            padding: 15mm 20mm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .main-title {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        table.rtm-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1.5px solid black;
+        }
+
+        table.rtm-table th,
+        table.rtm-table td {
+            border: 1px solid black;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        .bg-blue {
+            background-color: #dbe5f1;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .bg-blue-left {
+            background-color: #dbe5f1;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
+
+        /* Pengaturan Ukuran Logo */
+        .logo-print {
+            max-width: 160px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .kertas-a4 {
+                box-shadow: none;
+                padding: 0;
+                width: 100%;
+                margin: 0;
+                page-break-after: always;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            @page {
+                size: A4 portrait;
+                margin: 15mm;
+            }
+        }
+    </style>
+     <script src="../js/api_config.js"></script>
+</head>
+
+<body>
+
+    <div class="no-print">
+        <button class="btn-print" onclick="window.print()">🖨️ Cetak / Simpan Semua ke PDF</button>
+        <button class="btn-back" onclick="window.close()">❌ Tutup Tab</button>
+    </div>
+
+    <div id="megaRenderContainer"></div>
+
+    <script>
+  
+
+        async function loadSemuaTugasMatkul() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const kodeMk = urlParams.get('kode_mk');
+            const container = document.getElementById('megaRenderContainer');
+
+            if (!kodeMk) return alert("⚠️ Parameter Kode MK tidak ditemukan!");
+
+            try {
+                const response = await fetch(`${API_BASE}/get-rubrik-by-matkul?kode_mk=${kodeMk}`);
+                const textData = await response.text();
+
+                if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {
+                    container.innerHTML = '<div class="kertas-a4"><h3 style="text-align:center; color:red;">Gagal menarik data atau URL n8n terputus.</h3></div>';
+                    return;
+                }
+
+                const data = JSON.parse(textData);
+
+                if (data.length === 0) {
+                    container.innerHTML = '<div class="kertas-a4"><h3 style="text-align:center;">Belum ada rencana tugas.</h3></div>';
+                    return;
+                }
+
+                // GROUPING DATA TUGAS
+                const tugasGrouped = {};
+                data.forEach(row => {
+                    if (!tugasGrouped[row.id_tugas]) {
+                        tugasGrouped[row.id_tugas] = {
+                            judul: row.judul_tugas,
+                            metode: row.metode,
+                            waktu: row.waktu_pengerjaan,
+                            luaran: row.luaran_tugas,
+                            deskripsi: row.deskripsi,
+                            nama_mk: row.nama_mk,
+                            kode_mk: row.kode_mk,
+                            cpmk: row.kode_cpmk,
+                            cpl: row.kode_cpl,
+                            teknik: row.teknik_evaluasi,
+                            kriteriaList: []
+                        };
+                    }
+                    if (row.kriteria) {
+                        tugasGrouped[row.id_tugas].kriteriaList.push(row);
+                    }
+                });
+
+                container.innerHTML = '';
+
+                // CETAK LEMBARAN KERTAS PER TUGAS
+                Object.keys(tugasGrouped).forEach((idTugas, index) => {
+                    const t = tugasGrouped[idTugas];
+
+                    let kriteriaRows = '';
+                    if (t.kriteriaList.length === 0) {
+                        kriteriaRows = `<tr><td colspan="6" style="text-align:center; color:red;">Kriteria rubrik belum diisi.</td></tr>`;
+                    } else {
+                        t.kriteriaList.forEach(k => {
+                            kriteriaRows += `
+                                <tr>
+                                    <td style="font-weight:bold;">${k.kriteria}</td>
+                                    <td style="text-align:center; font-weight:bold;">${k.bobot_persen}%</td>
+                                    <td>${k.skala_1 || '-'}</td>
+                                    <td>${k.skala_2 || '-'}</td>
+                                    <td>${k.skala_3 || '-'}</td>
+                                    <td>${k.skala_4 || '-'}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+
+                    container.innerHTML += `
+                        <div class="kertas-a4">
+                            <div class="main-title">RENCANA TUGAS MAHASISWA</div>
+
+                            <table class="rtm-table">
+                                <tr>
+                                    <td width="30%" class="text-center" style="vertical-align: middle; padding: 10px;">
+                                        <!-- ⚠️ MASUKKAN LOKASI GAMBAR LOGO ANDA PADA BAGIAN src="" DI BAWAH INI -->
+                                        <img src="../components/logo_unaki.png" alt="Logo UNAKI" class="logo-print">
+                                    </td>
+                                    <td width="70%" colspan="2" style="vertical-align: middle; padding-left: 20px;">
+                                        <div style="font-size: 14pt; font-weight: bold; line-height: 1.3;">
+                                            UNIVERSITAS AKI<br>
+                                            FAKULTAS TEKNIK DAN INFORMATIKA<br>
+                                            PROGRAM STUDI SISTEM INFORMASI
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td colspan="3" class="bg-blue">RENCANA TUGAS MAHASISWA (TUGAS KE-${index + 1})</td>
+                                </tr>
+
+                                <tr>
+                                    <td class="font-bold" rowspan="2" style="vertical-align: middle;">Identitas MK</td>
+                                    <td class="font-bold text-center" width="35%">Nama MK</td>
+                                    <td class="font-bold text-center" width="35%">Kode MK</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">${t.nama_mk || '-'}</td>
+                                    <td class="text-center">${t.kode_mk || '-'}</td>
+                                </tr>
+
+                                <tr>
+                                    <td class="font-bold text-center">TEKNIK EVALUASI</td>
+                                    <td class="font-bold text-center">NAMA TUGAS</td>
+                                    <td class="font-bold text-center">WAKTU PENGERJAAN TUGAS</td>
+                                </tr>
+                                <tr>
+                                    <td>${t.teknik || '-'}</td>
+                                    <td>${t.judul || '-'}</td>
+                                    <td>${t.waktu || '-'}</td>
+                                </tr>
+
+                                <tr>
+                                    <td class="font-bold text-center">CPL</td>
+                                    <td class="font-bold text-center">CPMK</td>
+                                </tr>
+                                <tr>
+                                    <td>${t.cpl || '-'}</td>
+                                    <td>${t.cpmk || '-'}</td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="3" class="bg-blue-left">DESKRIPSI TUGAS</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" style="text-align: justify; padding: 10px;">${t.deskripsi || '-'}</td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan="3" class="bg-blue-left">BENTUK DAN FORMAT LUARAN</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" style="text-align: justify; padding: 10px;">${t.luaran || '-'}</td>
+                                </tr>
+                            </table>
+
+                            <h4 style="margin: 20px 0 5px 0;">MATRIKS RUBRIK PENILAIAN</h4>
+                            <table class="rtm-table">
+                                <thead>
+                                    <tr class="bg-blue">
+                                        <th width="20%">Kriteria</th>
+                                        <th width="10%">Bobot (%)</th>
+                                        <th width="17%">Skala 1 (< 55)</th>
+                                        <th width="17%">Skala 2 (56-69)</th>
+                                        <th width="17%">Skala 3 (70-84)</th>
+                                        <th width="17%">Skala 4 (85-100)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${kriteriaRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                });
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<div class="kertas-a4"><h3 style="text-align:center; color:red;">Gagal menarik seluruh data tugas matkul.</h3></div>';
+            }
+        }
+
+        window.onload = loadSemuaTugasMatkul;
+    </script>
+</body>
+
+</html>

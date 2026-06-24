@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Nilai Mahasiswa - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
+    <style>
+        .table-responsive { overflow-x: auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 40px; }
+        .table-nilai { width: 100%; border-collapse: collapse; min-width: 1300px; }
+        .table-nilai th, .table-nilai td { padding: 12px 8px; border: 1px solid #e5e7eb; text-align: center; font-size: 0.9rem; }
+        .table-nilai th { background-color: #111827; font-weight: 700; color: white; position: sticky; top: 0; z-index: 2; font-size: 0.85rem; text-transform: uppercase; }
+        
+        /* Kolom lengket (Sticky) untuk No dan NIM agar tidak hilang saat di-scroll ke kanan */
+        .table-nilai th.sticky-col, .table-nilai td.sticky-col { position: sticky; left: 0; background-color: white; z-index: 3; border-right: 2px solid #cbd5e1; }
+        .table-nilai th.sticky-col { background-color: #111827; } /* Header sticky tetap gelap */
+        .table-nilai th.sticky-col:nth-child(2), .table-nilai td.sticky-col:nth-child(2) { left: 40px; }
+        
+        .grade-badge { padding: 6px 12px; border-radius: 6px; font-weight: 800; color: white; font-size: 0.9rem; }
+        
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media print {
+            #sidebar-container, #navbar-container, .btn-action, .header-container { display: none !important; }
+            .main-content { padding: 0 !important; }
+            .table-responsive { box-shadow: none; border: none; overflow: visible; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+    
+    <div class="main-content">
+        <div id="navbar-container"></div>
+
+        <div class="content-wrapper">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">EVALUASI & RPS</div>
+                    <h1 class="header-title">DETAIL <span>NILAI KELAS</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+                <div>
+                    <a href="rekap_nilai.html" class="btn-action" style="background: #f1f5f9; color: #475569; font-weight: 600; border: 1px solid #cbd5e1; text-decoration: none; margin-bottom: 15px; display: inline-flex;">
+                        <i class="fas fa-arrow-left"></i> Kembali ke Rekap
+                    </a>
+                    <h2 id="labelMK" style="margin: 0 0 5px 0; font-size: 1.6rem; color: var(--text-dark); font-weight: 800;">Memuat Mata Kuliah...</h2>
+                    <p style="margin: 0; color: #64748b; font-size: 1.05rem; font-weight: 500;">Dosen Pengampu: <strong style="color: #1e293b;" id="labelDosen">-</strong></p>
+                </div>
+                <button class="btn-dark" style="background: #10b981; border: none; padding: 12px 24px;" onclick="window.print()">
+                    <i class="fas fa-print"></i> Cetak Laporan
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table-nilai">
+                    <thead>
+                        <tr>
+                            <th class="sticky-col" style="min-width: 40px;">No</th>
+                            <th class="sticky-col" style="min-width: 250px; text-align: left;">NIM & Nama Mahasiswa</th>
+                            <th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th><th>P7</th>
+                            <th id="headerUTS" style="background: #7f1d1d;">UTS</th>
+                            <th>P9</th><th>P10</th><th>P11</th><th>P12</th><th>P13</th><th>P14</th><th>P15</th>
+                            <th id="headerUAS" style="background: #7f1d1d;">UAS</th>
+                            <th style="background: #166534; font-size: 0.95rem;">NILAI AKHIR</th>
+                            <th style="background: #166534;">GRADE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyDetailNilai">
+                        <tr><td colspan="20" style="padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Memuat data nilai dari server...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // DETEKSI PRODI DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+    
+        const API_GET_DETAIL = `${API_BASE}/get-detail-kelas`;
+
+        // SATPAM HALAMAN
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        // Ambil parameter dari URL (?kode_mk=...&nama_mk=...&dosen=...)
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramKodeMK = urlParams.get('kode_mk');
+        const paramDosen = urlParams.get('dosen') || "Belum Dinamai";
+        const paramNamaMK = urlParams.get('nama_mk') || "";
+
+        // UI Setup
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            
+            // Tema warna bergantung pada prodi yang login
+            const warnaUtama = PRODI === 'si' ? 'var(--primary-teal)' : 'var(--primary-red)';
+            const warnaHeaderUjian = PRODI === 'si' ? '#0f766e' : '#7f1d1d'; // Teal tua vs Merah gelap
+
+            if(PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+            }
+
+            document.getElementById("labelMK").innerHTML = `<span style="color: ${warnaUtama};">[${paramKodeMK}]</span> ${paramNamaMK}`;
+            document.getElementById("labelDosen").innerText = paramDosen;
+            document.getElementById("headerUTS").style.background = warnaHeaderUjian;
+            document.getElementById("headerUAS").style.background = warnaHeaderUjian;
+        });
+
+        // Penentuan Warna Grade
+        function getGradeColor(grade) {
+            if(grade === 'A' || grade === 'A-') return 'background: #16a34a;'; // Hijau
+            if(grade.includes('B')) return 'background: #3b82f6;'; // Biru
+            if(grade.includes('C')) return 'background: #f59e0b;'; // Kuning
+            return 'background: #ef4444;'; // Merah (D/E)
+        }
+
+        async function loadDetailNilai() {
+            const tbody = document.getElementById("bodyDetailNilai");
+            if(!paramKodeMK) {
+                tbody.innerHTML = `<tr><td colspan="20" style="color: red; padding: 30px;">Kode Mata Kuliah tidak ditemukan di URL! Kembali ke halaman sebelumnya.</td></tr>`;
+                return;
+            }
+
+            // Warna *highlight* untuk sel UTS/UAS menyesuaikan prodi
+            const warnaKolomUjian = PRODI === 'si' ? 'background: #f0fdfa;' : 'background: #fff5f5;';
+            const warnaTeksNim = PRODI === 'si' ? 'var(--primary-teal)' : 'var(--primary-red)';
+
+            try {
+                // Melakukan request ke n8n berdasarkan kode_mk
+                const res = await fetch(`${API_GET_DETAIL}?kode_mk=${paramKodeMK}`);
+                if(!res.ok) throw new Error("Gagal mengambil data dari n8n");
+                
+                const dataMhs = await res.json();
+
+                if(!Array.isArray(dataMhs) || dataMhs.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="20" style="color: #64748b; padding: 40px;">Belum ada nilai yang diinput oleh dosen untuk kelas ini.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = "";
+                dataMhs.forEach((mhs, index) => {
+                    let htmlRow = `
+                        <tr style="border-bottom: 1px solid #e5e7eb;">
+                            <td class="sticky-col" style="font-weight: bold; color: #475569;">${index + 1}</td>
+                            <td class="sticky-col" style="text-align: left;">
+                                <div style="font-weight: 800; color: ${warnaTeksNim}; font-size: 0.95rem;">${mhs.nim}</div>
+                                <div style="font-size: 0.85rem; font-weight: 500; color: #1e293b; margin-top: 2px;">${mhs.nama_mahasiswa || '-'}</div>
+                            </td>`;
+
+                    // Looping nilai P1 sampai P16
+                    for(let p = 1; p <= 16; p++) {
+                        let nilaiP = mhs[`p${p}`] !== null ? mhs[`p${p}`] : '<span style="color:#cbd5e1;">-</span>';
+                        let bgUjian = (p === 8 || p === 16) ? warnaKolomUjian : '';
+                        let fontWeight = (p === 8 || p === 16) ? 'font-weight: bold;' : '';
+                        
+                        htmlRow += `<td style="${bgUjian} ${fontWeight}">${nilaiP}</td>`;
+                    }
+
+                    // Nilai Akhir & Grade
+                    let badgeStyle = getGradeColor(mhs.grade || 'E');
+                    htmlRow += `
+                            <td style="font-weight: 800; font-size: 1.1rem; background: #f8fafc; color: #0f172a;">${mhs.nilai_total || 0}</td>
+                            <td style="background: #f8fafc;"><span class="grade-badge" style="${badgeStyle}">${mhs.grade || '-'}</span></td>
+                        </tr>`;
+                    
+                    tbody.innerHTML += htmlRow;
+                });
+
+            } catch(error) {
+                tbody.innerHTML = `<tr><td colspan="20" style="color: red; padding: 30px;">Terjadi kesalahan saat memuat data. Pastikan n8n aktif.</td></tr>`;
+                console.error(error);
+            }
+        }
+
+        window.onload = () => {
+            setTimeout(loadDetailNilai, 400);
+        };
+    </script>
+</body>
+</html>
