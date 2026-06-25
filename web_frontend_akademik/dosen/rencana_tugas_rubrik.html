@@ -164,7 +164,9 @@
                 justify-content: center;
             }
         }
-        /* CSS Hamburger Menu */
+        /* =========================================
+           RESPONSIVE NAVBAR (SIDEBAR BIRU DI HP)
+        ========================================= */
         .hamburger-btn, .close-menu-btn, .mobile-overlay, .sidebar-header-mobile { display: none; }
         
         .nav-menu-wrapper { 
@@ -175,11 +177,18 @@
             flex: 1; 
         }
 
+        .btn-logout {
+            background: var(--primary-red); color: white;
+            padding: 8px 24px; border-radius: 50px; border: none;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
+
         @media screen and (max-width: 768px) {
             .navbar { padding: 15px 20px !important; justify-content: flex-start !important; }
             .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
             
-            /* Sidebar Kiri dengan Warna Biru Navy */
             .nav-menu-wrapper {
                 position: fixed; top: 0; left: -320px; width: 280px; height: 100vh;
                 background: var(--primary-navy); 
@@ -209,6 +218,7 @@
             .nav-links a { 
                 color: #cbd5e1; width: 100%; padding: 14px 16px; border-radius: 10px; border: none; 
                 font-weight: 600; font-size: 0.95rem; transition: 0.2s; margin-bottom: 5px; background: transparent;
+                display: block;
             }
             
             .nav-links a.active { 
@@ -228,7 +238,7 @@
                 justify-content: flex-start; margin-bottom: 12px; gap: 12px;
             }
             .user-chip i { color: #ffc561 !important; font-size: 1.8rem; }
-            .btn-logout { width: 100%; }
+            .btn-logout { width: 100%; padding: 12px 24px; }
 
             .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
             .mobile-overlay.active { display: block; }
@@ -237,7 +247,7 @@
 </head>
 <body>
 
-    <nav class="navbar">
+   <nav class="navbar">
         <div style="display: flex; align-items: center; gap: 15px;">
             <button class="hamburger-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
             <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
@@ -256,7 +266,7 @@
             
             <div class="nav-links">
                 <a href="jadwal_mengajar.html">Jadwal Mengajar</a>
-                <a href="input_nilai.html">Input Asesmen</a>
+                <a href="input_nilai.html" >Input Asesmen</a>
                 <a href="rps_dosen.html" class="active">Penyusunan RPS</a>
                 <a href="../kaprodi/laporan.html">Laporan OBE</a>
                 <a href="portofolio.html">Portofolio</a>
@@ -389,7 +399,38 @@
     </main>
 
     <script>
-        document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
+        // ==========================================
+        // SET DATA LOGIN & TOMBOL ADMIN (KAPRODI)
+        // ==========================================
+        const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
+        const userRoleSekarang = localStorage.getItem("user_role");
+        const userProdiSekarang = localStorage.getItem("prodi_aktif") || "ti";
+
+        document.getElementById("dosenName").innerText = userLogin;
+
+        if (userRoleSekarang === "admin") {
+            const navRightContainer = document.getElementById("navRightContainer");
+            const btnKembali = document.createElement("a");
+            
+            // Arahkan sesuai prodi aktif (SI atau TI)
+            btnKembali.href = userProdiSekarang === "si" ? "../kaprodi/kaprodi_si/admin_config_si.html" : "../kaprodi/kaprodi_ti/admin_config.html";
+            btnKembali.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 4px;"></i> Admin';
+            
+            // Styling persis seperti di halaman index dan rps
+            btnKembali.style.background = "#8b0000";
+            btnKembali.style.color = "white";
+            btnKembali.style.padding = "8px 16px";
+            btnKembali.style.borderRadius = "50px";
+            btnKembali.style.fontWeight = "bold";
+            btnKembali.style.textDecoration = "none";
+            btnKembali.style.fontSize = "0.9rem";
+            btnKembali.style.display = "flex";
+            btnKembali.style.alignItems = "center";
+            btnKembali.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
+            
+            // Sisipkan sebelum elemen profil dosen
+            navRightContainer.insertBefore(btnKembali, navRightContainer.firstChild);
+        }
 
         let daftarTugasDraft = []; 
         let modeEditIndex = -1; 
@@ -707,6 +748,10 @@
         function toggleMenu() {
             document.getElementById('navMenuWrapper').classList.toggle('active');
             document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+        function logout() { 
+            localStorage.clear(); 
+            window.location.replace("../login/login.html"); 
         }
     </script>
 </body>
