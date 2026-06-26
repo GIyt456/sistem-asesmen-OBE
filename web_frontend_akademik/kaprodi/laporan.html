@@ -4,40 +4,174 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan OBE - Universitas AKI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="/js/api_config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root { --navy: #0f172a; --blue: #1e3a8a; --red: #8b0000; --bg: #f8fafc; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .container { max-width: 1250px; margin: auto; }
-        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 24px; }
+        :root { 
+            --navy: #0f172a; 
+            --blue: #1e3a8a; 
+            --red: #8b0000; 
+            --bg: #f8fafc; 
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: #111827; }
+        
+        .container { max-width: 1250px; margin: 30px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 24px; border: 1px solid #e2e8f0; }
+        
         .table-wrapper { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; background: white; min-width: 800px; }
-        th, td { padding: 8px 12px; border: 1px solid #e2e8f0; text-align: center; font-size: 0.85rem; }
+        th, td { padding: 10px 12px; border: 1px solid #e2e8f0; text-align: center; font-size: 0.85rem; }
+        
         .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; }
         .success { background: #dcfce7; color: #166534; }
         .danger { background: #fee2e2; color: #991b1b; }
+        
         .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        select { padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%; max-width: 400px; }
-        @media (max-width: 900px) { .grid-top { grid-template-columns: 1fr; } }
+        select { padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%; max-width: 400px; outline: none; font-family: 'Inter'; }
+        select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        /* =========================================
+           NAVBAR DOSEN (STANDAR)
+        ========================================= */
+        .navbar {
+            background-color: var(--navy); padding: 15px 40px; 
+            display: flex; justify-content: space-between; align-items: center; color: white;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .nav-links { display: flex; gap: 30px; font-weight: 500; font-size: 0.95rem; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; transition: 0.3s; padding-bottom: 4px; opacity: 0.8; }
+        .nav-links a:hover, .nav-links a.active { opacity: 1; font-weight: 800; border-bottom: 2px solid #ffc561; }
+        
+        .nav-user { display: flex; align-items: center; gap: 16px; font-weight: 600; }
+        .user-chip { background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; color: #ffffff; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-logout { background: var(--red); color: white; padding: 8px 24px; border-radius: 50px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; }
+        .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
+
+        /* =========================================
+           PENGATURAN CHART & TABEL (MOBILE)
+        ========================================= */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 400px;
+        }
+
+        /* Menyembunyikan elemen khusus mobile saat di layar laptop */
+        .hamburger-btn, .close-menu-btn, .mobile-overlay, .sidebar-header-mobile { display: none; }
+        
+        /* Mengatur agar menu berjejer rapi ke kanan di layar laptop */
+        .nav-menu-wrapper { 
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-end; 
+            gap: 40px; 
+            flex: 1; 
+        }
+
+        @media screen and (max-width: 768px) {
+            .grid-top { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 15px; }
+            
+            .chart-wrapper { height: 320px; }
+
+            /* Sticky Kolom NIM & Nama */
+            #tableDetail th:nth-child(1), #tableDetail td:nth-child(1) { position: sticky; left: 0; z-index: 10; border-right: none; }
+            #tableDetail th:nth-child(2), #tableDetail td:nth-child(2) { position: sticky; left: 80px; z-index: 10; border-right: 2px solid #cbd5e1; }
+            #tableDetail th:nth-child(1), #tableDetail th:nth-child(2) { z-index: 12; } 
+
+            /* Sidebar Menu */
+            .navbar { padding: 15px 20px; justify-content: flex-start; gap: 15px; }
+            .nav-links { display: none !important; }
+            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+            
+            .nav-menu-wrapper { 
+                position: fixed; top: 0; left: -320px; width: 280px; height: 100vh; 
+                background: #0f172a; flex-direction: column; align-items: flex-start; 
+                padding: 0; box-shadow: 10px 0 25px rgba(0,0,0,0.5); 
+                transition: left 0.3s ease; z-index: 1000; overflow-y: auto; display: flex !important; 
+            }
+            .nav-menu-wrapper.active { left: 0; }
+            .sidebar-header-mobile { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .close-menu-btn { background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; }
+            
+            .nav-links.active { flex-direction: column; gap: 10px; width: 100%; padding: 20px; display: flex !important; align-items: flex-start; }
+            .nav-links.active a { display: block; width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.05); border-radius: 8px; border: none; margin-bottom: 5px; }
+            .nav-links.active a.active { background: rgba(255, 255, 255, 0.1); border-left: 4px solid #ffc561; border-radius: 0 8px 8px 0; }
+            
+            .nav-user { padding: 20px; width: 100%; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); flex-direction: column; justify-content: center; gap: 12px; }
+            .user-chip { width: 100%; justify-content: flex-start; }
+            .btn-logout { width: 100%; }
+
+            .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
+            .mobile-overlay.active { display: block; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <nav class="navbar">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+            <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);" onclick="window.location.href='index.html'">
+        </div>
+
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+
+        <div class="nav-menu-wrapper" id="navMenuWrapper">
+            
+            <div class="sidebar-header-mobile">
+                <p class="sidebar-brand" style="font-size: 1.3rem; font-weight: 900; color: white; margin: 0;">SISTEM <span style="color:#ffc561;">OBE</span></p>
+                <button class="close-menu-btn" onclick="toggleMenu()"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="nav-links" id="navLinksContainer">
+                <a href="jadwal_mengajar.html">Jadwal Mengajar</a>
+                <a href="input_nilai.html">Input Asesmen</a>
+                <a href="rps_dosen.html">Penyusunan RPS</a>
+                <a href="../kaprodi/laporan.html" class="active">Laporan OBE</a>
+                <a href="portofolio.html">Portofolio</a>
+            </div>
+
+            <div class="nav-user" id="navRightContainer">
+                <div class="user-chip">
+                    <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i>
+                    <div class="user-text-mobile">
+                        <div id="dosenName" style="font-size: 0.95rem; font-weight: 800; line-height: 1;">Dosen</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Log Out</button>
+            </div>
+            
+        </div>
+    </nav>
+
+    <main class="container">
         <div class="card">
-            <h2 style="color: var(--navy); margin-top:0;"><i class="fas fa-university"></i> Laporan Capaian OBE</h2>
+            <h2 style="color: var(--navy); margin-top:0; font-weight: 800;"><i class="fas fa-university"></i> Laporan Capaian OBE</h2>
             <select id="pilihMK" onchange="loadLaporan()"></select>
         </div>
 
         <div class="grid-top" style="margin-bottom: 24px;">
-            <div class="card"><canvas id="radarChart"></canvas></div>
+            <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h3 style="margin-top:0; color:var(--navy); width: 100%;"><i class="fas fa-chart-pie"></i> Visualisasi Capaian</h3>
+                <div class="chart-wrapper">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
             <div class="card">
                 <h3 style="margin-top:0; color:var(--navy);"><i class="fas fa-tasks"></i> Evaluasi Kelas</h3>
                 <div class="table-wrapper">
                     <table>
                         <thead><tr><th>CPL (CPMK)</th><th>Rata-rata</th><th>Status</th></tr></thead>
-                        <tbody id="bodyEvaluasi"></tbody>
+                        <tbody id="bodyEvaluasi">
+                            <tr><td colspan="3" style="color: #64748b;">Pilih mata kuliah terlebih dahulu.</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -48,25 +182,52 @@
             <div class="table-wrapper">
                 <table id="tableDetail">
                     <thead></thead>
-                    <tbody id="bodyDetail"></tbody>
+                    <tbody id="bodyDetail">
+                        <tr><td colspan="10" style="color: #64748b; padding: 30px;">Pilih mata kuliah terlebih dahulu.</td></tr>
+                    </tbody>
                 </table>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
         const API_METADATA = `${API_BASE}/get-metadata`;
         const API_GET_REPORT = `${API_BASE}/get-report-obe`;    
         const TARGET_PASS = 75;
 
-        // 2. SISTEM AUTENTIKASI (Hanya membaca sesi, tidak lagi memaksa login untuk mempermudah tes)
+        // AUTHENTIKASI & LOGIC ADMIN
+        let userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
         let userNidn = localStorage.getItem("user_nidn");
         let userProdi = localStorage.getItem("prodi_aktif");
+        let userRoleSekarang = localStorage.getItem("user_role");
 
-        // Jika Anda ingin menguji tanpa login, cukup biarkan NIDN ini aktif:
+        document.getElementById("dosenName").innerText = userLogin;
+
+        // Bypass untuk tes lokal (opsional)
         if (!userNidn) {
             userNidn = "0610029301";
             userProdi = "ti";
+        }
+
+        // Tambah Tombol Admin Jika Kaprodi
+        if (userRoleSekarang === "admin") {
+            const navRightContainer = document.getElementById("navRightContainer");
+            const btnKembali = document.createElement("a");
+            btnKembali.href = userProdi === "si" ? "../kaprodi/kaprodi_si/admin_config_si.html" : "../kaprodi/kaprodi_ti/admin_config.html";
+            btnKembali.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 4px;"></i> Admin';
+            
+            btnKembali.style.background = "#8b0000";
+            btnKembali.style.color = "white";
+            btnKembali.style.padding = "8px 16px";
+            btnKembali.style.borderRadius = "50px";
+            btnKembali.style.fontWeight = "bold";
+            btnKembali.style.textDecoration = "none";
+            btnKembali.style.fontSize = "0.9rem";
+            btnKembali.style.display = "flex";
+            btnKembali.style.alignItems = "center";
+            btnKembali.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
+            
+            navRightContainer.insertBefore(btnKembali, navRightContainer.firstChild);
         }
 
         async function init() {
@@ -89,13 +250,11 @@
                 selectMK.innerHTML = '<option value="" disabled selected>Pilih Mata Kuliah</option>';
                 
                 if(Array.isArray(data)) {
-                    // MESIN PENYARING ANTI-DUPLIKAT
-                    const mkTersimpan = new Set(); // Set hanya menyimpan data unik
+                    const mkTersimpan = new Set(); 
                     
                     data.filter(item => item.tipe === 'mk').forEach(mk => {
-                        // Jika kode mata kuliah belum ada di dalam Set, maka tambahkan
                         if (!mkTersimpan.has(mk.kode)) {
-                            mkTersimpan.add(mk.kode); // Catat kodenya agar tidak dobel
+                            mkTersimpan.add(mk.kode); 
                             selectMK.innerHTML += `<option value="${mk.kode}">[${mk.kode}] ${mk.label}</option>`;
                         }
                     });
@@ -117,20 +276,21 @@
                 
                 const flatData = JSON.parse(textData);
                 
-                // MENCEGAH ERROR "forEach is not a function" JIKA N8N MENGIRIM PESAN ERROR MYSQL
                 if(!Array.isArray(flatData)) {
                     console.error("Error n8n:", flatData);
                     throw new Error("n8n gagal mengeksekusi SQL. Cek Log Executions di n8n!");
                 }
 
                 if(flatData.length === 0) {
-                    document.getElementById("bodyDetail").innerHTML = `<tr><td colspan="10" style="color:red; text-align:center;">Data tidak ditemukan untuk mata kuliah ini.</td></tr>`;
+                    document.getElementById("bodyDetail").innerHTML = `<tr><td colspan="10" style="color:red; text-align:center; padding: 20px;">Data nilai belum diinput untuk mata kuliah ini.</td></tr>`;
+                    document.getElementById("bodyEvaluasi").innerHTML = `<tr><td colspan="3" style="color:red; text-align:center;">Tidak ada data.</td></tr>`;
+                    if(window.myChart) window.myChart.destroy();
                     return;
                 }
 
                 processAndRenderAll(flatData);
             } catch (e) {
-                document.getElementById("bodyDetail").innerHTML = `<tr><td colspan="10" style="color:red; font-weight:bold;">⚠️ Error: ${e.message}</td></tr>`;
+                document.getElementById("bodyDetail").innerHTML = `<tr><td colspan="10" style="color:red; font-weight:bold; padding: 20px;">⚠️ Error: ${e.message}</td></tr>`;
             }
         }
 
@@ -183,7 +343,7 @@
             });
             thead.innerHTML = `<tr>${h1}</tr><tr>${h2}</tr><tr>${h3}</tr>`;
 
-            let bobotRow = `<tr><td colspan="2" style="text-align:right; font-weight:bold; background:#f1f5f9;">BOBOT PENILAIAN (%)</td>`;
+            let bobotRow = `<tr><td colspan="2" style="text-align:right; font-weight:bold; background:#f1f5f9; position: sticky; left: 80px; z-index: 10;">BOBOT PENILAIAN (%)</td>`;
             sortedGroups.forEach(key => {
                 const item = groupMap[key];
                 let sumBobot = 0;
@@ -197,7 +357,7 @@
 
             Object.keys(studentMap).sort().forEach(nim => {
                 const mhs = studentMap[nim];
-                let rowHTML = `<tr><td style="font-weight:bold;">${nim}</td><td style="text-align:left;">${mhs.nama}</td>`;
+                let rowHTML = `<tr><td style="font-weight:bold; background: white;">${nim}</td><td style="text-align:left; background: white;">${mhs.nama}</td>`;
                 
                 sortedGroups.forEach(key => {
                     const item = groupMap[key];
@@ -224,12 +384,10 @@
                 body.innerHTML += `<tr>${rowHTML}</tr>`;
             });
 
-            // Panggil fungsi evaluasi dengan 3 parameter yang aman
             calculateAndRenderSummary(groupMap, studentMap, sortedGroups);
         }
 
         function calculateAndRenderSummary(structureMap, studentMap, sortedGroups) {
-            // Mencegah error jika parameter tidak terlempar dengan benar
             if(!sortedGroups || !Array.isArray(sortedGroups)) return;
 
             const summaryMap = {};
@@ -272,6 +430,9 @@
         function renderChart(labels, data) {
             const ctx = document.getElementById('radarChart').getContext('2d');
             if(window.myChart) window.myChart.destroy();
+            
+            const isMobile = window.innerWidth <= 768;
+
             window.myChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
@@ -281,17 +442,68 @@
                         data: data,
                         backgroundColor: 'rgba(30, 58, 138, 0.2)',
                         borderColor: '#1e3a8a',
-                        pointBackgroundColor: '#1e3a8a'
+                        pointBackgroundColor: '#1e3a8a',
+                        borderWidth: 2
                     }, {
-                        label: 'Target (75%)',
-                        data: labels.map(() => 75),
+                        label: 'Target Lulus (75%)',
+                        data: labels.map(() => TARGET_PASS),
                         borderColor: '#8b0000',
                         borderDash: [5, 5],
-                        fill: false, pointRadius: 0
+                        fill: false, 
+                        pointRadius: 0,
+                        borderWidth: 2
                     }]
                 },
-                options: { responsive: true, scales: { r: { min: 0, max: 100 } } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    layout: {
+                        padding: isMobile ? 5 : 20 
+                    },
+                    scales: { 
+                        r: { 
+                            min: 0, 
+                            max: 100,
+                            ticks: {
+                                stepSize: 20,
+                                backdropColor: 'transparent', 
+                                font: { size: isMobile ? 9 : 11 }
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: isMobile ? 10 : 12, 
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        } 
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: isMobile ? 10 : 12, family: "'Inter', sans-serif" },
+                                boxWidth: isMobile ? 12 : 40
+                            }
+                        }
+                    }
+                }
             });
+        }
+
+        // FUNGSI NAVIGASI MOBILE & LOGOUT
+        function toggleMenu() {
+            const wrapper = document.getElementById('navMenuWrapper');
+            const overlay = document.getElementById('mobileOverlay');
+            const navLinks = document.getElementById('navLinksContainer');
+            
+            wrapper.classList.toggle('active');
+            overlay.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        }
+
+        function logout() { 
+            localStorage.clear(); 
+            window.location.replace("../login/login.html"); 
         }
 
         window.onload = init;

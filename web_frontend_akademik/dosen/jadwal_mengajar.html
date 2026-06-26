@@ -109,10 +109,21 @@
         }
 
         /* KONTEN UTAMA */
+        /* Menggunakan flexbox pada body untuk footer yang selalu di bawah */
+        body {
+            background-color: #f8fafc;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Minimal tinggi body adalah 100% layar */
+        }
+
         .container {
             max-width: 1200px;
             margin: 40px auto;
             padding: 0 20px;
+            flex: 1; /* PENTING: Memaksa kontainer membentang memenuhi sisa layar kosong */
+            width: 100%; /* Memastikan kontainer tidak menciut di tengah */
         }
 
         .figma-card {
@@ -491,40 +502,169 @@
             font-weight: 700;
             user-select: none;
         }
+       /* =========================================
+           RESPONSIVE NAVBAR (SIDEBAR BIRU DI HP)
+        ========================================= */
+        .hamburger-btn, .close-menu-btn, .mobile-overlay, .sidebar-header-mobile { display: none; }
+        
+        .nav-menu-wrapper { 
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-end; 
+            gap: 40px; 
+            flex: 1; 
+        }
+
+        /* ==========================================================
+           RESPONSIVE MOBILE KHUSUS HALAMAN JADWAL (MAKS LEBAR 768px)
+        ========================================================== */
+        @media screen and (max-width: 768px) {
+            /* 1. NAVBAR / SIDEBAR BIRU */
+            .navbar { padding: 15px 20px !important; justify-content: flex-start !important; }
+            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+            
+            .nav-menu-wrapper {
+                position: fixed; top: 0; left: -320px; width: 280px; height: 100vh;
+                background: var(--primary-navy); 
+                flex-direction: column; align-items: flex-start; justify-content: flex-start;
+                padding: 0; box-shadow: 10px 0 25px rgba(0,0,0,0.5); 
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                z-index: 1000; overflow-y: auto;
+                display: flex !important;
+            }
+            .nav-menu-wrapper.active { left: 0; }
+
+            .sidebar-header-mobile { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .sidebar-brand { font-size: 1.3rem; font-weight: 900; color: white; margin: 0;}
+            .sidebar-brand span { color: #ffc561; }
+            .close-menu-btn { display: flex; align-items: center; justify-content: center; background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+            .nav-links { flex-direction: column; gap: 8px; width: 100%; padding: 20px; align-items: flex-start; display: flex !important; }
+            .nav-links a { color: #cbd5e1; width: 100%; padding: 14px 16px; border-radius: 10px; border: none; font-weight: 600; font-size: 0.95rem; transition: 0.2s; margin-bottom: 5px; background: transparent; display: block; }
+            .nav-links a.active { background: rgba(255, 255, 255, 0.1); color: white; border-left: 4px solid #ffc561; border-radius: 0 10px 10px 0; font-weight: 800; border-bottom: none; }
+            .nav-user { flex-direction: column; width: 100%; padding: 20px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); justify-content: center !important; }
+            .user-chip { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px 16px; border-radius: 10px; justify-content: flex-start; margin-bottom: 12px; gap: 12px; }
+            .user-chip i { color: #ffc561 !important; font-size: 1.8rem; }
+            .btn-logout { width: 100%; padding: 12px 24px; }
+            .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
+            .mobile-overlay.active { display: block; }
+
+            /* 2. RAPIKAN HEADER & SEARCH BAR */
+            .table-controls { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .search-box, .search-box input { width: 100%; }
+
+            /* 3. SULAP TABEL JADWAL MENJADI KARTU (Target Spesifik) */
+            /* Kita tambahkan .figma-card di depannya agar tidak merusak tabel Dosen di dalam modal */
+            .figma-card table, .figma-card thead, .figma-card tbody, 
+            .figma-card th, .figma-card td, .figma-card tr { 
+                display: block !important; width: 100% !important; 
+            }
+            .figma-card thead { position: absolute; top: -9999px; left: -9999px; } 
+            
+            .figma-card tbody tr {
+                border: 1px solid #cbd5e1 !important; border-radius: 12px !important;
+                margin-bottom: 20px !important; padding: 10px !important;
+                background: white !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+            }
+            
+            .figma-card tbody td {
+                display: flex !important; justify-content: space-between !important;
+                align-items: center !important; text-align: right !important;
+                padding: 12px 10px !important; border: none !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+            }
+            .figma-card tbody td:last-child { border-bottom: none !important; }
+            
+            .figma-card tbody td::before {
+                font-weight: 700; color: #64748b; text-align: left; font-size: 0.85rem; flex-basis: 40%;
+            }
+            .figma-card tbody td:nth-child(1)::before { content: "Tahun Akademik"; }
+            .figma-card tbody td:nth-child(2)::before { content: "Mata Kuliah"; }
+            .figma-card tbody td:nth-child(3)::before { content: "ID Kelas"; }
+            .figma-card tbody td:nth-child(4)::before { content: "Semester"; }
+            .figma-card tbody td:nth-child(5)::before { content: "SKS"; }
+            .figma-card tbody td:nth-child(6)::before { content: "Opsi"; display: none; } 
+            
+            .figma-card tbody td:nth-child(2) {
+                flex-direction: column; align-items: flex-start !important; text-align: left !important;
+            }
+
+            /* 4. RAPIKAN TOMBOL AKSI */
+            .figma-card tbody td:nth-child(6) { flex-direction: column; align-items: stretch !important; gap: 10px; margin-top: 10px; }
+            .action-cell { flex-direction: column; width: 100%; gap: 10px; }
+            .btn-detail, .btn-penilaian { width: 100%; justify-content: center; padding: 12px; }
+            .btn-dropdown-wrapper { width: 100%; }
+            .dropdown-menu { width: 100%; text-align: center; }
+
+            /* 5. MODAL DETAIL MENGAJAR (Perbaikan Scroll & Tombol) */
+            .modal-box {
+                max-height: 90vh !important; /* Batasi tinggi modal maksimal 90% dari layar HP */
+                display: flex !important;
+                flex-direction: column !important;
+            }
+            .modal-body { 
+                grid-template-columns: 1fr; gap: 15px; padding: 20px 15px; 
+                overflow-y: auto !important; /* PENTING: Izinkan isi modal di-scroll ke bawah */
+            }
+            .detail-grid { grid-template-columns: 1fr; gap: 8px; }
+            .detail-label { margin-top: 8px; color: var(--primary-navy); }
+            
+            /* Tombol Kembali dibuat Full-width agar mudah di-tap di HP */
+            .modal-footer { padding: 15px !important; justify-content: center !important; }
+            .modal-footer button { width: 100%; padding: 12px !important; }
+            
+            /* 6. PAGINATION */
+            .pagination-container { flex-direction: column; gap: 15px; }
+        }
     </style>
 </head>
 
 <body>
 
     <nav class="navbar">
-        <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
-            style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
-            onclick="window.location.href='index.html'">
-
-        <div class="nav-links">
-            <a href="jadwal_mengajar.html" class="active">Jadwal Mengajar</a>
-            <a href="input_nilai.html">Input Asesmen</a>
-            <a href="rps_dosen.html">Penyusunan RPS</a>
-            <a href="../kaprodi/laporan.html">Laporan OBE</a>
-            <a href="portofolio.html">Portofolio</a>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+            <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
+                style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
+                onclick="window.location.href='index.html'">
         </div>
 
-        <div class="nav-user" id="navRightContainer">
-            <div class="user-chip">
-                <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i>
-                <span id="dosenName">Dosen</span>
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+
+        <div class="nav-menu-wrapper" id="navMenuWrapper">
+            
+            <div class="sidebar-header-mobile">
+                <p class="sidebar-brand">SISTEM <span>OBE</span></p>
+                <button class="close-menu-btn" onclick="toggleMenu()"><i class="fas fa-times"></i></button>
             </div>
-            <button class="btn-logout" onclick="logout()">Log Out</button>
+            
+            <div class="nav-links">
+                <a href="jadwal_mengajar.html" class="active">Jadwal Mengajar</a>
+                <a href="input_nilai.html">Input Asesmen</a>
+                <a href="rps_dosen.html">Penyusunan RPS</a>
+                <a href="../kaprodi/laporan.html">Laporan OBE</a>
+                <a href="portofolio.html">Portofolio</a>
+            </div>
+
+            <div class="nav-user" id="navRightContainer">
+                <div class="user-chip">
+                    <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i>
+                    <div class="user-text-mobile">
+                        <div class="user-label-hp" style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700; line-height: 1; display: none;">DOSEN PENGAMPU</div>
+                        <div id="dosenName" style="font-size: 0.95rem; font-weight: 800; margin-top: 2px; line-height: 1;">Dosen</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Log Out</button>
+            </div>
+            
         </div>
     </nav>
-
     <main class="container">
 
         <div style="margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
             <h1 style="font-size: 2.2rem; font-weight: 900; color: var(--primary-navy); margin-bottom: 5px;">Jadwal
                 Mengajar</h1>
-            <p style="color: var(--text-gray); font-size: 1rem;">Daftar mata kuliah dan kelas yang Anda ampu pada
-                semester ini.</p>
+            <p style="color: var(--text-gray); font-size: 1rem;">Daftar mata kuliah dan kelas yang ditarik dari Metadata
+                Anda pada semester ini.</p>
         </div>
 
         <div class="figma-card">
@@ -622,9 +762,6 @@
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button class="btn-kembali" onclick="tutupModalDetail()">Kembali</button>
-            </div>
         </div>
     </div>
 
@@ -634,8 +771,8 @@
     </footer>
 
     <script>
-
-        const API_GET_KELAS = `${API_BASE}/get-kelas-aktif`;
+        // API CONFIG (Mengikuti sumber data yang sama dengan input_nilai.html)
+        const API_METADATA = `${API_BASE}/get-metadata`;
         const API_GET_MATKUL = `${API_BASE}/get-master-matkul`;
 
         // Sesi Login
@@ -647,6 +784,7 @@
         document.getElementById("dosenName").innerText = userLogin;
         document.getElementById("lblProdiTitle").innerText = userProdiSekarang === "si" ? "Sistem Informasi" : "Teknik Informatika";
 
+        // Tambah Tombol Admin Jika Diperlukan
         if (userRoleSekarang === "admin") {
             const navRightContainer = document.getElementById("navRightContainer");
             const btnKembali = document.createElement("a");
@@ -678,47 +816,52 @@
         async function loadJadwalMengajar() {
             const tbody = document.getElementById("tableBodyJadwal");
             try {
-                // 1. Tarik Data
-                const resKelas = await fetch(API_GET_KELAS);
-                const jsonKelas = await resKelas.json();
-                let dataKelasRaw = safeExtractArray(jsonKelas);
+                let prodiArray = userProdiSekarang.split(',');
+                let allMetadata = [];
 
-                // Filter Anti Duplikat id_kelas (jaga-jaga jika n8n looping)
-                const uniqueKelasMap = new Map();
-                dataKelasRaw.forEach(kelas => {
-                    if (kelas && kelas.id_kelas) {
-                        uniqueKelasMap.set(String(kelas.id_kelas), kelas);
-                    }
-                });
-                dataKelasRaw = Array.from(uniqueKelasMap.values());
+                // 1. TARIK METADATA SEPERTI DI HALAMAN INPUT NILAI
+                for (let p of prodiArray) {
+                    let prodiBersih = p.trim().toLowerCase();
+                    const res = await fetch(`${API_METADATA}?prodi=${prodiBersih}&context=dosen&nidn=${userNidn}`);
+                    let textData = await res.text();
+                    if (textData.startsWith('=')) textData = textData.substring(1);
+                    let data = JSON.parse(textData);
+                    data = data.map(item => ({ ...item, prodi_asal: prodiBersih }));
+                    allMetadata = allMetadata.concat(data);
+                }
 
-                // 2. Tarik Data Master Matkul
+                // Hapus duplikat metadata berdasarkan kode
+                const uniqueMeta = []; const mapMeta = new Map();
+                for (const item of allMetadata) {
+                    if (!mapMeta.has(item.kode)) { mapMeta.set(item.kode, true); uniqueMeta.push(item); }
+                }
+                const daftarMK = uniqueMeta.filter(item => item.tipe === 'mk');
+
+                // 2. TARIK DATA MASTER MATKUL UNTUK SKS DAN SEMESTER
                 const resMatkul = await fetch(API_GET_MATKUL);
                 const jsonMatkul = await resMatkul.json();
                 let dataMatkulRaw = safeExtractArray(jsonMatkul);
 
-                // 3. Cocokkan data
-                let gabunganData = dataKelasRaw.map(kelas => {
-                    const matkulCocok = dataMatkulRaw.find(m => m.kode_mk === kelas.kode_mk);
+                // 3. COCOKKAN DATA DAN BENTUK LIST JADWAL
+                let gabunganData = daftarMK.map(mk => {
+                    const matkulCocok = dataMatkulRaw.find(m => m.kode_mk === mk.kode);
                     return {
-                        id_kelas: kelas.id_kelas,
-                        kode_mk: kelas.kode_mk,
-                        nidn: kelas.nidn,
-                        semester: kelas.semester,
-                        kelompok: kelas.kelompok,
-                        nama_mk: matkulCocok ? matkulCocok.nama_mk : "Nama MK Tidak Ditemukan",
+                        id_kelas: "KL-" + mk.kode,
+                        kode_mk: mk.kode,
+                        nidn: userNidn,
+                        semester: matkulCocok ? matkulCocok.semester : "-",
+                        kelompok: "A",
+                        nama_mk: mk.label,
                         sks: matkulCocok ? matkulCocok.sks : "-",
-                        prodi: matkulCocok ? matkulCocok.prodi : "-"
+                        prodi: matkulCocok ? matkulCocok.prodi : mk.prodi_asal
                     };
                 });
 
-                // 4. FILTERING BERDASARKAN ROLE
+                // 4. FILTER ADMIN JIKA DIPERLUKAN
                 if (userRoleSekarang === "admin") {
                     dataJadwalGlobal = gabunganData.filter(item =>
                         item.prodi.toLowerCase() === userProdiSekarang.toLowerCase() || item.prodi === "-"
                     );
-                } else if (userNidn) {
-                    dataJadwalGlobal = gabunganData.filter(item => item.nidn === userNidn);
                 } else {
                     dataJadwalGlobal = gabunganData;
                 }
@@ -728,10 +871,17 @@
 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan=\"6\" style=\"text-align:center; padding:30px; color: red;\">Gagal memuat atau mencocokkan data. Pastikan n8n menyala.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color: red;">Gagal memuat data dari Metadata n8n.</td></tr>`;
             }
         }
 
+        function bukaRPS(kodeMk) {
+            window.location.href = "rps_dosen.html?mk=" + kodeMk;
+        }
+
+        // ==========================================
+        // RENDER TABEL & PAGINATION
+        // ==========================================
         function changeRowsPerPage() {
             rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value);
             currentPage = 1;
@@ -743,7 +893,7 @@
             tbody.innerHTML = "";
 
             if (filteredDataGlobal.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada jadwal kelas yang ditemukan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada jadwal mengajar yang ditemukan.</td></tr>`;
                 document.getElementById("dataCountInfo").innerText = "Showing 0 entries";
                 document.getElementById("paginationControls").innerHTML = "";
                 return;
@@ -754,12 +904,11 @@
 
             const startIndex = (currentPage - 1) * rowsPerPage;
             const endIndex = Math.min(startIndex + rowsPerPage, filteredDataGlobal.length);
-
             const currentDataPage = filteredDataGlobal.slice(startIndex, endIndex);
 
             currentDataPage.forEach((kelas) => {
                 const tr = document.createElement("tr");
-                const safeId = kelas.id_kelas;
+                const safeId = kelas.kode_mk.replace(/\s+/g, '-');
 
                 tr.innerHTML = `
                     <td>2025/2026</td>
@@ -775,10 +924,11 @@
                             <button class="btn-detail" onclick="bukaModalDetail('${kelas.kode_mk}', '${kelas.nama_mk}', '${kelas.sks}', '${kelas.semester}', '${kelas.id_kelas}', '${kelas.prodi}')">Detail</button>
                             <div class="btn-dropdown-wrapper">
                                 <button class="btn-penilaian" onclick="toggleActionMenu(event, 'menu-${safeId}')">
-                                    Penilaian <i class="fas fa-caret-down"></i>
+                                    Aksi <i class="fas fa-caret-down"></i>
                                 </button>
                                 <div class="dropdown-menu" id="menu-${safeId}">
-                                    <a href="penilaian_kelas.html?id_kelas=${kelas.id_kelas}&mk=${kelas.kode_mk}" class="dropdown-item">Input Nilai (Kelas ${kelas.id_kelas})</a>
+                                    <a href="penilaian_kelas.html?id_kelas=${kelas.id_kelas}&mk=${kelas.kode_mk}" class="dropdown-item"><i class="fas fa-edit" style="margin-right:8px;"></i> Input Nilai (Kelas ${kelas.id_kelas})</a>
+                                    <a href="#" onclick="bukaRPS('${kelas.kode_mk}')" class="dropdown-item"><i class="fas fa-book" style="margin-right:8px;"></i> Penyusunan RPS</a>
                                 </div>
                             </div>
                         </div>
@@ -788,44 +938,33 @@
             });
 
             document.getElementById("dataCountInfo").innerText = `Showing ${startIndex + 1} to ${endIndex} of ${filteredDataGlobal.length} entries`;
-
             renderSmartPagination(totalPages);
         }
 
-        // ==================================================
-        // SMART PAGINATION LOGIC (ANTI OVERFLOW)
-        // ==================================================
         function renderSmartPagination(totalPages) {
             const paginationEl = document.getElementById("paginationControls");
             let html = "";
 
-            // Tombol Previous
             html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
 
-            // Hitung batasan tombol yang tampil (Maksimal 5 tombol berurutan)
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, currentPage + 2);
 
-            // Tampilkan angka 1 dan Elipsis Kiri jika startPage terlalu jauh
             if (startPage > 1) {
                 html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
                 if (startPage > 2) html += `<span class="page-dots">...</span>`;
             }
 
-            // Looping tombol halaman yang aktif
             for (let i = startPage; i <= endPage; i++) {
                 html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
             }
 
-            // Tampilkan Elipsis Kanan dan Halaman Terakhir jika endPage belum mencapai akhir
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) html += `<span class="page-dots">...</span>`;
                 html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
             }
 
-            // Tombol Next
             html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
-
             paginationEl.innerHTML = html;
         }
 
@@ -849,6 +988,9 @@
             renderTable();
         }
 
+        // ==========================================
+        // UI & DROPDOWN CONTROLS
+        // ==========================================
         function toggleActionMenu(event, menuId) {
             event.stopPropagation();
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
@@ -879,6 +1021,13 @@
         function logout() { localStorage.clear(); window.location.replace("../login/login.html"); }
 
         window.onload = loadJadwalMengajar;
+        // ==========================================
+        // FUNGSI NAVIGASI MOBILE (HAMBURGER)
+        // ==========================================
+        function toggleMenu() {
+            document.getElementById('navMenuWrapper').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
     </script>
 </body>
 

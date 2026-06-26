@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import KRS Mahasiswa - Sistem OBE</title>
+
+    <link rel="stylesheet" href="../../../css/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
+    <style>
+        .upload-card { background: #fafafa; border: 2.5px dashed #cbd5e1; border-radius: 16px; padding: 50px 40px; max-width: 600px; text-align: center; margin: 40px auto; transition: 0.3s; }
+        .upload-card:hover { background: #f8fafc; }
+        
+        .file-input-wrapper { margin-bottom: 30px; background: white; padding: 15px; border-radius: 8px; border: 2px solid #e5e7eb; display: flex; align-items: center; justify-content: center;}
+        
+        .btn-upload { width: 100%; justify-content: center; padding: 16px; font-size: 1.05rem; display: inline-flex; align-items: center; gap: 10px; border: none; border-radius: 8px; font-weight: 700; color: white; cursor: pointer; transition: 0.2s;}
+        .btn-upload:hover:not(:disabled) { filter: brightness(0.9); transform: translateY(-2px); }
+
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+    
+    <div class="main-content">
+        <div id="navbar-container"></div>
+
+        <div class="content-wrapper">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">KELOLA KURIKULUM</div>
+                    <h1 class="header-title">IMPORT <span>KRS MAHASISWA</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
+            <div class="upload-card" id="dropZone">
+                <i class="fas fa-cloud-upload-alt" id="uploadIcon" style="font-size: 4.5rem; margin-bottom: 20px;"></i>
+                <h4 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; color: #1e293b;">Upload File KRS</h4>
+                <p style="color: #64748b; font-size: 0.95rem; line-height: 1.6; margin-bottom: 30px;">
+                    Sistem akan otomatis mengekstrak data dan menyinkronkan Mahasiswa, Mata Kuliah, serta Dosen ke dalam database sesuai program studi aktif. Format yang didukung: <strong>.xlsx</strong>
+                </p>
+
+                <div class="file-input-wrapper">
+                    <input type="file" id="krsFileInput" accept=".xlsx" style="width: 100%; font-family: 'Inter', sans-serif; font-size: 0.95rem; color: #475569; cursor: pointer; outline: none;">
+                </div>
+
+                <button class="btn-upload" id="btnUploadAction" style="background: #10b981;" onclick="handleKRSUpload()">
+                    <i class="fas fa-magic"></i> Jalankan Sinkronisasi n8n
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DETEKSI PRODI DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "si";
+
+        // SATPAM HALAMAN
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("../../../login/login.html");
+
+        // TEMA DINAMIS MENYESUAIKAN PRODI
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            const uploadCard = document.getElementById("dropZone");
+            const uploadIcon = document.getElementById("uploadIcon");
+            const titleSpan = document.querySelector('.header-title span');
+
+            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+
+            if(PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                titleSpan.style.color = "var(--primary-teal)";
+                uploadCard.style.borderColor = "var(--primary-teal)";
+                uploadIcon.style.color = "var(--primary-teal)";
+            } else {
+                badge.style.background = "var(--primary-red)";
+                titleSpan.style.color = "var(--primary-red)";
+                uploadCard.style.borderColor = "var(--primary-red)";
+                uploadIcon.style.color = "var(--primary-red)";
+            }
+        });
+
+        // FUNGSI SINKRONISASI UPLOAD KE N8N
+        async function handleKRSUpload() {
+            const fileInput = document.getElementById('krsFileInput');
+            const file = fileInput.files[0];
+            const btnUpload = document.getElementById('btnUploadAction');
+
+            if (!file) {
+                alert("⚠️ Silakan pilih file Excel (.xlsx) terlebih dahulu!");
+                return;
+            }
+
+            // Animasi Loading Tombol
+            btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah & Memproses...';
+            btnUpload.disabled = true;
+            btnUpload.style.opacity = '0.7';
+
+            // Bungkus data file
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('prodi', PRODI); // Kirim keterangan prodi ke n8n
+
+            try {
+                const response = await fetch(`${API_BASE}/upload-krs`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    alert("✅ File berhasil dikirim! Mesin n8n sedang memproses relasi Database di belakang layar.");
+                    fileInput.value = ""; // Bersihkan form setelah sukses
+                } else {
+                    alert("❌ Gagal memproses data. Pastikan format file sesuai dan n8n Anda aktif.");
+                }
+            } catch (error) {
+                alert("⚠️ Terjadi kesalahan jaringan saat menghubungi server n8n.");
+            }
+
+            // Kembalikan Tombol ke Semula
+            btnUpload.innerHTML = '<i class="fas fa-magic"></i> Jalankan Sinkronisasi n8n';
+            btnUpload.disabled = false;
+            btnUpload.style.opacity = '1';
+        }
+    </script>
+</body>
+</html>

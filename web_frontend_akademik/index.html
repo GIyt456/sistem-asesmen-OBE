@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Dosen - Sistem OBE</title>
+    <title>Sistem OBE - Universitas AKI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -15,7 +15,7 @@
             --text-dark: #111827;
         }
 
-        /* KUNCI HALAMAN AGAR TIDAK BISA DI-SCROLL */
+        /* KUNCI HALAMAN AGAR TIDAK BISA DI-SCROLL DI DESKTOP */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body, html { height: 100%; overflow: hidden; background-color: #0f172a; }
 
@@ -35,7 +35,6 @@
             justify-content: center;
         }
         
-        /* Gradien diubah menjadi Kuning ke Biru Dongker */
         .main-wrapper::before {
             content: '';
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -69,6 +68,15 @@
         }
         .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
 
+        .btn-login {
+            background: var(--primary-blue); color: white;
+            padding: 10px 28px; border-radius: 50px; border: none;
+            font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-login:hover { background: #172554; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+
         /* =========================================
            KONTEN TENGAH
         ========================================= */
@@ -79,7 +87,6 @@
             padding: 0 20px;
         }
 
-        /* Ditambahkan text-shadow agar teks putih tetap jelas di atas kuning */
         .hero-title { font-size: 2.8rem; font-weight: 900; margin-bottom: 15px; letter-spacing: -1px; text-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .hero-subtitle { font-size: 1.05rem; font-weight: 500; opacity: 0.95; margin-bottom: 40px; line-height: 1.6; text-shadow: 0 2px 8px rgba(0,0,0,0.4); }
 
@@ -139,6 +146,15 @@
         .slider-controls { display: flex; justify-content: center; gap: 15px; padding: 15px; background: #f8fafc; border-top: 1px solid #e5e7eb; }
         .slider-btn { background: #e2e8f0; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: 0.2s; font-size: 0.9rem; color: #334155; }
         .slider-btn:hover { background: #002878; color: white; }
+
+        /* =========================================
+           TAMBAHAN PENYESUAIAN KHUSUS HP
+        ========================================= */
+        @media screen and (max-width: 768px) {
+            .navbar { position: relative; flex-direction: column; gap: 15px; padding: 15px; } 
+            .hero-title { font-size: 1.8rem; margin-top: 15px; } 
+            .hero-subtitle { font-size: 0.95rem; margin-bottom: 25px; }
+        }
     </style>
 
     <link rel="stylesheet" href="css_dosen/index_mobile.css">
@@ -148,27 +164,35 @@
 
     <div class="main-wrapper">
         
-        <nav class="navbar">
+        <nav class="navbar header-dashboard">
             <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 40px; object-fit: contain; filter: brightness(0) invert(1);">
             
-            <div class="nav-right" id="navRightContainer">
-                <div class="user-chip">
-                    <i class="fas fa-user-circle" style="color: #ffc561;"></i> 
-                    <span id="dosenName">Dosen</span>
+            <div class="nav-right user-profile-info" id="navRightContainer">
+                
+                <button id="btnLogin" class="btn-login" onclick="window.location.href='../login/login.html'" style="display: none;">
+                    Log In <i class="fas fa-sign-in-alt"></i>
+                </button>
+
+                <div id="loggedInState" style="display: none; align-items: center; gap: 15px;">
+                    <div class="user-chip">
+                        <i class="fas fa-user-circle" style="color: #ffc561;"></i> 
+                        <span id="dosenName">Dosen</span>
+                    </div>
+                    <button class="btn-logout" onclick="logout()">Log Out</button>
                 </div>
-                <button class="btn-logout" onclick="logout()">Log Out</button>
+
             </div>
         </nav>
 
-        <div class="content-container">
+        <div class="content-container content-section">
             <h1 class="hero-title">Sistem Outcome Based Education</h1>
             <p class="hero-subtitle">
                 Platform automasi terpadu untuk mengelola Capaian Pembelajaran Lulusan (CPL), menyusun RPS, dan melakukan asesmen nilai mahasiswa secara real-time.
             </p>
 
-            <div class="action-list">
+            <div class="action-list action-buttons-container">
                 
-                <div class="action-btn" onclick="bukaTutorial()">
+                <div class="action-btn btn" onclick="bukaTutorial()">
                     <div class="action-icon icon-tutorial"><i class="fas fa-play"></i></div>
                     <div class="action-text">
                         <h4>Panduan Penggunaan</h4>
@@ -177,7 +201,7 @@
                     <i class="fas fa-chevron-right action-arrow"></i>
                 </div>
 
-                <div class="action-btn" onclick="window.location.href='input_nilai.html'">
+                <div class="action-btn btn" onclick="cekLoginDanMasuk()">
                     <div class="action-icon icon-input"><i class="fas fa-rocket"></i></div>
                     <div class="action-text">
                         <h4>Mulai Asesmen & RPS</h4>
@@ -192,7 +216,7 @@
     </div>
 
     <div id="modalTutorial" class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-content modal-content-box">
             <div class="modal-header">
                 <h3 style="margin:0; font-size: 1.1rem; color: #0f172a;"><i class="fas fa-info-circle" style="color: #f59e0b; margin-right: 8px;"></i> Tutorial Alur Asesmen</h3>
                 <button class="close-btn" onclick="tutupTutorial()"><i class="fas fa-times"></i></button>
@@ -215,37 +239,62 @@
 
     <script>
         // Set Data Login
-        const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
-        const userProdi = localStorage.getItem("prodi_aktif") || "ti";
+        const userLogin = localStorage.getItem("user_login");
+        const userProdi = localStorage.getItem("prodi_aktif");
         const userRoleSekarang = localStorage.getItem("user_role");
         
-        document.getElementById("dosenName").innerText = userLogin;
+        const btnLogin = document.getElementById("btnLogin");
+        const loggedInState = document.getElementById("loggedInState");
+        
+        // LOGIKA PENGECEKAN STATUS LOGIN SAAT HALAMAN DIBUKA
+        if (userLogin) {
+            // Jika SUDAH Login
+            btnLogin.style.display = "none";
+            loggedInState.style.display = "flex";
+            document.getElementById("dosenName").innerText = userLogin;
 
-        // Tombol Kembali ke Admin jika yg login adalah Kaprodi
-        if (userRoleSekarang === "admin") {
-            const navRightContainer = document.getElementById("navRightContainer");
-            const btnKembali = document.createElement("a");
-            
-            btnKembali.href = userProdi === "si" ? "../kaprodi/kaprodi_si/admin_config_si.html" : "../kaprodi/kaprodi_ti/admin_config.html";
-            btnKembali.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 6px;"></i> Kembali ke Admin';
-            
-            btnKembali.style.background = "#8b0000";
-            btnKembali.style.color = "white";
-            btnKembali.style.padding = "8px 16px";
-            btnKembali.style.borderRadius = "50px";
-            btnKembali.style.fontWeight = "bold";
-            btnKembali.style.textDecoration = "none";
-            btnKembali.style.fontSize = "0.9rem";
-            btnKembali.style.display = "flex";
-            btnKembali.style.alignItems = "center";
-            btnKembali.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
-            
-            navRightContainer.insertBefore(btnKembali, navRightContainer.firstChild);
+            // Memunculkan tombol Admin jika Kaprodi
+            if (userRoleSekarang === "admin") {
+                const btnKembali = document.createElement("a");
+                btnKembali.href = userProdi === "si" ? "../kaprodi/kaprodi_si/admin_config_si.html" : "../kaprodi/kaprodi_ti/admin_config.html";
+                btnKembali.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 4px;"></i> Admin';
+                
+                btnKembali.style.background = "#8b0000";
+                btnKembali.style.color = "white";
+                btnKembali.style.padding = "8px 16px";
+                btnKembali.style.borderRadius = "50px";
+                btnKembali.style.fontWeight = "bold";
+                btnKembali.style.textDecoration = "none";
+                btnKembali.style.fontSize = "0.9rem";
+                btnKembali.style.display = "flex";
+                btnKembali.style.alignItems = "center";
+                btnKembali.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
+                
+                loggedInState.insertBefore(btnKembali, loggedInState.firstChild);
+            }
+        } else {
+            // Jika BELUM Login
+            btnLogin.style.display = "flex";
+            loggedInState.style.display = "none";
         }
 
-        function logout() { localStorage.clear(); window.location.replace("../login/login.html"); }
+        // FUNGSI VALIDASI MENU "MULAI ASESMEN & RPS"
+        function cekLoginDanMasuk() {
+            if (userLogin) {
+                window.location.href = 'dosen/input_nilai.html';
+            } else {
+                alert("🔒 Silakan Log In terlebih dahulu untuk masuk ke panel asesmen!");
+                window.location.href = '../login/login.html';
+            }
+        }
 
-        // LOGIKA TUTORIAL SLIDER
+        // FUNGSI LOGOUT (Menghapus data dan refresh halaman landing page)
+        function logout() { 
+            localStorage.clear(); 
+            window.location.reload(); 
+        }
+
+        // LOGIKA TUTORIAL SLIDER (Tetap Utuh)
         const tutorialSteps = [
             { judul: "Langkah 1: Pilih Mata Kuliah", desc: "Masuk ke menu Input Nilai, dan pilih mata kuliah yang Anda ampu. Sistem akan otomatis menampilkan ketetapan Master Bobot dari Kaprodi." },
             { judul: "Langkah 2: Tentukan Bobot (100%)", desc: "Tentukan rencana asesmen Anda. Isi bobot untuk Tugas, Kuis, UTS, dan UAS. Pastikan total bobot yang Anda buat tepat 100%." },

@@ -172,3 +172,12 @@ styleDropdown.innerHTML = `
     .dropdown-item:hover { background-color: rgba(255,255,255,0.05); color: white; padding-left: 25px; }
 `;
 document.head.appendChild(styleDropdown);
+// Fungsi Pemicu Hamburger Menu
+function toggleMobileMenu() {
+    const navMenu = document.getElementById('navMenuContainer');
+    const overlay = document.getElementById('mobileOverlay');
+    
+    // Matikan atau nyalakan class 'active'
+    navMenu.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
