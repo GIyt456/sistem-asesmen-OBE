@@ -175,7 +175,7 @@
             const tableBody = document.getElementById('tabelMatkulDosen');
 
             try {
-                const N8N_URL = typeof API_BASE !== 'undefined' ? API_BASE : 'https://URL-N8N-ANDA.com/webhook';
+                const N8N_URL = typeof API_BASE !== 'undefined' ? API_BASE : 'https://n8n.obeyogabeta.net/webhook';
                 
                 // 3. API DINAMIS: Menarik data sesuai dengan Prodi yang login
                 let URL_API = `${N8N_URL}/get-matkul-portofolio?prodi=${userProdi}`;

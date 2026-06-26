@@ -886,7 +886,24 @@
 
             try {
                 const res = await fetch(API_GET_MASTER_BOBOT);
-                const allData = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(`Koneksi API Gagal. Status: ${res.status}`);
+                }
+
+                // --- ALGORITMA BARU: AMAN DARI JSON KOSONG ---
+                const rawText = await res.text();
+                let allData = [];
+                
+                if (rawText && rawText.trim() !== "") {
+                    allData = JSON.parse(rawText);
+                }
+                // ---------------------------------------------
+                
+                if (allData.data) allData = allData.data;
+                if (!Array.isArray(allData)) allData = [allData];
+                allData = allData.map(item => item.json ? item.json : item);
+
                 const dataMk = allData.filter(d => d.kode_mk === mkKode);
                 kaprodiQuotas = dataMk; 
 
@@ -921,7 +938,11 @@
                 tbody.innerHTML = html;
                 gTotal.innerText = totalSeluruh + "%";
                 gTotal.style.color = totalSeluruh === 100 ? "#16a34a" : "#dc2626";
-            } catch (e) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 20px; color: #ef4444;">Gagal memuat data.</td></tr>'; }
+                
+            } catch (e) { 
+                console.error("Error Master Bobot:", e);
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 20px; color: #ef4444;"><b>Gagal memuat data dari N8N.</b><br><small style="color:#64748b;">Pesan Error: ${e.message}</small></td></tr>`; 
+            }
         }
 
         async function inputManual() {
