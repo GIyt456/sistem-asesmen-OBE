@@ -249,16 +249,34 @@
             if(!kodeMk) { alert("Parameter Mata Kuliah tidak valid!"); return; }
             document.getElementById('titleMatkul').innerHTML = `PORTOFOLIO <span>${namaMk.toUpperCase()}</span>`;
 
-            // 1. IDENTITAS MATAKULIAH
+           // 1. IDENTITAS MATAKULIAH & EFEK TEMA BUNGLON
             const dataMatkul = await fetchSafeJSON(`${API_BASE}/get-matkul-detail?kode_mk=${kodeMk}`);
             if (dataMatkul.length > 0 && dataMatkul[0].kode_mk) {
                 const mk = dataMatkul[0];
+                const isSI = mk.prodi && mk.prodi.toLowerCase() === 'si';
+
                 document.getElementById('valNamaMk').innerText = mk.nama_mk || '-';
                 document.getElementById('valKodeMk').innerText = mk.kode_mk || '-';
                 document.getElementById('valSksMk').innerText = (mk.sks || '3') + ' SKS';
                 document.getElementById('valSemesterMk').innerText = mk.semester || 'Semester Ganjil';
-                document.getElementById('valProdiMk').innerText = (mk.prodi && mk.prodi.toLowerCase() === 'si') ? 'S1 Sistem Informasi' : 'Teknik Informatika';
-                document.getElementById('valDosenMk').innerText = mk.dosen_pengampu || 'Dosen Pengampu, M.Kom.';
+                document.getElementById('valDosenMk').innerText = mk.dosen_pengampu || localStorage.getItem("user_login") || 'Dosen Pengampu';
+
+                // Pasang Lencana Prodi & Ubah Tema Warna Secara Otomatis
+                if (isSI) {
+                    // Lencana Tosca SI
+                    document.getElementById('valProdiMk').innerHTML = '<span style="background:#ccfbf1; color:#0f766e; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:800; border: 1px solid #99f6e4;">S1 SISTEM INFORMASI</span>';
+                    
+                    // Ubah seluruh aksen warna halaman menjadi Tosca (SI)
+                    document.documentElement.style.setProperty('--primary-red', '#01626d'); 
+                    document.querySelector('.header-title p').innerHTML = "DOKUMEN PORTOFOLIO EVALUASI <span style='color:#01626d; font-weight:800;'>- SISTEM INFORMASI</span>";
+                } else {
+                    // Lencana Merah TI
+                    document.getElementById('valProdiMk').innerHTML = '<span style="background:#fee2e2; color:#991b1b; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:800; border: 1px solid #fecaca;">TEKNIK INFORMATIKA</span>';
+                    
+                    // Pertahankan aksen warna Merah (TI)
+                    document.documentElement.style.setProperty('--primary-red', '#8b0000');
+                    document.querySelector('.header-title p').innerHTML = "DOKUMEN PORTOFOLIO EVALUASI <span style='color:#8b0000; font-weight:800;'>- TEKNIK INFORMATIKA</span>";
+                }
             }
 
             // 1.5 CPL
@@ -296,38 +314,69 @@
                 });
             }
 
-            // 3. METODE PENILAIAN
-           // 3. METODE PENILAIAN
-            const dataPenilaian = await fetchSafeJSON(`${API_BASE}/get-metode-penilaian?kode_mk=${kodeMk}`);
+           // 3. METODE PENILAIAN (AGREGASI OTOMATIS DARI MASTER BOBOT)
+            const dataBobot = await fetchSafeJSON(`${API_BASE}/get-metode-penilaian?kode_mk=${kodeMk}`);
             const tbodyPenilaian = document.getElementById('tabelMetodePenilaian');
             tbodyPenilaian.innerHTML = "";
-            if (dataPenilaian.length > 0 && dataPenilaian[0].komponen) {
-                let totalBobotKeseluruhan = 0;
-                dataPenilaian.forEach(item => {
-                    let rawItem = item.json ? item.json : item;
-                    const persenBobot = rawItem.bobot ? parseFloat(rawItem.bobot) : 0;
-                    totalBobotKeseluruhan += persenBobot;
-                    let cleanCpmk = rawItem.cpmk ? [...new Set(rawItem.cpmk.split(',').map(str => str.trim()))].join(', ') : '-';
-                    
-                    tbodyPenilaian.innerHTML += `
-                        <tr>
-                            <td data-label="Komponen" style="font-weight: 500;">${rawItem.komponen || '-'}</td>
-                            <td data-label="Bobot (%)" style="text-align:center; font-weight:bold; color:var(--primary-red);">${persenBobot.toFixed(0)}%</td>
-                            <td data-label="CPMK Diukur" style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:12px; font-weight:700;">${cleanCpmk}</span></td>
-                            <td data-label="Instrumen" style="text-align:right;">${rawItem.instrumen || '-'}</td>
-                        </tr>`;
-                });
-                const isTotalValid = totalBobotKeseluruhan === 100;
-                tbodyPenilaian.innerHTML += `
-                    <tr style="background-color: #f8fafc; border-top: 2px solid #cbd5e1;">
-                        <td data-label="Keterangan" style="text-align: right; font-weight: 800; color: #1e293b;">TOTAL BOBOT:</td>
-                        <td data-label="Total %" style="text-align: center; font-weight: 800; font-size: 14px; color: ${isTotalValid ? '#166534' : '#ef4444'};"><span style="background: ${isTotalValid ? '#dcfce7' : '#fee2e2'}; padding: 4px 10px; border-radius: 6px;">${totalBobotKeseluruhan.toFixed(0)}%</span></td>
-                        <td data-label="Status" colspan="2" style="font-weight: 700; color: ${isTotalValid ? '#166534' : '#ef4444'}; font-size: 13px; text-align:right;">${isTotalValid ? '<i class="fas fa-check-circle"></i> Valid' : '<i class="fas fa-exclamation-triangle"></i> Tidak 100%'}</td>
-                    </tr>`;
-            } else {
-                tbodyPenilaian.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Belum ada data penilaian di database.</td></tr>";
-            }
+            
+            if (dataBobot.length > 0 && (dataBobot[0].kode_cpmk || dataBobot[0].tugas !== undefined)) {
+                // Siapkan wadah untuk menghitung total bobot per Komponen
+                let bTugas = 0, cTugas = [];
+                let bUts = 0, cUts = [];
+                let bUas = 0, cUas = [];
+                let bAtt = 0, cAtt = [];
+                let bHadir = 0, cHadir = [];
 
+                // Looping data dari database untuk digabungkan
+                dataBobot.forEach(item => {
+                    let r = item.json ? item.json : item;
+                    let cpmk = r.kode_cpmk || r.cpmk || '-';
+                    
+                    if(parseFloat(r.tugas) > 0) { bTugas += parseFloat(r.tugas); cTugas.push(cpmk); }
+                    if(parseFloat(r.uts) > 0) { bUts += parseFloat(r.uts); cUts.push(cpmk); }
+                    if(parseFloat(r.uas) > 0) { bUas += parseFloat(r.uas); cUas.push(cpmk); }
+                    if(parseFloat(r.attitude) > 0) { bAtt += parseFloat(r.attitude); cAtt.push(cpmk); }
+                    if(parseFloat(r.kehadiran) > 0) { bHadir += parseFloat(r.kehadiran); cHadir.push(cpmk); }
+                });
+
+                // Siapkan data untuk dicetak beserta Teks Instrumen Otomatis
+                const rekapPenilaian = [];
+                if(bTugas > 0) rekapPenilaian.push({ nama: "Tugas / Kuis", bobot: bTugas, cpmk: cTugas, instrumen: "Rubrik Penilaian Tugas / Lembar Kerja" });
+                if(bUts > 0) rekapPenilaian.push({ nama: "Ujian Tengah Semester (UTS)", bobot: bUts, cpmk: cUts, instrumen: "Soal Ujian Tertulis / Praktikum" });
+                if(bUas > 0) rekapPenilaian.push({ nama: "Ujian Akhir Semester (UAS)", bobot: bUas, cpmk: cUas, instrumen: "Soal Ujian Tertulis / Final Project" });
+                if(bAtt > 0) rekapPenilaian.push({ nama: "Sikap (Attitude)", bobot: bAtt, cpmk: cAtt, instrumen: "Lembar Observasi Perilaku & Partisipasi" });
+                if(bHadir > 0) rekapPenilaian.push({ nama: "Kehadiran (Presensi)", bobot: bHadir, cpmk: cHadir, instrumen: "Rekap Daftar Hadir Mahasiswa" });
+
+                let totalBobotKeseluruhan = 0;
+                
+                if (rekapPenilaian.length > 0) {
+                    rekapPenilaian.forEach(rp => {
+                        totalBobotKeseluruhan += rp.bobot;
+                        // Hapus duplikat nama CPMK agar rapi (misal: "CPMK1, CPMK1" menjadi "CPMK1")
+                        let cleanCpmk = [...new Set(rp.cpmk)].join(', '); 
+                        
+                        tbodyPenilaian.innerHTML += `
+                            <tr>
+                                <td data-label="Komponen" style="font-weight: 700; color:var(--text-dark);">${rp.nama}</td>
+                                <td data-label="Bobot (%)" style="text-align:center; font-weight:800; color:var(--primary-red);">${rp.bobot}%</td>
+                                <td data-label="CPMK Diukur" style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:12px; font-weight:700; color:#475569;">${cleanCpmk}</span></td>
+                                <td data-label="Instrumen" style="text-align:right; font-size:13px; color:#4b5563; font-weight:500;">${rp.instrumen}</td>
+                            </tr>`;
+                    });
+                    
+                    const isTotalValid = totalBobotKeseluruhan === 100;
+                    tbodyPenilaian.innerHTML += `
+                        <tr style="background-color: #f8fafc; border-top: 2px solid #cbd5e1;">
+                            <td data-label="Keterangan" style="text-align: right; font-weight: 800; color: #1e293b;">TOTAL BOBOT:</td>
+                            <td data-label="Total %" style="text-align: center; font-weight: 900; font-size: 14px; color: ${isTotalValid ? '#166534' : '#ef4444'};"><span style="background: ${isTotalValid ? '#dcfce7' : '#fee2e2'}; padding: 4px 10px; border-radius: 6px;">${totalBobotKeseluruhan}%</span></td>
+                            <td data-label="Status" colspan="2" style="font-weight: 700; color: ${isTotalValid ? '#166534' : '#ef4444'}; font-size: 13px; text-align:right;">${isTotalValid ? '<i class="fas fa-check-circle"></i> Valid (100%)' : '<i class="fas fa-exclamation-triangle"></i> Tidak 100%'}</td>
+                        </tr>`;
+                } else {
+                    tbodyPenilaian.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Bobot komponen bernilai 0 di database.</td></tr>";
+                }
+            } else {
+                tbodyPenilaian.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Belum ada pengaturan bobot (master_bobot) di database.</td></tr>";
+            }
             // 4. STATISTIK REKAP (DIAMBIL DARI API GET REPORT OBE)
             const tbodyRekapStats = document.getElementById('tabelRekapCapaianCpmk');
             tbodyRekapStats.innerHTML = "";
@@ -439,8 +488,9 @@
                 tbodyRekapStats.innerHTML = "<tr><td colspan='8' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Belum ada data CPMK di kurikulum.</td></tr>";
             }
 
-            // 5. EVALUASI LINTAS (FITUR EDIT AKTIF)
-            const dataLintas = await fetchSafeJSON(`${API_BASE}/get-evaluasi-lintas-kelas?kode_mk=${kodeMk}`);
+           // 5. EVALUASI LINTAS (KELAS PARALEL - FITUR EDIT AKTIF)
+            const userNidn = localStorage.getItem("user_nidn");
+            const dataLintas = await fetchSafeJSON(`${API_BASE}/get-evaluasi-lintas-kelas?kode_mk=${kodeMk}&nidn=${userNidn}`);
             const tbodyLintasKelas = document.getElementById('tabelEvaluasiLintasKelas');
             tbodyLintasKelas.innerHTML = "";
             
@@ -448,23 +498,21 @@
                 dataLintas.forEach((item, index) => {
                     let rawItem = item.json ? item.json : item;
                     let textProdi = (rawItem.prodi && rawItem.prodi.toUpperCase() === "TI") ? "Teknik Informatika" : "S1 Sistem Informasi";
-                    // Sedot catatan yang sudah ada di database (jika ada)
                     let catatanExisting = rawItem.catatan || ""; 
                     
                    tbodyLintasKelas.innerHTML += `
                         <tr data-kodemk="${rawItem.kode_mk}">
                             <td data-label="No" style="text-align:center; font-weight:700;">${index + 1}</td>
-                            <td data-label="Kelas / MK" style="text-align:right;"><strong style="color:var(--text-dark);">${rawItem.nama_mk}</strong><p style="font-size:11px; color:#64748b; margin-top:2px;">Kode: ${rawItem.kode_mk} (${textProdi})</p></td>
-                            <td data-label="Dosen" style="font-weight:600; color:#374151;">${rawItem.nama_dosen || 'Belum diplot'}</td>
+                            <td data-label="Kelas / MK" style="text-align:right;"><strong style="color:var(--text-dark);">${rawItem.nama_mk}</strong><p style="font-size:11px; color:#64748b; margin-top:2px;">ID Kelas Target: ${rawItem.kode_mk} (${textProdi})</p></td>
+                            <td data-label="Dosen" style="font-weight:600; color:#374151;">NIDN: ${rawItem.nama_dosen || 'Belum diplot'}</td>
                             <td data-label="CPMK" style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">${rawItem.daftar_cpmk || '-'}</span></td>
-                            <td data-label="Catatan Evaluasi"><textarea class="textarea-inline">${catatanExisting}</textarea></td>
+                            <td data-label="Catatan Evaluasi"><textarea class="textarea-inline" placeholder="Beri catatan ke kelas paralel ini...">${catatanExisting}</textarea></td>
                         </tr>`;
                 });
             } else {
-                tbodyLintasKelas.innerHTML = "<tr><td colspan='5' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Tidak ada relasi lintas kelas untuk mata kuliah ini.</td></tr>";
-                document.getElementById('btnSimpanLintas').disabled = true; // Matikan tombol jika kosong
+                tbodyLintasKelas.innerHTML = "<tr><td colspan='5' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Tidak ada kelas paralel dengan dosen berbeda untuk mata kuliah ini.</td></tr>";
+                document.getElementById('btnSimpanLintas').disabled = true;
             }
-
             // 6. CQI REKOMENDASI (FITUR EDIT AKTIF)
             const dataCqi = await fetchSafeJSON(`${API_BASE}/get-cqi?kode_mk=${kodeMk}`);
             const inputDosen = document.getElementById("areaRekomendasiDosen");
