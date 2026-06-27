@@ -75,6 +75,16 @@
         }
 
         @media screen and (max-width: 768px) {
+            /* Kunci layar agar tidak bisa di-scroll horizontal */
+            body, html { overflow-x: hidden; width: 100%; position: relative; }
+            
+            /* Kunci lebar Card dan Chart agar tidak meluber */
+            .card { width: 100%; max-width: 100%; overflow: hidden; box-sizing: border-box; }
+            .chart-wrapper { width: 100%; max-width: 100%; overflow: hidden; display: flex; justify-content: center; }
+            canvas { max-width: 100% !important; }
+            
+            /* Pastikan hanya bungkus tabelnya saja yang bisa di-scroll ke samping */
+            .table-wrapper { width: 100%; max-width: 100%; overflow-x: auto; }
             .grid-top { grid-template-columns: 1fr; gap: 15px; }
             .card { padding: 15px; }
             
@@ -131,11 +141,11 @@
             </div>
             
             <div class="nav-links" id="navLinksContainer">
-                <a href="jadwal_mengajar.html">Jadwal Mengajar</a>
-                <a href="input_nilai.html">Input Asesmen</a>
-                <a href="rps_dosen.html">Penyusunan RPS</a>
+                <a href="../dosen.jadwal_mengajar.html">Jadwal Mengajar</a>
+                <a href="../dosen/input_nilai.html">Input Asesmen</a>
+                <a href="../dosen/rps_dosen.html">Penyusunan RPS</a>
                 <a href="../kaprodi/laporan.html" class="active">Laporan OBE</a>
-                <a href="portofolio.html">Portofolio</a>
+                <a href="../dosen/portofolio.html">Portofolio</a>
             </div>
 
             <div class="nav-user" id="navRightContainer">
@@ -434,7 +444,7 @@
             const isMobile = window.innerWidth <= 768;
 
             window.myChart = new Chart(ctx, {
-                type: 'radar',
+                type: 'radar', /* KUNCI PERMANEN SEBAGAI RADAR/SPIDER CHART */
                 data: {
                     labels: labels,
                     datasets: [{
@@ -458,7 +468,7 @@
                     responsive: true, 
                     maintainAspectRatio: false, 
                     layout: {
-                        padding: isMobile ? 5 : 20 
+                        padding: isMobile ? 10 : 20 
                     },
                     scales: { 
                         r: { 
@@ -467,11 +477,11 @@
                             ticks: {
                                 stepSize: 20,
                                 backdropColor: 'transparent', 
-                                font: { size: isMobile ? 9 : 11 }
+                                font: { size: isMobile ? 8 : 11 }
                             },
                             pointLabels: {
                                 font: {
-                                    size: isMobile ? 10 : 12, 
+                                    size: isMobile ? 9 : 12, 
                                     family: "'Inter', sans-serif"
                                 }
                             }

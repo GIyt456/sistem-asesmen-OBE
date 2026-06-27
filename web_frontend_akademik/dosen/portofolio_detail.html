@@ -85,7 +85,9 @@
             .textarea-inline, .textarea-cqi { border: none !important; padding: 0 !important; background: transparent !important; resize: none; overflow: hidden; min-height: auto; }
             .table-striped tbody tr:nth-child(even) { background-color: transparent; }
         }
+        
     </style>
+    <link rel="stylesheet" href="css_dosen/index_mobile.css?v=9">
 </head>
 <body>
 
@@ -279,6 +281,7 @@
             }
 
             // 2. CPMK
+           // 2. CPMK
             const dataCpmk = await fetchSafeJSON(`${API_BASE}/get-matkul-cpmk?kode_mk=${kodeMk}`);
             const tableCpmk = document.getElementById('tabelCpmkDetail');
             tableCpmk.innerHTML = "";
@@ -289,11 +292,12 @@
                 dataCpmk.forEach((item, index) => {
                     let rawItem = item.json ? item.json : item;
                     let valKode = rawItem.kode_cpmk || rawItem.cpmk || '-';
-                    tableCpmk.innerHTML += `<tr><td style="text-align:center; font-weight:bold;">${index + 1}</td><td style="font-weight:700; color:var(--primary-red);">${valKode}</td><td>${rawItem.deskripsi || 'Tidak ada deskripsi.'}</td><td style="text-align:center; font-weight:bold;">${dummyBobotCpmk}%</td></tr>`;
+                    tableCpmk.innerHTML += `<tr><td data-label="No" style="text-align:center; font-weight:bold;">${index + 1}</td><td data-label="Kode CPMK" style="font-weight:700; color:var(--primary-red);">${valKode}</td><td data-label="Deskripsi" style="text-align:right;">${rawItem.deskripsi || 'Tidak ada deskripsi.'}</td><td data-label="Bobot (%)" style="text-align:center; font-weight:bold;">${dummyBobotCpmk}%</td></tr>`;
                 });
             }
 
             // 3. METODE PENILAIAN
+           // 3. METODE PENILAIAN
             const dataPenilaian = await fetchSafeJSON(`${API_BASE}/get-metode-penilaian?kode_mk=${kodeMk}`);
             const tbodyPenilaian = document.getElementById('tabelMetodePenilaian');
             tbodyPenilaian.innerHTML = "";
@@ -307,18 +311,18 @@
                     
                     tbodyPenilaian.innerHTML += `
                         <tr>
-                            <td style="font-weight: 500;">${rawItem.komponen || '-'}</td>
-                            <td style="text-align:center; font-weight:bold; color:var(--primary-red);">${persenBobot.toFixed(0)}%</td>
-                            <td style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:12px; font-weight:700;">${cleanCpmk}</span></td>
-                            <td>${rawItem.instrumen || '-'}</td>
+                            <td data-label="Komponen" style="font-weight: 500;">${rawItem.komponen || '-'}</td>
+                            <td data-label="Bobot (%)" style="text-align:center; font-weight:bold; color:var(--primary-red);">${persenBobot.toFixed(0)}%</td>
+                            <td data-label="CPMK Diukur" style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:12px; font-weight:700;">${cleanCpmk}</span></td>
+                            <td data-label="Instrumen" style="text-align:right;">${rawItem.instrumen || '-'}</td>
                         </tr>`;
                 });
                 const isTotalValid = totalBobotKeseluruhan === 100;
                 tbodyPenilaian.innerHTML += `
                     <tr style="background-color: #f8fafc; border-top: 2px solid #cbd5e1;">
-                        <td style="text-align: right; font-weight: 800; color: #1e293b;">TOTAL BOBOT:</td>
-                        <td style="text-align: center; font-weight: 800; font-size: 14px; color: ${isTotalValid ? '#166534' : '#ef4444'};"><span style="background: ${isTotalValid ? '#dcfce7' : '#fee2e2'}; padding: 4px 10px; border-radius: 6px;">${totalBobotKeseluruhan.toFixed(0)}%</span></td>
-                        <td colspan="2" style="font-weight: 700; color: ${isTotalValid ? '#166534' : '#ef4444'}; font-size: 13px;">${isTotalValid ? '<i class="fas fa-check-circle"></i> Valid' : '<i class="fas fa-exclamation-triangle"></i> Tidak 100%'}</td>
+                        <td data-label="Keterangan" style="text-align: right; font-weight: 800; color: #1e293b;">TOTAL BOBOT:</td>
+                        <td data-label="Total %" style="text-align: center; font-weight: 800; font-size: 14px; color: ${isTotalValid ? '#166534' : '#ef4444'};"><span style="background: ${isTotalValid ? '#dcfce7' : '#fee2e2'}; padding: 4px 10px; border-radius: 6px;">${totalBobotKeseluruhan.toFixed(0)}%</span></td>
+                        <td data-label="Status" colspan="2" style="font-weight: 700; color: ${isTotalValid ? '#166534' : '#ef4444'}; font-size: 13px; text-align:right;">${isTotalValid ? '<i class="fas fa-check-circle"></i> Valid' : '<i class="fas fa-exclamation-triangle"></i> Tidak 100%'}</td>
                     </tr>`;
             } else {
                 tbodyPenilaian.innerHTML = "<tr><td colspan='4' style='text-align:center; color:#ef4444; padding:15px;'><i class='fas fa-exclamation-circle'></i> Belum ada data penilaian di database.</td></tr>";
@@ -406,27 +410,27 @@
                             // Skenario jika dosen belum menginputkan nilai sama sekali
                             tbodyRekapStats.innerHTML += `
                                 <tr>
-                                    <td style="text-align:center;">${index + 1}</td>
-                                    <td style="font-weight:700; color:var(--primary-red);">${valKode}</td>
-                                    <td style="text-align:center; font-weight:600; color:#64748b;">Belum ada nilai</td>
-                                    <td style="text-align:center; font-weight:bold; color:#64748b;">0.00</td>
-                                    <td style="text-align:center; color:#64748b;">0.00</td>
-                                    <td style="text-align:center; color:#64748b;">0.00</td>
-                                    <td style="text-align:center; font-weight:600; color:#64748b;">0.00%</td>
-                                    <td style="text-align:center;"><span style="background:#f1f5f9; color:#64748b; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Data Kosong</span></td>
+                                    <td data-label="No" style="text-align:center;">${index + 1}</td>
+                                    <td data-label="Kode CPMK" style="font-weight:700; color:var(--primary-red);">${valKode}</td>
+                                    <td data-label="Bobot" style="text-align:center; font-weight:600; color:#64748b;">Belum ada nilai</td>
+                                    <td data-label="Rata-rata" style="text-align:center; font-weight:bold; color:#64748b;">0.00</td>
+                                    <td data-label="Min" style="text-align:center; color:#64748b;">0.00</td>
+                                    <td data-label="Max" style="text-align:center; color:#64748b;">0.00</td>
+                                    <td data-label="Lulus (%)" style="text-align:center; font-weight:600; color:#64748b;">0.00%</td>
+                                    <td data-label="Kategori" style="text-align:center;"><span style="background:#f1f5f9; color:#64748b; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Data Kosong</span></td>
                                 </tr>`;
                         } else {
                             // Skenario jika sudah ada data nilai
                             tbodyRekapStats.innerHTML += `
                                 <tr>
-                                    <td style="text-align:center;">${index + 1}</td>
-                                    <td style="font-weight:700; color:var(--primary-red);">${valKode}</td>
-                                    <td style="text-align:center; font-weight:600;">Max 100 (${score.bobotTotal.toFixed(0)}%)</td>
-                                    <td style="text-align:center; font-weight:bold; color:${score.avg < TARGET_PASS ? '#dc2626' : '#1f2937'};">${score.avg.toFixed(2)}</td>
-                                    <td style="text-align:center; color:#64748b;">${score.min.toFixed(2)}</td>
-                                    <td style="text-align:center; color:#64748b;">${score.max.toFixed(2)}</td>
-                                    <td style="text-align:center; font-weight:600;">${score.passPct.toFixed(2)}%</td>
-                                    <td style="text-align:center;">${score.avg >= TARGET_PASS ? '<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tercapai</span>' : '<span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tidak Tercapai</span>'}</td>
+                                    <td data-label="No" style="text-align:center;">${index + 1}</td>
+                                    <td data-label="Kode CPMK" style="font-weight:700; color:var(--primary-red);">${valKode}</td>
+                                    <td data-label="Bobot" style="text-align:center; font-weight:600;">Max 100 (${score.bobotTotal.toFixed(0)}%)</td>
+                                    <td data-label="Rata-rata" style="text-align:center; font-weight:bold; color:${score.avg < TARGET_PASS ? '#dc2626' : '#1f2937'};">${score.avg.toFixed(2)}</td>
+                                    <td data-label="Min" style="text-align:center; color:#64748b;">${score.min.toFixed(2)}</td>
+                                    <td data-label="Max" style="text-align:center; color:#64748b;">${score.max.toFixed(2)}</td>
+                                    <td data-label="Lulus (%)" style="text-align:center; font-weight:600;">${score.passPct.toFixed(2)}%</td>
+                                    <td data-label="Kategori" style="text-align:center;">${score.avg >= TARGET_PASS ? '<span style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tercapai</span>' : '<span style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">Tidak Tercapai</span>'}</td>
                                 </tr>`;
                         }
                     }
@@ -447,13 +451,13 @@
                     // Sedot catatan yang sudah ada di database (jika ada)
                     let catatanExisting = rawItem.catatan || ""; 
                     
-                    tbodyLintasKelas.innerHTML += `
+                   tbodyLintasKelas.innerHTML += `
                         <tr data-kodemk="${rawItem.kode_mk}">
-                            <td style="text-align:center; font-weight:700;">${index + 1}</td>
-                            <td><strong style="color:var(--text-dark);">${rawItem.nama_mk}</strong><p style="font-size:11px; color:#64748b; margin-top:2px;">Kode: ${rawItem.kode_mk} (${textProdi})</p></td>
-                            <td style="font-weight:600; color:#374151;">${rawItem.nama_dosen || 'Belum diplot'}</td>
-                            <td style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">${rawItem.daftar_cpmk || '-'}</span></td>
-                            <td><textarea class="textarea-inline">${catatanExisting}</textarea></td>
+                            <td data-label="No" style="text-align:center; font-weight:700;">${index + 1}</td>
+                            <td data-label="Kelas / MK" style="text-align:right;"><strong style="color:var(--text-dark);">${rawItem.nama_mk}</strong><p style="font-size:11px; color:#64748b; margin-top:2px;">Kode: ${rawItem.kode_mk} (${textProdi})</p></td>
+                            <td data-label="Dosen" style="font-weight:600; color:#374151;">${rawItem.nama_dosen || 'Belum diplot'}</td>
+                            <td data-label="CPMK" style="text-align:center;"><span style="background:#f1f5f9; padding:4px 8px; border-radius:4px; font-size:11px; font-weight:700;">${rawItem.daftar_cpmk || '-'}</span></td>
+                            <td data-label="Catatan Evaluasi"><textarea class="textarea-inline">${catatanExisting}</textarea></td>
                         </tr>`;
                 });
             } else {

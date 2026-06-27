@@ -269,7 +269,9 @@
             color: #64748b;
             font-style: italic;
         }
+        
     </style>
+    <link rel="stylesheet" href="css_dosen/index_mobile.css?v=13">
 </head>
 
 <body>
@@ -277,7 +279,7 @@
     <nav class="navbar">
         <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
             style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
-            onclick="window.location.href='index.html'">
+            onclick="window.location.href='../index.html'">
 
         <div class="nav-links">
             <a href="jadwal_mengajar.html">Jadwal Mengajar</a>
@@ -287,11 +289,34 @@
             <a href="portofolio.html">Portofolio</a>
         </div>
 
-        <div class="nav-user" id="navRightContainer">
-            <div class="user-chip">
-                <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i>
-                <span id="dosenName">Dosen</span>
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+
+        <div class="nav-menu-wrapper" id="navMenuWrapper">
+            
+            <div class="sidebar-header-mobile">
+                <p class="sidebar-brand">SISTEM <span>OBE</span></p>
+                <button class="close-menu-btn" onclick="toggleMenu()"><i class="fas fa-times"></i></button>
             </div>
+            
+            <div class="nav-links">
+                <a href="jadwal_mengajar.html" class="active">Jadwal Mengajar</a>
+                <a href="input_nilai.html">Input Asesmen</a>
+                <a href="rps_dosen.html">Penyusunan RPS</a>
+                <a href="../kaprodi/laporan.html">Laporan OBE</a>
+                <a href="portofolio.html">Portofolio</a>
+            </div>
+
+            <div class="nav-user" id="navRightContainer">
+                <div class="user-chip">
+                    <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i>
+                    <div class="user-text-mobile">
+                        <div class="user-label-hp" style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700; line-height: 1; display: none;">DOSEN PENGAMPU</div>
+                        <div id="dosenName" style="font-size: 0.95rem; font-weight: 800; margin-top: 2px; line-height: 1;">Dosen</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Log Out</button>
+            </div>
+            
         </div>
     </nav>
 
@@ -369,6 +394,36 @@
 
             await initDataSistem();
         };
+        // ==========================================
+        // TOMBOL ADMIN (KHUSUS KAPRODI)
+        // ==========================================
+        document.addEventListener("DOMContentLoaded", function () {
+            const role = localStorage.getItem("user_role");
+            const prodi = localStorage.getItem("prodi_aktif") || "ti";
+            
+            if (role === "admin") {
+                const navContainer = document.getElementById("navRightContainer");
+                const btnAdmin = document.createElement("a");
+                
+                btnAdmin.href = prodi === "si" ? "../kaprodi/kaprodi_si/admin_config_si.html" : "../kaprodi/kaprodi_ti/admin_config.html";
+                btnAdmin.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 6px;"></i> Admin';
+                
+                // Styling tombol
+                btnAdmin.style.background = "#8b0000";
+                btnAdmin.style.color = "white";
+                btnAdmin.style.padding = "8px 16px";
+                btnAdmin.style.borderRadius = "50px";
+                btnAdmin.style.fontWeight = "bold";
+                btnAdmin.style.textDecoration = "none";
+                btnAdmin.style.fontSize = "0.9rem";
+                btnAdmin.style.display = "flex";
+                btnAdmin.style.alignItems = "center";
+                btnAdmin.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
+                
+                // Sisipkan di atas nama profil
+                navContainer.insertBefore(btnAdmin, navContainer.firstChild);
+            }
+        });
 
         // ==========================================
         // FUNGSI UTAMA: KLONING IDENTIK LOGIKA "INPUT_NILAI.HTML"
@@ -640,6 +695,17 @@
 
             btn.innerHTML = '<i class="fas fa-save"></i> Simpan Penilaian';
             btn.disabled = false;
+        }
+        // ==========================================
+        // FUNGSI NAVIGASI MOBILE & LOGOUT
+        // ==========================================
+        function toggleMenu() {
+            document.getElementById('navMenuWrapper').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+        function logout() { 
+            localStorage.clear(); 
+            window.location.replace("../login/login.html"); 
         }
     </script>
 </body>

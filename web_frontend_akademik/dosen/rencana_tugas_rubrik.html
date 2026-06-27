@@ -185,65 +185,9 @@
         }
         .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
 
-        @media screen and (max-width: 768px) {
-            .navbar { padding: 15px 20px !important; justify-content: flex-start !important; }
-            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-            
-            .nav-menu-wrapper {
-                position: fixed; top: 0; left: -320px; width: 280px; height: 100vh;
-                background: var(--primary-navy); 
-                flex-direction: column; align-items: flex-start; justify-content: flex-start;
-                padding: 0; box-shadow: 10px 0 25px rgba(0,0,0,0.5); 
-                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                z-index: 1000; overflow-y: auto;
-                display: flex !important;
-            }
-            .nav-menu-wrapper.active { left: 0; }
-
-            .sidebar-header-mobile { 
-                display: flex; justify-content: space-between; align-items: center; 
-                width: 100%; padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); 
-            }
-            .sidebar-brand { font-size: 1.3rem; font-weight: 900; color: white; margin: 0;}
-            .sidebar-brand span { color: #ffc561; }
-            
-            .close-menu-btn { 
-                display: flex; align-items: center; justify-content: center;
-                background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5; 
-                width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; transition: 0.2s;
-            }
-            .close-menu-btn:hover { background: rgba(239, 68, 68, 0.5); color: white; }
-
-            .nav-links { flex-direction: column; gap: 8px; width: 100%; padding: 20px; align-items: flex-start; display: flex !important; }
-            .nav-links a { 
-                color: #cbd5e1; width: 100%; padding: 14px 16px; border-radius: 10px; border: none; 
-                font-weight: 600; font-size: 0.95rem; transition: 0.2s; margin-bottom: 5px; background: transparent;
-                display: block;
-            }
-            
-            .nav-links a.active { 
-                background: rgba(255, 255, 255, 0.1); color: white; 
-                border-left: 4px solid #ffc561; border-radius: 0 10px 10px 0; font-weight: 800; border-bottom: none;
-            }
-            .nav-links a:hover:not(.active) { background: rgba(255,255,255,0.05); color: white; opacity: 1; }
-
-            .nav-user { 
-                flex-direction: column; width: 100%; padding: 20px; 
-                margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); 
-                justify-content: center !important;
-            }
-            .user-chip { 
-                width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-                color: white; padding: 12px 16px; border-radius: 10px; 
-                justify-content: flex-start; margin-bottom: 12px; gap: 12px;
-            }
-            .user-chip i { color: #ffc561 !important; font-size: 1.8rem; }
-            .btn-logout { width: 100%; padding: 12px 24px; }
-
-            .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
-            .mobile-overlay.active { display: block; }
-        }
+        
     </style>
+    <link rel="stylesheet" href="css_dosen/index_mobile.css?v=12">
 </head>
 <body>
 
@@ -252,7 +196,7 @@
             <button class="hamburger-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
             <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
                 style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
-                onclick="window.location.href='index.html'">
+                onclick="window.location.href='../index.html'">
         </div>
 
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>

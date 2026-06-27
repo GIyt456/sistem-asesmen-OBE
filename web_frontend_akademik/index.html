@@ -157,7 +157,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="css_dosen/index_mobile.css">
+    <link rel="stylesheet" href="../css_dosen/index_mobile.css">
 
 </head>
 <body>
@@ -290,8 +290,10 @@
 
         // FUNGSI LOGOUT (Menghapus data dan refresh halaman landing page)
         function logout() { 
-            localStorage.clear(); 
-            window.location.reload(); 
+            if (confirm("Apakah Anda yakin ingin keluar?")) {
+                localStorage.clear(); 
+                window.location.replace("../index.html"); 
+            }
         }
 
         // LOGIKA TUTORIAL SLIDER (Tetap Utuh)

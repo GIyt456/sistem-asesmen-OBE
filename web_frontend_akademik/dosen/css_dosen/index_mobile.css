@@ -1,21 +1,60 @@
 /* ========================================================================
+   KODE GLOBAL DESKTOP (BERLAKU UNTUK SEMUA HALAMAN)
+   ======================================================================== */
+.sidebar {
+    position: sticky;
+    top: 0; 
+    height: 100vh; 
+    overflow-y: auto; 
+}
+.hamburger-btn, .close-menu-btn, .mobile-overlay, .sidebar-header-mobile, .user-label-hp { 
+    display: none !important; 
+}
+
+/* RAPIKAN SUSUNAN MENU DI LAYAR LAPTOP AGAR TIDAK MENGUMPUL */
+.nav-menu-wrapper { 
+    display: flex; 
+    align-items: center; 
+    justify-content: flex-end; 
+    gap: 40px; 
+    flex: 1; 
+}
+.nav-links { display: flex; gap: 30px; align-items: center; }
+.nav-user { display: flex; flex-direction: row; align-items: center; gap: 16px; }
+/* STANDARISASI TOMBOL PROFIL & LOGOUT GLOBAL */
+.user-chip {
+    background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 50px; 
+    display: flex; align-items: center; gap: 8px; color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-logout {
+    background: #8b0000; color: white; padding: 8px 24px; border-radius: 50px; 
+    border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s;
+}
+
+.btn-logout:hover { 
+    background: #b91c1c; transform: translateY(-2px); 
+}
+
+/* ========================================================================
    FILE CSS KHUSUS RESPONSIVITAS MOBILE & TABLET (MAKSIMAL LEBAR 768px)
    ======================================================================== */
-
 @media screen and (max-width: 768px) {
     
-    /* 1. BUKA GEMBOK SCROLL YANG DIKUNCI OLEH DESKTOP */
+    /* 1. BUKA GEMBOK SCROLL & HAPUS PADDING BODY (SOLUSI JARAK PUTIH) */
     body, html {
         height: auto !important;
         min-height: 100vh !important;
-        overflow-y: auto !important; /* Izinkan scroll ke bawah */
+        overflow-y: auto !important; 
         overflow-x: hidden !important;
+        padding: 0 !important; /* Menghapus celah putih di luar layar */
+        margin: 0 !important;
     }
 
     /* 2. BONGKAR LAYOUT UTAMA */
     .main-wrapper {
         display: flex !important;
-        flex-direction: column !important; /* Susun dari atas ke bawah */
+        flex-direction: column !important; 
         height: auto !important;
         min-height: 100vh !important;
         overflow-y: auto !important;
@@ -36,15 +75,14 @@
         flex-direction: row !important;
         justify-content: space-between !important;
         align-items: flex-start !important;
-        /* Ubah padding di sini agar mentok atas dan kiri */
         padding: 12px 15px !important; 
         gap: 10px !important;
         width: 100% !important;
     }
 
     .header-dashboard img {
-        height: 28px !important; /* Dikecilkan sedikit lagi supaya proporsional */
-        margin-top: 0 !important; /* Pastikan tidak ada margin atas tambahan */
+        height: 28px !important; 
+        margin-top: 0 !important; 
     }
 
     .user-profile-info {
@@ -53,21 +91,20 @@
         flex-direction: row !important;
         justify-content: flex-end !important;
         flex-wrap: wrap !important; 
-        gap: 6px !important; /* Jarak antar tombol dirapatkan sedikit */
+        gap: 6px !important; 
     }
 
-    /* Penyesuaian agar nama yang panjang bisa dipotong otomatis (opsional tapi disarankan) */
     .user-profile-info .user-chip {
         max-width: 140px !important;
         white-space: nowrap !important;
         overflow: hidden !important;
-        text-overflow: ellipsis !important; /* Memunculkan '...' jika nama terlalu panjang */
+        text-overflow: ellipsis !important; 
     }
 
     .user-profile-info .user-chip,
     .user-profile-info .btn-logout,
     .user-profile-info a {
-        font-size: 0.75rem !important; /* Dikecilkan sedikit lagi */
+        font-size: 0.75rem !important; 
         padding: 6px 10px !important;
         margin: 0 !important;
     }
@@ -76,7 +113,7 @@
     .grid-menu-container,
     .cards-grid {
         display: grid !important;
-        grid-template-columns: 1fr !important; /* Paksa jadi 1 kolom! */
+        grid-template-columns: 1fr !important; 
         gap: 15px !important;
         width: 100% !important;
     }
@@ -121,5 +158,427 @@
         object-fit: cover !important;
         z-index: -1 !important;
     }
-   
-}
+
+    /* ========================================================================
+       9. KHUSUS HALAMAN PORTOFOLIO DETAIL
+       ======================================================================== */
+    .header-container { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .header-title h1 { font-size: 20px; }
+    .header-container > div:last-child { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+    .btn-back { width: 100%; justify-content: center; }
+
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-details { grid-template-columns: 1fr; gap: 4px; }
+    .grid-details .label { margin-top: 10px; font-size: 12px; }
+    .grid-details .value { font-size: 14px; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9; }
+    
+    .card-custom table, .card-custom thead, .card-custom tbody, .card-custom th, .card-custom td, .card-custom tr { display: block; width: 100%; }
+    .card-custom thead { position: absolute; top: -9999px; left: -9999px; } 
+    .card-custom tr { background: white; border: 1px solid var(--border-light); border-radius: 12px; margin-bottom: 20px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .table-striped tbody tr:nth-child(even) { background-color: white; } 
+    .card-custom td { display: flex; justify-content: space-between; align-items: flex-start; text-align: right; border: none; border-bottom: 1px dashed #e2e8f0; padding: 12px 0; }
+    .card-custom td:last-child { border-bottom: none; }
+    .card-custom td::before { content: attr(data-label); font-weight: 700; color: #64748b; font-size: 12px; text-align: left; flex-basis: 40%; margin-right: 15px; }
+    
+    .textarea-inline { margin-top: 5px; width: 100%; text-align: left; }
+    td[data-label="Catatan Evaluasi"] { flex-direction: column; align-items: stretch; text-align: left; }
+    td[data-label="Catatan Evaluasi"]::before { margin-bottom: 10px; }
+
+    /* =========================================
+       10. KHUSUS UNTUK HALAMAN PORTOFOLIO.HTML
+    ========================================= */
+    .main-content { padding: 25px 20px; }
+    
+    .main-content table, .main-content thead, .main-content tbody, .main-content th, .main-content td, .main-content tr { display: block; width: 100%; }
+    .main-content thead { position: absolute; top: -9999px; left: -9999px; } 
+    .main-content tr { background: white; border: 1px solid var(--border-light); border-radius: 12px; margin-bottom: 20px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .main-content td { display: flex; justify-content: space-between; align-items: center; border: none; border-bottom: 1px solid #f1f5f9; padding: 12px 0; text-align: right; }
+    .main-content td:last-child { border-bottom: none; padding-bottom: 0; margin-top: 5px; justify-content: center; }
+    .main-content td:last-child::before { display: none; }
+    .main-content td::before { content: attr(data-label); font-weight: 700; color: #64748b; font-size: 0.85rem; text-align: left; flex-basis: 40%; }
+    
+    .btn-detail { width: 100%; justify-content: center; padding: 12px; }
+    td[data-label="Nama MK"] { text-align: right; line-height: 1.4; }
+    
+    .pagination-container { flex-direction: column; gap: 15px; align-items: center; }
+    .pagination-info { text-align: center; }
+    .pagination-buttons { flex-wrap: wrap; justify-content: center; }
+
+    /* ========================================================================
+       11. KHUSUS HALAMAN INPUT NILAI & NAVBAR MOBILE
+       ======================================================================== */
+    .navbar { padding: 15px 20px !important; }
+    .hamburger-btn { display: block !important; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+    
+    .nav-menu-wrapper {
+        position: fixed; top: 0; left: -320px; width: 280px; height: 100vh;
+        background: var(--primary-navy); flex-direction: column; align-items: flex-start; justify-content: flex-start;
+        padding: 0; box-shadow: 10px 0 25px rgba(0,0,0,0.5); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; overflow-y: auto;
+    }
+    .nav-menu-wrapper.active { left: 0; }
+
+    .sidebar-header-mobile { display: flex !important; justify-content: space-between; align-items: center; width: 100%; padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-brand { font-size: 1.3rem; font-weight: 900; color: white; margin: 0;}
+    .sidebar-brand span { color: #ffc561; }
+    
+    .close-menu-btn { display: flex !important; align-items: center; justify-content: center; background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+    .close-menu-btn:hover { background: rgba(239, 68, 68, 0.5); color: white; }
+
+    .nav-links { flex-direction: column; gap: 8px; width: 100%; padding: 20px; align-items: flex-start;}
+    .nav-links a { color: #cbd5e1; width: 100%; padding: 14px 16px; border-radius: 10px; border: none; font-weight: 600; font-size: 0.95rem; margin-bottom: 5px; background: transparent; }
+    .nav-links a.active { background: rgba(255, 255, 255, 0.1); color: white; border-left: 4px solid #ffc561; border-radius: 0 10px 10px 0; font-weight: 800; border-bottom: none; }
+    .nav-links a:hover:not(.active) { background: rgba(255,255,255,0.05); color: white; opacity: 1; }
+
+    .nav-user { flex-direction: column; width: 100%; padding: 20px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); }
+    .user-chip { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px 16px; border-radius: 10px; justify-content: flex-start; margin-bottom: 12px; gap: 12px; }
+    .user-chip i { color: #ffc561 !important; font-size: 1.8rem; }
+    .btn-logout { width: 100%; }
+
+    .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
+    .mobile-overlay.active { display: block; }
+
+    /* B. KONTEN & TABEL INPUT NILAI */
+    .container { margin-top: 20px !important; padding: 0 15px !important; }
+    .container > div:first-child { flex-direction: column !important; align-items: flex-start !important; gap: 15px; }
+    .container > div:first-child .btn-action { width: 100%; justify-content: center; }
+    
+    #card-bobot > div:nth-child(3) { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+    .select-mk { width: 100% !important; }
+    /* =========================================
+       SULAP TABEL INPUT NILAI MENJADI KARTU 
+       ========================================= */
+    /* 1. Ubah bungkus tabel menjadi blok (Perhatikan: 'td' dihapus dari sini agar tidak bentrok) */
+    #masterBobotTable, #masterBobotTable thead, #masterBobotTable tbody, #masterBobotTable th, #masterBobotTable tr,
+    #configTable, #configTable thead, #configTable tbody, #configTable th, #configTable tr { 
+        display: block !important; width: 100% !important; 
+    }
+    
+    /* 2. Sembunyikan Header bawaan */
+    #masterBobotTable thead, #configTable thead { position: absolute; top: -9999px; left: -9999px; }
+    
+    /* 3. Bentuk kartu */
+    #masterBobotTable tr, #configTable tr { 
+        border: 1px solid #cbd5e1 !important; border-radius: 12px !important; 
+        margin-bottom: 20px !important; padding: 10px !important; 
+        background: white !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; 
+    }
+    
+    /* 4. Atur sel sebagai Flexbox */
+    #masterBobotTable td, #configTable td { 
+        display: flex !important; justify-content: space-between !important; 
+        align-items: center !important; text-align: right !important; 
+        padding: 12px 10px !important; border: none !important; 
+        border-bottom: 1px solid #f1f5f9 !important; width: 100% !important;
+    }
+    #masterBobotTable td:last-child, #configTable td:last-child { border-bottom: none !important; }
+    
+    /* 5. KUNCI LABEL ANTI-MENGKERUT (Ini Solusi Utamanya!) */
+    #masterBobotTable td::before, #configTable td::before { 
+        content: attr(data-label); 
+        font-weight: 700; color: #64748b; text-align: left; font-size: 0.85rem; 
+        flex-basis: 40% !important; 
+        min-width: 40% !important; /* Paksa label meminta jatah minimal 40% layar */
+        flex-shrink: 0 !important; /* Haramkan label untuk mengecil */
+        display: block !important;
+    }
+    
+    /* 6. PAKSA FORM INPUT MENGALAH DAN MENGECIL */
+    #configTable select, #configTable input { 
+        width: 55% !important; 
+        max-width: 55% !important; 
+        min-width: 0 !important; /* Izinkan form mengecil menembus batas bawaannya */
+        flex-shrink: 1 !important; /* Paksa form mengalah */
+        text-align: right; 
+    }
+    
+    #card-master-bobot > div, #configTable { overflow-x: visible !important; }
+
+    #card-upload > div:first-child { flex-direction: column !important; align-items: flex-start !important; gap: 20px; }
+    #card-upload > div:first-child > div { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+    #card-upload .btn-action, #labelUpload { width: 100% !important; justify-content: center !important; margin: 0 !important; }
+    #area-simpan { flex-direction: column !important; gap: 12px; }
+    #area-simpan button { width: 100%; justify-content: center; }
+
+    #studentHead th:first-child, #studentBody td:first-child { position: static !important; box-shadow: none !important; }
+    #studentHead th:nth-child(2), #studentBody td:nth-child(2) { left: 0 !important; max-width: 140px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; border-right: 2px solid #e5e7eb !important; }
+
+    /* ========================================================================
+       12. KHUSUS HALAMAN PENYUSUNAN RPS DOSEN
+       ======================================================================== */
+    .header-section { flex-direction: column !important; align-items: flex-start !important; gap: 15px; }
+    .header-section > div:last-child { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+    .header-section button { width: 100%; justify-content: center; }
+    .grid-2-col { grid-template-columns: 1fr !important; gap: 20px !important; }
+
+    .tabs-header { overflow-x: auto !important; white-space: nowrap !important; -webkit-overflow-scrolling: touch !important; }
+
+    #tabelDaftarRPS, #tabelDaftarRPS thead, #tabelDaftarRPS tbody, #tabelDaftarRPS th, #tabelDaftarRPS td, #tabelDaftarRPS tr { display: block !important; width: 100% !important; }
+    #tabelDaftarRPS thead { position: absolute; top: -9999px; left: -9999px; }
+    #tabelDaftarRPS tr { border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; padding: 10px !important; background: white !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; }
+    #tabelDaftarRPS td { display: flex !important; justify-content: space-between !important; align-items: center !important; text-align: right !important; padding: 12px 10px !important; border: none !important; border-bottom: 1px solid #f1f5f9 !important; }
+    #tabelDaftarRPS td:last-child { border-bottom: none !important; flex-direction: column; align-items: stretch !important; gap: 10px; margin-top: 10px; }
+    
+    #tabelDaftarRPS td::before { font-weight: 700; color: #64748b; text-align: left; font-size: 0.85rem; flex-basis: 40%; }
+    #tabelDaftarRPS td:nth-child(2)::before { content: "Semester"; }
+    #tabelDaftarRPS td:nth-child(3)::before { content: "Tim Dosen"; }
+    #tabelDaftarRPS td:nth-child(4)::before { content: "Status"; }
+    #tabelDaftarRPS td:nth-child(5)::before { content: "Catatan"; }
+    #tabelDaftarRPS td:nth-child(1) { flex-direction: column !important; align-items: flex-start !important; text-align: left !important; background: #f8fafc !important; border-radius: 8px !important; }
+    #tabelDaftarRPS td:nth-child(1)::before { content: ""; display: none; }
+    
+    .btn-dropdown-wrapper { display: block; width: 100%; }
+    .btn-opsi { width: 100%; justify-content: center; }
+    .dropdown-menu { width: 100%; text-align: center !important; }
+
+    #tab-sesi .table-sesi, #tab-sesi .table-sesi thead, #tab-sesi .table-sesi tbody, #tab-sesi .table-sesi tr, #tab-sesi .table-sesi td { display: block !important; width: 100% !important; }
+    #tab-sesi .table-sesi thead { position: absolute; top: -9999px; left: -9999px; }
+    #tab-sesi .table-sesi tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 25px !important; padding: 15px !important; box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important; }
+    #tab-sesi .table-sesi td { border: none !important; padding: 10px 0 !important; border-bottom: 1px solid #f1f5f9 !important; position: static !important; text-align: left !important; box-shadow: none !important; }
+    #tab-sesi .table-sesi td:last-child { border-bottom: none !important; }
+    
+    #tab-sesi .table-sesi td::before { display: block; font-weight: 700; color: #64748b; font-size: 0.85rem; margin-bottom: 8px; }
+    #tab-sesi .table-sesi td:nth-child(1)::before { content: "Minggu Ke-"; }
+    #tab-sesi .table-sesi td:nth-child(2)::before { content: "ID CPMK"; }
+    #tab-sesi .table-sesi td:nth-child(3)::before { content: "Deskripsi CPMK"; }
+    #tab-sesi .table-sesi td:nth-child(4)::before { content: "Indikator"; }
+    #tab-sesi .table-sesi td:nth-child(5)::before { content: "Bentuk Assessmen"; }
+    #tab-sesi .table-sesi td:nth-child(6)::before { content: "Materi Pokok"; }
+    #tab-sesi .table-sesi td:nth-child(7)::before { content: "Metode"; }
+    #tab-sesi .table-sesi td:nth-child(8)::before { content: "Luring"; }
+    #tab-sesi .table-sesi td:nth-child(9)::before { content: "Daring"; }
+    
+    #tab-sesi .table-sesi td:nth-child(1) { background: var(--primary-navy) !important; color: white !important; border-radius: 8px; padding: 15px !important; margin-bottom: 15px !important; font-size: 1.2rem !important; }
+    #tab-sesi .table-sesi td:nth-child(1)::before { color: #94a3b8; font-size: 0.8rem; }
+    .row-ujian td:nth-child(1) { background: var(--primary-red) !important; }
+
+    #tab-penilaian .table-sesi, #tab-penilaian .table-sesi thead, #tab-penilaian .table-sesi tbody, #tab-penilaian .table-sesi tr, #tab-penilaian .table-sesi td { display: block !important; width: 100% !important; }
+    #tab-penilaian .table-sesi thead { position: absolute; top: -9999px; left: -9999px; }
+    #tab-penilaian .table-sesi tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 15px !important; padding: 10px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; }
+    #tab-penilaian .table-sesi td { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 10px !important; border: none !important; border-bottom: 1px solid #f1f5f9 !important; }
+    
+    #tab-penilaian .table-sesi td::before { font-weight: 700; color: #64748b; text-align: left; font-size: 0.85rem; flex-basis: 40%; }
+    #tab-penilaian .table-sesi td:nth-child(1)::before { content: "CPL"; }
+    #tab-penilaian .table-sesi td:nth-child(2)::before { content: "ID CPMK"; }
+    #tab-penilaian .table-sesi td:nth-child(3)::before { content: "TUGAS (%)"; }
+    #tab-penilaian .table-sesi td:nth-child(4)::before { content: "UTS (%)"; }
+    #tab-penilaian .table-sesi td:nth-child(5)::before { content: "UAS (%)"; }
+    #tab-penilaian .table-sesi td:nth-child(6)::before { content: "ATTITUDE (%)"; }
+    #tab-penilaian .table-sesi td:nth-child(7)::before { content: "KEHADIRAN (%)"; }
+    #tab-penilaian .table-sesi td:nth-child(8)::before { content: "TOTAL"; }
+
+    /* ========================================================================
+       13. KHUSUS FOOTER GLOBAL
+       ======================================================================== */
+    .footer { 
+        padding: 40px 20px 20px 20px !important; 
+        margin-top: 30px !important; 
+    }
+    
+    .footer-grid { 
+        grid-template-columns: 1fr !important; 
+        gap: 30px !important; 
+        margin-bottom: 25px !important; 
+        padding-bottom: 25px !important; 
+    }
+
+    .footer > div:last-child {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 12px !important;
+    }
+    /* ========================================================================
+       14. JURUS PAMUNGKAS NAVBAR MELAYANG (FIXED) DI HP
+       ======================================================================== */
+    /* Kunci navbar (yang berisi tombol hamburger) agar selalu melayang di atas */
+    .navbar { 
+        position: fixed !important; 
+        top: 0 !important; 
+        left: 0 !important; 
+        width: 100% !important; 
+        z-index: 990 !important; /* 990 agar tertutup rapi saat sidebar dibuka */
+    }
+    
+    /* Dorong konten utama ke bawah agar tidak tertindih oleh navbar melayang */
+    /* Trik '~' memastikan halaman yang tidak punya navbar (seperti portofolio detail) tidak ikut terdorong */
+    .navbar ~ .container, 
+    .navbar ~ main,
+    .navbar ~ .main-content {
+        padding-top: 80px !important;
+    }
+    /* ========================================================================
+       15. KHUSUS HALAMAN JADWAL MENGAJAR
+       ======================================================================== */
+    /* Header & Search Bar */
+    .table-controls { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .search-box, .search-box input { width: 100%; }
+
+    /* Sulap Tabel Jadwal Menjadi Kartu */
+    .figma-card table, .figma-card thead, .figma-card tbody, 
+    .figma-card th, .figma-card td, .figma-card tr { display: block !important; width: 100% !important; }
+    .figma-card thead { position: absolute; top: -9999px; left: -9999px; } 
+    
+    .figma-card tbody tr {
+        border: 1px solid #cbd5e1 !important; border-radius: 12px !important;
+        margin-bottom: 20px !important; padding: 10px !important;
+        background: white !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+    }
+    
+    .figma-card tbody td {
+        display: flex !important; justify-content: space-between !important;
+        align-items: center !important; text-align: right !important;
+        padding: 12px 10px !important; border: none !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+    }
+    .figma-card tbody td:last-child { border-bottom: none !important; }
+    
+    .figma-card tbody td::before { font-weight: 700; color: #64748b; text-align: left; font-size: 0.85rem; flex-basis: 40%; }
+    .figma-card tbody td:nth-child(1)::before { content: "Tahun Akademik"; }
+    .figma-card tbody td:nth-child(2)::before { content: "Mata Kuliah"; }
+    .figma-card tbody td:nth-child(3)::before { content: "ID Kelas"; }
+    .figma-card tbody td:nth-child(4)::before { content: "Semester"; }
+    .figma-card tbody td:nth-child(5)::before { content: "SKS"; }
+    .figma-card tbody td:nth-child(6)::before { content: "Opsi"; display: none; } 
+    
+    .figma-card tbody td:nth-child(2) { flex-direction: column; align-items: flex-start !important; text-align: left !important; }
+    .figma-card tbody td:nth-child(6) { flex-direction: column; align-items: stretch !important; gap: 10px; margin-top: 10px; }
+
+    /* Tombol Aksi */
+    .action-cell { flex-direction: column; width: 100%; gap: 10px; }
+    .btn-detail, .btn-penilaian { width: 100%; justify-content: center; padding: 12px; }
+    .btn-dropdown-wrapper { width: 100%; }
+    .dropdown-menu { width: 100%; text-align: center; }
+
+    /* Modal Detail Mengajar */
+    .modal-box { max-height: 90vh !important; display: flex !important; flex-direction: column !important; }
+    .modal-body { grid-template-columns: 1fr; gap: 15px; padding: 20px 15px; overflow-y: auto !important; }
+    .detail-grid { grid-template-columns: 1fr; gap: 8px; }
+    .detail-label { margin-top: 8px; color: var(--primary-navy); }
+    .modal-footer { padding: 15px !important; justify-content: center !important; }
+    .modal-footer button { width: 100%; padding: 12px !important; }
+
+        /* ========================================================================
+       16. KHUSUS HALAMAN RENCANA TUGAS & RUBRIK
+       ======================================================================== */
+    /* Rapikan Header & Tombol Atas */
+    .container > div:first-child > div:last-child { width: 100%; flex-direction: column; }
+    
+    /* Ubah Form 3 Kolom Menjadi 1 Kolom */
+    div[style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr !important; gap: 15px !important; }
+
+    /* Sembunyikan Header Tabel Rubrik */
+    .grid-header-row { display: none !important; }
+
+    /* Sulap Baris Rubrik Jadi Kartu */
+    .rubric-grid { 
+        display: flex !important; flex-direction: column !important; gap: 15px !important; 
+        background: white !important; padding: 20px !important; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important; border: 2px solid #e2e8f0 !important; 
+    }
+
+    /* Munculkan Label Judul di Atas Tiap Input */
+    .rubric-grid > div { display: flex; flex-direction: column; }
+    .rubric-grid > div::before { 
+        font-weight: 800; color: var(--primary-navy); font-size: 0.85rem; 
+        margin-bottom: 8px; text-transform: uppercase; 
+    }
+    
+    .rubric-grid > div:nth-child(1)::before { content: "Kriteria Penilaian"; }
+    .rubric-grid > div:nth-child(2)::before { content: "Bobot (%)"; }
+    .rubric-grid > div:nth-child(3)::before { content: "Skala 1 (Kurang: < 55)"; }
+    .rubric-grid > div:nth-child(4)::before { content: "Skala 2 (Cukup: 56-69)"; }
+    .rubric-grid > div:nth-child(5)::before { content: "Skala 3 (Baik: 70-84)"; }
+    .rubric-grid > div:nth-child(6)::before { content: "Skala 4 (Sangat Baik: 85-100)"; }
+    
+    /* Percantik Tombol Hapus Kriteria */
+    .rubric-grid > div:nth-child(7)::before { content: ""; display: none; }
+    .rubric-grid > div:nth-child(7) { margin-top: 10px; padding-top: 15px; border-top: 2px dashed #e2e8f0; }
+    .rubric-grid > div:nth-child(7) button { 
+        width: 100%; background: #fef2f2 !important; border: 1px solid #fecaca !important; 
+        border-radius: 8px; padding: 12px; color: #ef4444 !important; font-size: 0.95rem !important; 
+        display: flex; justify-content: center; align-items: center; gap: 8px; 
+    }
+    .rubric-grid > div:nth-child(7) button::after { content: "Hapus Kriteria Ini"; font-family: 'Inter', sans-serif; font-weight: 700; }
+
+    /* Kartu Draft Sementara */
+    #draftContainer > div { flex-direction: column !important; align-items: flex-start !important; gap: 15px; }
+    #draftContainer > div > div:last-child { width: 100%; justify-content: space-between; }
+    #draftContainer > div > div:last-child button { flex: 1; justify-content: center; }
+    /* ========================================================================
+       17. KHUSUS HALAMAN PENILAIAN KELAS
+       ======================================================================== */
+    /* Rapikan Header Judul */
+    .header-kelas { flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding: 20px 15px !important; }
+    .header-kelas button { width: 100%; justify-content: center; }
+    
+    /* Ubah Grid 2 Kolom menjadi 1 Kolom */
+    .grid-container { grid-template-columns: 1fr !important; padding: 15px !important; gap: 20px !important; }
+    
+    /* Sulap Menu Asesmen Vertikal Menjadi Tab Horizontal Bisa Di-scroll */
+    .asesmen-menu { flex-direction: row !important; overflow-x: auto !important; max-height: auto !important; white-space: nowrap; padding-bottom: 5px; }
+    .asesmen-item { border-bottom: none !important; border-right: 1px solid #f1f5f9; flex: 0 0 auto; justify-content: center; align-items: center; text-align: center; }
+    
+    /* Rapikan Header Tabel & Tombol Simpan */
+    .table-action-header { flex-direction: column; align-items: flex-start !important; gap: 15px; }
+    .table-action-header button { width: 100%; justify-content: center; }
+    
+    /* SULAP TABEL MAHASISWA MENJADI KARTU */
+    .table-container table, .table-container thead, .table-container tbody, .table-container th, .table-container td, .table-container tr { display: block !important; width: 100% !important; }
+    .table-container thead { position: absolute; top: -9999px; left: -9999px; }
+    
+    .table-container tbody tr { border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; padding: 10px !important; background: white !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; }
+    .table-container tbody td { display: flex !important; justify-content: space-between !important; align-items: center !important; text-align: right !important; padding: 12px 10px !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+    .table-container tbody td:last-child { border-bottom: none !important; }
+    
+    .table-container tbody tr:not(.row-default) td::before { font-weight: 700; color: #64748b; text-align: left; font-size: 0.85rem; flex-basis: 40%; }
+    .table-container tbody tr:not(.row-default) td:nth-child(1)::before { content: "No"; }
+    .table-container tbody tr:not(.row-default) td:nth-child(2)::before { content: "NIM"; }
+    .table-container tbody tr:not(.row-default) td:nth-child(3)::before { content: "Nama Mahasiswa"; }
+    .table-container tbody tr:not(.row-default) td:nth-child(4)::before { content: "Nilai"; }
+    
+    /* Khusus Tampilan Baris "Beri Default Nilai Sekelas" */
+    .row-default { background: #e0f2fe !important; border-color: #bae6fd !important; }
+    .row-default td:nth-child(1) { padding-bottom: 0 !important; border-bottom: none !important; text-align: left !important; justify-content: flex-start !important; color: #0369a1 !important; }
+    .row-default td:nth-child(2) { padding-top: 5px !important; justify-content: flex-end !important; }
+    .input-nilai { width: 100px !important; }
+
+    /* ========================================================================
+       18. PENANGKAL BUG TABEL PREVIEW EXCEL (DI INPUT NILAI)
+       ======================================================================== */
+    /* 1. Kembalikan tabel preview Excel dari format Kartu menjadi Tabel Normal */
+    #previewArea table { display: table !important; width: 100% !important; }
+    #previewArea thead { display: table-header-group !important; }
+    #previewArea tbody { display: table-row-group !important; }
+    
+    /* 2. Bersihkan baris dan kolom dari gaya kartu */
+    #previewArea tr { 
+        display: table-row !important; 
+        background: transparent !important; border: none !important; 
+        box-shadow: none !important; margin: 0 !important; padding: 0 !important; 
+    }
+    
+    #previewArea th, #previewArea td { 
+        display: table-cell !important; 
+        border: none !important; border-bottom: 1px solid #e5e7eb !important; 
+        text-align: center !important; vertical-align: middle !important; padding: 12px 8px !important; 
+    }
+    
+    /* 3. Matikan label palsu ::before agar tidak ada teks aneh yang muncul */
+    #previewArea td::before { display: none !important; }
+    
+    /* 4. Hidupkan kembali fitur kolom beku (sticky) untuk NIM dan Nama */
+    #studentHead th:first-child, #studentBody td:first-child,
+    #studentHead th:nth-child(2), #studentBody td:nth-child(2) { 
+        position: sticky !important; 
+        background: white !important; 
+        z-index: 10 !important; 
+        max-width: none !important; 
+        overflow: visible !important; 
+        white-space: nowrap !important;
+    }
+    
+    /* Bedakan warna latar header agar lebih manis */
+    #studentHead th { background: #f8fafc !important; z-index: 11 !important; }
+    #studentBody td:nth-child(2) { text-align: left !important; }
+
+} /* <--- INI ADALAH KURUNG KURAWAL PENUTUP UTAMA UNTUK MODE MOBILE. JANGAN ADA @MEDIA LAGI SETELAH INI */

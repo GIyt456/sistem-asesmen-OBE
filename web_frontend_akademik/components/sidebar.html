@@ -192,7 +192,7 @@
         </div>
 
         <div class="menu-category" style="margin-top: 20px;">AKSES DOSEN</div>
-        <div class="nav-item" onclick="window.location.href='../../index.html'"
+        <div class="nav-item" onclick="window.location.href='../../../dosen/input_nilai.html'"
             style="background: #10b981; color: white;">
             <i class="fas fa-chalkboard-teacher"></i> Masuk Mode Input Nilai
         </div>
@@ -266,9 +266,10 @@
 
     // 4. Logout Cerdas
     function logout() {
-        if (confirm("Apakah Anda yakin ingin keluar?")) {
+        if (confirm("Apakah Anda yakin ingin keluar")) {
             localStorage.clear();
-            window.location.replace('/login/login.html');
+            
+            window.location.replace('../../index.html'); 
         }
     }
 </script>
