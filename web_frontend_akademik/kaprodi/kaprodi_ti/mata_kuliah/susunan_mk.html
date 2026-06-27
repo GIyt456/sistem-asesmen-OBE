@@ -10,45 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
-    <style>
-        :root { 
-            --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
-            --success-green: #10b981;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
-        
-        /* CSS Sidebar dihapus karena sudah diatur oleh file global CSS / Template */
-        
-        .main-content { flex: 1; min-width: 0; overflow-y: auto; padding: 0; } 
-        .content-wrapper { padding: 40px 50px; } 
-        
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
-        .header-title-area { display: flex; flex-direction: column; }
-        .header-subtitle { color: #64748b; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
-        .header-title span { color: var(--primary-red); }
-        .badge-prodi { background: var(--primary-red); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
-        
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 40px; }
-        table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
-        th { background: #f8fafc; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; }
-        td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #1e293b; vertical-align: middle; }
-        
-        .action-buttons { display: flex; gap: 10px; align-items: center; }
-        .btn-action { color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .btn-dark { background: #1e293b; }
-        .btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
-        .btn-danger { background: #dc2626; }
-        .btn-danger:hover { background: #b91c1c; transform: translateY(-2px); }
-        .btn-download { background: #475569; }
-        .btn-download:hover { background: #334155; transform: translateY(-2px); }
-        .btn-upload { background: var(--success-green); }
-        .btn-upload:hover { background: #059669; transform: translateY(-2px); }
-    </style>
 
     <link rel="stylesheet" href="susunan_mk.css">
 </head>
@@ -57,19 +18,25 @@
     <div id="sidebar-container"></div>
 
     <div class="main-content">
+    <div class="mobile-top-navbar" style="display: none;">
+            <span>SISTEM ASESMEN OBE</span>
+    </div>
     <div class="content-wrapper">
-        <div class="header-container">
-            <div class="header-title-area">
-                <div class="mobile-header-row">
+            <div class="header-container">
+                
+                <div class="header-left">
                     <button id="btnToggleSidebar" class="mobile-menu-btn" onclick="toggleMobileSidebar()" style="display: none;">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <div class="header-subtitle">KELOLA KURIKULUM</div>
+                    
+                    <div class="header-title-area">
+                        <div class="header-subtitle">KELOLA KURIKULUM</div>
+                        <h1 class="header-title">KELOLA MATA <span>KULIAH</span></h1>
+                    </div>
                 </div>
-                <h1 class="header-title">KELOLA MATA <span>KULIAH</span></h1>
+
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
-            <div class="badge-prodi" id="prodiBadge">PRODI</div>
-        </div>
 
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">

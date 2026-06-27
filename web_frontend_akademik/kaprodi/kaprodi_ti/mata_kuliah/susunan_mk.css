@@ -1,153 +1,310 @@
 /* ========================================================================
-   FILE CSS KHUSUS MOBILE & TABLET (MAKSIMAL LEBAR 768px)
-   Halaman: Kelola Mata Kuliah (susunan_mk.html)
+   FILE GLOBAL CSS: KELOLA MATA KULIAH (susunan_mk.css)
+   Berisi Tampilan Utama (Desktop) & Tampilan Responsif (Mobile)
    ======================================================================== */
 
+/* ------------------------------------------------------------------------
+   A. TAMPILAN UTAMA (DESKTOP / LAPTOP) - Diambil dari HTML Bawaan
+   ------------------------------------------------------------------------ */
+:root { 
+    --primary-blue: #1e3a8a; 
+    --primary-red: #8b0000; 
+    --bg-main: #f9fafb; 
+    --text-dark: #111827; 
+    --border-color: #e5e7eb;
+    --success-green: #10b981;
+}
+
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Inter', sans-serif; 
+}
+
+body { 
+    display: flex; 
+    background: var(--bg-main); 
+    height: 100vh; 
+    overflow: hidden; 
+    color: var(--text-dark); 
+}
+
+.main-content { 
+    flex: 1; 
+    min-width: 0; 
+    overflow-y: auto; 
+    padding: 0; 
+} 
+
+.content-wrapper { 
+    padding: 40px 50px; 
+} 
+
+.header-container { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: flex-start; 
+    margin-bottom: 40px; 
+    border-bottom: 1px solid var(--border-color); 
+    padding-bottom: 20px; 
+}
+
+.header-title-area { 
+    display: flex; 
+    flex-direction: column; 
+}
+
+.header-subtitle { 
+    color: #64748b; 
+    font-size: 0.85rem; 
+    font-weight: 600; 
+    letter-spacing: 1px; 
+    text-transform: uppercase; 
+    margin-bottom: 8px; 
+}
+
+.header-title { 
+    font-size: 2.2rem; 
+    font-weight: 800; 
+    color: var(--text-dark); 
+}
+
+.header-title span { 
+    color: var(--primary-red); 
+}
+
+.badge-prodi { 
+    background: var(--primary-red); 
+    color: white; 
+    padding: 10px 20px; 
+    border-radius: 30px; 
+    font-size: 0.9rem; 
+    font-weight: 600; 
+    text-transform: uppercase; 
+}
+
+.table-container { 
+    background: white; 
+    border-radius: 12px; 
+    border: 1px solid var(--border-color); 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
+    overflow-x: auto; 
+    margin-bottom: 40px; 
+}
+
+table { 
+    width: 100%; 
+    min-width: 700px; 
+    border-collapse: collapse; 
+    text-align: left; 
+}
+
+th { 
+    background: #f8fafc; 
+    padding: 15px 20px; 
+    font-size: 0.85rem; 
+    font-weight: 700; 
+    color: #475569; 
+    border-bottom: 2px solid var(--border-color); 
+    text-transform: uppercase; 
+}
+
+td { 
+    padding: 15px 20px; 
+    border-bottom: 1px solid var(--border-color); 
+    font-size: 0.95rem; 
+    color: #1e293b; 
+    vertical-align: middle; 
+}
+
+.action-buttons { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center; 
+}
+
+.btn-action { 
+    color: white; 
+    border: none; 
+    padding: 10px 16px; 
+    border-radius: 8px; 
+    font-weight: 600; 
+    font-size: 0.85rem; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    transition: 0.2s; 
+}
+
+.btn-dark { background: #1e293b; }
+.btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
+.btn-danger { background: #dc2626; }
+.btn-danger:hover { background: #b91c1c; transform: translateY(-2px); }
+.btn-download { background: #475569; }
+.btn-download:hover { background: #334155; transform: translateY(-2px); }
+.btn-upload { background: var(--success-green); }
+.btn-upload:hover { background: #059669; transform: translateY(-2px); }
+
+
+/* ------------------------------------------------------------------------
+   B. TAMPILAN RESPONSIVE (MOBILE & TABLET - MAKSIMAL LEBAR 768px)
+   ------------------------------------------------------------------------ */
 @media screen and (max-width: 768px) {
     
     /* 1. BUKA GEMBOK SCROLL & UBAH ARAH LAYOUT UTAMA */
     body {
-                flex-direction: column !important;
-                overflow-y: auto !important;
-                height: auto !important;
-                min-height: 100vh !important;
-            }
+        flex-direction: column !important;
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+
+    .main-content {
+        position: relative !important;
+        width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    /* 2. NAVBAR BIRU KHUSUS MOBILE */
+    .mobile-top-navbar {
+        display: flex !important; /* Paksa muncul hanya saat di layar HP */
+        align-items: center;
+        justify-content: center; /* Teks otomatis di tengah */
+        background-color: var(--primary-blue) !important; 
+        color: white !important;
+        width: 100% !important;
+        padding: 15px 0 !important;
+        font-weight: 800;
+        font-size: 0.95rem;
+        letter-spacing: 1px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
 
     .content-wrapper {
         padding: 20px 15px !important;
     }
 
-    .mobile-header-row {
-        display: flex !important;
-        align-items: center !important;
-        gap: 12px !important; /* Jarak antara tombol garis tiga dan teks */
-        margin-bottom: 5px !important; /* Jarak ke judul besar di bawahnya */
-    }
-
-    .main-content {
-        position: relative !important; 
-        width: 100% !important;
-        overflow-x: hidden !important;
-    }
-
-    /* 2. RAPIKAN HEADER (Judul & Info Prodi) */
-    .header-content {
-        flex-direction: column !important;
+    /* 3. DESAIN HEADER BARU: IKON & TEKS SEJAJAR */
+    .header-container {
+        flex-direction: column !important; 
         align-items: flex-start !important;
-        gap: 12px !important;
+        gap: 15px !important;
         padding-bottom: 15px !important;
+        margin-bottom: 25px !important;
     }
 
-    .header-content h1 {
-        font-size: 1.5rem !important;
+    /* Ini kunci rahasia yang menyatukan ikon dan teks! */
+    .header-left {
+        display: flex !important;
+        align-items: center !important; 
+        gap: 15px !important; 
     }
 
-    /* 3. RAPIKAN PANEL KONTROL (Pencarian & Tombol) */
+    .mobile-menu-btn {
+        display: block !important; 
+        background: transparent !important; 
+        color: var(--text-dark) !important; 
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 1.8rem !important; 
+        cursor: pointer !important;
+        box-shadow: none !important;
+    }
+
+    .mobile-menu-btn:active {
+        opacity: 0.5;
+    }
+
+    .header-title-area {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+
+    .header-subtitle {
+        margin-bottom: 4px !important; 
+    }
+
+    .header-title {
+        font-size: 1.5rem !important; 
+        line-height: 1.1 !important;
+        margin: 0 !important;
+    }
+
+    /* 4. PANEL KONTROL ATAS */
     .control-panel {
-        flex-direction: column !important; /* Susun ke bawah */
-        align-items: stretch !important; /* Lebarkan ke ujung */
+        flex-direction: column !important;
+        align-items: stretch !important;
         gap: 15px !important;
         padding: 15px !important;
     }
 
-    /* Kotak Pencarian */
     input[type="text"][placeholder*="Cari"] {
         width: 100% !important;
         max-width: 100% !important;
     }
 
-    /* 4. SUSUN TOMBOL JADI BESAR (Mudah Ditekan di HP) */
     .action-buttons {
         flex-direction: column !important;
         width: 100% !important;
         gap: 10px !important;
     }
 
-    .action-buttons .btn {
+    .action-buttons .btn, 
+    .action-buttons .btn-action {
         width: 100% !important;
         justify-content: center !important;
         padding: 12px 20px !important;
     }
 
-    /* 5. PENYELAMATAN TABEL AGAR BISA DI-SCROLL KE SAMPING */
-    div[style*="overflow-x: auto"] {
+    /* 5. TABEL HORIZONTAL */
+    .table-container {
         width: 100% !important;
         border-radius: 8px !important;
-        /* Buat scroll super mulus di HP */
         -webkit-overflow-scrolling: touch !important; 
     }
 
-    .data-table {
-        min-width: 700px !important; /* Paksa tabel tetap lebar agar tidak gepeng */
+    table {
+        min-width: 700px !important; 
     }
 
-    /* Kotak Input Nilai SKS dan Matkul di dalam tabel */
-    .input-edit {
-        min-width: 80px !important; 
-    }
-    input[id^="in-"] {
-        min-width: 200px !important; /* Kotak nama matkul dipanjangkan sedikit */
+    /* 6. SIDEBAR TERSEMBUNYI */
+    #sidebar-container {
+        position: fixed !important;
+        left: -100% !important;
+        top: 0 !important;
+        height: 100vh !important;
+        z-index: 9999 !important;
+        transition: left 0.3s ease-in-out !important;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.5) !important;
     }
 
-    /* 6. RAPIKAN POP-UP (MODAL TAMBAH MATKUL) */
+    #sidebar-container.active {
+        left: 0 !important; 
+    }
+
+    /* 7. POP-UP MODAL */
     .modal-content {
-        width: 92% !important; /* Jangan mepet layar HP */
+        width: 92% !important;
         margin: 20px auto !important;
         padding: 20px 15px !important;
     }
 
     .form-group input, 
-    .form-group select {
-        width: 100% !important;
+    .form-group select { 
+        width: 100% !important; 
     }
 
     .form-actions {
-        flex-direction: column !important; /* Tombol Simpan & Batal susun ke bawah */
+        flex-direction: column !important;
         gap: 10px !important;
     }
 
     .form-actions button {
         width: 100% !important;
         margin-left: 0 !important;
-    }
-
-    /* =========================================
-       EFEK SIDEBAR TERSEMBUNYI (HAMBURGER MENU)
-       ========================================= */
-       
-    /* 1. Munculkan Tombol Garis Tiga */
-    .mobile-menu-btn {
-    display: flex !important; /* Paksa muncul di HP */
-        align-items: center !important;
-        justify-content: center !important;
-        background-color: var(--primary-blue) !important;
-        color: white !important;
-        border: none !important;
-        width: 38px !important; /* Ukuran pas agar serasi dengan teks subtitle */
-        height: 38px !important;
-        border-radius: 6px !important;
-        font-size: 1.1rem !important;
-        cursor: pointer !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-    }
-
-    #navbar-container {
-                padding-left: 65px !important; 
-            }
-            
-    /* 2. Sembunyikan Sidebar Secara Default ke Kiri Layar */
-    #sidebar-container {
-        position: fixed !important;
-        left: -100% !important; /* Terlempar ke luar layar kiri */
-        top: 0 !important;
-        height: 100vh !important;
-        z-index: 9999 !important; /* Pastikan selalu di paling depan */
-        transition: left 0.3s ease-in-out !important; /* Efek sliding mulus */
-        box-shadow: 4px 0 15px rgba(0,0,0,0.5) !important;
-    }
-
-    /* 3. Saat Tombol Ditekan, Sidebar Meluncur ke Kanan (Masuk Layar) */
-    #sidebar-container.active {
-        left: 0 !important; 
     }
 }
