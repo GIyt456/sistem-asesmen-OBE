@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=850, initial-scale=0.4, maximum-scale=3.0">
     <title>Cetak RPS & RTM - Terintegrasi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/api_config.js"></script>
@@ -210,6 +210,48 @@
                 break-inside: auto !important;
             }
         }
+        /* ========================================================================
+           TRICK ZOOM OUT MOBILE (Layar dipaksa menjadi 850px oleh Viewport)
+           ======================================================================== */
+        @media screen and (max-width: 900px) {
+            body { 
+                padding-bottom: 180px !important; /* Beri ruang di bawah kertas agar tidak tertutup tombol */
+                background-color: #e5e7eb;
+            }
+            
+            .page {
+                margin: 20px auto !important; /* Tengahkan kertas A4-nya */
+            }
+
+            /* Ubah tombol melayang menjadi Toolbar di bawah layar */
+            .no-print {
+                position: fixed !important;
+                bottom: 0 !important; left: 0 !important; right: 0 !important;
+                width: 100% !important;
+                background: white !important;
+                padding: 30px 40px !important;
+                border-top: 3px solid #cbd5e1 !important;
+                display: flex !important; 
+                gap: 20px !important;
+                box-shadow: 0 -5px 25px rgba(0,0,0,0.15) !important;
+                box-sizing: border-box !important;
+                justify-content: center !important;
+            }
+
+            /* Sengaja dijadikan RAKSASA agar saat di-zoom out, ukurannya pas di jempol HP! */
+            .no-print button {
+                flex: 1 !important;
+                padding: 30px !important;
+                font-size: 32px !important; 
+                border-radius: 16px !important;
+                font-weight: 900 !important;
+            }
+            
+            .no-print button i {
+                font-size: 36px !important;
+            }
+        }
+        
     </style>
 </head>
 
