@@ -572,16 +572,19 @@
                 </div>
             </div>
 
-            <div id="area-simpan"
-                style="display: flex; justify-content: space-between; align-items: center; margin-top:30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
-                <button class="btn-action" style="background: #1e3a8a; color: white; padding: 12px 24px;"
-                    onclick="lanjutKeRPS()"> <i class="fas fa-book-open"></i> Lanjut Susun RPS
+            <div id="area-simpan" style="display: flex; justify-content: space-between; align-items: center; margin-top:30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                <button class="btn-action" style="background: #1e3a8a; color: white; padding: 12px 24px;" onclick="lanjutKeRPS()"> 
+                    <i class="fas fa-book-open"></i> Lanjut Susun RPS
                 </button>
 
-                <button id="btnSimpan" class="btn-action"
-                    style="background: #0f172a; padding: 12px 24px; font-size: 1.05rem;" onclick="simpanKeDatabase()" disabled>
-                    <i class="fas fa-lock"></i> Penuhi Kuota Bobot Dulu
-                </button>
+                <div style="display: flex; gap: 10px;">
+                    <button id="btnSimpanDraf" class="btn-action" style="background: #f59e0b; color: white; padding: 12px 24px; font-size: 1.05rem;" onclick="simpanKeDatabase('draft')">
+                        <i class="fas fa-save"></i> Simpan Draf
+                    </button>
+                    <button id="btnSimpan" class="btn-action" style="background: #0f172a; padding: 12px 24px; font-size: 1.05rem;" onclick="simpanKeDatabase('final')" disabled>
+                        <i class="fas fa-check-circle"></i> Simpan Final 100%
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -918,47 +921,50 @@
                 const dbData = JSON.parse(textData);
 
                 // Jika data berhasil ditarik dari DB dan bukan array kosong/undefined
-                if(Array.isArray(dbData) && dbData.length > 0 && dbData[0].nim !== undefined) {
+                if(Array.isArray(dbData) && dbData.length > 0) {
                     
                     // 1. Rekonstruksi 16 Pertemuan dari Database
                     configData = [];
                     for(let i=1; i<=16; i++) {
                         let barisTerkait = dbData.find(d => d.pertemuan == i);
                         if(barisTerkait) {
-                            // Jika ada di database, gunakan data tersebut
                             configData.push({ 
                                 pertemuan: i, 
                                 cpl: barisTerkait.kode_cpl || "-", 
                                 cpmk: barisTerkait.kode_cpmk || "", 
-                                // Karena bentuk_penilaian tidak ter-SELECT di query n8n laporan, kita tebak berdasarkan draf lokal
-                                bentuk: (JSON.parse(localStorage.getItem("draft_bobot_" + mkKode) || "[]").find(d=>d.pertemuan==i)?.bentuk) || "", 
+                                bentuk: barisTerkait.bentuk_penilaian || "", 
                                 bobot: parseFloat(barisTerkait.bobot_maks_pertemuan) || 0 
                             });
                         } else {
-                            // Jika pertemuan ini (misal Materi/Libur) tidak ada di database, set 0
                             configData.push({ pertemuan: i, cpl: "-", cpmk: "NONE", bentuk: "", bobot: 0 });
                         }
                     }
 
                     // 2. Rekonstruksi Tabel Nilai Mahasiswa dari Database
                     let rekonstruksiMhs = [];
-                    let himpunanNIM = [...new Set(dbData.map(item => item.nim))]; // Ambil NIM unik
+                    // Filter pembuang nilai null (terjadi jika dosen baru simpan draf dan belum upload excel)
+                    let himpunanNIM = [...new Set(dbData.map(item => item.nim).filter(n => n !== null && n !== undefined))]; 
                     
-                    himpunanNIM.forEach(nimValid => {
-                        let namaMhs = dbData.find(d => d.nim === nimValid)?.nama || "Mahasiswa";
-                        let rowMhs = [nimValid, namaMhs];
+                    if (himpunanNIM.length > 0) {
+                        himpunanNIM.forEach(nimValid => {
+                            let namaMhs = dbData.find(d => d.nim === nimValid)?.nama || "Mahasiswa";
+                            let rowMhs = [nimValid, namaMhs];
+                            
+                            // Isi nilai untuk 16 kolom pertemuan
+                            for(let j=1; j<=16; j++) {
+                                let temuanNilai = dbData.find(d => d.nim === nimValid && d.pertemuan == j);
+                                rowMhs.push(temuanNilai ? (parseFloat(temuanNilai.nilai_asli) || 0) : 0);
+                            }
+                            rekonstruksiMhs.push(rowMhs);
+                        });
                         
-                        // Isi nilai untuk 16 kolom pertemuan
-                        for(let j=1; j<=16; j++) {
-                            let temuanNilai = dbData.find(d => d.nim === nimValid && d.pertemuan == j);
-                            rowMhs.push(temuanNilai ? (parseFloat(temuanNilai.nilai_asli) || 0) : 0);
-                        }
-                        rekonstruksiMhs.push(rowMhs);
-                    });
-                    
-                    // Lempar ke fungsi pembuat tabel
-                    if(rekonstruksiMhs.length > 0) {
+                        // Lempar ke fungsi pembuat tabel
                         processStudentData(rekonstruksiMhs, true);
+                    } else {
+                        // Kembalikan ke state kotak upload kosong (karena ini murni status Draf Bobot)
+                        document.getElementById("emptyUploadBox").style.display = "flex";
+                        document.getElementById("previewArea").style.display = "none";
+                        studentData = [];
                     }
 
                 } else {
@@ -1017,11 +1023,14 @@
                 // AMBIL KATEGORI YANG DIIZINKAN KAPRODI UNTUK CPMK INI
                 const kategoriDiizinkan = trackingQuotas.filter(q => q.cpmk === row.cpmk).map(q => q.kategori.toLowerCase());
                 
-                let optBentukHTML = `<option value="" disabled ${row.bentuk === "" ? 'selected' : ''}>-- Pilih Kegiatan --</option>`;
+                let optBentukHTML = `<option value="" disabled ${(!row.bentuk || row.bentuk.trim() === "") ? 'selected' : ''}>-- Pilih Kegiatan --</option>`;
                 
                 // JIKA API GAGAL, GUNAKAN FALLBACK DEFAULT
                 let listKomp = daftarKomponenMaster.length > 0 ? daftarKomponenMaster : 
                     [{nama_komponen:"Materi"}, {nama_komponen:"Libur"}, {nama_komponen:"Tugas"}, {nama_komponen:"UTS"}, {nama_komponen:"UAS"}];
+
+                let bentukSudahTerpilih = false;
+                let optionsSet = new Set();
 
                 listKomp.forEach(k => {
                     let namaAsli = k.nama_komponen;
@@ -1035,18 +1044,41 @@
                     else if(n.includes('attitude')) stdKat = 'attitude';
                     else if(n.includes('kehadiran')) stdKat = 'kehadiran';
 
+                    let isSelected = false;
+
                     if (stdKat === 'bebas') {
-                        // Opsi Bebas (Materi, Libur, dll) selalu muncul
-                        optBentukHTML += `<option value="${namaAsli}" ${row.bentuk === namaAsli ? 'selected' : ''}>📘 ${namaAsli} (Tanpa Bobot)</option>`;
+                        // Pencocokan Case-Insensitive untuk komponen bebas
+                        if (row.bentuk && row.bentuk.trim().toLowerCase() === namaAsli.trim().toLowerCase()) {
+                            isSelected = true;
+                            bentukSudahTerpilih = true;
+                        }
+                        if (!optionsSet.has(namaAsli.toLowerCase())) {
+                            optBentukHTML += `<option value="${namaAsli}" ${isSelected ? 'selected' : ''}>📘 ${namaAsli} (Tanpa Bobot)</option>`;
+                            optionsSet.add(namaAsli.toLowerCase());
+                        }
                     } else {
-                        // Opsi Berbobot, hanya muncul jika diizinkan Kaprodi
+                        // Pencocokan Case-Insensitive untuk komponen berbobot sesuai kuota Kaprodi
                         if (kategoriDiizinkan.includes(stdKat)) {
-                            // Mencari nama asli dari tracking Quota untuk huruf kapital yg pas
-                            let asliKaprodi = trackingQuotas.find(q => q.cpmk === row.cpmk && q.kategori.toLowerCase() === stdKat).kategori;
-                            optBentukHTML += `<option value="${asliKaprodi}" ${row.bentuk === asliKaprodi ? 'selected' : ''}>⭐ ${asliKaprodi}</option>`;
+                            let matchedQuota = trackingQuotas.find(q => q.cpmk === row.cpmk && q.kategori.toLowerCase() === stdKat);
+                            let asliKaprodi = matchedQuota ? matchedQuota.kategori : namaAsli;
+                            
+                            if (row.bentuk && row.bentuk.trim().toLowerCase() === asliKaprodi.trim().toLowerCase()) {
+                                isSelected = true;
+                                bentukSudahTerpilih = true;
+                            }
+                            if (!optionsSet.has(asliKaprodi.toLowerCase())) {
+                                optBentukHTML += `<option value="${asliKaprodi}" ${isSelected ? 'selected' : ''}>⭐ ${asliKaprodi}</option>`;
+                                optionsSet.add(asliKaprodi.toLowerCase());
+                            }
                         }
                     }
                 });
+
+                if (row.bentuk && row.bentuk.trim() !== "" && !bentukSudahTerpilih) {
+                    let bLower = row.bentuk.toLowerCase();
+                    let isBerbobot = bLower==='uts'||bLower==='uas'||bLower==='tugas'||bLower==='attitude'||bLower==='kehadiran';
+                    optBentukHTML += `<option value="${row.bentuk}" selected>${isBerbobot ? '⭐' : '📘'} ${row.bentuk}</option>`;
+                }
 
                 // Cek apakah kegiatan saat ini tergolong bebas (Materi/Libur) atau berbobot
                 let isBebas = true;
@@ -1154,8 +1186,14 @@
                     configData[i]['bobot'] = 0;
                 }
             }
+            
+            // Simpan Draft
+            const mkKode = document.getElementById("pilihMK").value;
+            if (mkKode && configData.length > 0) localStorage.setItem("draft_bobot_" + mkKode, JSON.stringify(configData));
 
-            renderTableAsesmen(); 
+            // JIKA MENGUBAH BENTUK, Render Tabel. Jika hanya bobot, biarkan.
+            if(field === 'bentuk') renderTableAsesmen(); 
+            
             hitungDanValidasiKuota(); 
         }
 
@@ -1166,6 +1204,8 @@
             const mkKode = document.getElementById("pilihMK").value;
             if (mkKode && configData.length > 0) localStorage.setItem("draft_bobot_" + mkKode, JSON.stringify(configData));
             
+            // PERBAIKAN: JANGAN PANGGIL renderTableAsesmen() DI SINI! 
+            // Cukup hitung kuotanya saja agar cursor dosen tidak hilang.
             hitungDanValidasiKuota();
         }
 
@@ -1173,6 +1213,10 @@
             const selectedOpt = selectEl.options[selectEl.selectedIndex]; 
             configData[i].cpmk = selectedOpt.value; 
             configData[i].cpl = selectedOpt.getAttribute("data-cpl"); 
+            
+            const mkKode = document.getElementById("pilihMK").value;
+            if (mkKode && configData.length > 0) localStorage.setItem("draft_bobot_" + mkKode, JSON.stringify(configData));
+
             renderTableAsesmen(); 
             hitungDanValidasiKuota(); 
         }
@@ -1327,18 +1371,25 @@
             }
         }
 
-        async function simpanKeDatabase() {
+        async function simpanKeDatabase(status_simpan = 'final') {
             const mkKode = document.getElementById("pilihMK").value;
             if (!mkKode) { alert("Mata Kuliah belum dipilih!"); return; }
-            if (studentData.length === 0) { alert("Data Excel belum diupload!"); return; }
-            if (!confirm(`Yakin menyimpan nilai untuk MK ${mkKode}?`)) return;
+            
+            // Cegah submit final jika excel kosong, tapi draf diizinkan
+            if (status_simpan === 'final' && studentData.length === 0) { 
+                alert("Data Excel belum diupload!"); return; 
+            }
 
-            const btn = document.getElementById("btnSimpan");
+            if (!confirm(`Yakin menyimpan data sebagai ${status_simpan.toUpperCase()} untuk MK ${mkKode}?`)) return;
+
+            const btn = status_simpan === 'final' ? document.getElementById("btnSimpan") : document.getElementById("btnSimpanDraf");
+            const originalText = btn.innerHTML;
             btn.innerHTML = "⏳ Mengirim Data..."; btn.disabled = true;
 
             const payload = {
-                metadata: { dosen: userLogin, nidn: userNidn, kode_mk: mkKode, tanggal: new Date().toISOString() },
-                data_bobot: configData, data_nilai: studentData
+                metadata: { dosen: userLogin, nidn: userNidn, kode_mk: mkKode, tanggal: new Date().toISOString(), status: status_simpan },
+                data_bobot: configData, 
+                data_nilai: studentData
             };
 
             try {
@@ -1347,13 +1398,12 @@
                 });
 
                 if (res.ok) {
-                    
-                    alert("✅ BERHASIL! Data Tersimpan di Database.");
-                    window.location.href = "rps_dosen.html?mk=" + mkKode;
+                    alert(`✅ BERHASIL! Data Tersimpan sebagai ${status_simpan.toUpperCase()}.`);
+                    if (status_simpan === 'final') window.location.href = "rps_dosen.html?mk=" + mkKode;
                 } else { alert("❌ Gagal menyimpan data ke server."); }
             } catch (e) { alert("⚠️ Error Koneksi ke n8n."); }
             
-            btn.innerHTML = '<i class="fas fa-save"></i> Simpan Nilai ke Database'; 
+            btn.innerHTML = originalText; 
             btn.disabled = false;
         }
 
