@@ -154,22 +154,49 @@
     </div>
 
     <script>
+      const API_GET_KELAS = `${API_BASE}/get-kelas-aktif`;
+        const API_GET_MATKUL = `${API_BASE}/get-master-matkul`;
+
         let dataSemuaMatkul = [];
         let dataTersaring = [];
         let halamanSaatIni = 1;
         const barisPerHalaman = 5; 
 
-        // 1. CEK IDENTITAS DOSEN SAAT INI (TI ATAU SI)
+        // 1. CEK IDENTITAS DOSEN SAAT INI
         const userProdi = localStorage.getItem("prodi_aktif") || 'ti';
+        const userNidn = localStorage.getItem("user_nidn");
+        const userRole = localStorage.getItem("user_role");
+
+        // FUNGSI EXTRAKSI AMAN (DIAMBIL DARI JADWAL MENGAJAR)
+        function safeExtractArray(jsonObj) {
+            if (!jsonObj) return [];
+            let data = jsonObj;
+            if (jsonObj.data) data = jsonObj.data;
+            if (!Array.isArray(data)) data = [data];
+            data = data.flat(Infinity);
+            return data.map(item => item.json ? item.json : item);
+        }
 
         // 2. FUNGSI BUNGLON (UBAH WARNA & TEKS OTOMATIS)
+       // 2. FUNGSI BUNGLON (UBAH WARNA & TEKS OTOMATIS)
         function aturTemaHalaman() {
-            if (userProdi === 'si') {
+            const p = String(userProdi).toLowerCase();
+            const teksProdi = document.getElementById('teks-prodi');
+            
+            if (p.includes('ti') && p.includes('si')) {
+                // Jika mengajar di kedua prodi
+                teksProdi.innerText = "LINTAS PROGRAM STUDI (TI & SI)";
+                // Gunakan warna netral (Navy elegan) agar tidak memihak satu prodi
+                document.documentElement.style.setProperty('--primary-color', '#0f172a');
+                document.documentElement.style.setProperty('--primary-color-dark', '#020617');
+            } else if (p.includes('si')) {
+                // Jika khusus SI
                 document.documentElement.style.setProperty('--primary-color', '#01626d');
                 document.documentElement.style.setProperty('--primary-color-dark', '#004d56');
-                document.getElementById('teks-prodi').innerText = "SISTEM INFORMASI";
+                teksProdi.innerText = "SISTEM INFORMASI";
             } else {
-                document.getElementById('teks-prodi').innerText = "TEKNIK INFORMATIKA";
+                // Jika khusus TI (Default)
+                teksProdi.innerText = "TEKNIK INFORMATIKA";
             }
         }
 
@@ -177,22 +204,54 @@
             const tableBody = document.getElementById('tabelMatkulDosen');
 
             try {
-                const N8N_URL = typeof API_BASE !== 'undefined' ? API_BASE : 'https://n8n.obeyogabeta.net/webhook';
-                
-                // 3. API DINAMIS: Menarik data sesuai dengan Prodi yang login
-                let URL_API = `${N8N_URL}/get-matkul-portofolio?prodi=${userProdi}`;
-                
-                const response = await fetch(URL_API);
-                const textData = await response.text(); 
-                
-                if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {
-                    dataSemuaMatkul = [];
+                // A. TARIK DATA DARI API YANG SUDAH TERBUKTI AMAN DI JADWAL MENGAJAR
+                const [resKelas, resMatkul] = await Promise.all([
+                    fetch(API_GET_KELAS),
+                    fetch(API_GET_MATKUL)
+                ]);
+
+                const jsonKelas = await resKelas.json();
+                const jsonMatkul = await resMatkul.json();
+
+                let dataKelasRaw = safeExtractArray(jsonKelas);
+                let dataMatkulRaw = safeExtractArray(jsonMatkul);
+
+                // B. GABUNGKAN DATA KELAS & MATKUL
+                let gabunganData = dataKelasRaw.map(kelas => {
+                    const matkulCocok = dataMatkulRaw.find(m => m.kode_mk === kelas.kode_mk);
+                    return {
+                        kode_mk: kelas.kode_mk,
+                        nidn: kelas.nidn,
+                        semester: matkulCocok ? matkulCocok.semester : kelas.semester,
+                        nama_mk: matkulCocok ? matkulCocok.nama_mk : "MK Tidak Ditemukan",
+                        prodi: matkulCocok ? matkulCocok.prodi : "-"
+                    };
+                });
+
+                // C. LOGIKA PENYARINGAN SUPER AKURAT
+                if (userRole === "admin") {
+                    // Admin (Kaprodi) melihat semua MK di Prodinya dari Master Matkul
+                    dataSemuaMatkul = dataMatkulRaw.filter(m => String(m.prodi).toLowerCase() === userProdi.toLowerCase());
+                } else if (userNidn) {
+                    // Dosen Biasa HANYA melihat MK dari kelas yang dia ajar (berdasarkan NIDN)
+                    dataSemuaMatkul = gabunganData.filter(item => String(item.nidn).trim() === String(userNidn).trim());
                 } else {
-                    dataSemuaMatkul = JSON.parse(textData);
+                    dataSemuaMatkul = [];
                 }
 
+                // Hapus duplikat matkul (jika dosen mengajar 2 kelas A dan B untuk MK yang sama)
+                const uniqueMk = new Map();
+                dataSemuaMatkul.forEach(mk => {
+                    const k = String(mk.kode_mk).trim().toUpperCase();
+                    if(k && k !== 'UNDEFINED' && !uniqueMk.has(k)) {
+                        uniqueMk.set(k, mk);
+                    }
+                });
+                dataSemuaMatkul = Array.from(uniqueMk.values());
+
+                // D. RENDER KE TABEL
                 if (dataSemuaMatkul.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color:#6b7280;">Tidak ada mata kuliah yang terdaftar di prodi Anda.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color:#6b7280;">Tidak ada mata kuliah Portofolio yang Anda ampu saat ini.</td></tr>';
                     document.getElementById('areaPaginasi').innerHTML = '';
                     return;
                 }
@@ -202,8 +261,8 @@
                 renderTabelMatkul();
 
             } catch (error) {
-                console.error("Error:", error);
-                tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red; padding:40px;">⚠️ Gagal memuatkan data. Pastikan webhook get-matkul-portofolio aktif.</td></tr>`;
+                console.error("Error Fetch Portofolio:", error);
+                tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red; padding:40px;">⚠️ Gagal memuatkan data. Pastikan Webhook Master Matkul dan Kelas Aktif menyala.</td></tr>`;
                 document.getElementById('areaPaginasi').innerHTML = '';
             }
         }
@@ -217,6 +276,7 @@
             halamanSaatIni = 1; 
             renderTabelMatkul();
         }
+
         function renderTabelMatkul() {
             const tableBody = document.getElementById('tabelMatkulDosen');
             tableBody.innerHTML = '';
@@ -233,15 +293,28 @@
             const dataHalamanIni = dataTersaring.slice(indexAwal, indexAkhir);
 
             dataHalamanIni.forEach(item => {
-                const namaMkEncoded = encodeURIComponent(item.nama_mk || '');
-                // PERHATIKAN PENAMBAHAN data-label="..." DI SETIAP TAG <td>
+                const kodeAsli = item.kode_mk || '-';
+                const namaAsli = item.nama_mk || '-';
+                const semesterAsli = item.semester || 'Ganjil';
+                const namaMkEncoded = encodeURIComponent(namaAsli);
+
+                // --- TAMBAHAN: LENCANA (BADGE) PRODI ---
+                let badgeProdi = '';
+                let p = String(item.prodi).toLowerCase();
+                if (p === 'si') {
+                    badgeProdi = '<br><span style="display:inline-block; margin-top:6px; background:#ccfbf1; color:#0f766e; padding:4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; border: 1px solid #99f6e4;">SISTEM INFORMASI</span>';
+                } else if (p === 'ti') {
+                    badgeProdi = '<br><span style="display:inline-block; margin-top:6px; background:#fee2e2; color:#991b1b; padding:4px 10px; border-radius:6px; font-size:0.7rem; font-weight:800; border: 1px solid #fecaca;">TEKNIK INFORMATIKA</span>';
+                }
+                // ----------------------------------------
+
                 tableBody.innerHTML += `
                     <tr>
-                        <td data-label="Kode MK" style="font-weight: 700; color: var(--primary-color);">${item.kode_mk || '-'}</td>
-                        <td data-label="Nama MK" style="font-weight: 600; color: var(--text-dark);">${item.nama_mk || '-'}</td>
-                        <td data-label="Semester" style="color: #4b5563;">Semester ${item.semester || 'Ganjil'}</td>
+                        <td data-label="Kode MK" style="font-weight: 800; color: var(--primary-color);">${kodeAsli}</td>
+                        <td data-label="Nama MK" style="font-weight: 700; color: var(--text-dark);">${namaAsli} ${badgeProdi}</td>
+                        <td data-label="Semester" style="color: #4b5563; font-weight: 600;">Semester ${semesterAsli}</td>
                         <td data-label="Aksi" style="text-align: center;">
-                            <a href="portofolio_detail.html?kode_mk=${item.kode_mk}&nama_mk=${namaMkEncoded}" class="btn-detail">
+                            <a href="portofolio_detail.html?kode_mk=${kodeAsli}&nama_mk=${namaMkEncoded}" class="btn-detail">
                                 <i class="fas fa-folder-open"></i> Detail Portofolio
                             </a>
                         </td>
@@ -251,7 +324,6 @@
 
             renderPaginasi(totalHalaman, indexAwal, dataHalamanIni.length, dataTersaring.length);
         }
-
         function renderPaginasi(totalHalaman, indexAwal, jumlahSaatIni, totalData) {
             const areaPaginasi = document.getElementById('areaPaginasi');
             let htmlPaginasi = `
