@@ -1,2 +1,2 @@
 // MASTER LINK CLOUDFLARE TUNNEL N8N
-const API_BASE = "https://better-acids-hostels-grain.trycloudflare.com/webhook";
+const API_BASE = "https://n8n.obeyogabeta.net/webhook";

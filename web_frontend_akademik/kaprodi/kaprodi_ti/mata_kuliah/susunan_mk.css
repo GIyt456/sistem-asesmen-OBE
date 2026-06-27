@@ -1,0 +1,153 @@
+/* ========================================================================
+   FILE CSS KHUSUS MOBILE & TABLET (MAKSIMAL LEBAR 768px)
+   Halaman: Kelola Mata Kuliah (susunan_mk.html)
+   ======================================================================== */
+
+@media screen and (max-width: 768px) {
+    
+    /* 1. BUKA GEMBOK SCROLL & UBAH ARAH LAYOUT UTAMA */
+    body {
+                flex-direction: column !important;
+                overflow-y: auto !important;
+                height: auto !important;
+                min-height: 100vh !important;
+            }
+
+    .content-wrapper {
+        padding: 20px 15px !important;
+    }
+
+    .mobile-header-row {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important; /* Jarak antara tombol garis tiga dan teks */
+        margin-bottom: 5px !important; /* Jarak ke judul besar di bawahnya */
+    }
+
+    .main-content {
+        position: relative !important; 
+        width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    /* 2. RAPIKAN HEADER (Judul & Info Prodi) */
+    .header-content {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+        padding-bottom: 15px !important;
+    }
+
+    .header-content h1 {
+        font-size: 1.5rem !important;
+    }
+
+    /* 3. RAPIKAN PANEL KONTROL (Pencarian & Tombol) */
+    .control-panel {
+        flex-direction: column !important; /* Susun ke bawah */
+        align-items: stretch !important; /* Lebarkan ke ujung */
+        gap: 15px !important;
+        padding: 15px !important;
+    }
+
+    /* Kotak Pencarian */
+    input[type="text"][placeholder*="Cari"] {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* 4. SUSUN TOMBOL JADI BESAR (Mudah Ditekan di HP) */
+    .action-buttons {
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 10px !important;
+    }
+
+    .action-buttons .btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 12px 20px !important;
+    }
+
+    /* 5. PENYELAMATAN TABEL AGAR BISA DI-SCROLL KE SAMPING */
+    div[style*="overflow-x: auto"] {
+        width: 100% !important;
+        border-radius: 8px !important;
+        /* Buat scroll super mulus di HP */
+        -webkit-overflow-scrolling: touch !important; 
+    }
+
+    .data-table {
+        min-width: 700px !important; /* Paksa tabel tetap lebar agar tidak gepeng */
+    }
+
+    /* Kotak Input Nilai SKS dan Matkul di dalam tabel */
+    .input-edit {
+        min-width: 80px !important; 
+    }
+    input[id^="in-"] {
+        min-width: 200px !important; /* Kotak nama matkul dipanjangkan sedikit */
+    }
+
+    /* 6. RAPIKAN POP-UP (MODAL TAMBAH MATKUL) */
+    .modal-content {
+        width: 92% !important; /* Jangan mepet layar HP */
+        margin: 20px auto !important;
+        padding: 20px 15px !important;
+    }
+
+    .form-group input, 
+    .form-group select {
+        width: 100% !important;
+    }
+
+    .form-actions {
+        flex-direction: column !important; /* Tombol Simpan & Batal susun ke bawah */
+        gap: 10px !important;
+    }
+
+    .form-actions button {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    /* =========================================
+       EFEK SIDEBAR TERSEMBUNYI (HAMBURGER MENU)
+       ========================================= */
+       
+    /* 1. Munculkan Tombol Garis Tiga */
+    .mobile-menu-btn {
+    display: flex !important; /* Paksa muncul di HP */
+        align-items: center !important;
+        justify-content: center !important;
+        background-color: var(--primary-blue) !important;
+        color: white !important;
+        border: none !important;
+        width: 38px !important; /* Ukuran pas agar serasi dengan teks subtitle */
+        height: 38px !important;
+        border-radius: 6px !important;
+        font-size: 1.1rem !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+
+    #navbar-container {
+                padding-left: 65px !important; 
+            }
+            
+    /* 2. Sembunyikan Sidebar Secara Default ke Kiri Layar */
+    #sidebar-container {
+        position: fixed !important;
+        left: -100% !important; /* Terlempar ke luar layar kiri */
+        top: 0 !important;
+        height: 100vh !important;
+        z-index: 9999 !important; /* Pastikan selalu di paling depan */
+        transition: left 0.3s ease-in-out !important; /* Efek sliding mulus */
+        box-shadow: 4px 0 15px rgba(0,0,0,0.5) !important;
+    }
+
+    /* 3. Saat Tombol Ditekan, Sidebar Meluncur ke Kanan (Masuk Layar) */
+    #sidebar-container.active {
+        left: 0 !important; 
+    }
+}
