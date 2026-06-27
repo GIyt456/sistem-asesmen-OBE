@@ -333,7 +333,7 @@
             const PRODI = 'ti'; 
             
             // Mengamankan URL agar tidak error meski folder berbeda
-            const N8N_URL = typeof API_BASE !== 'undefined' ? API_BASE : 'https://URL-N8N-ANDA.com/webhook';
+          
 
             // ==========================================
             // 2. SISTEM KEAMANAN
@@ -352,7 +352,7 @@
 
                 try {
                     // PERBAIKAN: MENGIRIM PARAMETER prodi=ti AGAR N8N TIDAK CRASH
-                    const URL_API = `${N8N_URL}/get-master-rubrik?prodi=${PRODI}`;
+                    const URL_API = `${API_BASE}/get-master-rubrik?prodi=${PRODI}`;
 
                     const response = await fetch(URL_API);
                     const textData = await response.text();
@@ -456,8 +456,8 @@
                 document.getElementById('modalDetailRubrik').style.display = "flex";
 
                 try {
-                    // PERBAIKAN: MENGGUNAKAN N8N_URL alih-alih BASE_N8N_URL yang membuat detail error
-                    const response = await fetch(`${N8N_URL}/get-detail-rubrik?id_tugas=${idTugas}`);
+                    // PERBAIKAN: MENGGUNAKAN API_BASE alih-alih BASE_API_BASE yang membuat detail error
+                    const response = await fetch(`${API_BASE}/get-detail-rubrik?id_tugas=${idTugas}`);
                     const textData = await response.text();
 
                     if (!textData || textData.trim() === '' || textData.includes('<!DOCTYPE html>')) {
