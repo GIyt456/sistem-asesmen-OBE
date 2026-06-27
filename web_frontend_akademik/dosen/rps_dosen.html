@@ -613,7 +613,7 @@
             <button class="hamburger-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
             <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
                 style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
-                onclick="window.location.href='index.html'">
+                onclick="window.location.href='../index.html'">
         </div>
 
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
@@ -1647,7 +1647,12 @@
             window.location.href = `rencana_tugas_rubrik.html?kode_mk=${currentMkDipilih}`;
         }
 
-        function logout() { localStorage.clear(); window.location.replace("../login/login.html"); }
+        function logout() {
+            if (confirm("Apakah Anda yakin ingin keluar?")) {
+                localStorage.clear();
+                window.location.replace('../index.html');
+            }
+        }
 
         window.onload = async () => {
             await loadDaftarRPS();

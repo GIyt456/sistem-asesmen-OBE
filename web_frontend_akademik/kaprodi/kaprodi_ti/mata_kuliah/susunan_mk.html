@@ -49,22 +49,27 @@
         .btn-upload { background: var(--success-green); }
         .btn-upload:hover { background: #059669; transform: translateY(-2px); }
     </style>
+
+    <link rel="stylesheet" href="susunan_mk.css">
 </head>
 <body>
 
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <div id="navbar-container"></div>
-
-        <div class="content-wrapper">
-            <div class="header-container">
-                <div class="header-title-area">
+    <div class="content-wrapper">
+        <div class="header-container">
+            <div class="header-title-area">
+                <div class="mobile-header-row">
+                    <button id="btnToggleSidebar" class="mobile-menu-btn" onclick="toggleMobileSidebar()" style="display: none;">
+                        <i class="fas fa-bars"></i>
+                    </button>
                     <div class="header-subtitle">KELOLA KURIKULUM</div>
-                    <h1 class="header-title">KELOLA MATA <span>KULIAH</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+                <h1 class="header-title">KELOLA MATA <span>KULIAH</span></h1>
             </div>
+            <div class="badge-prodi" id="prodiBadge">PRODI</div>
+        </div>
 
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
@@ -260,6 +265,12 @@
             else alert("❌ Gagal menyimpan data.");
         } catch (e) { alert("Terjadi kesalahan jaringan."); } 
         finally { btn.innerHTML = oldHtml; btn.disabled = false; }
+    }
+
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('sidebar-container');
+        // Toggle class 'active' untuk memunculkan sidebar
+        sidebar.classList.toggle('active');
     }
 
     window.onload = async () => {

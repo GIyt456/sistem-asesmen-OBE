@@ -7,6 +7,10 @@
     <title>Sistem Input Nilai Dosen - OBE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="/js/api_config.js"></script>
 
@@ -361,7 +365,7 @@
             <button class="hamburger-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
             <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
                 style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
-                onclick="window.location.href='index.html'">
+                onclick="window.location.href='../index.html'">
         </div>
 
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
@@ -465,22 +469,37 @@
             <h3 class="card-title">1. Konfigurasi Bobot Penilaian</h3>
             <p class="card-subtitle" style="margin-bottom: 20px;">Pilih Mata Kuliah untuk memulai.</p>
 
-            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
-                <select id="pilihMK" class="select-mk" onchange="loadMappingOtomatis()">
-                    <option value="" disabled selected>Pilih Mata Kuliah</option>
-                </select>
-                <div style="color: #64748b; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-                    <i class="fas fa-info-circle"></i> Data MK, CPL, CPMK akan terisi otomatis
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                
+                <div>
+                    <label style="font-weight: 700; font-size: 0.85rem; color: #1e3a8a; display: block; margin-bottom: 8px;">
+                        <i class="fas fa-laptop-code" style="color: #0284c7;"></i> Teknik Informatika (TI)
+                    </label>
+                    <select id="pilihMK_TI" class="select-mk" style="width: 100%;">
+                        <option value="" disabled selected>-- Memuat MK TI --</option>
+                    </select>
                 </div>
+
+                <div>
+                    <label style="font-weight: 700; font-size: 0.85rem; color: #16a34a; display: block; margin-bottom: 8px;">
+                        <i class="fas fa-network-wired" style="color: #16a34a;"></i> Sistem Informasi (SI)
+                    </label>
+                    <select id="pilihMK_SI" class="select-mk" style="width: 100%;">
+                        <option value="" disabled selected>-- Memuat MK SI --</option>
+                    </select>
+                </div>
+                
+                <input type="hidden" id="pilihMK" value="">
             </div>
 
-            <div id="card-quota" style="display: none; margin-bottom: 20px; padding: 20px; border: 1px dashed #cbd5e1; border-radius: 12px;">
-                <div style="font-weight: 800; font-size: 1.1rem; color: #1e3a8a; margin-bottom: 10px;">
-                    <i class="fas fa-chart-pie"></i> Anggaran Bobot Kaprodi
+            <div id="card-quota" style="display: none; margin-bottom: 20px; padding: 12px 15px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <div style="font-weight: 800; font-size: 0.8rem; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-chart-bar" style="color: #0284c7;"></i> Visualisasi Target Kaprodi
                 </div>
-                <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">Target persentase yang harus dipenuhi Dosen.</p>
-                <div id="quotaContainer" class="quota-grid">
-                    </div>
+                
+                <div id="sparklineContainer" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 10px;"></div>
+                
+                <div id="statusTextContainer" style="font-size: 0.8rem; font-weight: 700; padding-top: 8px; border-top: 1px dashed #e2e8f0;"></div>
             </div>
 
             <table id="configTable">
@@ -604,9 +623,11 @@
         const API_GET_MASTER_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
         const API_GET_KOMPONEN = `${API_BASE}/get-master-komponen`;
 
-        const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
+        const userLogin = localStorage.getItem("user_login");
         const userNidn = localStorage.getItem("user_nidn");
         const userRole = localStorage.getItem("user_role");
+
+        document.getElementById("dosenName").innerText = userLogin;
         const userProdi = localStorage.getItem("prodi_aktif") || "ti";
 
         let allMetadata = [];
@@ -618,11 +639,14 @@
         let cpmkTersedia = [];
         let kaprodiQuotas = []; 
         let trackingQuotas = []; 
-        let daftarKomponenMaster = []; // VARIABEL PENYIMPAN LIST MASTER KOMPONEN
+        let daftarKomponenMaster = [];
 
-        if (!userLogin) window.location.replace("../login/login.html");
-        document.getElementById("dosenName").innerText = userLogin;
-
+        if (!userLogin || !userNidn) {
+            alert("🔒 Akses Ditolak! Sesi Anda telah habis atau Anda belum login.");
+            window.location.replace("../index.html"); 
+            throw new Error("Hentikan eksekusi script karena belum login!"); 
+        }
+    
         // =====================================
         // NAVIGASI KAPRODI
         // =====================================
@@ -776,19 +800,10 @@
 
         async function loadMetadata() {
             await cekMKSudahInput();
-            
-            // TARIK MASTER KOMPONEN DARI KAPRODI
-            try {
-                const resKomp = await fetch(API_GET_KOMPONEN);
-                if(resKomp.ok) {
-                    daftarKomponenMaster = await resKomp.json();
-                }
-            } catch (e) { console.warn("Gagal menarik master komponen."); }
+            try { const resKomp = await fetch(API_GET_KOMPONEN); if(resKomp.ok) { daftarKomponenMaster = await resKomp.json(); } } catch (e) { }
 
             let prodiArray = userProdi.split(',');
             allMetadata = [];
-            const selectMK = document.getElementById('pilihMK');
-            selectMK.innerHTML = '<option value="" disabled selected>Pilih Mata Kuliah</option>';
 
             try {
                 for (let p of prodiArray) {
@@ -802,26 +817,63 @@
                 }
 
                 const uniqueMeta = []; const map = new Map();
-                for (const item of allMetadata) {
-                    if (!map.has(item.kode)) { map.set(item.kode, true); uniqueMeta.push(item); }
-                }
+                for (const item of allMetadata) { if (!map.has(item.kode)) { map.set(item.kode, true); uniqueMeta.push(item); } }
                 allMetadata = uniqueMeta;
 
                 const daftarMK = allMetadata.filter(item => item.tipe === 'mk');
-                if (daftarMK.length === 0) { selectMK.innerHTML = '<option value="" disabled selected>Tidak ada Mata Kuliah</option>'; return; }
+                
+                const selectTI = document.getElementById('pilihMK_TI');
+                const selectSI = document.getElementById('pilihMK_SI');
+                let htmlTI = '<option value="" disabled selected>-- Cari MK Teknik Informatika --</option>';
+                let htmlSI = '<option value="" disabled selected>-- Cari MK Sistem Informasi --</option>';
 
                 daftarMK.forEach(mk => {
-                    const opt = document.createElement('option');
-                    opt.value = mk.kode;
                     let statusText = mkSudahInput.includes(mk.kode) ? " 🔒 (Selesai)" : "";
-                    opt.textContent = `[${mk.kode}] ${mk.label}${statusText}`;
-                    selectMK.appendChild(opt);
+                    let optHTML = `<option value="${mk.kode}">[${mk.kode}] ${mk.label}${statusText}</option>`;
+                    if (mk.parent === 'ti' || mk.prodi_asal === 'ti') htmlTI += optHTML;
+                    else if (mk.parent === 'si' || mk.prodi_asal === 'si') htmlSI += optHTML;
                 });
 
+                selectTI.innerHTML = htmlTI; selectSI.innerHTML = htmlSI;
+
+                // Mengaktifkan Fitur Pencarian & Sinkronisasi Klik
+                if (window.jQuery && $.fn.select2) {
+                    $('#pilihMK_TI').select2({ placeholder: "Cari MK Teknik Informatika...", allowClear: true, width: '100%' });
+                    $('#pilihMK_SI').select2({ placeholder: "Cari MK Sistem Informasi...", allowClear: true, width: '100%' });
+
+                    // Jika Dosen klik di TI, bersihkan yang di SI, lalu jalankan sistem
+                    $('#pilihMK_TI').on('select2:select', function (e) {
+                        $('#pilihMK_SI').val(null).trigger('change.select2');
+                        document.getElementById('pilihMK').value = this.value;
+                        loadMappingOtomatis();
+                    });
+
+                    // Jika Dosen klik di SI, bersihkan yang di TI, lalu jalankan sistem
+                    $('#pilihMK_SI').on('select2:select', function (e) {
+                        $('#pilihMK_TI').val(null).trigger('change.select2');
+                        document.getElementById('pilihMK').value = this.value;
+                        loadMappingOtomatis();
+                    });
+                    
+                    $('#pilihMK_TI, #pilihMK_SI').on('select2:unselect', function(e) {
+                        document.getElementById('pilihMK').value = "";
+                    });
+                }
+
+                // Memuat kembali Draft sebelumnya (jika ada)
                 const draftMK = localStorage.getItem("draft_mk_terpilih");
-                if (draftMK && Array.from(selectMK.options).some(opt => opt.value === draftMK)) {
-                    selectMK.value = draftMK;
-                    loadMappingOtomatis();
+                if (draftMK) {
+                    if (Array.from(selectTI.options).some(opt => opt.value === draftMK)) {
+                        selectTI.value = draftMK;
+                        if (window.jQuery && $.fn.select2) $('#pilihMK_TI').trigger('change.select2');
+                        document.getElementById('pilihMK').value = draftMK;
+                        loadMappingOtomatis();
+                    } else if (Array.from(selectSI.options).some(opt => opt.value === draftMK)) {
+                        selectSI.value = draftMK;
+                        if (window.jQuery && $.fn.select2) $('#pilihMK_SI').trigger('change.select2');
+                        document.getElementById('pilihMK').value = draftMK;
+                        loadMappingOtomatis();
+                    }
                 }
             } catch (e) { console.error("❌ Gagal memproses metadata:", e); }
         }
@@ -839,19 +891,14 @@
             localStorage.setItem("draft_mk_terpilih", mkKode);
             await fetchMasterBobotDosen(mkKode);
 
-            try {
-                const mkInfo = allMetadata.find(m => m.kode === mkKode && m.tipe === 'mk');
-                const prodiQuery = mkInfo ? mkInfo.prodi_asal : userProdi;
-                const res = await fetch(`${API_GET_MAPPING}?mk=${mkKode}&prodi=${prodiQuery}`);
-                const mappedData = await res.json();
-                if (Array.isArray(mappedData) && mappedData.length > 0) {
-                    mappedData.forEach(item => {
-                        const targetCPMK = item.kode_cpmk || item.KODE_CPMK;
-                        const detailCPMK = allMetadata.find(m => m.kode === targetCPMK && m.tipe === 'cpmk');
-                        if (detailCPMK) cpmkTersedia.push({ cpmk: targetCPMK, cpl: detailCPMK.parent });
-                    });
+            cpmkTersedia = [];
+            let seenCpmk = new Set();
+            kaprodiQuotas.forEach(row => {
+                if(!seenCpmk.has(row.cpmk)) {
+                    seenCpmk.add(row.cpmk);
+                    cpmkTersedia.push({ cpmk: row.cpmk, cpl: row.cpl });
                 }
-            } catch (e) { }
+            });
 
             trackingQuotas = [];
             kaprodiQuotas.forEach(row => {
@@ -1026,50 +1073,73 @@
             const mkKode = document.getElementById("pilihMK").value;
             if (mkKode && configData.length > 0) localStorage.setItem("draft_bobot_" + mkKode, JSON.stringify(configData));
         }
-
+        
         function hitungDanValidasiKuota() {
             trackingQuotas.forEach(q => q.current = 0);
-            let grandTotal = 0;
             
-            configData.forEach(row => {
-                if (row.cpmk && row.bentuk && row.bobot > 0) {
-                    let match = trackingQuotas.find(q => q.cpmk === row.cpmk && q.kategori === row.bentuk);
-                    if (match) match.current += row.bobot;
-                }
-                grandTotal += row.bobot;
+            // Hitung akumulasi bobot input dosen per komponen
+            configData.forEach(cfg => {
+                let bobot = parseFloat(cfg.bobot) || 0;
+                let bentuk = (cfg.bentuk || "").toLowerCase();
+                let matched = trackingQuotas.find(q => q.cpmk === cfg.cpmk && bentuk.includes(q.kategori.toLowerCase()));
+                if(matched) matched.current += bobot;
             });
 
-            const qContainer = document.getElementById("quotaContainer");
-            qContainer.innerHTML = "";
-            let semuaValid = true;
+            let allValid = true;
+            const container = document.getElementById("sparklineContainer");
+            container.innerHTML = ""; // Bersihkan sparkline lama
 
+            // Susun Grafik Sparkline Bar
             trackingQuotas.forEach(q => {
-                const isValid = q.current === q.target;
-                if (!isValid) semuaValid = false;
-                const boxClass = isValid ? "valid" : "invalid";
-                const icon = isValid ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-times-circle"></i>';
+                let isOk = q.current === q.target;
+                let isOver = q.current > q.target;
+                if (!isOk) allValid = false;
 
-                qContainer.innerHTML += `
-                    <div class="quota-box ${boxClass}">
-                        <div class="quota-lbl">${q.cpmk} - ${q.kategori}</div>
-                        <div class="quota-val">${q.current}% / ${q.target}%</div>
-                        <div style="font-size: 0.8rem; margin-top: 5px;">${icon}</div>
+                let color = isOk ? "#16a34a" : (isOver ? "#dc2626" : "#ea580c");
+                
+                // Kalkulasi persentase lebar batang (Maksimal 100% agar tidak luber)
+                let percent = (q.target > 0) ? (q.current / q.target) * 100 : 0;
+                if (percent > 100) percent = 100;
+
+                container.innerHTML += `
+                    <div style="display: flex; flex-direction: column; min-width: 100px; flex: 1;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; color: #475569; margin-bottom: 4px;">
+                            <span>${q.kategori} (${q.cpmk})</span>
+                            <span style="color: ${color};">${q.current}/${q.target}%</span>
+                        </div>
+                        <div style="width: 100%; background: #f1f5f9; height: 6px; border-radius: 4px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);">
+                            <div style="width: ${percent}%; background: ${color}; height: 100%; transition: width 0.3s ease;"></div>
+                        </div>
                     </div>
                 `;
             });
 
-            const gt = document.getElementById("grandTotal");
-            gt.innerText = grandTotal + "%"; gt.style.color = grandTotal === 100 ? "#16a34a" : "#dc2626";
+            // Update Teks Status
+            const statusBox = document.getElementById("statusTextContainer");
+            let sumTotal = configData.reduce((sum, item) => sum + (parseFloat(item.bobot) || 0), 0);
 
-            const btnSimpan = document.getElementById("btnSimpan");
-            if (semuaValid && trackingQuotas.length > 0) {
-                btnSimpan.disabled = false;
-                btnSimpan.innerHTML = '<i class="fas fa-save"></i> Simpan Nilai ke Database';
-                btnSimpan.style.background = "#16a34a"; 
+            if (allValid && sumTotal === 100) {
+                statusBox.innerHTML = '<span style="color: #16a34a;"><i class="fas fa-check-circle"></i> Anggaran Sesuai & Total 100%</span>';
             } else {
-                btnSimpan.disabled = true;
-                btnSimpan.innerHTML = '<i class="fas fa-lock"></i> Penuhi Kuota Bobot Dulu';
-                btnSimpan.style.background = "#0f172a"; 
+                let pesan = '<span style="color: #ea580c;"><i class="fas fa-exclamation-triangle"></i> ';
+                if (!allValid) pesan += 'Bobot komponen belum klop. ';
+                if (sumTotal !== 100) pesan += `Total input ${sumTotal}% (Kurang ${100 - sumTotal}%).`;
+                pesan += '</span>';
+                statusBox.innerHTML = pesan;
+            }
+
+            // Validasi Tombol Simpan
+            const btnSimpan = document.getElementById("btnSimpan");
+            if(btnSimpan) {
+                if (allValid && sumTotal === 100) {
+                    btnSimpan.disabled = false;
+                    btnSimpan.style.opacity = '1';
+                    btnSimpan.innerHTML = '<i class="fas fa-save"></i> Simpan Nilai ke Database';
+                } else {
+                    btnSimpan.disabled = true;
+                    btnSimpan.style.opacity = '0.5';
+                    btnSimpan.innerText = "Penuhi Anggaran Kaprodi & Total 100% untuk Menyimpan";
+                }
             }
         }
 
@@ -1287,7 +1357,12 @@
             btn.disabled = false;
         }
 
-        function logout() { localStorage.clear(); window.location.replace("../login/login.html"); }
+        function logout() {
+            if (confirm("Apakah Anda yakin ingin keluar?")) {
+                localStorage.clear();
+                window.location.replace('../index.html');
+            }
+        }
         // ==========================================
         // FUNGSI NAVIGASI MOBILE (HAMBURGER)
         // ==========================================
