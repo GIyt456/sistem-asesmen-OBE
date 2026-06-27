@@ -351,7 +351,7 @@
 
         
     </style>
-     <link rel="stylesheet" href="css_dosen/index_mobile.css?v=9">
+     <link rel="stylesheet" href="css_dosen/index_mobile.css?v=99">
 </head>
 
 <body>
@@ -1017,7 +1017,6 @@
                     <td data-label="Bentuk Kegiatan"><select style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; outline:none;" onchange="updateRow(${i}, 'bentuk', this.value)">${optBentukHTML}</select></td>
                     <td data-label="Bobot Penilaian"><input type="number" value="${row.bobot}" ${lockAttr} style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" oninput="updateRowOnlyBobot(${i}, this.value)"></td>
                 `;
-                tbody.appendChild(tr);
                 tbody.appendChild(tr);
             });
 

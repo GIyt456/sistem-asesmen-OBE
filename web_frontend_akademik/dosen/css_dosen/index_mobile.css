@@ -244,16 +244,53 @@
     
     #card-bobot > div:nth-child(3) { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
     .select-mk { width: 100% !important; }
-    .quota-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
-
-    #masterBobotTable, #masterBobotTable thead, #masterBobotTable tbody, #masterBobotTable th, #masterBobotTable td, #masterBobotTable tr,
-    #configTable, #configTable thead, #configTable tbody, #configTable th, #configTable td, #configTable tr { display: block !important; width: 100% !important; }
+    /* =========================================
+       SULAP TABEL INPUT NILAI MENJADI KARTU 
+       ========================================= */
+    /* 1. Ubah bungkus tabel menjadi blok (Perhatikan: 'td' dihapus dari sini agar tidak bentrok) */
+    #masterBobotTable, #masterBobotTable thead, #masterBobotTable tbody, #masterBobotTable th, #masterBobotTable tr,
+    #configTable, #configTable thead, #configTable tbody, #configTable th, #configTable tr { 
+        display: block !important; width: 100% !important; 
+    }
+    
+    /* 2. Sembunyikan Header bawaan */
     #masterBobotTable thead, #configTable thead { position: absolute; top: -9999px; left: -9999px; }
-    #masterBobotTable tr, #configTable tr { border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; padding: 10px !important; background: white !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; }
-    #masterBobotTable td, #configTable td { display: flex !important; justify-content: space-between !important; align-items: center !important; text-align: right !important; padding: 12px 10px !important; border: none !important; border-bottom: 1px solid #f1f5f9 !important; }
+    
+    /* 3. Bentuk kartu */
+    #masterBobotTable tr, #configTable tr { 
+        border: 1px solid #cbd5e1 !important; border-radius: 12px !important; 
+        margin-bottom: 20px !important; padding: 10px !important; 
+        background: white !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; 
+    }
+    
+    /* 4. Atur sel sebagai Flexbox */
+    #masterBobotTable td, #configTable td { 
+        display: flex !important; justify-content: space-between !important; 
+        align-items: center !important; text-align: right !important; 
+        padding: 12px 10px !important; border: none !important; 
+        border-bottom: 1px solid #f1f5f9 !important; width: 100% !important;
+    }
     #masterBobotTable td:last-child, #configTable td:last-child { border-bottom: none !important; }
-    #masterBobotTable td::before, #configTable td::before { content: attr(data-label); font-weight: 700; color: #64748b; text-align: left; font-size: 0.85rem; flex-basis: 40%; }
-    #configTable select, #configTable input { width: 55% !important; text-align: right; }
+    
+    /* 5. KUNCI LABEL ANTI-MENGKERUT (Ini Solusi Utamanya!) */
+    #masterBobotTable td::before, #configTable td::before { 
+        content: attr(data-label); 
+        font-weight: 700; color: #64748b; text-align: left; font-size: 0.85rem; 
+        flex-basis: 40% !important; 
+        min-width: 40% !important; /* Paksa label meminta jatah minimal 40% layar */
+        flex-shrink: 0 !important; /* Haramkan label untuk mengecil */
+        display: block !important;
+    }
+    
+    /* 6. PAKSA FORM INPUT MENGALAH DAN MENGECIL */
+    #configTable select, #configTable input { 
+        width: 55% !important; 
+        max-width: 55% !important; 
+        min-width: 0 !important; /* Izinkan form mengecil menembus batas bawaannya */
+        flex-shrink: 1 !important; /* Paksa form mengalah */
+        text-align: right; 
+    }
+    
     #card-master-bobot > div, #configTable { overflow-x: visible !important; }
 
     #card-upload > div:first-child { flex-direction: column !important; align-items: flex-start !important; gap: 20px; }
@@ -504,5 +541,44 @@
     .row-default td:nth-child(1) { padding-bottom: 0 !important; border-bottom: none !important; text-align: left !important; justify-content: flex-start !important; color: #0369a1 !important; }
     .row-default td:nth-child(2) { padding-top: 5px !important; justify-content: flex-end !important; }
     .input-nilai { width: 100px !important; }
+
+    /* ========================================================================
+       18. PENANGKAL BUG TABEL PREVIEW EXCEL (DI INPUT NILAI)
+       ======================================================================== */
+    /* 1. Kembalikan tabel preview Excel dari format Kartu menjadi Tabel Normal */
+    #previewArea table { display: table !important; width: 100% !important; }
+    #previewArea thead { display: table-header-group !important; }
+    #previewArea tbody { display: table-row-group !important; }
+    
+    /* 2. Bersihkan baris dan kolom dari gaya kartu */
+    #previewArea tr { 
+        display: table-row !important; 
+        background: transparent !important; border: none !important; 
+        box-shadow: none !important; margin: 0 !important; padding: 0 !important; 
+    }
+    
+    #previewArea th, #previewArea td { 
+        display: table-cell !important; 
+        border: none !important; border-bottom: 1px solid #e5e7eb !important; 
+        text-align: center !important; vertical-align: middle !important; padding: 12px 8px !important; 
+    }
+    
+    /* 3. Matikan label palsu ::before agar tidak ada teks aneh yang muncul */
+    #previewArea td::before { display: none !important; }
+    
+    /* 4. Hidupkan kembali fitur kolom beku (sticky) untuk NIM dan Nama */
+    #studentHead th:first-child, #studentBody td:first-child,
+    #studentHead th:nth-child(2), #studentBody td:nth-child(2) { 
+        position: sticky !important; 
+        background: white !important; 
+        z-index: 10 !important; 
+        max-width: none !important; 
+        overflow: visible !important; 
+        white-space: nowrap !important;
+    }
+    
+    /* Bedakan warna latar header agar lebih manis */
+    #studentHead th { background: #f8fafc !important; z-index: 11 !important; }
+    #studentBody td:nth-child(2) { text-align: left !important; }
 
 } /* <--- INI ADALAH KURUNG KURAWAL PENUTUP UTAMA UNTUK MODE MOBILE. JANGAN ADA @MEDIA LAGI SETELAH INI */
