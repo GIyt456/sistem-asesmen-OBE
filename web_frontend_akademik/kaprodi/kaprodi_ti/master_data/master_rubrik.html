@@ -429,11 +429,14 @@
             // ==========================================
             // 4. FUNGSI MENAMPILKAN DETAIL RUBRIK 
             // ==========================================
+            // ==========================================
+            // 4. FUNGSI MENAMPILKAN DETAIL RUBRIK 
+            // ==========================================
             async function bukaModalDetailRubrik(idTugas, judulTugas, kodeMk, kodeCpmk) {
-                document.getElementById('modalRubrikJudul').innerText = judulTugas;
-                document.getElementById('modalRubrikSubtitle').innerText = `Mata Kuliah: ${kodeMk} | Sub-CPMK: ${kodeCpmk}`;
+                // HAPUS DUA BARIS document.getElementById YANG LAMA DI SINI
 
                 const headerModal = document.querySelector('.modal-header');
+                // InnerHTML ini sudah cukup untuk mencetak judul dan tombol PDF sekaligus
                 headerModal.innerHTML = `
             <div>
                 <h3 style="margin: 0 0 4px 0; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">${judulTugas}</h3>
@@ -456,7 +459,6 @@
                 document.getElementById('modalDetailRubrik').style.display = "flex";
 
                 try {
-                    // PERBAIKAN: MENGGUNAKAN API_BASE alih-alih BASE_API_BASE yang membuat detail error
                     const response = await fetch(`${API_BASE}/get-detail-rubrik?id_tugas=${idTugas}`);
                     const textData = await response.text();
 

@@ -73,7 +73,7 @@
             border-bottom: 2px solid #ffc561;
         }
 
-        .nav-user {
+       .nav-user {
             display: flex;
             align-items: center;
             gap: 16px;
@@ -510,7 +510,7 @@
         .nav-menu-wrapper { 
             display: flex; 
             align-items: center; 
-            justify-content: flex-end; 
+            justify-content: flex-start; /* <-- Ubah ini agar menu pindah ke kiri */
             gap: 40px; 
             flex: 1; 
         }
@@ -521,18 +521,14 @@
 
 <body>
 
-    <nav class="navbar">
+    <nav class="navbar" style="justify-content: flex-start; gap: 20px;">
+        <button class="hamburger-btn" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+
         <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
             style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);"
             onclick="window.location.href='../index.html'">
-
-        <div class="nav-links">
-            <a href="jadwal_mengajar.html" class="active">Jadwal Mengajar</a>
-            <a href="input_nilai.html">Input Asesmen</a>
-            <a href="rps_dosen.html">Penyusunan RPS</a>
-            <a href="../kaprodi/laporan.html">Laporan OBE</a>
-            <a href="portofolio.html">Portofolio</a>
-        </div>
 
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
 
