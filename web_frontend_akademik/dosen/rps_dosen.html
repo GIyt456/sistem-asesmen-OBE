@@ -529,76 +529,185 @@
             color: var(--primary-blue);
             background: #f8fafc;
         }
+
         /* =========================================
            RESPONSIVE NAVBAR (SIDEBAR BIRU DI HP)
         ========================================= */
-        .hamburger-btn, .close-menu-btn, .mobile-overlay, .sidebar-header-mobile { display: none; }
-        
-        .nav-menu-wrapper { 
-            display: flex; 
-            align-items: center; 
-            justify-content: flex-end; 
-            gap: 40px; 
-            flex: 1; 
+        .hamburger-btn,
+        .close-menu-btn,
+        .mobile-overlay,
+        .sidebar-header-mobile {
+            display: none;
+        }
+
+        .nav-menu-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 40px;
+            flex: 1;
         }
 
         @media screen and (max-width: 768px) {
-            .navbar { padding: 15px 20px !important; justify-content: flex-start !important; }
-            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-            
+            .navbar {
+                padding: 15px 20px !important;
+                justify-content: flex-start !important;
+            }
+
+            .hamburger-btn {
+                display: block;
+                background: transparent;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+
             /* Sidebar Kiri dengan Warna Biru Navy */
             .nav-menu-wrapper {
-                position: fixed; top: 0; left: -320px; width: 280px; height: 100vh;
-                background: var(--primary-navy); 
-                flex-direction: column; align-items: flex-start; justify-content: flex-start;
-                padding: 0; box-shadow: 10px 0 25px rgba(0,0,0,0.5); 
+                position: fixed;
+                top: 0;
+                left: -320px;
+                width: 280px;
+                height: 100vh;
+                background: var(--primary-navy);
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: flex-start;
+                padding: 0;
+                box-shadow: 10px 0 25px rgba(0, 0, 0, 0.5);
                 transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                z-index: 1000; overflow-y: auto;
+                z-index: 1000;
+                overflow-y: auto;
                 display: flex !important;
             }
-            .nav-menu-wrapper.active { left: 0; }
 
-            .sidebar-header-mobile { 
-                display: flex; justify-content: space-between; align-items: center; 
-                width: 100%; padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); 
+            .nav-menu-wrapper.active {
+                left: 0;
             }
-            .sidebar-brand { font-size: 1.3rem; font-weight: 900; color: white; margin: 0;}
-            .sidebar-brand span { color: #ffc561; }
-            
-            .close-menu-btn { 
-                display: flex; align-items: center; justify-content: center;
-                background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5; 
-                width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; transition: 0.2s;
-            }
-            .close-menu-btn:hover { background: rgba(239, 68, 68, 0.5); color: white; }
 
-            .nav-links { flex-direction: column; gap: 8px; width: 100%; padding: 20px; align-items: flex-start; display: flex !important; }
-            .nav-links a { 
-                color: #cbd5e1; width: 100%; padding: 14px 16px; border-radius: 10px; border: none; 
-                font-weight: 600; font-size: 0.95rem; transition: 0.2s; margin-bottom: 5px; background: transparent;
+            .sidebar-header-mobile {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                padding: 25px 20px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
-            
-            .nav-links a.active { 
-                background: rgba(255, 255, 255, 0.1); color: white; 
-                border-left: 4px solid #ffc561; border-radius: 0 10px 10px 0; font-weight: 800; border-bottom: none;
-            }
-            .nav-links a:hover:not(.active) { background: rgba(255,255,255,0.05); color: white; opacity: 1; }
 
-            .nav-user { 
-                flex-direction: column; width: 100%; padding: 20px; 
-                margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); 
+            .sidebar-brand {
+                font-size: 1.3rem;
+                font-weight: 900;
+                color: white;
+                margin: 0;
+            }
+
+            .sidebar-brand span {
+                color: #ffc561;
+            }
+
+            .close-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(239, 68, 68, 0.2);
+                border: none;
+                color: #fca5a5;
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: 0.2s;
+            }
+
+            .close-menu-btn:hover {
+                background: rgba(239, 68, 68, 0.5);
+                color: white;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+                padding: 20px;
+                align-items: flex-start;
+                display: flex !important;
+            }
+
+            .nav-links a {
+                color: #cbd5e1;
+                width: 100%;
+                padding: 14px 16px;
+                border-radius: 10px;
+                border: none;
+                font-weight: 600;
+                font-size: 0.95rem;
+                transition: 0.2s;
+                margin-bottom: 5px;
+                background: transparent;
+            }
+
+            .nav-links a.active {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                border-left: 4px solid #ffc561;
+                border-radius: 0 10px 10px 0;
+                font-weight: 800;
+                border-bottom: none;
+            }
+
+            .nav-links a:hover:not(.active) {
+                background: rgba(255, 255, 255, 0.05);
+                color: white;
+                opacity: 1;
+            }
+
+            .nav-user {
+                flex-direction: column;
+                width: 100%;
+                padding: 20px;
+                margin-top: auto;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
                 justify-content: center !important;
             }
-            .user-chip { 
-                width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-                color: white; padding: 12px 16px; border-radius: 10px; 
-                justify-content: flex-start; margin-bottom: 12px; gap: 12px;
-            }
-            .user-chip i { color: #ffc561 !important; font-size: 1.8rem; }
-            .btn-logout { width: 100%; }
 
-            .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
-            .mobile-overlay.active { display: block; }
+            .user-chip {
+                width: 100%;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: white;
+                padding: 12px 16px;
+                border-radius: 10px;
+                justify-content: flex-start;
+                margin-bottom: 12px;
+                gap: 12px;
+            }
+
+            .user-chip i {
+                color: #ffc561 !important;
+                font-size: 1.8rem;
+            }
+
+            .btn-logout {
+                width: 100%;
+            }
+
+            .mobile-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: rgba(15, 23, 42, 0.6);
+                backdrop-filter: blur(3px);
+                z-index: 999;
+                display: none;
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
         }
     </style>
     <link rel="stylesheet" href="css_dosen/index_mobile.css?v=9">
@@ -619,12 +728,12 @@
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
 
         <div class="nav-menu-wrapper" id="navMenuWrapper">
-            
+
             <div class="sidebar-header-mobile">
                 <p class="sidebar-brand">SISTEM <span>OBE</span></p>
                 <button class="close-menu-btn" onclick="toggleMenu()"><i class="fas fa-times"></i></button>
             </div>
-            
+
             <div class="nav-links">
                 <a href="jadwal_mengajar.html">Jadwal Mengajar</a>
                 <a href="input_nilai.html">Input Asesmen</a>
@@ -637,13 +746,16 @@
                 <div class="user-chip">
                     <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i>
                     <div class="user-text-mobile">
-                        <div class="user-label-hp" style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700; line-height: 1; display: none;">DOSEN PENGAMPU</div>
-                        <div id="dosenName" style="font-size: 0.95rem; font-weight: 800; margin-top: 2px; line-height: 1;">Dosen</div>
+                        <div class="user-label-hp"
+                            style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700; line-height: 1; display: none;">
+                            DOSEN PENGAMPU</div>
+                        <div id="dosenName"
+                            style="font-size: 0.95rem; font-weight: 800; margin-top: 2px; line-height: 1;">Dosen</div>
                     </div>
                 </div>
                 <button class="btn-logout" onclick="logout()">Log Out</button>
             </div>
-            
+
         </div>
     </nav>
     <main class="container">
@@ -1019,10 +1131,20 @@
             try {
                 const res = await fetch(`${API_CPMK_LIST}?prodi=${userProdiSekarang}`);
                 if (res.ok) {
-                    masterCPMK = await res.json();
+                    const rawJson = await res.json();
+
+                    // PERBAIKAN: Gunakan safeExtractArray agar bungkusan "json" dari n8n terbongkar!
+                    masterCPMK = safeExtractArray(rawJson);
+
                     let htmlOptions = "";
                     masterCPMK.forEach(item => {
-                        htmlOptions += `<option value="${item.kode_cpmk}">${item.deskripsi}</option>`;
+                        // Amankan pembacaan nama kolom yang mungkin berbeda
+                        let kode = item.kode_cpmk || item.id_cpmk || item.cpmk || '';
+                        let desc = item.deskripsi_cpmk || item.deskripsi || item.kemampuan_akhir || '';
+
+                        if (kode) {
+                            htmlOptions += `<option value="${kode}">${desc}</option>`;
+                        }
                     });
                     document.getElementById('cpmk_options').innerHTML = htmlOptions;
                 }
@@ -1066,7 +1188,9 @@
             const badgeContainer = document.getElementById(`badge_container_${indexBaris}`);
             const selectEl = document.getElementById(`select_cpmk_${indexBaris}`);
 
-            let currentArray = hiddenInput.value.split(',').map(k => k.trim()).filter(k => k !== '');
+            // AMANKAN ARRAY DARI STRING KOTOR SEPERTI "NONE"
+            let currentArray = hiddenInput.value.split(',').map(k => k.trim()).filter(k => k !== '' && k !== 'NONE' && k !== 'null' && k !== 'undefined');
+            hiddenInput.value = currentArray.join(', ');
 
             // 1. Cetak ulang HTML Stiker/Badge di Atas
             badgeContainer.innerHTML = "";
@@ -1079,7 +1203,7 @@
                 `;
             });
 
-            // 2. Logika Animasi Dropdown (Besar jika Kosong, Kecil jika Ada isinya)
+            // 2. Logika Animasi Dropdown
             if (currentArray.length === 0) {
                 selectEl.className = "input-rps";
                 selectEl.options[0].text = "+ Pilih CPMK...";
@@ -1093,20 +1217,31 @@
 
         function isiOtomatisDeskripsi(indexBaris) {
             const inputKodeStr = document.getElementById(`id_cpmk_${indexBaris}`).value;
-            const kodeArray = inputKodeStr.split(',').map(k => k.trim()).filter(k => k !== '');
+            const kodeArray = inputKodeStr.split(',').map(k => k.trim()).filter(k => k !== '' && k !== 'NONE');
 
             let combinedDesc = [];
 
             kodeArray.forEach(kode => {
-                const cpmkDitemukan = masterCPMK.find(item => item.kode_cpmk === kode);
-                if (cpmkDitemukan) combinedDesc.push(`[${kode}]\n${cpmkDitemukan.deskripsi}`);
+                // Tembak memori global
+                let teksDesc = window.cpmkDescriptions ? window.cpmkDescriptions[kode] : null;
+
+                if (!teksDesc) {
+                    const cpmkDitemukan = masterCPMK.find(m => m.kode_cpmk === kode || m.id_cpmk === kode || m.cpmk === kode);
+                    if (cpmkDitemukan) teksDesc = cpmkDitemukan.deskripsi_cpmk || cpmkDitemukan.deskripsi || cpmkDitemukan.kemampuan_akhir || '';
+                }
+
+                if (teksDesc) combinedDesc.push(`[${kode}]\n${teksDesc}`);
+                else combinedDesc.push(`[${kode}]`);
             });
 
             const colDesc = document.getElementById(`sub_cpmk_${indexBaris}`);
             colDesc.value = combinedDesc.length > 0 ? combinedDesc.join('\n\n') : '';
 
+            // Animasi visual flash
             colDesc.style.backgroundColor = "#ccfbf1";
-            setTimeout(() => { colDesc.style.backgroundColor = (indexBaris === 8 || indexBaris === 16) ? "#fef2f2" : "#f8fafc"; }, 600);
+            setTimeout(() => {
+                colDesc.style.backgroundColor = (indexBaris === 8 || indexBaris === 16) ? "#fef2f2" : "#f8fafc";
+            }, 600);
 
             colDesc.style.height = 'auto';
             colDesc.style.height = (colDesc.scrollHeight) + 'px';
@@ -1269,7 +1404,11 @@
 
             // 4. TARIK CPL & CPMK (Sambil menyimpan memori relasi CPL ke CPMK)
             let validCpmkKodes = [];
-            let mapCpmkToCpl = {}; // <-- Wadah memori relasi baru
+            let mapCpmkToCpl = {};
+
+            // --- TAMBAHAN BARU: WADAH MEMORI GLOBAL DESKRIPSI ---
+            window.cpmkDescriptions = {};
+
             try {
                 const resCplCpmk = await fetch(`${API_GET_CPL_CPMK}?kode_mk=${kodeMK}`);
                 if (resCplCpmk.ok) {
@@ -1284,7 +1423,10 @@
                         filteredData.forEach(row => {
                             if (row.kode_cpmk) {
                                 validCpmkKodes.push(row.kode_cpmk);
-                                if (row.kode_cpl) mapCpmkToCpl[row.kode_cpmk] = row.kode_cpl; // Simpan relasinya di sini
+                                if (row.kode_cpl) mapCpmkToCpl[row.kode_cpmk] = row.kode_cpl;
+
+                                // BAJAK & SIMPAN DESKRIPSI KE MEMORI BROWSER
+                                if (row.deskripsi_cpmk) window.cpmkDescriptions[row.kode_cpmk] = row.deskripsi_cpmk;
                             }
                             if (row.kode_cpl && row.deskripsi_cpl) cplMap.set(row.kode_cpl, row.deskripsi_cpl);
                             if (row.kode_cpmk && row.deskripsi_cpmk) cpmkArray.push(`<li><strong>${row.kode_cpmk}</strong> - ${row.deskripsi_cpmk} <em>(Ref: ${row.kode_cpl || '-'})</em></li>`);
@@ -1393,7 +1535,7 @@
             } catch (e) { console.warn("Belum ada data di rps_lainnya"); }
         }
 
-        function bukaDetailRPS(kode_mk, nama_mk, semester, sks) {
+        async function bukaDetailRPS(kode_mk, nama_mk, semester, sks) {
             currentMkDipilih = kode_mk;
 
             document.getElementById('view-list').style.display = 'none';
@@ -1403,7 +1545,9 @@
             document.getElementById('dtlMk').value = `${kode_mk} - ${nama_mk.toUpperCase()}`;
             document.getElementById('dtlSem').value = semester;
 
-            loadInfoKelengkapanRPS(kode_mk);
+            // TUNGGU DATA CPL & CPMK SELESAI DITARIK DULU
+            await loadInfoKelengkapanRPS(kode_mk);
+            // BARU RENDER TABEL 16 MINGGU
             loadDataRPSTable(kode_mk);
         }
 
@@ -1468,47 +1612,66 @@
             const tbodySesi = document.getElementById("bodyTabelSesi");
             let htmlSesi = "";
 
-            // Buat daftar dropdown dinamis dengan opsi pertama disabled
+            let configBobot = [];
+            try {
+                const draft = localStorage.getItem("draft_bobot_" + kodeMK);
+                if (draft) configBobot = JSON.parse(draft);
+            } catch (e) { console.log("Draft bobot tidak ditemukan"); }
+
             let optCpmk = '<option value="" disabled selected>+ Pilih CPMK...</option>';
             masterCPMK.forEach(c => {
-                optCpmk += `<option value="${c.kode_cpmk}">${c.kode_cpmk}</option>`;
+                let kodeC = c.kode_cpmk || c.id_cpmk || c.cpmk || '';
+                if (kodeC) optCpmk += `<option value="${kodeC}">${kodeC}</option>`;
             });
 
             for (let i = 1; i <= 16; i++) {
                 const rowData = existingData.find(item => parseInt(item.pertemuan) === i) || {};
+                const rowBobot = configBobot.find(item => parseInt(item.pertemuan) === i) || {};
 
-                let bgRowClass = '';
-                let bgInput = '#f8fafc';
-                let hint = '';
+                let valCpmk = rowData.id_cpmk || rowBobot.cpmk || '';
+                let valAssessmen = rowData.assessmen || rowData.bentuk_pembelajaran || rowBobot.bentuk || '';
 
-                if (i === 8) {
-                    bgRowClass = 'row-ujian';
-                    bgInput = '#fef2f2';
-                    hint = '[UTS] ';
-                } else if (i === 16) {
-                    bgRowClass = 'row-ujian';
-                    bgInput = '#fef2f2';
-                    hint = '[UAS] ';
+                if (valCpmk === 'NONE' || valCpmk === 'null' || valCpmk === 'undefined') valCpmk = '';
+                if (valAssessmen.includes("(Tanpa Bobot)")) valAssessmen = valAssessmen.replace("(Tanpa Bobot)", "").trim();
+
+                let valDeskripsi = rowData.deskripsi_cpmk || rowData.sub_cpmk || rowData.kemampuan_akhir || '';
+
+                // PENCARIAN DARI MEMORI YANG SUDAH PASTI ADA DESKRIPSINYA
+                if (valCpmk !== '') {
+                    let descTemp = [];
+                    let arrKodes = valCpmk.split(',').map(k => k.trim()).filter(k => k !== '');
+                    arrKodes.forEach(kode => {
+                        let teksDesc = window.cpmkDescriptions ? window.cpmkDescriptions[kode] : null;
+
+                        // Fallback darurat
+                        if (!teksDesc) {
+                            let cpmkDitemukan = masterCPMK.find(m => m.kode_cpmk === kode || m.id_cpmk === kode || m.cpmk === kode);
+                            if (cpmkDitemukan) teksDesc = cpmkDitemukan.deskripsi_cpmk || cpmkDitemukan.deskripsi || cpmkDitemukan.kemampuan_akhir || '';
+                        }
+
+                        if (teksDesc) descTemp.push(`[${kode}]\n${teksDesc}`);
+                        else descTemp.push(`[${kode}]`);
+                    });
+                    if (descTemp.length > 0) valDeskripsi = descTemp.join('\n\n');
                 }
+
+                let bgRowClass = ''; let bgInput = '#f8fafc'; let hint = '';
+                if (i === 8) { bgRowClass = 'row-ujian'; bgInput = '#fef2f2'; hint = '[UTS] '; }
+                else if (i === 16) { bgRowClass = 'row-ujian'; bgInput = '#fef2f2'; hint = '[UAS] '; }
 
                 htmlSesi += `
                     <tr class="${bgRowClass}">
                         <td style="text-align: center; font-weight: bold; padding-top: 15px; font-size:1.1rem; color: ${(i === 8 || i === 16) ? 'var(--primary-red)' : '#475569'};">${i}</td>
-                        
                         <td style="vertical-align: top;">
                             <div id="badge_container_${i}" style="display:flex; flex-direction:column; gap:5px; margin-bottom:5px;"></div>
-                            
                             <select class="input-rps" id="select_cpmk_${i}" onchange="tambahCpmkKeSesi(${i})" style="background:${bgInput}; cursor:pointer; font-weight:600;">
                                 ${optCpmk}
                             </select>
-                            
-                            <input type="hidden" id="id_cpmk_${i}" value="${rowData.id_cpmk || ''}">
+                            <input type="hidden" id="id_cpmk_${i}" value="${valCpmk}">
                         </td>
-                        
-                        <td><textarea class="input-rps sub_cpmk-input" id="sub_cpmk_${i}" placeholder="${hint}Deskripsi otomatis..." style="background:${bgInput}; cursor:not-allowed; font-size:0.8rem;" readonly>${rowData.deskripsi_cpmk || rowData.sub_cpmk || rowData.kemampuan_akhir || ''}</textarea></td>
-                        
+                        <td><textarea class="input-rps sub_cpmk-input" id="sub_cpmk_${i}" placeholder="${hint}Deskripsi otomatis..." style="background:${bgInput}; cursor:not-allowed; font-size:0.8rem;" readonly>${valDeskripsi}</textarea></td>
                         <td><textarea class="input-rps indikator-input" id="indikator_${i}" placeholder="Indikator..." style="background:${bgInput};">${rowData.indikator || rowData.indikator_pencapaian || ''}</textarea></td>
-                        <td><textarea class="input-rps assessmen-input" id="assessmen_${i}" placeholder="Asesmen..." style="background:${bgInput};">${rowData.assessmen || rowData.bentuk_pembelajaran || ''}</textarea></td>
+                        <td><textarea class="input-rps assessmen-input" id="assessmen_${i}" placeholder="Asesmen..." style="background:${bgInput};">${valAssessmen}</textarea></td>
                         <td><textarea class="input-rps materi-input" id="materi_${i}" placeholder="Materi..." style="background:${bgInput};">${rowData.materi || rowData.materi_pembelajaran || ''}</textarea></td>
                         <td><textarea class="input-rps metode-input" id="metode_${i}" placeholder="Metode..." style="background:${bgInput};">${rowData.metode || rowData.metode_pembelajaran || ''}</textarea></td>
                         <td><textarea class="input-rps tatap_muka-input" id="tatap_muka_${i}" placeholder="Tatap Muka..." style="background:${bgInput};">${rowData.tatap_muka || ''}</textarea></td>
@@ -1518,11 +1681,7 @@
             }
 
             tbodySesi.innerHTML = htmlSesi;
-
-            for (let i = 1; i <= 16; i++) {
-                renderBadgeCpmk(i, false);
-            }
-
+            for (let i = 1; i <= 16; i++) renderBadgeCpmk(i, false);
             const textareas = document.querySelectorAll('.input-rps');
             textareas.forEach(tx => {
                 tx.style.height = 'auto';
