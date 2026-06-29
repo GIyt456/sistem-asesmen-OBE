@@ -1,0 +1,60 @@
+<style>
+    /* 1. Secara bawaan (di Desktop), sembunyikan Navbar ini */
+    #navbar-container {
+        display: none;
+    }
+
+    /* 2. Aktifkan dan Desain Navbar khusus di layar Mobile */
+    @media screen and (max-width: 768px) {
+        #navbar-container {
+            display: block !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .mobile-navbar-content {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important; /* Susun semua elemen mulai dari kiri */
+            gap: 15px !important; /* Jarak pas antara garis tiga dan logo */
+            background-color: var(--text-dark) !important;
+            padding: 15px 20px !important; /* Normalisasi padding agar tidak kepenuhan */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-sizing: border-box !important;
+            width: 100% !important;
+        }
+
+        .mobile-menu-btn {
+            display: flex !important;
+            background: transparent !important;
+            color: white !important; 
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important; /* Bersihkan margin/right yang nyasar */
+            font-size: 1.6rem !important;
+            cursor: pointer !important;
+        }
+
+        .mobile-menu-btn:active {
+            opacity: 0.6;
+        }
+
+        .navbar-title {
+            color: white !important;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="mobile-navbar-content">
+    <button id="btnToggleSidebar" class="mobile-menu-btn" onclick="toggleMobileSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <img src="/gambar/logo_unaki.png" 
+    style="height: 30px; object-fit: contain; margin-left: 10px; cursor: pointer; filter: brightness(0) invert(1);">
+</div>

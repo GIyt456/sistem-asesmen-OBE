@@ -52,7 +52,8 @@ body {
 
 .header-title-area { 
     display: flex; 
-    flex-direction: column; 
+    flex-direction: column;
+    padding: 5px; 
 }
 
 .header-subtitle { 
@@ -147,6 +148,9 @@ td {
 .btn-upload { background: var(--success-green); }
 .btn-upload:hover { background: #059669; transform: translateY(-2px); }
 
+#navbar-container {
+    display: none;
+}
 
 /* ------------------------------------------------------------------------
    B. TAMPILAN RESPONSIVE (MOBILE & TABLET - MAKSIMAL LEBAR 768px)
@@ -165,21 +169,11 @@ td {
         position: relative !important;
         width: 100% !important;
         overflow-x: hidden !important;
-    }
+    }    
 
-    /* 2. NAVBAR BIRU KHUSUS MOBILE */
-    .mobile-top-navbar {
-        display: flex !important; /* Paksa muncul hanya saat di layar HP */
-        align-items: center;
-        justify-content: center; /* Teks otomatis di tengah */
-        background-color: var(--primary-blue) !important; 
-        color: white !important;
-        width: 100% !important;
-        padding: 15px 0 !important;
-        font-weight: 800;
-        font-size: 0.95rem;
-        letter-spacing: 1px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    .header-title-area {
+        display: flex !important;
+        flex-direction: column !important;
     }
 
     .content-wrapper {
@@ -193,35 +187,6 @@ td {
         gap: 15px !important;
         padding-bottom: 15px !important;
         margin-bottom: 25px !important;
-    }
-
-    /* Ini kunci rahasia yang menyatukan ikon dan teks! */
-    .header-left {
-        display: flex !important;
-        align-items: center !important; 
-        gap: 15px !important; 
-    }
-
-    .mobile-menu-btn {
-        display: block !important; 
-        background: transparent !important; 
-        color: var(--text-dark) !important; 
-        border: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        font-size: 1.8rem !important; 
-        cursor: pointer !important;
-        box-shadow: none !important;
-    }
-
-    .mobile-menu-btn:active {
-        opacity: 0.5;
-    }
-
-    .header-title-area {
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
     }
 
     .header-subtitle {
