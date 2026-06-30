@@ -52,9 +52,6 @@
 
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
                 <div>
-                    <a href="rekap_nilai.html" class="btn-action" style="background: #f1f5f9; color: #475569; font-weight: 600; border: 1px solid #cbd5e1; text-decoration: none; margin-bottom: 15px; display: inline-flex;">
-                        <i class="fas fa-arrow-left"></i> Kembali ke Rekap
-                    </a>
                     <h2 id="labelMK" style="margin: 0 0 5px 0; font-size: 1.6rem; color: var(--text-dark); font-weight: 800;">Memuat Mata Kuliah...</h2>
                     <p style="margin: 0; color: #64748b; font-size: 1.05rem; font-weight: 500;">Dosen Pengampu: <strong style="color: #1e293b;" id="labelDosen">-</strong></p>
                 </div>
@@ -132,58 +129,94 @@
 
         async function loadDetailNilai() {
             const tbody = document.getElementById("bodyDetailNilai");
+            
             if(!paramKodeMK) {
-                tbody.innerHTML = `<tr><td colspan="20" style="color: red; padding: 30px;">Kode Mata Kuliah tidak ditemukan di URL! Kembali ke halaman sebelumnya.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="20" style="color: red; padding: 30px; text-align: center;">Kode Mata Kuliah tidak ditemukan di URL! Kembali ke halaman sebelumnya.</td></tr>`;
                 return;
             }
 
-            // Warna *highlight* untuk sel UTS/UAS menyesuaikan prodi
             const warnaKolomUjian = PRODI === 'si' ? 'background: #f0fdfa;' : 'background: #fff5f5;';
             const warnaTeksNim = PRODI === 'si' ? 'var(--primary-teal)' : 'var(--primary-red)';
 
-            try {
-                // Melakukan request ke n8n berdasarkan kode_mk
-                const res = await fetch(`${API_GET_DETAIL}?kode_mk=${paramKodeMK}`);
-                if(!res.ok) throw new Error("Gagal mengambil data dari n8n");
-                
-                const dataMhs = await res.json();
+            tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Menarik detail nilai dan metadata RPS dari database...</td></tr>`;
 
-                if(!Array.isArray(dataMhs) || dataMhs.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="20" style="color: #64748b; padding: 40px;">Belum ada nilai yang diinput oleh dosen untuk kelas ini.</td></tr>`;
+            try {
+                const res = await fetch(`${API_GET_DETAIL}?kode_mk=${paramKodeMK}`);
+                if(!res.ok) throw new Error("Gagal load API");
+
+                const rawText = await res.text();
+                
+                if (!rawText || rawText.trim() === "" || rawText.includes("empty_database")) {
+                    tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #dc2626; padding: 30px; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Belum ada data nilai mahasiswa di kelas ini.</td></tr>`;
+                    return;
+                }
+
+                const data = JSON.parse(rawText);
+
+                if(!data || data.length === 0 || !data[0].nim) {
+                    tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #dc2626; padding: 30px; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Belum ada data nilai mahasiswa di kelas ini.</td></tr>`;
                     return;
                 }
 
                 tbody.innerHTML = "";
-                dataMhs.forEach((mhs, index) => {
-                    let htmlRow = `
-                        <tr style="border-bottom: 1px solid #e5e7eb;">
-                            <td class="sticky-col" style="font-weight: bold; color: #475569;">${index + 1}</td>
-                            <td class="sticky-col" style="text-align: left;">
-                                <div style="font-weight: 800; color: ${warnaTeksNim}; font-size: 0.95rem;">${mhs.nim}</div>
-                                <div style="font-size: 0.85rem; font-weight: 500; color: #1e293b; margin-top: 2px;">${mhs.nama_mahasiswa || '-'}</div>
-                            </td>`;
+                let urutanMhs = 1;
 
-                    // Looping nilai P1 sampai P16
-                    for(let p = 1; p <= 16; p++) {
-                        let nilaiP = mhs[`p${p}`] !== null ? mhs[`p${p}`] : '<span style="color:#cbd5e1;">-</span>';
-                        let bgUjian = (p === 8 || p === 16) ? warnaKolomUjian : '';
-                        let fontWeight = (p === 8 || p === 16) ? 'font-weight: bold;' : '';
-                        
-                        htmlRow += `<td style="${bgUjian} ${fontWeight}">${nilaiP}</td>`;
-                    }
-
-                    // Nilai Akhir & Grade
-                    let badgeStyle = getGradeColor(mhs.grade || 'E');
-                    htmlRow += `
-                            <td style="font-weight: 800; font-size: 1.1rem; background: #f8fafc; color: #0f172a;">${mhs.nilai_total || 0}</td>
-                            <td style="background: #f8fafc;"><span class="grade-badge" style="${badgeStyle}">${mhs.grade || '-'}</span></td>
-                        </tr>`;
+                data.forEach((mhs) => {
                     
-                    tbody.innerHTML += htmlRow;
+                    // CEK JIKA INI ADALAH BARIS HEADER INJEKSI (CPL / CPMK / BOBOT)
+                    if (mhs.nim === '0_HEADER_CPL' || mhs.nim === '1_HEADER_CPMK' || mhs.nim === '2_HEADER_BOBOT') {
+                        let isBobot = mhs.nim === '2_HEADER_BOBOT';
+                        // Memberikan warna background abu-abu sedikit lebih gelap khusus untuk baris Bobot agar menjadi pembatas yang jelas
+                        let bgStyle = isBobot ? 'background: #e2e8f0; color: #0f172a; font-weight: 800;' : 'background: #f8fafc; color: #475569; font-weight: 700; font-size: 0.85rem;';
+                        
+                        let htmlHeader = `
+                            <tr>
+                                <td class="sticky-col" style="${bgStyle} border-right: none;"></td>
+                                
+                                <td class="sticky-col" style="${bgStyle} text-align: left;">
+                                    <div style="font-size: 0.9rem;">${mhs.nama_mahasiswa}</div>
+                                </td>`;
+                        
+                        for(let p = 1; p <= 16; p++) {
+                            let val = (mhs[`p${p}`] !== null && mhs[`p${p}`] !== '0') ? mhs[`p${p}`] : '<span style="color:#cbd5e1;">-</span>';
+                            htmlHeader += `<td style="${bgStyle} text-align: center;">${val}</td>`;
+                        }
+                        
+                        htmlHeader += `<td style="${bgStyle} text-align: center;">${mhs.nilai_total}</td><td style="${bgStyle} text-align: center;">-</td></tr>`;
+                        tbody.innerHTML += htmlHeader;
+                    } 
+                    // JIKA INI ADALAH BARIS MAHASISWA ASLI
+                    else {
+                        let htmlRow = `
+                            <tr>
+                                <td class="sticky-col" style="font-weight: 700; color: #475569; text-align: center;">${urutanMhs++}</td>
+                                <td class="sticky-col" style="text-align: left;">
+                                    <div style="font-weight: 800; color: ${warnaTeksNim}; font-size: 0.95rem;">${mhs.nim || '-'}</div>
+                                    <div style="font-size: 0.85rem; font-weight: 500; color: #475569; margin-top: 2px;">${mhs.nama_mahasiswa || '-'}</div>
+                                </td>`;
+
+                        for(let p = 1; p <= 16; p++) {
+                            let nilaiP = mhs[`p${p}`] !== null ? mhs[`p${p}`] : '<span style="color:#cbd5e1;">-</span>';
+                            let bgUjian = (p === 8 || p === 16) ? warnaKolomUjian : '';
+                            let fontWeight = (p === 8 || p === 16) ? 'font-weight: bold;' : '';
+                            
+                            htmlRow += `<td style="${bgUjian} ${fontWeight} text-align: center;">${nilaiP}</td>`;
+                        }
+
+                        let badgeStyle = getGradeColor(mhs.grade || 'E');
+                        htmlRow += `
+                                <td style="font-weight: 900; font-size: 1.15rem; background: #f8fafc; color: #0f172a; text-align: center;">${mhs.nilai_total || 0}</td>
+                                <td style="background: #f8fafc; text-align: center;">
+                                    <span class="grade-badge" style="display: inline-block; padding: 4px 12px; border-radius: 6px; font-weight: bold; ${badgeStyle}">${mhs.grade || '-'}</span>
+                                </td>
+                            </tr>`;
+                        
+                        tbody.innerHTML += htmlRow;
+                    }
                 });
 
             } catch(error) {
-                tbody.innerHTML = `<tr><td colspan="20" style="color: red; padding: 30px;">Terjadi kesalahan saat memuat data. Pastikan n8n aktif.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: red; padding: 30px;"><i class="fas fa-wifi"></i> Terjadi kesalahan saat memuat data. Pastikan n8n aktif.</td></tr>`;
                 console.error(error);
             }
         }

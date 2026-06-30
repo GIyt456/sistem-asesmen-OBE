@@ -49,19 +49,15 @@
 
             <div class="filter-container">
                 <div style="display: flex; gap: 15px; align-items: center;">
-                    <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-users"></i> Pilih Angkatan:</label>
-                    <select id="selectAngkatan" class="form-control" style="width: 200px; font-weight: 500;">
-                        <option value="2023">Angkatan 2023</option>
-                        <option value="2022">Angkatan 2022</option>
-                        <option value="2021">Angkatan 2021</option>
-                    </select>
+                    <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-users"></i> Cari Angkatan:</label>
+                    <input type="number" id="inputAngkatan" placeholder="Contoh: 2025" value="2025" style="padding: 10px 15px; border-radius: 6px; border: 1px solid #cbd5e1; width: 140px; font-weight: bold; outline: none;">
                     
-                    <button class="btn-dark" style="padding: 12px 20px; border: none; font-size: 0.95rem;" onclick="loadGrafikCPL()">
+                    <button style="background: #1e293b; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; font-weight: 600;" onclick="loadGrafikCPL()">
                         <i class="fas fa-sync-alt"></i> Bangun Grafik Radar
                     </button>
                 </div>
 
-                <button class="btn-action" style="background: #10b981; color: white; padding: 12px 20px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer;" onclick="window.print()">
+                <button class="btn-action" style="background: #10b981; color: white; padding: 10px 20px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer;" onclick="window.print()">
                     <i class="fas fa-print"></i> Cetak PDF
                 </button>
             </div>
@@ -111,25 +107,38 @@
         });
 
         async function loadGrafikCPL() {
-            const angkatan = document.getElementById("selectAngkatan").value;
+            // Tarik input angka dari Search Box, jika kosong setel default "2025"
+            const inputThn = document.getElementById("inputAngkatan").value;
+            const angkatan = inputThn ? inputThn.trim() : "2025"; 
+            
             const loadingMsg = document.getElementById("loadingMsg");
             const errorMsg = document.getElementById("errorMsg");
             const canvas = document.getElementById("cplChart");
             
+            loadingMsg.innerHTML = `<i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 15px;"></i><br><span style="font-weight: 600;">Menghitung data CPL Angkatan ${angkatan} dari database...</span>`;
             loadingMsg.style.display = "block";
             errorMsg.style.display = "none";
             canvas.style.display = "none";
 
             try {
-                // Kirmkan parameter angkatan DAN prodi ke N8N
+                // Kirimkan parameter angkatan DAN prodi ke N8N
                 const res = await fetch(`${API_GRAFIK_CPL}?angkatan=${angkatan}&prodi=${PRODI}`);
                 if(!res.ok) throw new Error("Gagal load API");
-                const data = await res.json();
                 
+                const rawText = await res.text();
                 loadingMsg.style.display = "none";
 
+                // Pengecekan Aman Jika Database / N8N mengirim balasan kosong
+                if (!rawText || rawText.trim() === "" || rawText.includes("empty_database")) {
+                    errorMsg.innerHTML = `<i class="fas fa-exclamation-circle"></i> Tidak ada data nilai untuk Angkatan ${angkatan} di prodi ini.`;
+                    errorMsg.style.display = "block";
+                    return;
+                }
+                
+                const data = JSON.parse(rawText);
+
                 if(!data || data.length === 0 || !data[0].kode_cpl) {
-                    errorMsg.innerHTML = `<i class="fas fa-exclamation-circle"></i> Data nilai untuk Angkatan ${angkatan} belum tersedia di prodi ini.`;
+                    errorMsg.innerHTML = `<i class="fas fa-exclamation-circle"></i> Tidak ada data nilai untuk Angkatan ${angkatan} di prodi ini.`;
                     errorMsg.style.display = "block";
                     return;
                 }
