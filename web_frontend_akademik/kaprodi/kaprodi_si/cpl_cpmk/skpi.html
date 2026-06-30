@@ -10,44 +10,66 @@
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        .report-page { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto; color: #111827; }
+    .report-page { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto; color: #111827; }
         
         .skpi-header-title { text-align: center; font-size: 1.6rem; font-weight: 800; border-bottom: 2px solid #111827; padding-bottom: 15px; margin-bottom: 20px; }
         
-        /* Grid Identitas (Atas) */
-        .identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px; font-size: 0.85rem; }
-        .ident-section { border: 1px solid #cbd5e1; padding: 15px; }
-        .ident-title { font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
-        .ident-row { display: grid; grid-template-columns: 140px 1fr; margin-bottom: 5px; }
-        .ident-row span:first-child { font-weight: 600; color: #475569; }
+        /* Grid Identitas (Atas) - Format Presisi Tinggi */
+        .identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; font-size: 0.85rem; }
+        .ident-section { border: 1px solid #cbd5e1; padding: 18px; border-radius: 8px; background: #f8fafc; }
+        .ident-title { font-size: 0.95rem; font-weight: 800; margin-bottom: 12px; text-transform: uppercase; color: #0f172a; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+        
+        /* Baris 3 Kolom untuk kesejajaran sempurna */
+        .ident-row { display: flex; margin-bottom: 6px; align-items: flex-start; }
+        .ident-label { width: 140px; font-weight: 600; color: #475569; flex-shrink: 0; }
+        .ident-colon { width: 15px; font-weight: 600; color: #475569; flex-shrink: 0; }
+        .ident-value { flex: 1; font-weight: 800; color: #111827; }
 
         /* Grid Utama 2 Kolom (Kiri & Kanan) */
-        .skpi-body { display: grid; grid-template-columns: 35% 62%; gap: 3%; }
+        .skpi-body { display: flex; flex-wrap: wrap; justify-content: space-between; margin-top: 20px; }
+        .skpi-left { width: 36%; }
+        .skpi-right { width: 61%; }
         
-        .section-heading { font-size: 0.95rem; font-weight: 800; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; }
+        .section-heading { font-size: 0.95rem; font-weight: 800; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; color: #0f172a;}
         
-        /* Kolom Kiri (CPL & Chart) */
-        .cpl-item { margin-bottom: 15px; font-size: 0.8rem; }
-        .cpl-header { display: flex; justify-content: space-between; font-weight: 700; color: #0f172a; margin-bottom: 3px; }
+        /* CPL & Chart */
+        .cpl-item { margin-bottom: 15px; font-size: 0.8rem; border-bottom: 1px dashed #f1f5f9; padding-bottom: 10px; page-break-inside: avoid; }
+        .cpl-header { display: flex; justify-content: space-between; font-weight: 800; color: #1e3a8a; margin-bottom: 6px; }
         .cpl-desc { color: #475569; line-height: 1.4; text-align: justify; }
-        .chart-container { margin: 20px 0; display: flex; justify-content: center; }
+        .chart-container { margin: 20px auto; display: flex; justify-content: center; page-break-inside: avoid; }
         
-        /* Kolom Kanan (CPMK) */
-        .cpmk-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        .cpmk-table td { padding: 8px 5px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
-        .cpmk-num { width: 20px; font-weight: 700; color: #64748b; }
-        .cpmk-desc { text-align: justify; padding-right: 15px !important; }
-        .cpmk-score { font-weight: 700; text-align: right; white-space: nowrap; }
+        /* CPMK (Mencegah Terpotong Horisontal) */
+        .cpmk-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; table-layout: fixed; }
+        .cpmk-table tr { page-break-inside: avoid; }
+        .cpmk-table td { padding: 10px 8px; border-bottom: 1px solid #f1f5f9; vertical-align: top; word-wrap: break-word; }
+        .cpmk-num { width: 23%; font-weight: 800; color: #1e3a8a; } 
+        .cpmk-desc { width: 62%; text-align: justify; padding-right: 15px !important; color: #334155; line-height: 1.4; }
+        .cpmk-score { width: 15%; font-weight: 800; text-align: right; font-size: 0.9rem; }
 
         @media print {
             .no-print, #sidebar-container, #navbar-container { display: none !important; }
             .main-content { padding: 0 !important; margin: 0 !important; }
-            .report-page { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
+            .report-page { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; margin: 0; }
             body { background: white; }
-            /* Memaksa Chart agar ter-render sempurna saat diprint */
-            #skpiChart { width: 100% !important; max-width: 350px !important; height: auto !important; }
+            
+            /* FIX PDF TERPOTONG KE BAWAH: Trik Khusus Chrome */
+            .skpi-body { display: block !important; }
+            .skpi-left { float: left !important; width: 36% !important; }
+            .skpi-right { float: right !important; width: 60% !important; }
+            
+            /* Clearfix: Memaksa Tanda Tangan menunggu kolom tabel selesai merender (Halaman 2) */
+            .skpi-body::after { content: ""; clear: both; display: table; }
+
+            /* Penyesuaian Skala Kertas A4 */
+            #skpiChart { width: 100% !important; max-width: 250px !important; height: auto !important; margin: 0 auto; }
+            .cpmk-table { font-size: 0.75rem !important; }
+            .cpl-item { font-size: 0.75rem !important; }
+            .cpmk-score { font-size: 0.8rem !important; }
+            
+            .identity-grid { page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -65,8 +87,8 @@
                     <button class="btn-action" style="background: #3b82f6; color: white; padding: 10px 20px; font-weight: bold;" onclick="loadSKPI()">
                         <i class="fas fa-search"></i> Cari & Generate SKPI
                     </button>
-                    <button id="btnPrint" class="btn-action" style="background: #10b981; color: white; padding: 10px 20px; font-weight: bold; display: none;" onclick="window.print()">
-                        <i class="fas fa-print"></i> Cetak Dokumen SKPI
+                    <button id="btnPrint" class="btn-action" style="background: #10b981; color: white; padding: 10px 20px; font-weight: bold; display: none;" onclick="cetakPDFProfesional()">
+                        <i class="fas fa-file-pdf"></i> Download PDF
                     </button>
                 </div>
             </div>
@@ -77,45 +99,70 @@
                 <div class="identity-grid">
                     <div class="ident-section">
                         <div class="ident-title">1. IDENTITAS DIRI</div>
-                        <div class="ident-row"><span>Nama Lengkap</span> <span id="resNama">: -</span></div>
-                        <div class="ident-row"><span>Nomor Induk Mahasiswa</span> <span id="resNIM">: -</span></div>
+                        <div class="ident-row">
+                            <div class="ident-label">Nama Lengkap</div>
+                            <div class="ident-colon">:</div>
+                            <div class="ident-value" id="resNama">-</div>
+                        </div>
+                        <div class="ident-row">
+                            <div class="ident-label">Nomor Induk Mahasiswa</div>
+                            <div class="ident-colon">:</div>
+                            <div class="ident-value" id="resNIM">-</div>
+                        </div>
                     </div>
+
                     <div class="ident-section">
                         <div class="ident-title">2. PENYELENGGARA PROGRAM</div>
-                        <div class="ident-row"><span>Nama Institusi</span> <span>: UNIVERSITAS AKI SEMARANG</span></div>
-                        <div class="ident-row"><span>Fakultas</span> <span>: Teknik dan Informatika</span></div>
-                        <div class="ident-row"><span>Program Studi</span> <span id="resProdi">: Teknik Informatika</span></div>
+                        <div class="ident-row">
+                            <div class="ident-label">Nama Institusi</div>
+                            <div class="ident-colon">:</div>
+                            <div class="ident-value">UNIVERSITAS AKI SEMARANG</div>
+                        </div>
+                        <div class="ident-row">
+                            <div class="ident-label">Fakultas</div>
+                            <div class="ident-colon">:</div>
+                            <div class="ident-value" id="resFakultas">-</div>
+                        </div>
+                        <div class="ident-row">
+                            <div class="ident-label">Program Studi</div>
+                            <div class="ident-colon">:</div>
+                            <div class="ident-value" id="resProdi">-</div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="skpi-body">
+                    
                     <div class="skpi-left">
                         <div class="section-heading">PROFIL BERDASARKAN CPL</div>
-                        
                         <div class="chart-container">
-                            <canvas id="skpiChart" width="300" height="300"></canvas>
+                            <canvas id="skpiChart" width="300" height="250"></canvas>
                         </div>
 
                         <div class="section-heading" style="margin-top: 20px;">3. CAPAIAN CPL PRODI</div>
-                        <div id="listCPL">
-                            </div>
+                        <div id="listCPL"></div>
                     </div>
 
                     <div class="skpi-right">
-                        <div class="section-heading">CAPAIAN PEMBELAJARAN MATA KULIAH</div>
-                        <table class="cpmk-table">
-                            <tbody id="listCPMK">
-                                </tbody>
-                        </table>
+                        <div class="section-heading">4. CAPAIAN PEMBELAJARAN MATA KULIAH</div>
+                        <div id="listCPMK" style="margin-bottom: 20px;">
+                            </div>
+                    </div>
+                    </div> <div style="clear: both;"></div>
 
-                        <div style="margin-top: 60px; display: flex; justify-content: space-between; align-items: flex-end;">
-                            <div style="width: 100px; height: 100px; border: 2px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; text-align: center;">
-                                *Scan untuk validasi<br>(QR Code)
-                            </div>
-                            <div style="text-align: left; width: 250px; font-size: 0.85rem;">
-                                <p>Semarang, <span id="resTanggal"></span><br>Kepala Program Studi</p>
-                                <p style="margin-top: 60px; font-weight: bold; text-decoration: underline;">Tegar Yaswananta, M.Kom</p>
-                            </div>
+                    <div style="margin-top: 40px; padding-top: 30px; border-top: 2px solid #e5e7eb; display: flex; justify-content: flex-end; page-break-inside: avoid;">
+                        <div style="text-align: left; width: 250px; font-size: 0.9rem; color: #0f172a;">
+                            <p>Semarang, <span id="resTanggal"></span><br>Kepala Program Studi</p>
+                            
+                            <p style="margin-top: 70px; font-weight: bold;">
+                                <span id="namaKaprodi" contenteditable="true" 
+                                    style="display: inline-block; padding: 6px 12px; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 6px; outline: none; cursor: text; transition: 0.2s; min-width: 220px; text-align: center; color: #0f172a;" 
+                                    title="Klik di sini untuk mengubah nama Kaprodi"
+                                    onfocus="this.style.background='#eff6ff'; this.style.borderColor='#3b82f6';" 
+                                    onblur="this.style.background='#f8fafc'; this.style.borderColor='#cbd5e1'; localStorage.setItem('namaKaprodi_SKPI', this.innerText)">
+                                    nama kaprodi
+                                </span>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -150,32 +197,64 @@
                 }
 
                 // 1. Set Identitas
-                document.getElementById("resNama").innerText = `: ${data[0].nama_mahasiswa}`;
-                document.getElementById("resNIM").innerText = `: ${data[0].nim}`;
-                document.getElementById("resProdi").innerText = ': Teknik Informatika';
+                let mhsNim = data[0].nim;
+                document.getElementById("resNama").innerText = data[0].nama_mahasiswa;
+                document.getElementById("resNIM").innerText = mhsNim;
                 document.getElementById("resTanggal").innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                // --- ALGORITMA CERDAS: BACA NIM MAHASISWA ---
+                let digitFakultas = mhsNim.substring(0, 1);
+                let digitProdi = mhsNim.substring(1, 3);
+                let digitAngkatan = mhsNim.substring(3, 5); 
+
+                // Terjemahkan Fakultas
+                let namaFakultas = "Tidak Diketahui";
+                if (digitFakultas === "2") {
+                    namaFakultas = "Teknik dan Informatika";
+                }
+
+                // Terjemahkan Prodi
+                let namaProdi = "Tidak Diketahui";
+                if (digitProdi === "23") {
+                    namaProdi = "Teknik Informatika";
+                } else if (digitProdi === "22") {
+                    namaProdi = "Sistem Informasi";
+                }
+            
+                // Terapkan Prodi ke Layar
+                document.getElementById("resFakultas").innerText = namaFakultas;
+                document.getElementById("resProdi").innerText = namaProdi;
 
                 // 2. Olah Data Mentah menjadi Agregat CPL dan CPMK
                 let cplStats = {};
                 let cpmkStats = {};
 
-                data.forEach(row => {
-                    // PENGAMAN: Paksa ubah data menjadi angka murni (jika kosong/null, jadikan 0)
-                    let nilai = parseFloat(row.nilai_mentah) || 0;
-                    let bobot = parseFloat(row.bobot_persen) || 0;
+                // --- ALGORITMA BARU: FILTER KODE MATKUL (Digit 3 & 4) ---
+                // Hanya izinkan Matkul yang prodi-nya SAMA dengan prodi mahasiswa
+                const dataFiltered = data.filter(item => {
+                    if (!item.kode_mk) return true; // Loloskan jika API tidak mengirim kode_mk
+                    let mkProdi = item.kode_mk.substring(2, 4); // Ambil digit ke-3 dan 4 dari kode matkul
+                    return mkProdi === digitProdi; // digitProdi didapat dari NIM di awal kode Anda
+                });
 
-                    // Agregat CPL
-                    if (row.kode_cpl) {
-                        if (!cplStats[row.kode_cpl]) cplStats[row.kode_cpl] = { desc: row.deskripsi_cpl, totalSkor: 0, totalBobot: 0 };
-                        cplStats[row.kode_cpl].totalSkor += (nilai * (bobot / 100));
-                        cplStats[row.kode_cpl].totalBobot += bobot;
+                if (dataFiltered.length === 0) {
+                    alert("⚠️ Data nilai ditemukan, namun tidak ada Mata Kuliah yang sesuai dengan Program Studi mahasiswa ini.");
+                }
+
+                // Gunakan dataFiltered, BUKAN data mentah lagi
+                dataFiltered.forEach(item => {
+                    if (!cplStats[item.kode_cpl]) {
+                        cplStats[item.kode_cpl] = { deskripsi: item.deskripsi_cpl, totalNilai: 0, totalBobot: 0 };
                     }
-                    // Agregat CPMK
-                    if (row.kode_cpmk) {
-                        if (!cpmkStats[row.kode_cpmk]) cpmkStats[row.kode_cpmk] = { desc: row.deskripsi_cpmk, totalSkor: 0, totalBobot: 0 };
-                        cpmkStats[row.kode_cpmk].totalSkor += (nilai * (bobot / 100));
-                        cpmkStats[row.kode_cpmk].totalBobot += bobot;
+                    cplStats[item.kode_cpl].totalNilai += (parseFloat(item.nilai_mentah) * parseFloat(item.bobot_persen));
+                    cplStats[item.kode_cpl].totalBobot += parseFloat(item.bobot_persen);
+
+                    let keyCpmk = `${item.kode_cpl}-${item.kode_cpmk}`;
+                    if (!cpmkStats[keyCpmk]) {
+                        cpmkStats[keyCpmk] = { kode_cpmk: item.kode_cpmk, deskripsi: item.deskripsi_cpmk, totalNilai: 0, totalBobot: 0 };
                     }
+                    cpmkStats[keyCpmk].totalNilai += (parseFloat(item.nilai_mentah) * parseFloat(item.bobot_persen));
+                    cpmkStats[keyCpmk].totalBobot += parseFloat(item.bobot_persen);
                 });
 
                 // 3. Render Kolom Kiri (CPL) & Siapkan Data Chart
@@ -184,11 +263,12 @@
                 let chartData = [];
 
                 Object.keys(cplStats).sort().forEach(cpl => {
-                    // PENGAMAN: Cegah pembagian dengan 0 agar tidak menjadi Infinity/NaN
+                    // MENGGUNAKAN totalNilai, bukan totalSkor
                     let avg = cplStats[cpl].totalBobot > 0 
-                        ? ((cplStats[cpl].totalSkor / cplStats[cpl].totalBobot) * 100).toFixed(2) 
+                        ? (cplStats[cpl].totalNilai / cplStats[cpl].totalBobot).toFixed(2) 
                         : "0.00";
-                    let desc = cplStats[cpl].desc || "Deskripsi tidak tersedia.";
+                    // MENGGUNAKAN deskripsi, bukan desc
+                    let desc = cplStats[cpl].deskripsi || "Deskripsi tidak tersedia.";
                     
                     chartLabels.push(cpl);
                     chartData.push(avg);
@@ -205,22 +285,24 @@
                 });
                 document.getElementById("listCPL").innerHTML = cplHtml;
 
-                // 4. Render Kolom Kanan (CPMK)
+                // 4. Render CPMK (Diubah menjadi gaya Blok Paragraf)
                 let cpmkHtml = "";
-                let no = 1;
                 Object.keys(cpmkStats).sort().forEach(cpmk => {
-                    // PENGAMAN: Cegah pembagian dengan 0
                     let avg = cpmkStats[cpmk].totalBobot > 0 
-                        ? ((cpmkStats[cpmk].totalSkor / cpmkStats[cpmk].totalBobot) * 100).toFixed(2) 
+                        ? (cpmkStats[cpmk].totalNilai / cpmkStats[cpmk].totalBobot).toFixed(2) 
                         : "0.00";
-                    let desc = cpmkStats[cpmk].desc || "Deskripsi tidak tersedia.";
+                    let desc = cpmkStats[cpmk].deskripsi || "Deskripsi tidak tersedia.";
+                    let kodeAsli = cpmkStats[cpmk].kode_cpmk; 
 
+                    // Kita pinjam class CSS milik CPL karena bentuknya sama persis!
                     cpmkHtml += `
-                        <tr>
-                            <td class="cpmk-num">${no++}</td>
-                            <td class="cpmk-desc">${desc}</td>
-                            <td class="cpmk-score">${avg}%</td>
-                        </tr>
+                        <div class="cpl-item">
+                            <div class="cpl-header">
+                                <span style="color: #1e3a8a;">${kodeAsli}</span>
+                                <span style="color: #1e3a8a;">${avg}%</span>
+                            </div>
+                            <div class="cpl-desc">${desc}</div>
+                        </div>
                     `;
                 });
                 document.getElementById("listCPMK").innerHTML = cpmkHtml;
@@ -270,6 +352,51 @@
                     },
                     plugins: { legend: { display: false } }
                 }
+            });
+        }
+
+        // Memuat Nama Kaprodi dari Local Storage (jika sebelumnya sudah pernah diedit)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedKaprodi = localStorage.getItem('namaKaprodi_SKPI');
+            if (savedKaprodi) {
+                document.getElementById("namaKaprodi").innerText = savedKaprodi;
+            }
+        });
+        function cetakPDFProfesional() {
+            const elemen = document.getElementById("printArea");
+            const nim = document.getElementById("inputNIM").value || "SKPI";
+            
+            // 1. Sembunyikan efek border/edit sementara saat PDF dirender
+            const kaprodiInput = document.getElementById("namaKaprodi");
+            const oriBorder = kaprodiInput.style.border;
+            const oriBg = kaprodiInput.style.background;
+            kaprodiInput.style.border = "none";
+            kaprodiInput.style.background = "transparent";
+            kaprodiInput.style.padding = "0";
+
+            // 2. Animasi Tombol Loading
+            const btn = document.getElementById("btnPrint");
+            const oriText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyusun PDF...';
+            btn.disabled = true;
+
+            // 3. Konfigurasi Rendering HD
+            const opsiPDF = {
+                margin:       [10, 10, 15, 10], // Margin atas, kiri, bawah, kanan (mm)
+                filename:     `SKPI_${nim}.pdf`,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { scale: 2, useCORS: true, letterRendering: true }, // Skala 2 agar resolusi tinggi/tidak pecah
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // 4. Eksekusi Pembuatan PDF
+            html2pdf().set(opsiPDF).from(elemen).save().then(() => {
+                // Kembalikan tombol dan desain input ke kondisi semula
+                kaprodiInput.style.border = oriBorder;
+                kaprodiInput.style.background = oriBg;
+                kaprodiInput.style.padding = "6px 12px";
+                btn.innerHTML = oriText;
+                btn.disabled = false;
             });
         }
     </script>

@@ -60,53 +60,31 @@
             <div class="badge-prodi">Teknik Informatika</div>
         </div>
 
-        <div id="content-dashboard" class="section active">
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
-                <div style="background: var(--border-dark); color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #9ca3af;">Total Mahasiswa Dinilai</h4>
-                    <h2 id="totMhs" style="margin: 0; font-size: 2.2rem;">0</h2>
+        <div id="content-dashboard" class="section">
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; border-bottom: 4px solid #3b82f6; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                    <div style="color: #64748b; font-size: 0.85rem; font-weight: 700; margin-bottom: 5px;">TOTAL MAHASISWA TI</div>
+                    <div id="totMhs" style="font-size: 2.2rem; font-weight: 900; color: #0f172a;">0</div>
                 </div>
-                <div style="background: #10b981; color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #d1fae5;">Mahasiswa Lulus (A - C)</h4>
-                    <h2 id="totLulus" style="margin: 0; font-size: 2.2rem;">0</h2>
+                <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; border-bottom: 4px solid #16a34a; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                    <div style="color: #64748b; font-size: 0.85rem; font-weight: 700; margin-bottom: 5px;">MATA KULIAH LULUS (A-C)</div>
+                    <div id="totLulus" style="font-size: 2.2rem; font-weight: 900; color: #16a34a;">0</div>
                 </div>
-                <div style="background: #ef4444; color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-                    <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #fee2e2;">Tidak Lulus (D - E)</h4>
-                    <h2 id="totGagal" style="margin: 0; font-size: 2.2rem;">0</h2>
-                </div>
-            </div>
-
-            <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
-                <div class="figma-card" style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
-                    <h3 style="margin-top: 0; color: #111827;">Distribusi Nilai (Grade) Prodi</h3>
-                    <div style="position: relative; height: 300px; width: 100%; display: flex; justify-content: center;">
-                        <canvas id="gradeChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="figma-card" style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
-                    <h3 style="margin-top: 0; color: #111827;">Rata-rata Pencapaian CPL</h3>
-                    <div style="position: relative; height: 300px; width: 100%;">
-                        <canvas id="cplChart"></canvas>
-                    </div>
+                <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; border-bottom: 4px solid #dc2626; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                    <div style="color: #64748b; font-size: 0.85rem; font-weight: 700; margin-bottom: 5px;">MATA KULIAH GAGAL (D-E)</div>
+                    <div id="totGagal" style="font-size: 2.2rem; font-weight: 900; color: #dc2626;">0</div>
                 </div>
             </div>
 
-            <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
-                <div class="figma-card" style="border-top: 4px solid #217346; background: white; padding: 20px; border-radius: 12px;">
-                    <h3 style="margin-top: 0; color: #217346;"><i class="fas fa-chart-pie"></i> Pintasan Laporan Kelas</h3>
-                    <p style="color: #666; font-size: 0.95rem;">Lihat analisis transkrip nilai dan ketercapaian CPL dan CPMK mahasiswa secara spesifik per mata kuliah</p>
-                    <button class="btn-dark" style="width: 100%; padding: 10px; background: #217346; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;" onclick="window.location.href='laporan.html'">
-                        <i class="fas fa-external-link-alt"></i> Buka Laporan Kelas
-                    </button>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
+                    <h3 style="font-size: 1.1rem; font-weight: 800; color: #1e3a8a; margin-bottom: 20px;">Rata-Rata Capaian CPL (Teknik Informatika)</h3>
+                    <div style="height: 350px;"><canvas id="cplChart"></canvas></div>
                 </div>
-                
-                <div class="figma-card" style="border-top: 4px solid #8b0000; background: white; padding: 20px; border-radius: 12px;">
-                    <h3 style="margin-top: 0; color: #8b0000;"><i class="fas fa-user-graduate"></i> Portofolio CPL Global</h3>
-                    <p style="color: #666; font-size: 0.95rem;">Cari dan lihat rekapitulasi persentase penguasaan CPL mahasiswa Teknik Informatika dari total seluruh mata kuliah</p>
-                    <button class="btn-primary-ti" style="width: 100%; padding: 10px; text-align: center;" onclick="window.location.href='portofolio_admin.html'">
-                        <i class="fas fa-external-link-alt"></i> Buka Portofolio CPL
-                    </button>
+                <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb;">
+                    <h3 style="font-size: 1.1rem; font-weight: 800; color: #1e3a8a; margin-bottom: 20px;">Distribusi Grade Kelulusan</h3>
+                    <div style="height: 350px;"><canvas id="gradeChart"></canvas></div>
                 </div>
             </div>
         </div>
@@ -156,196 +134,47 @@
     </div>
 
     <script>
-        // 1. KONFIGURASI API KHUSUS TI
         const PRODI = 'ti'; 
-        const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
-        const API_MAP_MK = `${API_BASE}/admin-map-mk-cpmk`;
-        const API_GET_USERS = `${API_BASE}/get-users`;
-        const API_DASHBOARD = `${API_BASE}/get-dashboard-kaprodi?prodi=` + PRODI;
+        const API_DASHBOARD = `${API_BASE}/get-dashboard-kaprodi?prodi=${PRODI}`;
+        
+        let chartGradeInst = null; 
+        let chartCplInst = null;
+        let isDashboardLoaded = false;
 
-        // 2. SATPAM AKSES LOGIN TI
-        const userLogin = localStorage.getItem("user_login");
-        const userRole = localStorage.getItem("user_role");
-        const userProdi = localStorage.getItem("prodi_aktif");
-
-        if (!userLogin) window.location.replace("../../login/login.html");
-
-        if (userRole !== 'head_admin') {
-            if (userRole === 'dosen') window.location.replace("../../dosen/input_nilai.html");
-            else if (userRole === 'admin' && userProdi === 'si') window.location.replace("../kaprodi_si/admin_config_si.html");
-        }
-
-        // 3. MESIN PENGUBAH TAB INTERNAL SPA
-        function switchTab(type) {
-            document.querySelectorAll('.section').forEach(el => { 
-                el.style.display = 'none'; 
-                el.classList.remove('active'); 
-            });
-            
-            const contentSection = document.getElementById('content-' + type);
-            if(contentSection) {
-                contentSection.style.display = 'block';
-                contentSection.classList.add('active');
-            }
-
-            const titles = {
-                'dashboard': '📊 Dashboard Admin TI',
-                'mapping-mk': '🔗 Mapping Mata Kuliah - CPMK TI',
-                'reset': '🔑 Reset Password Dosen TI',
-
-            };
-            document.getElementById('pageTitle').innerHTML = titles[type] || 'Panel Admin TI';
-
-            if(type === 'dashboard') loadDashboard();
-            if(type === 'reset') loadUserList();
-            if(type === 'mapping-mk') loadDropdownMK();
-        }
-
-        // 4. JEMBATAN SIDEBAR SPA
-        function pasangJembatanSidebar() {
-            const petaMenu = {
-                '/mapping/map_mk_cpmk.html': 'mapping-mk',
-                '/settings.html': 'reset'
-            };
-
-            document.querySelectorAll('.nav-menu .nav-item, .dropdown-container .dropdown-item').forEach(el => {
-                const path = el.getAttribute('data-path');
-                
-                if (petaMenu[path]) {
-                    el.href = "#"; 
-                    el.onclick = (e) => {
-                        e.preventDefault();
-                        switchTab(petaMenu[path]);
-                    };
-                }
-                
-                if (path === '/admin_config.html') {
-                    el.href = "#";
-                    el.onclick = (e) => {
-                        e.preventDefault();
-                        switchTab('dashboard');
-                    };
-                }
-            });
-        }
-
-        // 5. FUNGSI SINKRONISASI BACKEND N8N
-        async function loadUserList() { 
-            try { const res = await fetch(API_GET_USERS); if (!res.ok) return; const data = await res.json(); const datalist = document.getElementById("daftarDosenTI"); datalist.innerHTML = ""; let users = Array.isArray(data) ? ((data[0] && data[0].data) ? data[0].data : data) : (data.data || []); users.forEach(u => { if (u.role === 'dosen' && u.prodi === 'ti') { const option = document.createElement('option'); option.value = u.username; option.text = `${u.nama_lengkap} (Dosen TI)`; datalist.appendChild(option); } }); } catch (e) { console.error(e); }
-        }
-
-        async function prosesResetPassword() { 
-            const username = document.getElementById("targetUsername").value.trim(); const newPassword = document.getElementById("newPassword").value.trim();
-            if (!username || !newPassword) { alert("⚠️ Username dan Password baru tidak boleh kosong!"); return; }
-            if (!confirm(`Apakah Anda yakin ingin mengganti password untuk akun "${username}"?`)) return;
-            try {
-               const res = await fetch(`${API_BASE}/reset-password`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, new_password: newPassword }) });
-                const data = await res.json();
-                if (res.ok && data.status === "success") { alert(`✅ BERHASIL: ${data.message}`); document.getElementById("targetUsername").value = ""; document.getElementById("newPassword").value = ""; } 
-                else alert("❌ Gagal mereset password. Pastikan username benar.");
-            } catch (e) { alert("❌ Terjadi kesalahan koneksi ke server n8n."); }
-        }
-
-        async function loadDropdownMK() { 
-            try {
-                const res = await fetch(API_URL); const data = await res.json(); 
-                const select = document.getElementById("pilihMKMapping"); 
-                select.innerHTML = '<option value="">-- Pilih Mata Kuliah TI --</option>';
-                data.filter(i => i.tipe === 'mk').forEach(mk => { select.innerHTML += `<option value="${mk.kode}">${mk.kode} - ${mk.label}</option>`; });
-            } catch (e) { console.error("Gagal load MK:", e); }
-        }
-
-        async function loadMappingUI() { 
-            const mkKode = document.getElementById("pilihMKMapping").value; 
-            const area = document.getElementById("checklistArea"); 
-            const container = document.getElementById("mappingContainer"); 
-            const loading = document.getElementById("loadingMapping");
-            const emptyState = document.getElementById("mappingEmptyState"); 
-
-            if(!mkKode) { 
-                container.style.display = 'none'; 
-                loading.style.display = 'none';
-                emptyState.style.display = 'flex'; 
-                return; 
-            }
-            
-            emptyState.style.display = 'none'; 
-            loading.style.display = 'block'; 
-            container.style.display = 'none';
-            area.innerHTML = "";
-            
-            try {
-                const [resMeta, resMap] = await Promise.all([ fetch(API_URL), fetch(`${API_BASE}/get-mapping-mk?mk=${mkKode}&prodi=${PRODI}`) ]);
-                const meta = await resMeta.json(); const existing = await resMap.json(); const checkedCPMKs = new Set(existing.map(e => e.kode_cpmk));
-                const listCPL = meta.filter(i => i.tipe === 'cpl'); const listCPMK = meta.filter(i => i.tipe === 'cpmk');
-                
-                listCPL.forEach(cpl => {
-                    const childCPMK = listCPMK.filter(c => c.parent === cpl.kode);
-                    if (childCPMK.length > 0) {
-                        let html = "";
-                        childCPMK.forEach(cpmk => { const isChecked = checkedCPMKs.has(cpmk.kode) ? "checked" : ""; html += `<div style="display:flex; align-items:center; padding: 12px; border-bottom:1px solid #e5e7eb; background: white;"><input type="checkbox" class="chk-cpmk" value="${cpmk.kode}" ${isChecked} style="width:18px; height:18px; margin-right:12px; cursor:pointer;"><div><strong style="color:#111827;">${cpmk.kode}</strong> - <span style="color:#4b5563;">${cpmk.label}</span></div></div>`; });
-                        area.innerHTML += `<div style="margin-bottom:16px; border:1.5px solid #8b0000; border-radius:8px; overflow:hidden;"><div style="background:#fee2e2; padding:12px 16px; font-weight:700; color:#8b0000; border-bottom:1.5px solid #8b0000;"><i class="fas fa-folder-open" style="margin-right:8px;"></i> ${cpl.kode}</div><div>${html}</div></div>`;
-                    }
-                });
-                
-                loading.style.display = 'none'; 
-                container.style.display = 'block'; 
-            } catch (e) { alert("Error memuat UI Mapping!"); }
-        }
-
-        async function simpanMappingMK() { 
-            const mkKode = document.getElementById("pilihMKMapping").value; 
-            const listCpmk = Array.from(document.querySelectorAll('.chk-cpmk:checked')).map(cb => cb.value); 
-            const token = localStorage.getItem("api_token"); 
-            
-            try {
-                const res = await fetch(API_MAP_MK, { method: "POST", headers: {"Content-Type":"application/json", "Authorization": "Bearer " + token}, body: JSON.stringify({ kode_mk: mkKode, cpmk_list: listCpmk, prodi: PRODI }) }); 
-                if(res.ok) alert("✅ Mapping MK-CPMK TI Berhasil Tersimpan!"); 
-                else alert("❌ Gagal menyimpan mapping.");
-            } catch (e) { alert("❌ Terjadi kesalahan koneksi."); }
-        }
-
-        // --- FUNGSI DASHBOARD GRAFIK CHART.JS ---
-        let chartGradeInst, chartCplInst; 
-
+        // 2. FUNGSI PEMUAT DATA DASHBOARD
         async function loadDashboard() {
+            if (isDashboardLoaded) return; 
+            isDashboardLoaded = true;
+
             try {
                 const res = await fetch(API_DASHBOARD);
                 if (!res.ok) return;
-                const data = await res.json();
 
+                const rawText = await res.text();
+                if (!rawText || rawText.trim() === "" || rawText.includes("empty_database")) {
+                    console.warn("⚠️ Data masih kosong.");
+                    calculateSummary([], 0); 
+                    return; 
+                }
+                
+                const data = JSON.parse(rawText);
+                
                 const dataCPL = data.filter(item => item.kategori === 'performa_cpl');
                 const dataGrade = data.filter(item => item.kategori === 'distribusi_grade');
+                
+                // MENGAMBIL ANGKA PASTI JUMLAH MAHASISWA DARI N8N
+                const dataMhsAsli = data.find(item => item.kategori === 'total_mahasiswa');
+                const jumlahManusiaAsli = dataMhsAsli ? parseInt(dataMhsAsli.nilai) : 0;
 
                 renderGradeChart(dataGrade);
                 renderCPLChart(dataCPL);
-                calculateSummary(dataGrade);
+                calculateSummary(dataGrade, jumlahManusiaAsli); // Kirim angka aslinya!
             } catch (error) {
-                console.error("Gagal memuat grafik Dashboard:", error);
+                console.error("Gagal memuat Dashboard:", error);
             }
         }
 
-        function renderGradeChart(gradeData) {
-            const labels = gradeData.map(item => item.label);
-            const values = gradeData.map(item => item.nilai);
-            const ctx = document.getElementById('gradeChart').getContext('2d');
-            
-            if(chartGradeInst) chartGradeInst.destroy(); 
-            
-            chartGradeInst = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: ['#1e3a8a', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6b7280'],
-                        borderWidth: 2
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
+        // 3. FUNGSI RENDER GRAFIK CPL (WARNA MERAH KHAS TI)
         function renderCPLChart(cplData) {
             const labels = cplData.map(item => item.label);
             const values = cplData.map(item => parseFloat(item.nilai));
@@ -360,40 +189,98 @@
                     datasets: [{
                         label: 'Persentase Capaian (%)',
                         data: values,
-                        backgroundColor: '#8b0000', // Warna merah TI
+                        backgroundColor: '#8b0000', // Warna MERAH khas TI
                         borderRadius: 6
                     }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     scales: { y: { beginAtZero: true, max: 100 } },
-                    plugins: { legend: { display: false } }
+                    plugins: { legend: { display: false } },
+                    animation: { duration: 800 } 
                 }
             });
         }
 
-        function calculateSummary(gradeData) {
-            let total = 0, lulus = 0, gagal = 0;
-            const lulusGrades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C'];
-
-            gradeData.forEach(item => {
-                total += item.nilai;
-                if (lulusGrades.includes(item.label)) lulus += item.nilai;
-                else gagal += item.nilai;
+        // 4. FUNGSI RENDER GRAFIK GRADE
+        function renderGradeChart(gradeData) {
+            const labels = gradeData.map(item => item.label);
+            const values = gradeData.map(item => item.nilai);
+            const ctx = document.getElementById('gradeChart').getContext('2d');
+            
+            if(chartGradeInst) chartGradeInst.destroy();
+            
+            chartGradeInst = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#16a34a', '#3b82f6', '#f59e0b', '#f97316', '#dc2626', '#8b0000', '#64748b']
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
             });
-
-            document.getElementById('totMhs').innerText = total;
-            document.getElementById('totLulus').innerText = lulus;
-            document.getElementById('totGagal').innerText = gagal;
         }
 
-        // 6. EKSEKUSI SAAT HALAMAN DIMUAT
-        window.onload = () => { 
-            setTimeout(() => { 
-                switchTab('dashboard'); 
-                pasangJembatanSidebar(); 
-            }, 350); 
-        };
+        // 5. FUNGSI HITUNG STATISTIK 
+        function calculateSummary(gradeData, jumlahManusiaAsli) {
+            let lulus = 0, gagal = 0;
+            const lulusGrades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C'];
+
+            if (Array.isArray(gradeData)) {
+                gradeData.forEach(item => {
+                    let jumlahDistribusi = parseInt(item.nilai) || 0;
+                    if (lulusGrades.includes(item.label)) lulus += jumlahDistribusi;
+                    else gagal += jumlahDistribusi;
+                });
+            }
+
+            const elTotMhs = document.getElementById('totMhs');
+            const elTotLulus = document.getElementById('totLulus');
+            const elTotGagal = document.getElementById('totGagal');
+
+            // Kotak Total Mahasiswa kini diisi jumlah MANUSIA ASLI (29 untuk TI, 20 untuk SI)
+            if (elTotMhs) elTotMhs.innerText = jumlahManusiaAsli; 
+            
+            // Note: Angka "Lulus" & "Gagal" adalah jumlah DISTRIBUSI NILAI (Makul), bukan manusia.
+            if (elTotLulus) elTotLulus.innerText = lulus;
+            if (elTotGagal) elTotGagal.innerText = gagal;
+        }
+
+        // 6. MANAJEMEN TAB
+        function switchTab(type) {
+            document.querySelectorAll('.section').forEach(el => { 
+                el.style.display = 'none'; 
+                el.classList.remove('active'); 
+            });
+            
+            const contentSection = document.getElementById('content-' + type);
+            if(contentSection) {
+                contentSection.style.display = 'block';
+                contentSection.classList.add('active');
+            }
+
+            const titles = {
+                'dashboard': '📊 Dashboard Kaprodi Teknik Informatika',
+                'mapping-mk': '🔗 Mapping Mata Kuliah - CPMK (TI)',
+                'reset': '🔑 Manajemen Dosen (TI)',
+            };
+            document.getElementById('pageTitle').innerHTML = titles[type] || 'Panel Kaprodi TI';
+
+            if(type === 'dashboard') loadDashboard();
+        }
+
+        // 7. EKSEKUSI SAAT HALAMAN DIMUAT
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof pasangJembatanSidebar === "function") pasangJembatanSidebar();
+                switchTab('dashboard');
+            }, 500); 
+        });
     </script>
 </body>
 </html>
