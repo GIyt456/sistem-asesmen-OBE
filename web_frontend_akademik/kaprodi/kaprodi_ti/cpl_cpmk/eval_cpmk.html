@@ -6,9 +6,9 @@
     <title>Evaluasi CPMK Angkatan - Sistem OBE</title>
     
     <link rel="stylesheet" href="/css/style.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
     <style>
@@ -60,22 +60,18 @@
 
             <div class="filter-container">
                 <div style="display: flex; gap: 15px; align-items: center;">
-                    <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-users"></i> Angkatan:</label>
-                    <select id="selectAngkatan" class="form-control" style="width: 180px; font-weight: 500;">
-                        <option value="2023">Angkatan 2023</option>
-                        <option value="2022">Angkatan 2022</option>
-                        <option value="2021">Angkatan 2021</option>
-                    </select>
+                    <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-users"></i> Cari Angkatan:</label>
+                    <input type="number" id="inputAngkatan" placeholder="Contoh: 2025" value="2025" style="padding: 10px 15px; border-radius: 6px; border: 1px solid #cbd5e1; width: 140px; font-weight: bold; outline: none;">
                     
                     <label style="font-weight: 700; margin-left: 10px; color: #1e293b;"><i class="fas fa-sliders-h"></i> Standar Lulus:</label>
-                    <input type="number" id="standarLulus" class="form-control" value="60" style="width: 90px; text-align: center; font-weight: bold;">
+                    <input type="number" id="standarLulus" class="form-control" value="60" style="padding: 10px; width: 80px; text-align: center; font-weight: bold; border-radius: 6px; border: 1px solid #cbd5e1;">
                     
-                    <button class="btn-dark" style="padding: 12px 20px; border: none; font-size: 0.95rem;" onclick="loadEvalCPMK()">
-                        <i class="fas fa-chart-line"></i> Analisis Data
+                    <button style="background: #1e293b; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; font-weight: 600;" onclick="loadEvalCPMK()">
+                        <i class="fas fa-search"></i> Analisis Data
                     </button>
                 </div>
 
-                <button class="btn-action" style="background: #10b981; color: white; padding: 12px 20px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer;" onclick="window.print()">
+                <button style="background: #10b981; color: white; padding: 10px 20px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer;" onclick="window.print()">
                     <i class="fas fa-print"></i> Cetak Laporan
                 </button>
             </div>
@@ -94,7 +90,7 @@
                         </tr>
                     </thead>
                     <tbody id="bodyTable">
-                        <tr><td colspan="7" style="padding: 40px; color: #64748b; text-align: center;"><i class="fas fa-info-circle"></i> Silakan pilih angkatan dan klik "Analisis Data".</td></tr>
+                        <tr><td colspan="7" style="padding: 40px; color: #64748b; text-align: center;"><i class="fas fa-info-circle"></i> Silakan ketik tahun angkatan dan klik "Analisis Data".</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -102,49 +98,59 @@
     </div>
 
     <script>
-        // DETEKSI PRODI DINAMIS
-        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-
+        // 1. TANGKAP IDENTITAS LOGIN SECARA DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
         const API_EVAL_CPMK = `${API_BASE}/get-eval-cpmk`;
+        let warnaTeksCpmk = '#8b0000'; // Default warna merah TI
 
-        // SATPAM HALAMAN
-        const userLogin = localStorage.getItem("user_login");
-        if (!userLogin) window.location.replace("/login/login.html");
-
-        // Tema Dinamis
-        let warnaTeksCpmk = '#8b0000'; // Default Merah TI
-
+        // 2. RUBAH TEMA OTOMATIS BERDASARKAN PRODI
         document.addEventListener("DOMContentLoaded", () => {
+            const userLogin = localStorage.getItem("user_login");
+            if (!userLogin) window.location.replace("/login/login.html");
+
             const badge = document.getElementById("prodiBadge");
-            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            const titleSpan = document.querySelector('.header-title span');
             
             if(PRODI === "si") {
-                badge.style.background = "var(--primary-teal)";
-                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
-                warnaTeksCpmk = 'var(--primary-teal)';
+                badge.innerText = "Sistem Informasi";
+                badge.style.background = "#0097a7"; // Tema SI
+                titleSpan.style.color = "#0097a7";
+                warnaTeksCpmk = '#0097a7';
+            } else {
+                badge.innerText = "Teknik Informatika";
+                badge.style.background = "#8b0000"; // Tema TI
+                titleSpan.style.color = "#8b0000";
+                warnaTeksCpmk = '#8b0000';
             }
         });
 
-        // FUNGSI EVALUASI CPMK
+        // 3. FUNGSI ANALISIS DATA
         async function loadEvalCPMK() {
-            const angkatan = document.getElementById("selectAngkatan").value;
+            const inputThn = document.getElementById("inputAngkatan").value;
+            const angkatan = inputThn ? inputThn.trim() : "2025"; 
             const standar = parseFloat(document.getElementById("standarLulus").value) || 60;
             const bodyTbl = document.getElementById("bodyTable");
             
-            bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Menghitung agregat nilai CPMK dari Server...</td></tr>`;
+            bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Mengkalkulasi data CPMK Angkatan ${angkatan}...</td></tr>`;
 
             try {
-                // Mengirim parameter angkatan & prodi
+                // Mengirim parameter pencarian & identitas prodi yang sedang login
                 const res = await fetch(`${API_EVAL_CPMK}?angkatan=${angkatan}&prodi=${PRODI}`);
                 if(!res.ok) throw new Error("Gagal mengambil data");
-                const data = await res.json();
-
-                if(!data || data.length === 0 || !data[0].kode_mk) {
-                    bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red; padding: 30px;"><i class="fas fa-exclamation-circle"></i> Belum ada data nilai tersimpan untuk angkatan ${angkatan} di prodi ini.</td></tr>`;
+                
+                const rawText = await res.text();
+                if (!rawText || rawText.trim() === "" || rawText.includes("empty_database")) {
+                    bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 30px;"><i class="fas fa-exclamation-circle"></i> Tidak ada data nilai untuk angkatan ${angkatan} di program studi ini.</td></tr>`;
                     return;
                 }
 
-                // 1. Grouping data mentah mahasiswa menjadi per CPMK
+                const data = JSON.parse(rawText);
+
+                if (data.length === 0 || !data[0].kode_mk) {
+                    bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 30px;"><i class="fas fa-exclamation-circle"></i> Tidak ada rekap nilai untuk angkatan ${angkatan} di program studi ini.</td></tr>`;
+                    return;
+                }
+
                 let evalData = {}; 
                 data.forEach(item => {
                     let key = `${item.kode_mk}_${item.kode_cpmk}`;
@@ -157,27 +163,22 @@
                     }
                 });
 
-                // 2. Render ke Tabel
                 bodyTbl.innerHTML = "";
                 let no = 1;
-
                 let sortedKeys = Object.keys(evalData).sort();
 
                 sortedKeys.forEach(key => {
                     let row = evalData[key];
                     let totalMhs = row.list_nilai.length;
                     
-                    if(totalMhs === 0) return; // Lewati jika bobotnya 0 (mencegah NaN)
+                    if(totalMhs === 0) return; 
 
-                    // Hitung Rata-Rata
                     let totalNilai = row.list_nilai.reduce((a, b) => a + b, 0);
                     let rataRata = (totalNilai / totalMhs).toFixed(2);
                     
-                    // Hitung Persentase Lulus
                     let lulusCount = row.list_nilai.filter(n => n >= standar).length;
                     let persenLulus = ((lulusCount / totalMhs) * 100).toFixed(1);
 
-                    // Penentuan Warna
                     let barColor = persenLulus >= 75 ? 'bg-success' : (persenLulus >= 50 ? 'bg-warning' : 'bg-danger');
                     let rataColor = rataRata >= standar ? '#166534' : '#991b1b';
                     
@@ -209,7 +210,7 @@
         }
 
         window.onload = () => {
-            setTimeout(loadEvalCPMK, 400); // Langsung eksekusi analisis saat web dibuka
+            setTimeout(loadEvalCPMK, 400); 
         };
     </script>
 </body>

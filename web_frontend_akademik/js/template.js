@@ -162,14 +162,34 @@ window.initSmartSidebar = function() {
     });
 };
 
-// =========================================================
-// PENGAMAN CSS DROPDOWN
-// =========================================================
+// CSS DROPDOWN
+
 var styleDropdown = document.createElement('style');
 styleDropdown.innerHTML = `
-    .dropdown-container { display: none; background-color: #1e293b; padding: 5px 0; border-radius: 4px; margin-top: 5px; }
-    .dropdown-item { display: block; padding: 10px 20px; color: #cbd5e1; text-decoration: none; font-size: 0.85rem; transition: 0.2s; }
-    .dropdown-item:hover { background-color: rgba(255,255,255,0.05); color: white; padding-left: 25px; }
+    .dropdown-container { 
+        display: none; 
+        background-color: transparent; 
+        padding: 0; 
+        margin-top: 2px; 
+    }
+    
+    .dropdown-item { 
+        display: block; 
+        padding: 10px 20px 10px 48px; 
+        color: #ffffff; 
+        text-decoration: none; 
+        font-size: 0.85rem; 
+        transition: 0.2s; 
+        opacity: 0.85; /* Sedikit soft saat idle */
+    }
+    
+    .dropdown-item:hover { 
+        background-color: rgba(255, 255, 255, 0.1); 
+        color: #ffffff; 
+        opacity: 1; 
+        padding-left: 52px; /* Efek bergeser sedikit saat di-hover */
+        border-radius: 8px;
+    }
 `;
 document.head.appendChild(styleDropdown);
 // Fungsi Pemicu Hamburger Menu

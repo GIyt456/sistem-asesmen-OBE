@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Mengajar - Panel Dosen</title>
+    <title>Mengajar - Panel Dosen</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -73,7 +73,7 @@
             border-bottom: 2px solid #ffc561;
         }
 
-       .nav-user {
+        .nav-user {
             display: flex;
             align-items: center;
             gap: 16px;
@@ -115,15 +115,18 @@
             color: var(--text-dark);
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Minimal tinggi body adalah 100% layar */
+            min-height: 100vh;
+            /* Minimal tinggi body adalah 100% layar */
         }
 
         .container {
             max-width: 1200px;
             margin: 40px auto;
             padding: 0 20px;
-            flex: 1; /* PENTING: Memaksa kontainer membentang memenuhi sisa layar kosong */
-            width: 100%; /* Memastikan kontainer tidak menciut di tengah */
+            flex: 1;
+            /* PENTING: Memaksa kontainer membentang memenuhi sisa layar kosong */
+            width: 100%;
+            /* Memastikan kontainer tidak menciut di tengah */
         }
 
         .figma-card {
@@ -502,19 +505,25 @@
             font-weight: 700;
             user-select: none;
         }
-       /* =========================================
+
+        /* =========================================
            RESPONSIVE NAVBAR (SIDEBAR BIRU DI HP)
         ========================================= */
-        .hamburger-btn, .close-menu-btn, .mobile-overlay, .sidebar-header-mobile { display: none; }
-        
-        .nav-menu-wrapper { 
-            display: flex; 
-            align-items: center; 
-            justify-content: flex-start; /* <-- Ubah ini agar menu pindah ke kiri */
-            gap: 40px; 
-            flex: 1; 
+        .hamburger-btn,
+        .close-menu-btn,
+        .mobile-overlay,
+        .sidebar-header-mobile {
+            display: none;
         }
 
+        .nav-menu-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            /* <-- Ubah ini agar menu pindah ke kiri */
+            gap: 40px;
+            flex: 1;
+        }
     </style>
     <link rel="stylesheet" href="css_dosen/index_mobile.css?v=11">
 </head>
@@ -533,12 +542,12 @@
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
 
         <div class="nav-menu-wrapper" id="navMenuWrapper">
-            
+
             <div class="sidebar-header-mobile">
                 <p class="sidebar-brand">SISTEM <span>OBE</span></p>
                 <button class="close-menu-btn" onclick="toggleMenu()"><i class="fas fa-times"></i></button>
             </div>
-            
+
             <div class="nav-links">
                 <a href="jadwal_mengajar.html" class="active">Mengajar</a>
                 <a href="input_nilai.html">Input Asesmen</a>
@@ -551,13 +560,16 @@
                 <div class="user-chip">
                     <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i>
                     <div class="user-text-mobile">
-                        <div class="user-label-hp" style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700; line-height: 1; display: none;">DOSEN PENGAMPU</div>
-                        <div id="dosenName" style="font-size: 0.95rem; font-weight: 800; margin-top: 2px; line-height: 1;">Dosen</div>
+                        <div class="user-label-hp"
+                            style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700; line-height: 1; display: none;">
+                            DOSEN PENGAMPU</div>
+                        <div id="dosenName"
+                            style="font-size: 0.95rem; font-weight: 800; margin-top: 2px; line-height: 1;">Dosen</div>
                     </div>
                 </div>
                 <button class="btn-logout" onclick="logout()">Log Out</button>
             </div>
-            
+
         </div>
     </nav>
     <main class="container">
@@ -794,7 +806,7 @@
             tbody.innerHTML = "";
 
             if (filteredDataGlobal.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada jadwal mengajar yang ditemukan.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada mengajar yang ditemukan.</td></tr>`;
                 document.getElementById("dataCountInfo").innerText = "Showing 0 entries";
                 document.getElementById("paginationControls").innerHTML = "";
                 return;

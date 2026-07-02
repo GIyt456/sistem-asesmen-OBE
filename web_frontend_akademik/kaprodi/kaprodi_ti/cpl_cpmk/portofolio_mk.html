@@ -7,12 +7,27 @@
     
     <!-- PANGGIL CSS GLOBAL SECARA ABSOLUT -->
     <link rel="stylesheet" href="/css/style.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
     <style>
+        .select2-container .select2-selection--single {
+            height: 42px !important;
+            border: 1px solid #ccc !important;
+            border-radius: 8px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+        }
+
+        .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
+
         .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
         
         .report-page { background: white; padding: 50px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; max-width: 1000px; margin-left: auto; margin-right: auto; }
@@ -40,8 +55,17 @@
             .main-content { padding: 0 !important; margin: 0 !important; background: white; }
             .report-page { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
             body { background: white; }
-            table.laporan th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
-            .section-title { background-color: #f8fafc !important; -webkit-print-color-adjust: exact; }
+            table.laporan th {
+                background-color: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .section-title {
+                background-color: #f8fafc !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
     </style>
 </head>
@@ -68,16 +92,19 @@
             <div class="filter-container no-print">
                 <div style="display: flex; gap: 15px; align-items: center;">
                     <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-file-invoice"></i> Pilih Kelas:</label>
+                    
+                    <!-- Dropdown MK -->
                     <select id="selectMK" class="form-control" style="width: 400px; font-weight: 500;">
                         <option value="">⏳ Memuat daftar kelas aktif...</option>
                     </select>
                     
-                    <button class="btn-dark" style="padding: 12px 20px; border: none; font-size: 0.95rem; background: #2563eb;" onclick="loadPortofolio()">
+                    <!-- Tombol Generate yang sudah diubah warnanya -->
+                    <button class="btn-dark" style="padding: 10px 20px; border: none; font-size: 0.95rem; background: #2563eb; color: #ffffff; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap;" onclick="loadPortofolio()">
                         <i class="fas fa-cogs"></i> Generate Portofolio
                     </button>
                 </div>
 
-                <button class="btn-action" style="background: #10b981; color: white; padding: 12px 20px; font-weight: 600; border: none; border-radius: 8px; cursor: pointer;" onclick="window.print()">
+                <button class="btn-dark" style="padding: 10px 20px; border: none; font-size: 0.95rem; background: #10b981; color: #ffffff; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap;" onclick="window.print()">
                     <i class="fas fa-print"></i> Cetak Dokumen PDF
                 </button>
             </div>
@@ -205,16 +232,31 @@
                 }
 
                 let html = "<option value=''>-- Pilih Kelas Mata Kuliah --</option>";
+                
+                // ✨ JURUS SARINGAN ANTI-DUPLIKAT & FILTER PRODI ✨
                 let kelasUnik = new Set();
 
                 data.forEach(item => {
                     let kunci = `${item.kode_mk}-${item.kelas}`;
-                    if (!kelasUnik.has(kunci)) {
+                    let namaKelas = (item.kelas || "").toLowerCase();
+                    let isMilikProdi = false;
+                    
+                    // Logika Deteksi Prodi
+                    if (PRODI === 'ti' && (namaKelas.includes('ti') || namaKelas.includes('teknik'))) {
+                        isMilikProdi = true;
+                    } else if (PRODI === 'si' && (namaKelas.includes('si') || namaKelas.includes('sistem'))) {
+                        isMilikProdi = true;
+                    }
+
+                    // Eksekusi jika cocok & unik
+                    if (isMilikProdi && !kelasUnik.has(kunci)) {
                         kelasUnik.add(kunci);
                         html += `<option value="${item.kode_mk}">[${item.kelas}] ${item.nama_mk} - ${item.dosen}</option>`;
                     }
                 });
+                
                 selectMk.innerHTML = html;
+                
             } catch (e) {
                 selectMk.innerHTML = `<option value="">Gagal memuat kelas asli dari server</option>`;
             }
@@ -324,6 +366,13 @@
         window.onload = () => {
             setTimeout(loadPilihanKelas, 400); // Otomatis muat dropdown kelas
         };
+        $(document).ready(function() {
+            $('#selectMK').select2({
+                placeholder: "Ketik / Pilih Kelas Mata Kuliah...",
+                allowClear: true,
+                width: '400px' // Lebar sesuai dengan desain form-control Anda
+            });
+        });
     </script>
 </body>
-</html>kilas
+</html>

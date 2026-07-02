@@ -47,13 +47,13 @@
             <p style="color: #64748b; font-size: 0.95rem; margin: 0 0 20px 0;">Analisis Ketercapaian Pembelajaran Lulusan (CPL) untuk evaluasi kurikulum.</p>
 
             <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; display: flex; gap: 15px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); align-items: center;">
-                <label style="font-weight: 600; color: #1e293b;">Pilih Angkatan:</label>
-                <select id="filterAngkatan" class="form-control" style="width: 250px;">
-                    <option value="2023">Angkatan 2023</option>
-                    <option value="2022">Angkatan 2022</option>
-                    <option value="2021">Angkatan 2021</option>
-                </select>
-                <button class="btn-dark" onclick="loadDataLaporan()"><i class="fas fa-chart-pie"></i> Tampilkan Analisis</button>
+                <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-search"></i> Cari Angkatan:</label>
+                
+                <input type="number" id="filterAngkatan" class="form-control" placeholder="Ketik Tahun (Cth: 2025)..." style="width: 250px; font-weight: 500;" value="2025">
+                
+                <button onclick="loadDataLaporan()" style="background-color: #2563eb; color: #ffffff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                    <i class="fas fa-chart-pie"></i> Tampilkan Analisis
+                </button>
             </div>
 
             <div class="dashboard-grid">
@@ -82,8 +82,8 @@
                     <thead>
                         <tr>
                             <th width="12%">Kode CPL</th>
-                            <th width="58%">Deskripsi Capaian Pembelajaran</th>
-                            <th width="15%">Kategori</th>
+                            <th width="53%">Deskripsi Capaian Pembelajaran</th>
+                            <th width="20%">Kategori</th>
                             <th width="15%" style="text-align: center;">Skor (Skala 100)</th>
                         </tr>
                     </thead>
@@ -107,7 +107,8 @@
 
         // Tema Dinamis
         const warnaChartAman = PRODI === 'si' ? 'rgba(0, 96, 100, 0.8)' : 'rgba(139, 0, 0, 0.8)';
-        const warnaChartBahaya = 'rgba(220, 38, 38, 0.85)'; // Tetap merah menyala untuk peringatan
+        const warnaChartBahaya = 'rgba(220, 38, 38, 0.85)';
+        const angkatan = document.getElementById('filterAngkatan').value;
 
         document.addEventListener("DOMContentLoaded", () => {
             const badge = document.getElementById("prodiBadge");
@@ -150,7 +151,7 @@
                         <tr>
                             <td><strong style="color: ${PRODI === 'si' ? 'var(--primary-teal)' : 'var(--primary-red)'};">${item.kode}</strong></td>
                             <td style="color: #374151; line-height: 1.5;">${item.deskripsi || 'Deskripsi belum diatur'}</td>
-                            <td><span style="background: #f1f5f9; color: #475569; font-weight: 600; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; border: 1px solid #cbd5e1;">${item.kategori}</span></td>
+                            <td><span style="background: #f1f5f9; color: #475569; font-weight: 700; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; border: 1px solid #cbd5e1; display: inline-block; white-space: nowrap;">${item.kategori}</span></td>
                             <td style="text-align: center; ${warnaSkor}">${item.skor}</td>
                         </tr>
                     `;
