@@ -561,17 +561,31 @@
     
     #previewArea td::before { display: none !important; }
     
-    #studentHead th:first-child, #studentBody td:first-child,
-    #studentHead th:nth-child(2), #studentBody td:nth-child(2) { 
-        position: sticky !important; 
-        background: white !important; 
-        z-index: 10 !important; 
-        max-width: none !important; 
-        overflow: visible !important; 
-        white-space: nowrap !important;
+    /* 1. Biarkan NIM ikut ter-scroll agar tidak memakan tempat di layar sempit */
+    #studentHead th:first-child, #studentBody td:first-child { 
+        position: static !important; 
+        box-shadow: none !important; 
     }
     
-    #studentHead th { background: #f8fafc !important; z-index: 11 !important; }
-    #studentBody td:nth-child(2) { text-align: left !important; }
+    /* 2. Jadikan Nama Mahasiswa Sticky, tapi BATASI LEBARNYA dengan ketat! */
+    #studentHead th:nth-child(2), #studentBody td:nth-child(2) { 
+        position: sticky !important; 
+        left: 0 !important; 
+        background: white !important; 
+        z-index: 10 !important; 
+        min-width: 120px !important; 
+        max-width: 120px !important; /* Batasi lebarnya agar nilai tidak tertutup */
+        overflow: hidden !important; 
+        text-overflow: ellipsis !important; /* Beri titik-titik jika nama panjang */
+        white-space: nowrap !important;
+        border-right: 2px solid #cbd5e1 !important; /* Beri garis batas tegas */
+        text-align: left !important;
+    }
+    
+    /* Bedakan warna latar header Nama agar lebih rapi */
+    #studentHead th:nth-child(2) { 
+        background: #f8fafc !important; 
+        z-index: 11 !important; 
+    }
 
 } /* <--- INI ADALAH KURUNG KURAWAL PENUTUP UTAMA UNTUK MODE MOBILE. JANGAN ADA @MEDIA LAGI SETELAH INI */
