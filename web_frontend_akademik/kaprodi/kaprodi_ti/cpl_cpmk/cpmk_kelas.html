@@ -6,12 +6,24 @@
     <title>Pemenuhan CPMK per Kelas - Sistem OBE</title>
     
     <link rel="stylesheet" href="/css/style.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
     <style>
+        .select2-container .select2-selection--single {
+            height: 42px !important;
+            border: 1px solid #ccc !important;
+            border-radius: 8px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+        }
         .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; }
         .table-responsive { overflow-x: auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; }
         .table-cpmk { width: 100%; border-collapse: collapse; min-width: 1000px; }
@@ -52,8 +64,8 @@
                 <select id="selectMK" class="form-control" style="width: 400px; font-weight: 500;">
                     <option value="">⏳ Memuat daftar kelas aktif...</option>
                 </select>
-                <button class="btn-dark" style="padding: 12px 25px; border: none; font-size: 0.95rem;" onclick="loadDataCPMK()">
-                    <i class="fas fa-search"></i> Kalkulasi CPMK
+                <button onclick="loadDataCPMK()" style="background-color: #2563eb; color: #ffffff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap;">
+                    <i class="fas fa-calculator"></i> Kalkulasi CPMK
                 </button>
             </div>
 
@@ -118,11 +130,25 @@
                 let kelasUnik = new Set();
 
                 data.forEach(item => {
-                    // Membuat kunci identitas (Gabungan Kode MK dan Nama Kelas)
                     let kunci = `${item.kode_mk}-${item.kelas}`;
                     
-                    // Jika kunci ini belum pernah dimasukkan ke dropdown, maka masukkan
-                    if (!kelasUnik.has(kunci)) {
+                    // 1. Ambil nama kelas/kelompok dari database dan jadikan huruf kecil
+                    let namaKelas = (item.kelas || "").toLowerCase();
+                    
+                    // 2. Logika Deteksi Prodi
+                    let isMilikProdi = false;
+                    
+                    // Jika Kaprodi TI: Izinkan jika nama kelas mengandung kata "ti" atau "teknik"
+                    if (PRODI === 'ti' && (namaKelas.includes('ti') || namaKelas.includes('teknik'))) {
+                        isMilikProdi = true;
+                    } 
+                    // Jika Kaprodi SI: Izinkan jika nama kelas mengandung kata "si" atau "sistem"
+                    else if (PRODI === 'si' && (namaKelas.includes('si') || namaKelas.includes('sistem'))) {
+                        isMilikProdi = true;
+                    }
+
+                    // 3. Masukkan ke dropdown HANYA JIKA milik prodi yang login & belum ada duplikat
+                    if (isMilikProdi && !kelasUnik.has(kunci)) {
                         kelasUnik.add(kunci);
                         html += `<option value="${item.kode_mk}">[${item.kelas}] ${item.nama_mk} - ${item.dosen}</option>`;
                     }
@@ -150,7 +176,7 @@
             bodyTbl.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Memproses kalkulasi jutaan bobot CPMK dari database...</td></tr>`;
 
             try {
-                const res = await fetch(`${API_GET_CPMK}?kode_mk=${kodeMK}`);
+                const res = await fetch(`${API_GET_CPMK}?kode_mk=${kodeMK}&prodi=${PRODI}`);
                 if(!res.ok) throw new Error("Gagal ambil data");
                 const data = await res.json();
 
@@ -159,9 +185,14 @@
                     return;
                 }
 
-                // 1. Ekstrak Header CPMK
+                // 1. Ekstrak Header CPMK (Hanya render CPMK milik Prodi yang sedang login)
                 let cpmkSet = new Set();
-                data.forEach(item => { if(item.kode_cpmk) cpmkSet.add(item.kode_cpmk) });
+                data.forEach(item => { 
+                    // Cek apakah kode_cpmk ada isinya DAN mengandung string 'ti' atau 'si' (sesuai prodi aktif)
+                    if(item.kode_cpmk && item.kode_cpmk.toLowerCase().includes(PRODI)) {
+                        cpmkSet.add(item.kode_cpmk);
+                    } 
+                });
                 let cpmkList = Array.from(cpmkSet).sort();
 
                 // Generate Header Table
@@ -214,6 +245,13 @@
         window.onload = () => {
             setTimeout(loadPilihanKelas, 400); // Otomatis muat dropdown
         };
+        $(document).ready(function() {
+            $('#selectMK').select2({
+                placeholder: "Ketik / Pilih Kelas Mata Kuliah...",
+                allowClear: true,
+                width: '400px'
+            });
+        });                                    
     </script>
 </body>
 </html>
