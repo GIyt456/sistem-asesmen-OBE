@@ -552,6 +552,21 @@
             gap: 40px;
             flex: 1;
         }
+
+        /* PERBAIKAN TOMBOL ACTION DI TAMPILAN MOBILE */
+        @media screen and (max-width: 768px) {
+            .action-cell {
+                flex-direction: column !important;
+                width: 100%;
+            }
+
+            .btn-detail,
+            .btn-penilaian,
+            .btn-rps {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+        }
     </style>
     <link rel="stylesheet" href="css_dosen/index_mobile.css?v=11">
 </head>
