@@ -260,6 +260,11 @@
             font-weight: 600;
             cursor: pointer;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            /* Mencegah teks turun ke bawah */
         }
 
         .btn-detail:hover {
@@ -284,10 +289,33 @@
             align-items: center;
             gap: 8px;
             transition: 0.2s;
+            white-space: nowrap;
+            /* Mencegah teks turun ke bawah */
         }
 
         .btn-penilaian:hover {
             background: #0369a1;
+        }
+
+        .btn-rps {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            white-space: nowrap;
+            /* Mencegah teks turun ke bawah */
+        }
+
+        .btn-rps:hover {
+            background: #059669;
         }
 
         .dropdown-menu {
@@ -577,22 +605,37 @@
         <div style="margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;">
             <h1 style="font-size: 2.2rem; font-weight: 900; color: var(--primary-navy); margin-bottom: 5px;">
                 Mengajar</h1>
-            <p style="color: var(--text-gray); font-size: 1rem;">Daftar mata kuliah dan kelas yang diampu pada semester ini.</p>
+            <p style="color: var(--text-gray); font-size: 1rem;">Daftar mata kuliah dan kelas yang diampu pada semester
+                ini.</p>
         </div>
 
         <div class="figma-card">
-            <h3 class="card-title" id="lblProdiTitle">Memuat Program Studi...</h3>
 
-            <div class="table-controls">
-                <div class="show-entries">
-                    Show
-                    <select id="rowsPerPageSelect" onchange="changeRowsPerPage()">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                    entries
+            <div class="table-controls"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div class="show-entries">
+                        Show
+                        <select id="rowsPerPageSelect" onchange="changeRowsPerPage()">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        entries
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #4b5563;">
+                        <label for="filterProdi" style="font-weight: 700;"><i class="fas fa-filter"></i> Prodi:</label>
+                        <select id="filterProdi" onchange="filterTable()"
+                            style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); outline: none; font-family: 'Inter'; cursor: pointer; background: white; color: var(--text-dark); font-weight: 600;">
+                            <option value="semua">Semua</option>
+                            <option value="ti">Teknik Informatika</option>
+                            <option value="si">Sistem Informasi</option>
+                        </select>
+                    </div>
                 </div>
+
                 <div class="search-box">
                     Search: <input type="text" id="searchInput" placeholder="Cari MK atau ID Kelas..."
                         oninput="filterTable()">
@@ -695,7 +738,7 @@
         const userProdiSekarang = localStorage.getItem("prodi_aktif") || "ti";
 
         document.getElementById("dosenName").innerText = userLogin;
-        document.getElementById("lblProdiTitle").innerText = userProdiSekarang === "si" ? "Sistem Informasi" : "Teknik Informatika";
+        // document.getElementById("lblProdiTitle").innerText = userProdiSekarang === "si" ? "Sistem Informasi" : "Teknik Informatika";
 
         // Tambah Tombol Admin Jika Diperlukan
         if (userRoleSekarang === "admin") {
@@ -820,30 +863,41 @@
             const currentDataPage = filteredDataGlobal.slice(startIndex, endIndex);
 
             currentDataPage.forEach((kelas) => {
+                // ALGORITMA STIKER PRODI
+                let badgeProdi = '';
+                let prodiText = (kelas.prodi || '').toLowerCase();
+
+                if (prodiText === 'ti' || prodiText.includes('informa')) {
+                    badgeProdi = '<span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:800; margin-left:8px; vertical-align: middle;">TI</span>';
+                } else if (prodiText === 'si' || prodiText.includes('sistem')) {
+                    badgeProdi = '<span style="background:#fce7f3; color:#be185d; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:800; margin-left:8px; vertical-align: middle;">SI</span>';
+                }
+
                 const tr = document.createElement("tr");
                 const safeId = kelas.kode_mk.replace(/\s+/g, '-');
 
                 tr.innerHTML = `
                     <td>2025/2026</td>
                     <td>
-                        <strong>${kelas.kode_mk} - ${kelas.nama_mk.toUpperCase()}</strong><br>
+                        <strong>${kelas.kode_mk} - ${kelas.nama_mk.toUpperCase()}</strong> ${badgeProdi}<br>
                         <span style="color:#6b7280; font-size:0.8rem;">Kelompok: ${kelas.kelompok}</span>
                     </td>
                     <td style="font-weight: 800; color: #0284c7; text-align: center; font-size: 1.1rem;">${kelas.id_kelas}</td>
                     <td style="text-align: center;">${kelas.semester}</td>
                     <td style="text-align: center;">${kelas.sks}</td>
                     <td>
-                        <div class="action-cell">
-                            <button class="btn-detail" onclick="bukaModalDetail('${kelas.kode_mk}', '${kelas.nama_mk}', '${kelas.sks}', '${kelas.semester}', '${kelas.id_kelas}', '${kelas.prodi}')">Detail</button>
-                            <div class="btn-dropdown-wrapper">
-                                <button class="btn-penilaian" onclick="toggleActionMenu(event, 'menu-${safeId}')">
-                                    Aksi <i class="fas fa-caret-down"></i>
-                                </button>
-                                <div class="dropdown-menu" id="menu-${safeId}">
-                                    <a href="penilaian_kelas.html?id_kelas=${kelas.id_kelas}&mk=${kelas.kode_mk}" class="dropdown-item"><i class="fas fa-edit" style="margin-right:8px;"></i> Input Nilai (Kelas ${kelas.id_kelas})</a>
-                                    <a href="#" onclick="bukaRPS('${kelas.kode_mk}')" class="dropdown-item"><i class="fas fa-book" style="margin-right:8px;"></i> Penyusunan RPS</a>
-                                </div>
-                            </div>
+                        <div class="action-cell" style="justify-content: center; gap: 8px;">
+                            <button class="btn-detail" onclick="bukaModalDetail('${kelas.kode_mk}', '${kelas.nama_mk}', '${kelas.sks}', '${kelas.semester}', '${kelas.id_kelas}', '${kelas.prodi}')" style="display:flex; align-items:center; gap:6px;">
+                                <i class="fas fa-info-circle"></i> Detail
+                            </button>
+                            
+                            <button class="btn-penilaian" onclick="window.location.href='penilaian_kelas.html?id_kelas=${kelas.id_kelas}&mk=${kelas.kode_mk}'">
+                                <i class="fas fa-edit"></i> Input Nilai
+                            </button>
+                            
+                            <button class="btn-rps" onclick="bukaRPS('${kelas.kode_mk}')">
+                                <i class="fas fa-book"></i> RPS
+                            </button>
                         </div>
                     </td>
                 `;
@@ -891,11 +945,28 @@
 
         function filterTable() {
             const keyword = document.getElementById("searchInput").value.toLowerCase();
-            filteredDataGlobal = dataJadwalGlobal.filter(kelas =>
-                kelas.kode_mk.toLowerCase().includes(keyword) ||
-                kelas.nama_mk.toLowerCase().includes(keyword) ||
-                String(kelas.id_kelas).toLowerCase().includes(keyword)
-            );
+            const filterProdi = document.getElementById("filterProdi") ? document.getElementById("filterProdi").value.toLowerCase() : 'semua';
+
+            filteredDataGlobal = dataJadwalGlobal.filter(kelas => {
+                // 1. Cek pencarian kolom teks
+                const matchKeyword = kelas.kode_mk.toLowerCase().includes(keyword) ||
+                    kelas.nama_mk.toLowerCase().includes(keyword) ||
+                    String(kelas.id_kelas).toLowerCase().includes(keyword);
+
+                // 2. Cek filter dropdown prodi
+                let matchProdi = true;
+                if (filterProdi !== 'semua') {
+                    let p = (kelas.prodi || "").toLowerCase();
+                    if (filterProdi === 'ti') {
+                        matchProdi = (p === 'ti' || p.includes('informa') || p === 'teknik informatika');
+                    } else if (filterProdi === 'si') {
+                        matchProdi = (p === 'si' || p.includes('sistem') || p === 'sistem informasi');
+                    }
+                }
+
+                // Harus lolos pencarian teks DAN lolos filter prodi
+                return matchKeyword && matchProdi;
+            });
 
             currentPage = 1;
             renderTable();
