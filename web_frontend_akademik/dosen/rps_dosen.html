@@ -32,32 +32,67 @@
             background-color: #f8fafc;
             color: var(--text-dark);
         }
-       /* =========================================
+
+        /* =========================================
            TAMBAHAN: PAGINATION PERTEMUAN (SMART MODE)
         ========================================= */
         /* 1. Aturan Khusus Layar HP (Aktifkan Pagination) */
         @media screen and (max-width: 768px) {
-            .hidden-row { display: none !important; }
+            .hidden-row {
+                display: none !important;
+            }
         }
 
         /* 2. Aturan Khusus Layar Laptop (Matikan Pagination, Tampilkan Semua) */
         @media screen and (min-width: 769px) {
-            .hidden-row { display: table-row !important; } /* Munculkan semua 16 baris */
-            #sesiPaginationContainer { display: none !important; } /* Sembunyikan pil angka */
-            #sesiNavButtons { display: none !important; } /* Sembunyikan tombol next/prev */
+            .hidden-row {
+                display: table-row !important;
+            }
+
+            /* Munculkan semua 16 baris */
+            #sesiPaginationContainer {
+                display: none !important;
+            }
+
+            /* Sembunyikan pil angka */
+            #sesiNavButtons {
+                display: none !important;
+            }
+
+            /* Sembunyikan tombol next/prev */
         }
-        
+
         /* Desain Tombol Pil Angka (Berlaku saat muncul di HP) */
-        #sesiPaginationContainer::-webkit-scrollbar { height: 6px; }
-        #sesiPaginationContainer::-webkit-scrollbar-track { background: transparent; }
-        #sesiPaginationContainer::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        .btn-pertemuan {
-            padding: 8px 16px; border: 1px solid #cbd5e1; border-radius: 50px; 
-            background: white; cursor: pointer; font-weight: 600; color: #334155;
-            white-space: nowrap; transition: 0.2s; font-size: 0.85rem;
+        #sesiPaginationContainer::-webkit-scrollbar {
+            height: 6px;
         }
-        .btn-pertemuan:hover { background: #f1f5f9; }
+
+        #sesiPaginationContainer::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #sesiPaginationContainer::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .btn-pertemuan {
+            padding: 8px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 50px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            color: #334155;
+            white-space: nowrap;
+            transition: 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .btn-pertemuan:hover {
+            background: #f1f5f9;
+        }
+
         /* ========================================= */
 
         /* NAVBAR DOSEN */
@@ -849,6 +884,11 @@
                     <button class="tab-btn" onclick="bukaTab(event, 'tab-sesi')"
                         style="color: #8b0000; font-weight: 800;">Sesi Pertemuan</button>
                     <button class="tab-btn" onclick="bukaTab(event, 'tab-penilaian')">Penilaian (Bobot)</button>
+                    <button class="tab-btn" id="btnTabPersetujuan"
+                        style="display: none; color: var(--primary-purple); font-weight: 800;"
+                        onclick="bukaTab(event, 'tab-persetujuan')">
+                        <i class="fas fa-check-circle"></i> Persetujuan Kaprodi
+                    </button>
                 </div>
 
                 <div id="tab-detail" class="tab-content active">
@@ -878,7 +918,7 @@
                         <div>
                             <div class="box-catatan">
                                 <h4>Catatan Revisi RPS dari Prodi:</h4>
-                                <p>Belum/tidak ada catatan dari prodi.</p>
+                                <p id="textCatatanDosen" style="white-space: pre-wrap;">Memuat catatan...</p>
                             </div>
                         </div>
                     </div>
@@ -1048,16 +1088,52 @@
                     </div>
                 </div>
 
+                <div id="tab-persetujuan" class="tab-content">
+                    <h3 class="section-title">Persetujuan & Catatan Revisi RPS</h3>
+                    <div class="grid-2-col">
+                        <div>
+                            <div class="form-group">
+                                <label>Status Persetujuan RPS</label>
+                                <select id="valStatusRps" class="form-control" style="font-weight: bold;">
+                                    <option value="pending">⏳ Belum Disetujui (Pending)</option>
+                                    <option value="revisi">❌ Perlu Revisi</option>
+                                    <option value="approved">✅ Disetujui (Approved)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Catatan Revisi untuk Dosen Pengampu</label>
+                                <textarea id="valCatatanRps" class="form-control"
+                                    style="height: 150px; resize: vertical;"
+                                    placeholder="Tuliskan catatan perbaikan di sini..."></textarea>
+                            </div>
+                            <button class="btn-action" onclick="simpanPersetujuan()" id="btnSimpanPersetujuan">
+                                <i class="fas fa-save"></i> Simpan Persetujuan & Catatan
+                            </button>
+                        </div>
+                        <div>
+                            <div class="box-catatan">
+                                <h4>Informasi untuk Kaprodi:</h4>
+                                <p style="color:#64748b;">Gunakan form ini untuk memvalidasi RPS yang telah disusun oleh
+                                    dosen pengampu. Catatan revisi yang Anda simpan akan langsung ditampilkan di Tab
+                                    Detail RPS pada layar dosen yang bersangkutan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="tab-sesi" class="tab-content">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h3 class="section-title" style="margin: 0; border: none;">Rencana Pertemuan</h3>
-                        <button class="btn-action" onclick="simpanRPSDosen()" id="btnSimpanRPS" style="background: #059669;">
+                        <button class="btn-action" onclick="simpanRPSDosen()" id="btnSimpanRPS"
+                            style="background: #059669;">
                             <i class="fas fa-save"></i> Simpan Semua Sesi
                         </button>
                     </div>
 
                     <!-- WADAH TOMBOL CHIPS 1-16 -->
-                    <div id="sesiPaginationContainer" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scroll-behavior: smooth;">
+                    <div id="sesiPaginationContainer"
+                        style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scroll-behavior: smooth;">
                         <!-- Tombol navigasi 1-16 akan dimasukkan JS di sini -->
                     </div>
 
@@ -1078,7 +1154,8 @@
                             </thead>
                             <tbody id="bodyTabelSesi">
                                 <tr>
-                                    <td colspan="9" style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-spin"></i> Menarik data pertemuan...</td>
+                                    <td colspan="9" style="text-align: center; padding: 40px;"><i
+                                            class="fas fa-spinner fa-spin"></i> Menarik data pertemuan...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1089,7 +1166,8 @@
                         <button id="btnPrevSesi" class="btn-kembali" onclick="changeSesi(-1)">
                             <i class="fas fa-arrow-left"></i> Sebelumnya
                         </button>
-                        <button id="btnNextSesi" class="btn-action" style="background: var(--primary-navy);" onclick="changeSesi(1)">
+                        <button id="btnNextSesi" class="btn-action" style="background: var(--primary-navy);"
+                            onclick="changeSesi(1)">
                             Selanjutnya <i class="fas fa-arrow-right"></i>
                         </button>
                     </div>
@@ -1342,6 +1420,16 @@
                     const statusAcc = `<span class="badge-status status-pend">Belum Disetujui</span>`;
                     const dosenHtml = `<span class="badge-dosen-blue">${userLogin}</span><br><small style="color:#64748b; font-weight:600; margin-left:5px;">Koordinator</small>`;
 
+                    // CEK ROLE: Buat item dropdown "Catatan Revisi" HANYA untuk Admin/Kaprodi
+                    let tombolCatatanHTML = "";
+                    if (userRoleSekarang === "admin" || userRoleSekarang === "headadmin") {
+                        tombolCatatanHTML = `
+                            <div class="dropdown-item" style="color: #ea580c;" onclick="bukaCatatanRevisi('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')">
+                                <i class="fas fa-comment-dots" style="width:20px;"></i> Beri Catatan Revisi
+                            </div>
+                        `;
+                    }
+
                     tbody.innerHTML += `
                         <tr>
                             <td>
@@ -1359,7 +1447,9 @@
                                     </button>
                                     <div class="dropdown-menu" id="menu-${safeKode}" style="text-align: left;">
                                         <div class="dropdown-item" onclick="bukaDetailRPS('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')"><i class="fas fa-file-alt" style="width:20px;"></i> Detail RPS</div>
-                                        <div class="dropdown-item"><i class="fas fa-comment-dots" style="width:20px;"></i> Catatan Revisi</div>
+                                        
+                                        ${tombolCatatanHTML}
+                                        
                                         <div class="dropdown-item" onclick="bukaHalamanCetak('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')"><i class="fas fa-print" style="width:20px;"></i> Cetak RPS</div>
                                     </div>
                                 </div>
@@ -1573,6 +1663,30 @@
                     }
                 }
             } catch (e) { console.warn("Belum ada data di rps_lainnya"); }
+
+            // 7. TARIK DATA STATUS & CATATAN PERSETUJUAN RPS
+            try {
+                const resPersetujuan = await fetch(`${API_BASE}/get-persetujuan-rps?kode_mk=${kodeMK}`);
+                if (resPersetujuan.ok) {
+                    // Gunakan fungsi aman untuk bongkar bungkus n8n
+                    const jsonPersetujuan = safeExtractArray(await resPersetujuan.json());
+                    const dataSetuju = jsonPersetujuan[0];
+
+                    if (dataSetuju) {
+                        // Tampilkan teks di layar dosen
+                        document.getElementById("textCatatanDosen").innerText = dataSetuju.catatan || "Belum/tidak ada catatan dari prodi.";
+
+                        // Isi nilai di form Kaprodi (jika Kaprodi yang sedang buka)
+                        if (document.getElementById("valStatusRps")) document.getElementById("valStatusRps").value = dataSetuju.status || 'pending';
+                        if (document.getElementById("valCatatanRps")) document.getElementById("valCatatanRps").value = dataSetuju.catatan || '';
+                    } else {
+                        document.getElementById("textCatatanDosen").innerText = "Belum/tidak ada catatan dari prodi.";
+                    }
+                }
+            } catch (e) {
+                console.warn("API Persetujuan belum terhubung.");
+                document.getElementById("textCatatanDosen").innerText = "Belum/tidak ada catatan dari prodi.";
+            }
         }
 
         async function bukaDetailRPS(kode_mk, nama_mk, semester, sks) {
@@ -1589,6 +1703,18 @@
             await loadInfoKelengkapanRPS(kode_mk);
             // BARU RENDER TABEL 16 MINGGU
             loadDataRPSTable(kode_mk);
+        }
+
+        // FUNGSI KHUSUS KAPRODI UNTUK LANGSUNG MELOMPAT KE TAB PERSETUJUAN
+        async function bukaCatatanRevisi(kode_mk, nama_mk, semester, sks) {
+            // 1. Buka halaman detail (menunggu data ditarik dari server)
+            await bukaDetailRPS(kode_mk, nama_mk, semester, sks);
+
+            // 2. Simulasikan klik pada Tab "Persetujuan Kaprodi" agar langsung terbuka
+            const tabSetuju = document.getElementById("btnTabPersetujuan");
+            if (tabSetuju) {
+                tabSetuju.click();
+            }
         }
 
         function kembaliKeList() {
@@ -1743,9 +1869,9 @@
         // --- FUNGSI BARU UNTUK NAVIGASI PERTEMUAN ---
         function renderSesiPagination() {
             const container = document.getElementById('sesiPaginationContainer');
-            if(!container) return;
+            if (!container) return;
             let html = '';
-            for(let i=1; i<=16; i++) {
+            for (let i = 1; i <= 16; i++) {
                 let extraStyle = (i === 8 || i === 16) ? 'border-color: var(--primary-red); color: var(--primary-red);' : '';
                 let label = (i === 8) ? 'UTS (8)' : (i === 16) ? 'UAS (16)' : `Pert ${i}`;
                 html += `<button class="btn-pertemuan" id="btn_pert_${i}" onclick="showPertemuan(${i})" style="${extraStyle}">${label}</button>`;
@@ -1755,44 +1881,44 @@
 
         function showPertemuan(num) {
             currentSesi = num;
-            for(let i=1; i<=16; i++) {
+            for (let i = 1; i <= 16; i++) {
                 const row = document.getElementById(`row_pertemuan_${i}`);
                 const btn = document.getElementById(`btn_pert_${i}`);
-                
+
                 // Atur Sembunyi/Tampil Baris
-                if(row) {
-                    if(i === num) row.classList.remove('hidden-row');
+                if (row) {
+                    if (i === num) row.classList.remove('hidden-row');
                     else row.classList.add('hidden-row');
                 }
-                
+
                 // Atur Warna Tombol Aktif
-                if(btn) {
-                    if(i === num) {
-                        btn.style.background = (i===8 || i===16) ? 'var(--primary-red)' : 'var(--primary-navy)';
+                if (btn) {
+                    if (i === num) {
+                        btn.style.background = (i === 8 || i === 16) ? 'var(--primary-red)' : 'var(--primary-navy)';
                         btn.style.color = 'white';
                     } else {
                         btn.style.background = 'white';
-                        btn.style.color = (i===8 || i===16) ? 'var(--primary-red)' : '#334155';
+                        btn.style.color = (i === 8 || i === 16) ? 'var(--primary-red)' : '#334155';
                     }
                 }
             }
 
             // Scroll otomatis kotak navigasi agar tombol selalu terlihat
             const activeBtn = document.getElementById(`btn_pert_${num}`);
-            if(activeBtn) {
+            if (activeBtn) {
                 activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
 
             // Atur Muncul/Hilang Tombol Next-Prev
             const btnPrev = document.getElementById('btnPrevSesi');
             const btnNext = document.getElementById('btnNextSesi');
-            if(btnPrev) btnPrev.style.visibility = (num === 1) ? 'hidden' : 'visible';
-            if(btnNext) btnNext.style.visibility = (num === 16) ? 'hidden' : 'visible';
+            if (btnPrev) btnPrev.style.visibility = (num === 1) ? 'hidden' : 'visible';
+            if (btnNext) btnNext.style.visibility = (num === 16) ? 'hidden' : 'visible';
         }
 
         function changeSesi(arah) {
             let nextSesi = currentSesi + arah;
-            if(nextSesi >= 1 && nextSesi <= 16) {
+            if (nextSesi >= 1 && nextSesi <= 16) {
                 showPertemuan(nextSesi);
                 // Kembalikan scroll layar sedikit ke atas agar nyaman dilihat
                 document.querySelector('.header-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1880,6 +2006,41 @@
             if (btn2) btn2.innerHTML = '<i class="fas fa-save"></i> Simpan Info Tambahan';
         }
 
+        async function simpanPersetujuan() {
+            if (!currentMkDipilih) return;
+
+            const btn = document.getElementById("btnSimpanPersetujuan");
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            const payload = {
+                kode_mk: currentMkDipilih,
+                status: document.getElementById("valStatusRps").value,
+                catatan: document.getElementById("valCatatanRps").value
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/simpan-persetujuan-rps`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    alert("✅ Status & Catatan RPS Berhasil Disimpan ke Database!");
+                    // Langsung update layar teks dosen agar sinkron
+                    document.getElementById("textCatatanDosen").innerText = payload.catatan || "Belum/tidak ada catatan dari prodi.";
+                } else {
+                    alert("❌ Gagal menyimpan. Periksa webhook n8n Anda.");
+                }
+            } catch (e) {
+                alert("❌ Terjadi kesalahan jaringan.");
+            }
+
+            btn.innerHTML = '<i class="fas fa-save"></i> Simpan Persetujuan & Catatan';
+            btn.disabled = false;
+        }
+
         function toggleOpsiMenu(event, menuId) {
             event.stopPropagation();
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
@@ -1935,6 +2096,12 @@
                     // 3. Eksekusi fungsi buka detail (Klik Otomatis)
                     bukaDetailRPS(matkulTarget.kode_mk, matkulTarget.nama_mk, matkulTarget.semester, matkulTarget.sks);
                 }
+            }
+
+            // Tampilkan Tab Persetujuan jika rolenya Kaprodi (Admin)
+            if (userRoleSekarang === "admin" || userRoleSekarang === "headadmin") {
+                const tabSetuju = document.getElementById("btnTabPersetujuan");
+                if (tabSetuju) tabSetuju.style.display = "inline-block";
             }
         };
         // ==========================================
