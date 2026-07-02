@@ -9,48 +9,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <style>
-        /* --- WAJIB: Layout Flexbox agar Sidebar dan Konten bersebelahan --- */
-        body { 
-            display: flex; 
-            margin: 0; 
-            background: #f9fafb; 
-            height: 100vh; 
-            overflow: hidden; 
-            font-family: 'Inter', sans-serif;
-            color: #111827;
-        }
-
-        .main-content { 
-            flex: 1; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column;
-        }
-
-        /* --- Tambahan Tema TI (Merah Gelap) --- */
-        .btn-primary-ti { background: linear-gradient(to right, #8b0000, #5c0000); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; box-shadow: 0 2px 4px rgba(139, 0, 0, 0.2); }
-        .btn-primary-ti:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3); }
-        
-        .section { display: none; animation: fadeIn 0.3s ease; padding: 0 40px 40px 40px; }
-        .section.active { display: block; }
-        
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 40px 40px 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
-        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: #8b0000; }
-        .badge-prodi { background: #8b0000; color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 4px rgba(139, 0, 0, 0.2); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>   
+    <link rel="stylesheet" href="admin_config.css">
 </head>
 <body>
     
     <div id="sidebar-container"></div>
-
+    <div id="navbar-container"></div>
     <div class="main-content">
-        <div id="navbar-container"></div>
         
         <div class="header-container">
             <div class="header-title-area">
@@ -279,6 +245,28 @@
                 if (typeof pasangJembatanSidebar === "function") pasangJembatanSidebar();
                 switchTab('dashboard');
             }, 500); 
+        });
+
+        // Fungsi untuk memunculkan dan menyembunyikan sidebar di mobile
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById("sidebar-container");
+            if (sidebar) {
+                // Tambahkan atau hapus class 'show-mobile' yang ada di CSS tadi
+                sidebar.classList.toggle("show-mobile");
+            }
+        }
+
+        // Opsional: Klik di sembarang tempat (luar sidebar) untuk menutupnya
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById("sidebar-container");
+            const toggleBtn = document.getElementById("btnToggleSidebar");
+            
+            // Jika sidebar sedang terbuka, dan user mengklik di luar sidebar & bukan di tombol garis tiga
+            if (sidebar && sidebar.classList.contains("show-mobile")) {
+                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    sidebar.classList.remove("show-mobile");
+                }
+            }
         });
     </script>
 </body>

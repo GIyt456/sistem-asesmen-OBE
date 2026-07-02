@@ -11,32 +11,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
-    <style>
-        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 30px; }
-        .table-master { width: 100%; border-collapse: collapse; }
-        .table-master th, .table-master td { padding: 15px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: middle; }
-        .table-master th { background: #111827; color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
-        .text-center { text-align: center !important; }
+    <link rel="stylesheet" href="rekap_nilai.css">
 
-        /* Progress Bar Sederhana */
-        .progress-bg { background: #e5e7eb; border-radius: 10px; height: 10px; width: 100%; overflow: hidden; margin-top: 5px; }
-        .progress-bar { background: #10b981; height: 100%; border-radius: 10px; transition: width 0.5s ease; }
-        .progress-text { font-size: 0.8rem; font-weight: 600; color: #4b5563; }
-        .status-danger { color: #dc2626; background: #fee2e2; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
-        .status-success { color: #059669; background: #d1fae5; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
-        
-        body { animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
 </head>
 <body>
 
     <div id="sidebar-container"></div>
-
+    <div id="navbar-container"></div>
     <div class="main-content">
-        <div id="navbar-container"></div>
-
-        <div class="content-wrapper">
+        <div class="content-wrapper" style="padding-top: 5px !important;">
             <div class="header-container">
                 <div class="header-title-area">
                     <div class="header-subtitle">EVALUASI & RPS</div>
@@ -167,6 +150,28 @@
                 `;
             });
         }
+
+        // Fungsi untuk memunculkan dan menyembunyikan sidebar di mobile
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById("sidebar-container");
+            if (sidebar) {
+                // Tambahkan atau hapus class 'show-mobile' yang ada di CSS tadi
+                sidebar.classList.toggle("show-mobile");
+            }
+        }
+
+        // Opsional: Klik di sembarang tempat (luar sidebar) untuk menutupnya
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById("sidebar-container");
+            const toggleBtn = document.getElementById("btnToggleSidebar");
+            
+            // Jika sidebar sedang terbuka, dan user mengklik di luar sidebar & bukan di tombol garis tiga
+            if (sidebar && sidebar.classList.contains("show-mobile")) {
+                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    sidebar.classList.remove("show-mobile");
+                }
+            }
+        });
 
         window.onload = () => {
             setTimeout(loadRekapNilai, 400);

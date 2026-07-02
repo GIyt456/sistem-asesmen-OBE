@@ -75,6 +75,11 @@ body {
     color: var(--primary-red); 
 }
 
+/* HEADER TABEL DESKTOP */
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.section-title { margin: 0; font-size: 1.4rem; font-weight: 800; }
+.section-subtitle { margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500; }
+
 .badge-prodi { 
     background: var(--primary-red); 
     color: white; 
@@ -199,6 +204,106 @@ td {
         margin: 0 !important;
     }
 
+    /* 3. TRANSFORMASI TABEL KARTU (CARD-BASED) */
+    .table-container {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        overflow-x: visible !important; 
+        width: 100% !important;
+        margin-bottom: 20px !important;
+    }
+
+    table, thead, tbody, th, td, tr {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important; /* 👇 INI OBATNYA! Mematikan paksaan lebar 700px dari desktop 👇 */
+    }
+
+    thead tr {
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
+    }
+
+    tbody tr {
+        background: white !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 12px !important; 
+        padding: 15px !important;
+        margin-bottom: 15px !important; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+        box-sizing: border-box !important;
+    }
+
+    td {
+        display: flex !important;
+        justify-content: space-between !important; 
+        align-items: center !important;
+        padding: 10px 0 !important; 
+        border-bottom: 1px dashed #e2e8f0 !important; 
+        font-size: 0.9rem !important;
+        text-align: right !important;
+    }
+
+    td:last-child {
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+
+    td::before {
+        content: attr(data-label) !important; 
+        font-weight: 700 !important;
+        color: #64748b !important; 
+        text-transform: uppercase !important;
+        font-size: 0.75rem !important;
+        letter-spacing: 0.5px !important;
+        flex: 1 !important;
+        text-align: left !important;
+    }
+
+    td > * {
+        flex: 2 !important;
+        text-align: right !important;
+    }
+
+    /* Penyesuaian Input Data di Dalam Kartu agar lebih lentur */
+    td input[type="text"] {
+        text-align: left !important; 
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 6px 10px !important;
+        font-size: 0.85rem !important;
+        box-sizing: border-box !important;
+    }
+    
+    td input[type="number"] {
+        text-align: center !important;
+        max-width: 70px !important;
+        padding: 6px !important;
+    }
+
+    /* Tombol Aksi (Simpan & Hapus) di Dalam Kartu */
+    .action-buttons-wrapper {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+
+    td .action-buttons, td div[style*="display: flex"] {
+        flex-direction: row !important; 
+        justify-content: flex-end !important;
+        width: auto !important;
+        gap: 8px !important;
+    }
+
+    td .btn-action {
+        width: auto !important; 
+        padding: 8px 12px !important;
+        font-size: 0.8rem !important;
+    }
+
     /* 4. PANEL KONTROL ATAS */
     .control-panel {
         flex-direction: column !important;
@@ -212,28 +317,43 @@ td {
         max-width: 100% !important;
     }
 
-    .action-buttons {
+    /* ==========================================================
+       PERBAIKAN HEADER TABEL & TOMBOL BULAT DI MOBILE
+       ========================================================== */
+    .section-header {
         flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 15px !important;
+    }
+    
+    .section-title { font-size: 1.25rem !important; }
+    .section-subtitle { font-size: 0.85rem !important; }
+
+    /* PENGUATAN: Gunakan gabungan class agar posisinya mutlak berjejer */
+    .action-buttons.top-actions {
+        display: flex !important;
+        flex-direction: row !important;
         width: 100% !important;
-        gap: 10px !important;
+        gap: 12px !important;
+        justify-content: flex-start !important;
     }
 
-    .action-buttons .btn, 
-    .action-buttons .btn-action {
-        width: 100% !important;
+    /* HILANGKAN TEKS TOMBOL DI HP */
+    .action-buttons.top-actions .btn-text {
+        display: none !important; 
+    }
+
+    /* SULAP TOMBOL MENJADI BOLA (BULAT SEMPURNA) */
+    .action-buttons.top-actions .btn-action {
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 50% !important; /* Ini yang bikin bulat bola! */
+        padding: 0 !important;
+        display: flex !important;
         justify-content: center !important;
-        padding: 12px 20px !important;
-    }
-
-    /* 5. TABEL HORIZONTAL */
-    .table-container {
-        width: 100% !important;
-        border-radius: 8px !important;
-        -webkit-overflow-scrolling: touch !important; 
-    }
-
-    table {
-        min-width: 700px !important; 
+        align-items: center !important;
+        font-size: 1.2rem !important; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
     }
 
     /* 6. SIDEBAR TERSEMBUNYI */

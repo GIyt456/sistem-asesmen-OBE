@@ -36,28 +36,30 @@
             </div>
 
             <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                    <div>
-                        <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Susunan Mata Kuliah</h3>
-                        <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500;">Menampilkan Daftar Mata Kuliah Terstruktur</p>
+                <div class="section-header">
+                    <div class="section-title-area">
+                        <h3 class="section-title">Susunan Mata Kuliah</h3>
+                        <p class="section-subtitle">Menampilkan Daftar Mata Kuliah Terstruktur</p>
                     </div>
                     
-                    <div class="action-buttons">
-                        <button class="btn-action btn-download" onclick="exportKeExcel()">
-                            <i class="fas fa-file-download"></i> Download Excel
+                    <div class="action-buttons top-actions">
+                        <button class="btn-action btn-download" onclick="exportKeExcel()" title="Download Excel">
+                            <i class="fas fa-file-download"></i> <span class="btn-text">Download</span>
                         </button>
                         
                         <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;" onchange="uploadExcel()">
-                        <button class="btn-action btn-upload" onclick="document.getElementById('fileExcel').click()">
-                            <i class="fas fa-file-upload"></i> Impor Excel
-                        </button>
-
-                        <button class="btn-action btn-dark" onclick="loadData()">
-                            <i class="fas fa-sync-alt"></i> Refresh Data
+                        <button class="btn-action btn-upload" onclick="document.getElementById('fileExcel').click()" title="Impor Excel">
+                            <i class="fas fa-file-upload"></i> <span class="btn-text">Impor</span>
                         </button>
                     </div>
                 </div>
                 
+                <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; background: white; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                    <label for="filter-semester" style="font-weight: 700; color: var(--primary-blue);">Pilih Semester:</label>
+                    <select id="filter-semester" onchange="renderTabelSemester()" style="flex: 1; max-width: 200px; padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-family: 'Inter', sans-serif; font-size: 0.95rem; cursor: pointer; outline: none;">
+                        <option value="">-- Pilih --</option>
+                    </select>
+                </div>
                 <div id="container-tabel-semester"></div>
             </div>
         </div>
@@ -73,73 +75,109 @@
     const API_DELETE = `${API_BASE}/delete-master-mk`;
     const userLogin = localStorage.getItem("user_login");
 
-    // LOGIKA INTI MILIK TEMAN ANDA TETAP UTUH DI BAWAH INI
+    // 1. Buat variabel global untuk menyimpan data sementara agar tidak perlu loading API terus-menerus
+    let dataMatkulGlobal = []; 
+
+    // 2. Fungsi untuk menarik data dari n8n (Hanya dipanggil sekali saat halaman dibuka)
     async function loadData() { 
         const container = document.getElementById('container-tabel-semester');
+        const filterSelect = document.getElementById('filter-semester');
         if (!container) return;
         
         container.innerHTML = "<p style='text-align:center; padding:20px;'><i class='fas fa-spinner fa-spin'></i> Memuat data...</p>";
 
         try {
             const res = await fetch(API_MATKUL); 
-            const data = await res.json(); 
-            container.innerHTML = "";
-
-            if (!data || data.length === 0) {
-                container.innerHTML = "<p style='text-align:center; padding:20px; color:#64748b;'>Belum ada data mata kuliah untuk prodi ini. Silakan impor via Excel.</p>";
+            dataMatkulGlobal = await res.json(); // Simpan data ke dalam variabel global
+            
+            if (!dataMatkulGlobal || dataMatkulGlobal.length === 0) {
+                container.innerHTML = "<p style='text-align:center; padding:20px; color:#64748b;'>Belum ada data mata kuliah. Silakan impor via Excel.</p>";
+                filterSelect.disabled = true;
                 return;
             }
 
-            const perSemester = data.reduce((acc, item) => {
-                if (!acc[item.semester]) acc[item.semester] = [];
-                acc[item.semester].push(item);
-                return acc;
-            }, {});
-
-            Object.keys(perSemester).sort().forEach(sem => {
-                let tableHTML = `
-                    <h4 style="margin-bottom: 15px; margin-top: 10px; font-size: 1.1rem; color: var(--primary-blue); font-weight: 700;">
-                        <i class="fas fa-graduation-cap"></i> SEMESTER ${sem}
-                    </h4>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th width="15%">Kode MK</th>
-                                    <th>Nama Mata Kuliah</th>
-                                    <th width="15%" style="text-align: center;">SKS</th>
-                                    <th width="12%" style="text-align: center;">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-
-                perSemester[sem].forEach(mk => {
-                    tableHTML += `
-                        <tr>
-                            <td style="font-weight: 800; color: var(--primary-blue);">${mk.kode_mk}</td>
-                            <td><input type="text" id="in-${mk.kode_mk}" value="${mk.nama_mk}" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; font-size: 0.95rem;"></td>
-                            <td style="text-align: center;"><input type="number" id="sks-${mk.kode_mk}" value="${mk.sks}" style="width:70px; padding:10px; border:1px solid #cbd5e1; border-radius:6px; text-align:center; font-weight: 600;" min="1" max="6"></td>
-                            <td style="text-align:center;">
-                                <div style="display: flex; gap: 8px; justify-content: center;">
-                                    <button class="btn-action btn-dark" style="padding: 8px 12px;" onclick="simpanEdit('matkul', '${mk.kode_mk}')" title="Simpan">
-                                        <i class="fas fa-save"></i>
-                                    </button>
-                                    <button class="btn-action btn-danger" style="padding: 8px 12px;" onclick="hapusMK('${mk.kode_mk}')" title="Hapus">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>`;
-                });
-
-                tableHTML += `</tbody></table></div>`;
-                container.innerHTML += tableHTML;
+            // Ambil daftar semester unik dari data dan urutkan (contoh: 1, 2, 3...)
+            const semesters = [...new Set(dataMatkulGlobal.map(item => item.semester))].sort((a, b) => a - b);
+            
+            // Masukkan daftar semester ke dalam dropdown pilihan
+            filterSelect.innerHTML = '<option value="">-- Pilih Semester --</option>';
+            semesters.forEach(sem => {
+                filterSelect.innerHTML += `<option value="${sem}">Semester ${sem}</option>`;
             });
+
+            // Kosongkan area tabel dan minta user memilih semester
+            container.innerHTML = "<p style='text-align:center; padding:30px; color:#64748b; font-weight:600;'><i class='fas fa-hand-point-up'></i> Silakan pilih semester di atas terlebih dahulu.</p>";
 
         } catch(e) { 
             container.innerHTML = "<p style='color:red; text-align:center; padding: 20px;'>Gagal menarik data. Pastikan n8n menyala.</p>";
         }
     }
+
+    // 3. FUNGSI BARU: Ini akan dijalankan otomatis setiap kali Dropdown Semester dipilih
+    function renderTabelSemester() {
+        const container = document.getElementById('container-tabel-semester');
+        const selectedSem = document.getElementById('filter-semester').value;
+
+        // Jika user kembali memilih "-- Pilih --", kosongkan tabel
+        if (selectedSem === "") {
+            container.innerHTML = "<p style='text-align:center; padding:30px; color:#64748b; font-weight:600;'><i class='fas fa-hand-point-up'></i> Silakan pilih semester di atas terlebih dahulu.</p>";
+            return;
+        }
+
+        // Saring data: Ambil hanya matkul yang semesternya cocok dengan yang dipilih
+        const dataSemesterIni = dataMatkulGlobal.filter(item => item.semester.toString() === selectedSem.toString());
+
+        // Mulai bangun kerangka tabel untuk semester tersebut
+        let tableHTML = `
+            <h4 style="margin-bottom: 15px; margin-top: 10px; font-size: 1.1rem; color: var(--primary-blue); font-weight: 700;">
+                <i class="fas fa-graduation-cap"></i> SEMESTER ${selectedSem}
+            </h4>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="15%">Kode MK</th>
+                            <th>Nama Mata Kuliah</th>
+                            <th width="15%" style="text-align: center;">SKS</th>
+                            <th width="12%" style="text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+        // Masukkan data baris per baris lengkap dengan data-label mobile
+        dataSemesterIni.forEach(mk => {
+            tableHTML += `
+                <tr>
+                    <td data-label="KODE MK" style="font-weight: 800; color: var(--primary-blue);">${mk.kode_mk}</td>
+                    
+                    <td data-label="MATA KULIAH">
+                        <input type="text" id="in-${mk.kode_mk}" value="${mk.nama_mk}" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; font-size: 0.95rem;">
+                    </td>
+                    
+                    <td data-label="SKS" style="text-align: center;">
+                        <input type="number" id="sks-${mk.kode_mk}" value="${mk.sks}" style="width:70px; padding:10px; border:1px solid #cbd5e1; border-radius:6px; text-align:center; font-weight: 600;" min="1" max="6">
+                    </td>
+                    
+                    <td data-label="AKSI" style="text-align:center;">
+                        <div class="action-buttons-wrapper">
+                            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                <button class="btn-action btn-dark" style="padding: 8px 12px;" onclick="simpanEdit('matkul', '${mk.kode_mk}')" title="Simpan">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                                <button class="btn-action btn-danger" style="padding: 8px 12px;" onclick="hapusMK('${mk.kode_mk}')" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+
+        tableHTML += `</tbody></table></div>`;
+        
+        // Cetak tabelnya ke layar!
+        container.innerHTML = tableHTML;
+    }      
 
     async function exportKeExcel() {
         const btn = document.querySelector('.btn-download');

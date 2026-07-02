@@ -8,48 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="../../../js/api_config.js"></script>
-    
-    <style>
-        :root { 
-            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
-            --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
-        
-        #sidebar-container { width: 280px; min-width: 280px; height: 100vh; background: var(--sidebar-bg); flex-shrink: 0; }
-        
-        .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-main); }
-        .fixed-header { padding: 40px 50px 20px 50px; flex-shrink: 0; background: var(--bg-main); z-index: 10; border-bottom: 1px solid var(--border-color); }
-        .scrollable-content { flex: 1; overflow-y: auto; padding: 30px 50px 40px 50px; }
-        
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
-        .header-title-area { display: flex; flex-direction: column; }
-        .header-subtitle { color: #64748b; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
-        .header-title span { color: var(--primary-blue); }
-        .badge-prodi { background: var(--primary-blue); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
-
-        .mapping-panel { background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        
-        table { width: 100%; border-collapse: collapse; text-align: center; }
-        th, td { border: 1px solid var(--border-color); padding: 12px; font-size: 0.9rem; }
-        th { background: #f8fafc; font-weight: 700; color: #475569; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
-        td { color: #1e293b; }
-        
-        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-blue); }
-        
-        .btn-save { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; margin-top: 20px; width: 100%; justify-content: center; font-size: 1rem;}
-        .btn-save:hover { background: #1e40af; transform: translateY(-2px); }
-        .btn-save:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
-        
-        .cpl-row td { text-align: left; font-weight: 700; background: #f8fafc; color: var(--primary-blue); }
-    </style>
+    <link rel="stylesheet" href="pemetaan_cpl_bk.css">
 </head>
 <body>
     <div id="sidebar-container"></div>
-
+    <div id="navbar-container"></div>
     <div class="main-content">
         <div class="fixed-header">
             <div class="header-container">
@@ -62,7 +25,6 @@
             
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Bahan Kajian (BK) yang berelasi dengan Capaian Pembelajaran Lulusan (CPL).</p>
-                <button class="btn-save" style="width: auto; margin-top: 0; background: #475569;" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
             </div>
         </div>
 
@@ -212,6 +174,28 @@
             btnSave.disabled = false;
         }
     }
+
+    // Fungsi untuk memunculkan dan menyembunyikan sidebar di mobile
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById("sidebar-container");
+            if (sidebar) {
+                // Tambahkan atau hapus class 'show-mobile' yang ada di CSS tadi
+                sidebar.classList.toggle("show-mobile");
+            }
+        }
+
+        // Opsional: Klik di sembarang tempat (luar sidebar) untuk menutupnya
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById("sidebar-container");
+            const toggleBtn = document.getElementById("btnToggleSidebar");
+            
+            // Jika sidebar sedang terbuka, dan user mengklik di luar sidebar & bukan di tombol garis tiga
+            if (sidebar && sidebar.classList.contains("show-mobile")) {
+                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    sidebar.classList.remove("show-mobile");
+                }
+            }
+        });
 </script>
 </body>
 </html>

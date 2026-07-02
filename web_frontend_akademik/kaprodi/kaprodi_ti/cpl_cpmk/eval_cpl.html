@@ -28,14 +28,13 @@
             .table-responsive { box-shadow: none; border: none; padding: 0; }
         }
     </style>
+    <link rel="stylesheet" href="eval_cpl.css">
 </head>
 <body>
 
     <div id="sidebar-container"></div>
-    
+    <div id="navbar-container"></div>
     <div class="main-content">
-        <div id="navbar-container"></div>
-
         <div class="content-wrapper">
             <div class="header-container" style="margin-bottom: 20px;">
                 <div class="header-title-area">
@@ -193,6 +192,28 @@
             }
         }
 
+        // Fungsi untuk memunculkan dan menyembunyikan sidebar di mobile
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById("sidebar-container");
+            if (sidebar) {
+                // Tambahkan atau hapus class 'show-mobile' yang ada di CSS tadi
+                sidebar.classList.toggle("show-mobile");
+            }
+        }
+
+        // Opsional: Klik di sembarang tempat (luar sidebar) untuk menutupnya
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById("sidebar-container");
+            const toggleBtn = document.getElementById("btnToggleSidebar");
+            
+            // Jika sidebar sedang terbuka, dan user mengklik di luar sidebar & bukan di tombol garis tiga
+            if (sidebar && sidebar.classList.contains("show-mobile")) {
+                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    sidebar.classList.remove("show-mobile");
+                }
+            }
+        });
+        
         window.onload = () => {
             setTimeout(loadEvalCPL, 400); 
         };
