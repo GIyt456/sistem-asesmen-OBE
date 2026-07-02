@@ -3,65 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel TI - Sistem OBE</title>
+    <title>Admin Panel - Sistem OBE</title>
     <link rel="stylesheet" href="../../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/api_config.js"></script>
-    <script src="/js/template.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* --- WAJIB: Layout Flexbox agar Sidebar dan Konten bersebelahan --- */
+        :root { 
+            --sidebar-bg: #161923;
+            --border-dark: #1f2937;
+        }
+
+        /* --- WAJIB: Layout Flexbox Desktop --- */
         body { 
-            display: flex; 
-            margin: 0; 
-            background: #f9fafb; 
-            height: 100vh; 
-            overflow: hidden; 
-            font-family: 'Inter', sans-serif;
-            color: #111827;
+            display: flex; margin: 0; background: #f9fafb; 
+            height: 100vh; overflow: hidden; 
+            font-family: 'Inter', sans-serif; color: #111827;
         }
 
         .main-content { 
-            flex: 1; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column;
+            flex: 1; overflow-y: auto; display: flex; flex-direction: column;
         }
 
-        /* --- Tambahan Tema TI (Merah Gelap) --- */
+        #sidebar-container { width: 280px; min-width: 280px; height: 100vh; background: var(--sidebar-bg); flex-shrink: 0; z-index: 1000; }
+
+        /* --- TEMA DINAMIS --- */
         .btn-primary-ti { background: linear-gradient(to right, #8b0000, #5c0000); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; box-shadow: 0 2px 4px rgba(139, 0, 0, 0.2); }
         .btn-primary-ti:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3); }
         
         .section { display: none; animation: fadeIn 0.3s ease; padding: 0 40px 40px 40px; }
         .section.active { display: block; }
         
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin: 20px 40px 40px 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
         .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: #8b0000; }
-        .badge-prodi { background: #8b0000; color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 4px rgba(139, 0, 0, 0.2); }
+        .header-title { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
+        .badge-prodi { color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* =========================================
+           RESPONSIVE MOBILE (KAPRODI DASHBOARD)
+           ========================================= */
+        .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
+        .mobile-overlay.active { display: block; }
+        
+        .navbar-mobile { display: none; } 
+
+        @media screen and (max-width: 768px) {
+            body { height: auto !important; overflow-y: auto !important; }
+            
+            .navbar-mobile {
+                display: flex; position: fixed; top: 0; left: 0; width: 100%;
+                background-color: var(--sidebar-bg);
+                padding: 12px 20px; align-items: center; justify-content: space-between;
+                z-index: 990; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+            
+            .profile-btn-mobile {
+                width: 36px; height: 36px; border-radius: 50%; 
+                border: 2px solid rgba(255, 255, 255, 0.2); overflow: hidden; 
+                cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            }
+            .profile-btn-mobile img { width: 100%; height: 100%; object-fit: cover; }
+            
+            .main-content { margin-top: 60px !important; height: auto !important; display: block !important; overflow: visible !important; }
+
+            #sidebar-container { 
+                position: fixed; top: 0; left: -320px; height: 100vh; 
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 10px 0 25px rgba(0,0,0,0.5);
+            }
+            #sidebar-container.active { left: 0; }
+            
+            /* Rapikan Header Mobile */
+            .header-container { margin: 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; }
+            .header-title { font-size: 1.6rem !important; }
+            .badge-prodi { font-size: 0.7rem; padding: 6px 12px; }
+            .section { padding: 0 20px 40px 20px !important; }
+
+            /* --- MENGHANCURKAN GRID MENJADI 1 KOLOM --- */
+            #stat-cards { grid-template-columns: 1fr !important; gap: 15px !important; }
+            .dashboard-grid { grid-template-columns: 1fr !important; gap: 15px !important; }
+            
+            /* Perbaiki Halaman Mapping di HP */
+            #mapping-header { flex-direction: column !important; align-items: stretch !important; gap: 15px; }
+            #mapping-header > div { width: 100% !important; }
+        }
     </style>
 </head>
 <body>
     
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="../../gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
+                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
+                 onclick="window.location.href='../../index.html'">
+        </div>
+        
+        <div class="profile-btn-mobile" onclick="toggleSidebar()">
+            <img id="mobileNavbarAvatar" src="https://ui-avatars.com/api/?name=K&background=8b0000&color=fff&bold=true" alt="Profil Kaprodi">
+        </div>
+    </nav>
+
+    <!-- 2. OVERLAY -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <div id="navbar-container"></div>
         
         <div class="header-container">
             <div class="header-title-area">
                 <div class="header-subtitle" id="pageSubtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title" id="pageTitle">PANEL KENDALI <span>ADMIN</span></h1>
+                <h1 class="header-title" id="pageTitle">PANEL KENDALI <span id="titleSpan">ADMIN</span></h1>
             </div>
-            <div class="badge-prodi">Teknik Informatika</div>
+            <div class="badge-prodi" id="prodiBadge">PRODI</div>
         </div>
 
         <div id="content-dashboard" class="section active">
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
+            <!-- ID stat-cards ditambahkan untuk responsif mobile -->
+            <div id="stat-cards" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
                 <div style="background: var(--border-dark); color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
                     <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; font-weight: 500; color: #9ca3af;">Total Mahasiswa Dinilai</h4>
                     <h2 id="totMhs" style="margin: 0; font-size: 2.2rem;">0</h2>
@@ -101,10 +169,10 @@
                     </button>
                 </div>
                 
-                <div class="figma-card" style="border-top: 4px solid #8b0000; background: white; padding: 20px; border-radius: 12px;">
-                    <h3 style="margin-top: 0; color: #8b0000;"><i class="fas fa-user-graduate"></i> Portofolio CPL Global</h3>
-                    <p style="color: #666; font-size: 0.95rem;">Cari dan lihat rekapitulasi persentase penguasaan CPL mahasiswa Teknik Informatika dari total seluruh mata kuliah</p>
-                    <button class="btn-primary-ti" style="width: 100%; padding: 10px; text-align: center;" onclick="window.location.href='portofolio_admin.html'">
+                <div class="figma-card" id="cardPortofolio" style="border-top: 4px solid #8b0000; background: white; padding: 20px; border-radius: 12px;">
+                    <h3 style="margin-top: 0;" id="titlePortofolio"><i class="fas fa-user-graduate"></i> Portofolio CPL Global</h3>
+                    <p style="color: #666; font-size: 0.95rem;">Cari dan lihat rekapitulasi persentase penguasaan CPL mahasiswa dari total seluruh mata kuliah</p>
+                    <button class="btn-primary-ti" id="btnPortofolio" style="width: 100%; padding: 10px; text-align: center;" onclick="window.location.href='portofolio_admin.html'">
                         <i class="fas fa-external-link-alt"></i> Buka Portofolio CPL
                     </button>
                 </div>
@@ -112,37 +180,37 @@
         </div>
 
         <div id="content-mapping-mk" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+            <div id="mapping-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
                 <div style="width: 60%;">
-                    <label><strong>Pilih Mata Kuliah TI:</strong></label>
+                    <label><strong>Pilih Mata Kuliah:</strong></label>
                     <select id="pilihMKMapping" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;" onchange="loadMappingUI()">
                         <option value="">-- Pilih Mata Kuliah --</option>
                     </select>
                 </div>
-                <button class="btn-primary-ti" onclick="simpanMappingMK()"><i class="fas fa-save"></i> Simpan Mapping</button>
+                <button class="btn-primary-ti" id="btnSimpanMapping" onclick="simpanMappingMK()"><i class="fas fa-save"></i> Simpan Mapping</button>
             </div>
 
             <div id="mappingEmptyState" style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 40px;">
-                <h3 style="font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 30px;">Panduan Pemetaan Mata Kuliah (TI)</h3>
+                <h3 style="font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 30px;">Panduan Pemetaan Mata Kuliah</h3>
                 <p style="color: #6b7280;">Pilih Mata Kuliah dari dropdown di atas untuk mulai memetakan CPMK.</p>
             </div>
 
-            <div id="loadingMapping" style="display:none; text-align:center; color:#666; margin-top: 40px;"><i class="fas fa-spinner fa-spin"></i> Memuat data pemetaan TI...</div>
+            <div id="loadingMapping" style="display:none; text-align:center; color:#666; margin-top: 40px;"><i class="fas fa-spinner fa-spin"></i> Memuat data pemetaan...</div>
             
             <div id="mappingContainer" style="display:none;">
-                <p style="background: #fee2e2; padding: 10px; border-radius: 5px; color: #8b0000; font-size: 0.9rem;"><i class="fas fa-info-circle"></i> Centang CPMK TI yang dibebankan ke Mata Kuliah ini.</p>
+                <p id="infoMapping" style="background: #fee2e2; padding: 10px; border-radius: 5px; color: #8b0000; font-size: 0.9rem;"><i class="fas fa-info-circle"></i> Centang CPMK yang dibebankan ke Mata Kuliah ini.</p>
                 <div id="checklistArea"></div>
             </div>
         </div>
 
         <div id="content-reset" class="section" style="max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
-            <h3 style="color: #8b0000; margin-top: 0;"><i class="fas fa-key"></i> Reset Password Dosen TI</h3>
-            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Gunakan form ini jika ada Dosen Teknik Informatika (TI) yang lupa password mereka.</p>
+            <h3 id="resetTitle" style="color: #8b0000; margin-top: 0;"><i class="fas fa-key"></i> Reset Password Dosen</h3>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Gunakan form ini jika ada Dosen yang lupa password mereka.</p>
             
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">Cari Nama Dosen / Username</label>
-                <input list="daftarDosenTI" id="targetUsername" placeholder="🔍 Ketik username atau nama..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
-                <datalist id="daftarDosenTI"></datalist>
+                <input list="daftarDosen" id="targetUsername" placeholder="🔍 Ketik username atau nama..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
+                <datalist id="daftarDosen"></datalist>
             </div>
             
             <div style="margin-bottom: 20px;">
@@ -150,32 +218,68 @@
                 <input type="password" id="newPassword" placeholder="Masukkan password baru..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
             </div>
             
-            <button onclick="prosesResetPassword()" class="btn-primary-ti" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Paksa Reset Password</button>
+            <button onclick="prosesResetPassword()" class="btn-primary-ti" id="btnReset" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Paksa Reset Password</button>
         </div>
 
     </div>
+    
+    <!-- Template JS -->
+    <script src="/js/template.js"></script>
 
     <script>
-        // 1. KONFIGURASI API KHUSUS TI
-        const PRODI = 'ti'; 
+        // --- 1. KONFIGURASI API & SESI ---
+        const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
         const API_URL = `${API_BASE}/get-metadata?prodi=` + PRODI;
         const API_MAP_MK = `${API_BASE}/admin-map-mk-cpmk`;
         const API_GET_USERS = `${API_BASE}/get-users`;
         const API_DASHBOARD = `${API_BASE}/get-dashboard-kaprodi?prodi=` + PRODI;
 
-        // 2. SATPAM AKSES LOGIN TI
         const userLogin = localStorage.getItem("user_login");
         const userRole = localStorage.getItem("user_role");
         const userProdi = localStorage.getItem("prodi_aktif");
 
         if (!userLogin) window.location.replace("../../login/login.html");
-
-        if (userRole !== 'head_admin') {
+        if (userRole !== 'head_admin' && userRole !== 'admin') {
             if (userRole === 'dosen') window.location.replace("../../dosen/input_nilai.html");
-            else if (userRole === 'admin' && userProdi === 'si') window.location.replace("../kaprodi_si/admin_config_si.html");
         }
 
-        // 3. MESIN PENGUBAH TAB INTERNAL SPA
+        // --- SETUP TEMA DINAMIS ---
+        const pAktif = localStorage.getItem("prodi_aktif") || "ti";
+        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+        const warnaProdi = pAktif === 'si' ? '#1e3a8a' : '#8b0000';
+        const bgLembut = pAktif === 'si' ? '#dbeafe' : '#fee2e2';
+
+        document.getElementById("titleSpan").style.color = warnaProdi;
+        document.getElementById("prodiBadge").style.backgroundColor = warnaProdi;
+        document.getElementById("prodiBadge").innerText = pAktif === 'si' ? "SISTEM INFORMASI" : "TEKNIK INFORMATIKA";
+        
+        document.getElementById("cardPortofolio").style.borderTopColor = warnaProdi;
+        document.getElementById("titlePortofolio").style.color = warnaProdi;
+        document.getElementById("resetTitle").style.color = warnaProdi;
+        document.getElementById("infoMapping").style.color = warnaProdi;
+        document.getElementById("infoMapping").style.backgroundColor = bgLembut;
+
+        const btnPortofolio = document.getElementById("btnPortofolio");
+        const btnSimpanMapping = document.getElementById("btnSimpanMapping");
+        const btnReset = document.getElementById("btnReset");
+        [btnPortofolio, btnSimpanMapping, btnReset].forEach(btn => {
+            if(pAktif === 'si') {
+                btn.style.background = "linear-gradient(to right, #1e3a8a, #1e40af)";
+            }
+        });
+
+        const avatarMobile = document.getElementById("mobileNavbarAvatar");
+        if(avatarMobile) {
+            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${warnaProdi.replace('#','')}&color=fff&bold=true`;
+        }
+
+        // --- 2. FUNGSI SIDEBAR MOBILE ---
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+
+        // --- 3. MESIN PENGUBAH TAB INTERNAL SPA ---
         function switchTab(type) {
             document.querySelectorAll('.section').forEach(el => { 
                 el.style.display = 'none'; 
@@ -189,19 +293,17 @@
             }
 
             const titles = {
-                'dashboard': '📊 Dashboard Admin TI',
-                'mapping-mk': '🔗 Mapping Mata Kuliah - CPMK TI',
-                'reset': '🔑 Reset Password Dosen TI',
-
+                'dashboard': '📊 Dashboard Admin',
+                'mapping-mk': '🔗 Mapping Mata Kuliah - CPMK',
+                'reset': '🔑 Reset Password Dosen',
             };
-            document.getElementById('pageTitle').innerHTML = titles[type] || 'Panel Admin TI';
+            document.getElementById('pageTitle').innerHTML = titles[type] || 'Panel Admin';
 
             if(type === 'dashboard') loadDashboard();
             if(type === 'reset') loadUserList();
             if(type === 'mapping-mk') loadDropdownMK();
         }
 
-        // 4. JEMBATAN SIDEBAR SPA
         function pasangJembatanSidebar() {
             const petaMenu = {
                 '/mapping/map_mk_cpmk.html': 'mapping-mk',
@@ -216,6 +318,7 @@
                     el.onclick = (e) => {
                         e.preventDefault();
                         switchTab(petaMenu[path]);
+                        if(window.innerWidth <= 768) toggleSidebar(); // Tutup sidebar otomatis di HP
                     };
                 }
                 
@@ -224,14 +327,15 @@
                     el.onclick = (e) => {
                         e.preventDefault();
                         switchTab('dashboard');
+                        if(window.innerWidth <= 768) toggleSidebar();
                     };
                 }
             });
         }
 
-        // 5. FUNGSI SINKRONISASI BACKEND N8N
+        // --- 4. FUNGSI SINKRONISASI BACKEND N8N ---
         async function loadUserList() { 
-            try { const res = await fetch(API_GET_USERS); if (!res.ok) return; const data = await res.json(); const datalist = document.getElementById("daftarDosenTI"); datalist.innerHTML = ""; let users = Array.isArray(data) ? ((data[0] && data[0].data) ? data[0].data : data) : (data.data || []); users.forEach(u => { if (u.role === 'dosen' && u.prodi === 'ti') { const option = document.createElement('option'); option.value = u.username; option.text = `${u.nama_lengkap} (Dosen TI)`; datalist.appendChild(option); } }); } catch (e) { console.error(e); }
+            try { const res = await fetch(API_GET_USERS); if (!res.ok) return; const data = await res.json(); const datalist = document.getElementById("daftarDosen"); datalist.innerHTML = ""; let users = Array.isArray(data) ? ((data[0] && data[0].data) ? data[0].data : data) : (data.data || []); users.forEach(u => { if (u.role === 'dosen' && u.prodi === PRODI) { const option = document.createElement('option'); option.value = u.username; option.text = `${u.nama_lengkap} (Dosen)`; datalist.appendChild(option); } }); } catch (e) { console.error(e); }
         }
 
         async function prosesResetPassword() { 
@@ -250,7 +354,7 @@
             try {
                 const res = await fetch(API_URL); const data = await res.json(); 
                 const select = document.getElementById("pilihMKMapping"); 
-                select.innerHTML = '<option value="">-- Pilih Mata Kuliah TI --</option>';
+                select.innerHTML = '<option value="">-- Pilih Mata Kuliah --</option>';
                 data.filter(i => i.tipe === 'mk').forEach(mk => { select.innerHTML += `<option value="${mk.kode}">${mk.kode} - ${mk.label}</option>`; });
             } catch (e) { console.error("Gagal load MK:", e); }
         }
@@ -284,7 +388,7 @@
                     if (childCPMK.length > 0) {
                         let html = "";
                         childCPMK.forEach(cpmk => { const isChecked = checkedCPMKs.has(cpmk.kode) ? "checked" : ""; html += `<div style="display:flex; align-items:center; padding: 12px; border-bottom:1px solid #e5e7eb; background: white;"><input type="checkbox" class="chk-cpmk" value="${cpmk.kode}" ${isChecked} style="width:18px; height:18px; margin-right:12px; cursor:pointer;"><div><strong style="color:#111827;">${cpmk.kode}</strong> - <span style="color:#4b5563;">${cpmk.label}</span></div></div>`; });
-                        area.innerHTML += `<div style="margin-bottom:16px; border:1.5px solid #8b0000; border-radius:8px; overflow:hidden;"><div style="background:#fee2e2; padding:12px 16px; font-weight:700; color:#8b0000; border-bottom:1.5px solid #8b0000;"><i class="fas fa-folder-open" style="margin-right:8px;"></i> ${cpl.kode}</div><div>${html}</div></div>`;
+                        area.innerHTML += `<div style="margin-bottom:16px; border:1.5px solid ${warnaProdi}; border-radius:8px; overflow:hidden;"><div style="background:${bgLembut}; padding:12px 16px; font-weight:700; color:${warnaProdi}; border-bottom:1.5px solid ${warnaProdi};"><i class="fas fa-folder-open" style="margin-right:8px;"></i> ${cpl.kode}</div><div>${html}</div></div>`;
                     }
                 });
                 
@@ -300,12 +404,12 @@
             
             try {
                 const res = await fetch(API_MAP_MK, { method: "POST", headers: {"Content-Type":"application/json", "Authorization": "Bearer " + token}, body: JSON.stringify({ kode_mk: mkKode, cpmk_list: listCpmk, prodi: PRODI }) }); 
-                if(res.ok) alert("✅ Mapping MK-CPMK TI Berhasil Tersimpan!"); 
+                if(res.ok) alert("✅ Mapping MK-CPMK Berhasil Tersimpan!"); 
                 else alert("❌ Gagal menyimpan mapping.");
             } catch (e) { alert("❌ Terjadi kesalahan koneksi."); }
         }
 
-        // --- FUNGSI DASHBOARD GRAFIK CHART.JS ---
+        // --- 5. FUNGSI DASHBOARD GRAFIK CHART.JS ---
         let chartGradeInst, chartCplInst; 
 
         async function loadDashboard() {
@@ -360,7 +464,7 @@
                     datasets: [{
                         label: 'Persentase Capaian (%)',
                         data: values,
-                        backgroundColor: '#8b0000', // Warna merah TI
+                        backgroundColor: warnaProdi,
                         borderRadius: 6
                     }]
                 },

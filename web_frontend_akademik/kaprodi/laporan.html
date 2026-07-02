@@ -90,10 +90,14 @@
             
             .chart-wrapper { height: 320px; }
 
-            /* Sticky Kolom NIM & Nama */
-            #tableDetail th:nth-child(1), #tableDetail td:nth-child(1) { position: sticky; left: 0; z-index: 10; border-right: none; }
-            #tableDetail th:nth-child(2), #tableDetail td:nth-child(2) { position: sticky; left: 80px; z-index: 10; border-right: 2px solid #cbd5e1; }
-            #tableDetail th:nth-child(1), #tableDetail th:nth-child(2) { z-index: 12; } 
+            /* --- PERBAIKAN BUG TABEL MENABRAK --- */
+            /* Menggunakan penamaan Class Spesifik agar tidak asal menempelkan elemen */
+            .sticky-nim { position: sticky; left: 0; z-index: 11 !important; background: white; min-width: 90px; max-width: 90px; border-right: none !important; }
+            .sticky-nama { position: sticky; left: 90px; z-index: 11 !important; background: white; min-width: 140px; max-width: 140px; border-right: 2px solid #cbd5e1 !important; }
+            .sticky-bobot { position: sticky; left: 0; z-index: 11 !important; background: #f1f5f9; min-width: 230px; max-width: 230px; border-right: 2px solid #cbd5e1 !important; }
+            
+            th.sticky-nim { background: #0f172a !important; z-index: 12 !important; border-right: 1px solid rgba(255,255,255,0.2) !important; }
+            th.sticky-nama { background: #0f172a !important; z-index: 12 !important; border-right: 2px solid #cbd5e1 !important; }
 
             /* Sidebar Menu */
             .navbar { padding: 15px 20px; justify-content: flex-start; gap: 15px; }
@@ -141,7 +145,7 @@
             </div>
             
             <div class="nav-links" id="navLinksContainer">
-                <a href="../dosen/jadwal_mengajar.html">Jadwal Mengajar</a>
+                <a href="../dosen/jadwal_mengajar.html">Mengajar</a>
                 <a href="../dosen/input_nilai.html">Input Asesmen</a>
                 <a href="../dosen/rps_dosen.html">Penyusunan RPS</a>
                 <a href="../kaprodi/laporan.html" class="active">Laporan OBE</a>
@@ -335,8 +339,9 @@
             const thead = document.querySelector("#tableDetail thead");
             const body = document.getElementById("bodyDetail");
 
-            let h1 = `<th rowspan="3" style="background:#0f172a; color:white; vertical-align:middle;">NIM</th>
-                      <th rowspan="3" style="background:#0f172a; color:white; vertical-align:middle; text-align:left;">NAMA</th>`;
+            /* Terapkan class khusus untuk menghindari bug tabrakan di HP */
+            let h1 = `<th class="sticky-nim" rowspan="3" style="background:#0f172a; color:white; vertical-align:middle;">NIM</th>
+                      <th class="sticky-nama" rowspan="3" style="background:#0f172a; color:white; vertical-align:middle; text-align:left;">NAMA</th>`;
             let h2 = ``; let h3 = ``;
 
             sortedGroups.forEach(key => {
@@ -353,7 +358,8 @@
             });
             thead.innerHTML = `<tr>${h1}</tr><tr>${h2}</tr><tr>${h3}</tr>`;
 
-            let bobotRow = `<tr><td colspan="2" style="text-align:right; font-weight:bold; background:#f1f5f9; position: sticky; left: 80px; z-index: 10;">BOBOT PENILAIAN (%)</td>`;
+            /* Kolom Bobot juga diberikan Class Khusus agar pas 100% dan rapi */
+            let bobotRow = `<tr><td colspan="2" class="sticky-bobot" style="text-align:right; font-weight:bold; color: #1e3a8a;">BOBOT PENILAIAN (%)</td>`;
             sortedGroups.forEach(key => {
                 const item = groupMap[key];
                 let sumBobot = 0;
@@ -367,7 +373,8 @@
 
             Object.keys(studentMap).sort().forEach(nim => {
                 const mhs = studentMap[nim];
-                let rowHTML = `<tr><td style="font-weight:bold; background: white;">${nim}</td><td style="text-align:left; background: white;">${mhs.nama}</td>`;
+                /* Terapkan class khusus pada baris NIM dan NAMA Mahasiswa */
+                let rowHTML = `<tr><td class="sticky-nim" style="font-weight:bold; background: white;">${nim}</td><td class="sticky-nama" style="text-align:left; background: white;">${mhs.nama}</td>`;
                 
                 sortedGroups.forEach(key => {
                     const item = groupMap[key];
@@ -391,7 +398,7 @@
                         <td style="font-weight:bold; color:${isLulus ? '#16a34a' : '#dc2626'}">${persen}%</td>
                         <td><span class="badge ${isLulus ? 'success' : 'danger'}">${isLulus ? 'TERPENUHI' : 'TIDAK'}</span></td>`;
                 });
-                body.innerHTML += `<tr>${rowHTML}</tr>`;
+                body.innerHTML += `${rowHTML}</tr>`;
             });
 
             calculateAndRenderSummary(groupMap, studentMap, sortedGroups);

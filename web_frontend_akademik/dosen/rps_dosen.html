@@ -32,6 +32,33 @@
             background-color: #f8fafc;
             color: var(--text-dark);
         }
+       /* =========================================
+           TAMBAHAN: PAGINATION PERTEMUAN (SMART MODE)
+        ========================================= */
+        /* 1. Aturan Khusus Layar HP (Aktifkan Pagination) */
+        @media screen and (max-width: 768px) {
+            .hidden-row { display: none !important; }
+        }
+
+        /* 2. Aturan Khusus Layar Laptop (Matikan Pagination, Tampilkan Semua) */
+        @media screen and (min-width: 769px) {
+            .hidden-row { display: table-row !important; } /* Munculkan semua 16 baris */
+            #sesiPaginationContainer { display: none !important; } /* Sembunyikan pil angka */
+            #sesiNavButtons { display: none !important; } /* Sembunyikan tombol next/prev */
+        }
+        
+        /* Desain Tombol Pil Angka (Berlaku saat muncul di HP) */
+        #sesiPaginationContainer::-webkit-scrollbar { height: 6px; }
+        #sesiPaginationContainer::-webkit-scrollbar-track { background: transparent; }
+        #sesiPaginationContainer::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .btn-pertemuan {
+            padding: 8px 16px; border: 1px solid #cbd5e1; border-radius: 50px; 
+            background: white; cursor: pointer; font-weight: 600; color: #334155;
+            white-space: nowrap; transition: 0.2s; font-size: 0.85rem;
+        }
+        .btn-pertemuan:hover { background: #f1f5f9; }
+        /* ========================================= */
 
         /* NAVBAR DOSEN */
         .navbar {
@@ -626,7 +653,7 @@
             </div>
             
             <div class="nav-links">
-                <a href="jadwal_mengajar.html">Jadwal Mengajar</a>
+                <a href="jadwal_mengajar.html">Mengajar</a>
                 <a href="input_nilai.html">Input Asesmen</a>
                 <a href="rps_dosen.html" class="active">Penyusunan RPS</a>
                 <a href="../kaprodi/laporan.html">Laporan OBE</a>
@@ -910,12 +937,16 @@
                 </div>
 
                 <div id="tab-sesi" class="tab-content">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 class="section-title" style="margin: 0; border: none;">Rencana Pertemuan 1 - 16</h3>
-                        <button class="btn-action" onclick="simpanRPSDosen()" id="btnSimpanRPS">
-                            <i class="fas fa-save"></i> Simpan Sesi Pertemuan
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 class="section-title" style="margin: 0; border: none;">Rencana Pertemuan</h3>
+                        <button class="btn-action" onclick="simpanRPSDosen()" id="btnSimpanRPS" style="background: #059669;">
+                            <i class="fas fa-save"></i> Simpan Semua Sesi
                         </button>
+                    </div>
+
+                    <!-- WADAH TOMBOL CHIPS 1-16 -->
+                    <div id="sesiPaginationContainer" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scroll-behavior: smooth;">
+                        <!-- Tombol navigasi 1-16 akan dimasukkan JS di sini -->
                     </div>
 
                     <div style="overflow-x: auto;">
@@ -935,11 +966,20 @@
                             </thead>
                             <tbody id="bodyTabelSesi">
                                 <tr>
-                                    <td colspan="9" style="text-align: center; padding: 40px;"><i
-                                            class="fas fa-spinner fa-spin"></i> Menarik data pertemuan...</td>
+                                    <td colspan="9" style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-spin"></i> Menarik data pertemuan...</td>
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- TOMBOL SEBELUMNYA & SELANJUTNYA -->
+                    <div id="sesiNavButtons" style="display: none; justify-content: space-between; margin-top: 20px;">
+                        <button id="btnPrevSesi" class="btn-kembali" onclick="changeSesi(-1)">
+                            <i class="fas fa-arrow-left"></i> Sebelumnya
+                        </button>
+                        <button id="btnNextSesi" class="btn-action" style="background: var(--primary-navy);" onclick="changeSesi(1)">
+                            Selanjutnya <i class="fas fa-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -1464,11 +1504,12 @@
             }
         }
 
+        let currentSesi = 1;
+
         function generateSemuaTabel(existingData = [], kodeMK) {
             const tbodySesi = document.getElementById("bodyTabelSesi");
             let htmlSesi = "";
 
-            // Buat daftar dropdown dinamis dengan opsi pertama disabled
             let optCpmk = '<option value="" disabled selected>+ Pilih CPMK...</option>';
             masterCPMK.forEach(c => {
                 optCpmk += `<option value="${c.kode_cpmk}">${c.kode_cpmk}</option>`;
@@ -1491,8 +1532,9 @@
                     hint = '[UAS] ';
                 }
 
+                // PERHATIKAN: Kita menambahkan ID dan class "hidden-row" pada tr
                 htmlSesi += `
-                    <tr class="${bgRowClass}">
+                    <tr id="row_pertemuan_${i}" class="${bgRowClass} hidden-row">
                         <td style="text-align: center; font-weight: bold; padding-top: 15px; font-size:1.1rem; color: ${(i === 8 || i === 16) ? 'var(--primary-red)' : '#475569'};">${i}</td>
                         
                         <td style="vertical-align: top;">
@@ -1519,9 +1561,7 @@
 
             tbodySesi.innerHTML = htmlSesi;
 
-            for (let i = 1; i <= 16; i++) {
-                renderBadgeCpmk(i, false);
-            }
+            for (let i = 1; i <= 16; i++) { renderBadgeCpmk(i, false); }
 
             const textareas = document.querySelectorAll('.input-rps');
             textareas.forEach(tx => {
@@ -1532,8 +1572,71 @@
                     this.style.height = (this.scrollHeight) + 'px';
                 });
             });
+
+            // MUNCULKAN PAGINATION & TOMBOL NAVIGASI
+            document.getElementById('sesiNavButtons').style.display = 'flex';
+            renderSesiPagination();
+            showPertemuan(1); // Buka langsung pertemuan 1
         }
 
+        // --- FUNGSI BARU UNTUK NAVIGASI PERTEMUAN ---
+        function renderSesiPagination() {
+            const container = document.getElementById('sesiPaginationContainer');
+            if(!container) return;
+            let html = '';
+            for(let i=1; i<=16; i++) {
+                let extraStyle = (i === 8 || i === 16) ? 'border-color: var(--primary-red); color: var(--primary-red);' : '';
+                let label = (i === 8) ? 'UTS (8)' : (i === 16) ? 'UAS (16)' : `Pert ${i}`;
+                html += `<button class="btn-pertemuan" id="btn_pert_${i}" onclick="showPertemuan(${i})" style="${extraStyle}">${label}</button>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function showPertemuan(num) {
+            currentSesi = num;
+            for(let i=1; i<=16; i++) {
+                const row = document.getElementById(`row_pertemuan_${i}`);
+                const btn = document.getElementById(`btn_pert_${i}`);
+                
+                // Atur Sembunyi/Tampil Baris
+                if(row) {
+                    if(i === num) row.classList.remove('hidden-row');
+                    else row.classList.add('hidden-row');
+                }
+                
+                // Atur Warna Tombol Aktif
+                if(btn) {
+                    if(i === num) {
+                        btn.style.background = (i===8 || i===16) ? 'var(--primary-red)' : 'var(--primary-navy)';
+                        btn.style.color = 'white';
+                    } else {
+                        btn.style.background = 'white';
+                        btn.style.color = (i===8 || i===16) ? 'var(--primary-red)' : '#334155';
+                    }
+                }
+            }
+
+            // Scroll otomatis kotak navigasi agar tombol selalu terlihat
+            const activeBtn = document.getElementById(`btn_pert_${num}`);
+            if(activeBtn) {
+                activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+
+            // Atur Muncul/Hilang Tombol Next-Prev
+            const btnPrev = document.getElementById('btnPrevSesi');
+            const btnNext = document.getElementById('btnNextSesi');
+            if(btnPrev) btnPrev.style.visibility = (num === 1) ? 'hidden' : 'visible';
+            if(btnNext) btnNext.style.visibility = (num === 16) ? 'hidden' : 'visible';
+        }
+
+        function changeSesi(arah) {
+            let nextSesi = currentSesi + arah;
+            if(nextSesi >= 1 && nextSesi <= 16) {
+                showPertemuan(nextSesi);
+                // Kembalikan scroll layar sedikit ke atas agar nyaman dilihat
+                document.querySelector('.header-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
         // ==========================================
         // SIMPAN KE DATABASE (TIDAK ADA LAGI `CONTINUE` 8 & 16)
         // ==========================================
