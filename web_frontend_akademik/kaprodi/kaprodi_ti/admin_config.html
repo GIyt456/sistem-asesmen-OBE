@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel TI - Sistem OBE</title>
+    <title>Admin Panel - Sistem OBE</title>
     <link rel="stylesheet" href="../../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,6 +14,25 @@
 </head>
 <body>
     
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="../../gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
+                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
+                 onclick="window.location.href='../../index.html'">
+        </div>
+        
+        <div class="profile-btn-mobile" onclick="toggleSidebar()">
+            <img id="mobileNavbarAvatar" src="https://ui-avatars.com/api/?name=K&background=8b0000&color=fff&bold=true" alt="Profil Kaprodi">
+        </div>
+    </nav>
+
+    <!-- 2. OVERLAY -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
     <div id="sidebar-container"></div>
     <div id="navbar-container"></div>
     <div class="main-content">
@@ -21,7 +40,7 @@
         <div class="header-container">
             <div class="header-title-area">
                 <div class="header-subtitle" id="pageSubtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title" id="pageTitle">PANEL KENDALI <span>ADMIN</span></h1>
+                <h1 class="header-title" id="pageTitle">PANEL KENDALI <span id="titleSpan">ADMIN</span></h1>
             </div>
         </div>
 
@@ -55,37 +74,37 @@
         </div>
 
         <div id="content-mapping-mk" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+            <div id="mapping-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
                 <div style="width: 60%;">
-                    <label><strong>Pilih Mata Kuliah TI:</strong></label>
+                    <label><strong>Pilih Mata Kuliah:</strong></label>
                     <select id="pilihMKMapping" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;" onchange="loadMappingUI()">
                         <option value="">-- Pilih Mata Kuliah --</option>
                     </select>
                 </div>
-                <button class="btn-primary-ti" onclick="simpanMappingMK()"><i class="fas fa-save"></i> Simpan Mapping</button>
+                <button class="btn-primary-ti" id="btnSimpanMapping" onclick="simpanMappingMK()"><i class="fas fa-save"></i> Simpan Mapping</button>
             </div>
 
             <div id="mappingEmptyState" style="display: flex; flex-direction: column; justify-content: center; align-items: center; margin-top: 40px;">
-                <h3 style="font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 30px;">Panduan Pemetaan Mata Kuliah (TI)</h3>
+                <h3 style="font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 30px;">Panduan Pemetaan Mata Kuliah</h3>
                 <p style="color: #6b7280;">Pilih Mata Kuliah dari dropdown di atas untuk mulai memetakan CPMK.</p>
             </div>
 
-            <div id="loadingMapping" style="display:none; text-align:center; color:#666; margin-top: 40px;"><i class="fas fa-spinner fa-spin"></i> Memuat data pemetaan TI...</div>
+            <div id="loadingMapping" style="display:none; text-align:center; color:#666; margin-top: 40px;"><i class="fas fa-spinner fa-spin"></i> Memuat data pemetaan...</div>
             
             <div id="mappingContainer" style="display:none;">
-                <p style="background: #fee2e2; padding: 10px; border-radius: 5px; color: #8b0000; font-size: 0.9rem;"><i class="fas fa-info-circle"></i> Centang CPMK TI yang dibebankan ke Mata Kuliah ini.</p>
+                <p id="infoMapping" style="background: #fee2e2; padding: 10px; border-radius: 5px; color: #8b0000; font-size: 0.9rem;"><i class="fas fa-info-circle"></i> Centang CPMK yang dibebankan ke Mata Kuliah ini.</p>
                 <div id="checklistArea"></div>
             </div>
         </div>
 
         <div id="content-reset" class="section" style="max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
-            <h3 style="color: #8b0000; margin-top: 0;"><i class="fas fa-key"></i> Reset Password Dosen TI</h3>
-            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Gunakan form ini jika ada Dosen Teknik Informatika (TI) yang lupa password mereka.</p>
+            <h3 id="resetTitle" style="color: #8b0000; margin-top: 0;"><i class="fas fa-key"></i> Reset Password Dosen</h3>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Gunakan form ini jika ada Dosen yang lupa password mereka.</p>
             
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">Cari Nama Dosen / Username</label>
-                <input list="daftarDosenTI" id="targetUsername" placeholder="🔍 Ketik username atau nama..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
-                <datalist id="daftarDosenTI"></datalist>
+                <input list="daftarDosen" id="targetUsername" placeholder="🔍 Ketik username atau nama..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
+                <datalist id="daftarDosen"></datalist>
             </div>
             
             <div style="margin-bottom: 20px;">
@@ -93,10 +112,13 @@
                 <input type="password" id="newPassword" placeholder="Masukkan password baru..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
             </div>
             
-            <button onclick="prosesResetPassword()" class="btn-primary-ti" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Paksa Reset Password</button>
+            <button onclick="prosesResetPassword()" class="btn-primary-ti" id="btnReset" style="width: 100%; justify-content: center; padding: 12px; font-size: 1rem;"><i class="fas fa-sync-alt"></i> Paksa Reset Password</button>
         </div>
 
     </div>
+    
+    <!-- Template JS -->
+    <script src="/js/template.js"></script>
 
     <script>
         const PRODI = 'ti'; 

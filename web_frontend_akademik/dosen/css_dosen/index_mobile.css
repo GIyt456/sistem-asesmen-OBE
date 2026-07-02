@@ -21,6 +21,7 @@
 }
 .nav-links { display: flex; gap: 30px; align-items: center; }
 .nav-user { display: flex; flex-direction: row; align-items: center; gap: 16px; }
+
 /* STANDARISASI TOMBOL PROFIL & LOGOUT GLOBAL */
 .user-chip {
     background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 50px; 
@@ -47,7 +48,7 @@
         min-height: 100vh !important;
         overflow-y: auto !important; 
         overflow-x: hidden !important;
-        padding: 0 !important; /* Menghapus celah putih di luar layar */
+        padding: 0 !important; 
         margin: 0 !important;
     }
 
@@ -244,26 +245,23 @@
     
     #card-bobot > div:nth-child(3) { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
     .select-mk { width: 100% !important; }
+
     /* =========================================
        SULAP TABEL INPUT NILAI MENJADI KARTU 
        ========================================= */
-    /* 1. Ubah bungkus tabel menjadi blok (Perhatikan: 'td' dihapus dari sini agar tidak bentrok) */
     #masterBobotTable, #masterBobotTable thead, #masterBobotTable tbody, #masterBobotTable th, #masterBobotTable tr,
     #configTable, #configTable thead, #configTable tbody, #configTable th, #configTable tr { 
         display: block !important; width: 100% !important; 
     }
     
-    /* 2. Sembunyikan Header bawaan */
     #masterBobotTable thead, #configTable thead { position: absolute; top: -9999px; left: -9999px; }
     
-    /* 3. Bentuk kartu */
     #masterBobotTable tr, #configTable tr { 
         border: 1px solid #cbd5e1 !important; border-radius: 12px !important; 
         margin-bottom: 20px !important; padding: 10px !important; 
         background: white !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; 
     }
     
-    /* 4. Atur sel sebagai Flexbox */
     #masterBobotTable td, #configTable td { 
         display: flex !important; justify-content: space-between !important; 
         align-items: center !important; text-align: right !important; 
@@ -272,22 +270,20 @@
     }
     #masterBobotTable td:last-child, #configTable td:last-child { border-bottom: none !important; }
     
-    /* 5. KUNCI LABEL ANTI-MENGKERUT (Ini Solusi Utamanya!) */
     #masterBobotTable td::before, #configTable td::before { 
         content: attr(data-label); 
         font-weight: 700; color: #64748b; text-align: left; font-size: 0.85rem; 
         flex-basis: 40% !important; 
-        min-width: 40% !important; /* Paksa label meminta jatah minimal 40% layar */
-        flex-shrink: 0 !important; /* Haramkan label untuk mengecil */
+        min-width: 40% !important; 
+        flex-shrink: 0 !important; 
         display: block !important;
     }
     
-    /* 6. PAKSA FORM INPUT MENGALAH DAN MENGECIL */
     #configTable select, #configTable input { 
         width: 55% !important; 
         max-width: 55% !important; 
-        min-width: 0 !important; /* Izinkan form mengecil menembus batas bawaannya */
-        flex-shrink: 1 !important; /* Paksa form mengalah */
+        min-width: 0 !important; 
+        flex-shrink: 1 !important; 
         text-align: right; 
     }
     
@@ -330,9 +326,25 @@
     .btn-opsi { width: 100%; justify-content: center; }
     .dropdown-menu { width: 100%; text-align: center !important; }
 
-    #tab-sesi .table-sesi, #tab-sesi .table-sesi thead, #tab-sesi .table-sesi tbody, #tab-sesi .table-sesi tr, #tab-sesi .table-sesi td { display: block !important; width: 100% !important; }
+    /* --- PERBAIKAN BUG TABEL SESI PERTEMUAN (PAGINATION) --- */
+    #tab-sesi .table-sesi, #tab-sesi .table-sesi thead, #tab-sesi .table-sesi tbody, #tab-sesi .table-sesi td { 
+        display: block !important; width: 100% !important; 
+    }
     #tab-sesi .table-sesi thead { position: absolute; top: -9999px; left: -9999px; }
-    #tab-sesi .table-sesi tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 25px !important; padding: 15px !important; box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important; }
+    
+    /* Hanya baris yang aktif (tidak memiliki class hidden-row) yang dirender sebagai kartu */
+    #tab-sesi .table-sesi tr:not(.hidden-row) { 
+        display: block !important; width: 100% !important;
+        background: white !important; border: 1px solid #cbd5e1 !important; 
+        border-radius: 12px !important; margin-bottom: 25px !important; 
+        padding: 15px !important; box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important; 
+    }
+    
+    /* Baris yang memiliki class hidden-row akan disembunyikan dengan tegas */
+    #tab-sesi .table-sesi tr.hidden-row {
+        display: none !important;
+    }
+
     #tab-sesi .table-sesi td { border: none !important; padding: 10px 0 !important; border-bottom: 1px solid #f1f5f9 !important; position: static !important; text-align: left !important; box-shadow: none !important; }
     #tab-sesi .table-sesi td:last-child { border-bottom: none !important; }
     
@@ -350,6 +362,10 @@
     #tab-sesi .table-sesi td:nth-child(1) { background: var(--primary-navy) !important; color: white !important; border-radius: 8px; padding: 15px !important; margin-bottom: 15px !important; font-size: 1.2rem !important; }
     #tab-sesi .table-sesi td:nth-child(1)::before { color: #94a3b8; font-size: 0.8rem; }
     .row-ujian td:nth-child(1) { background: var(--primary-red) !important; }
+
+    /* Tombol Navigasi Sesi (Next/Prev) di HP */
+    #sesiNavButtons { flex-direction: row !important; gap: 10px !important; width: 100% !important; }
+    #sesiNavButtons button { flex: 1 !important; justify-content: center !important; padding: 12px !important; font-size: 0.85rem !important; }
 
     #tab-penilaian .table-sesi, #tab-penilaian .table-sesi thead, #tab-penilaian .table-sesi tbody, #tab-penilaian .table-sesi tr, #tab-penilaian .table-sesi td { display: block !important; width: 100% !important; }
     #tab-penilaian .table-sesi thead { position: absolute; top: -9999px; left: -9999px; }
@@ -387,33 +403,30 @@
         text-align: center !important;
         gap: 12px !important;
     }
+
     /* ========================================================================
        14. JURUS PAMUNGKAS NAVBAR MELAYANG (FIXED) DI HP
        ======================================================================== */
-    /* Kunci navbar (yang berisi tombol hamburger) agar selalu melayang di atas */
     .navbar { 
         position: fixed !important; 
         top: 0 !important; 
         left: 0 !important; 
         width: 100% !important; 
-        z-index: 990 !important; /* 990 agar tertutup rapi saat sidebar dibuka */
+        z-index: 990 !important; 
     }
     
-    /* Dorong konten utama ke bawah agar tidak tertindih oleh navbar melayang */
-    /* Trik '~' memastikan halaman yang tidak punya navbar (seperti portofolio detail) tidak ikut terdorong */
     .navbar ~ .container, 
     .navbar ~ main,
     .navbar ~ .main-content {
         padding-top: 80px !important;
     }
+
     /* ========================================================================
        15. KHUSUS HALAMAN JADWAL MENGAJAR
        ======================================================================== */
-    /* Header & Search Bar */
     .table-controls { flex-direction: column; align-items: flex-start; gap: 15px; }
     .search-box, .search-box input { width: 100%; }
 
-    /* Sulap Tabel Jadwal Menjadi Kartu */
     .figma-card table, .figma-card thead, .figma-card tbody, 
     .figma-card th, .figma-card td, .figma-card tr { display: block !important; width: 100% !important; }
     .figma-card thead { position: absolute; top: -9999px; left: -9999px; } 
@@ -443,13 +456,11 @@
     .figma-card tbody td:nth-child(2) { flex-direction: column; align-items: flex-start !important; text-align: left !important; }
     .figma-card tbody td:nth-child(6) { flex-direction: column; align-items: stretch !important; gap: 10px; margin-top: 10px; }
 
-    /* Tombol Aksi */
     .action-cell { flex-direction: column; width: 100%; gap: 10px; }
     .btn-detail, .btn-penilaian { width: 100%; justify-content: center; padding: 12px; }
     .btn-dropdown-wrapper { width: 100%; }
     .dropdown-menu { width: 100%; text-align: center; }
 
-    /* Modal Detail Mengajar */
     .modal-box { max-height: 90vh !important; display: flex !important; flex-direction: column !important; }
     .modal-body { grid-template-columns: 1fr; gap: 15px; padding: 20px 15px; overflow-y: auto !important; }
     .detail-grid { grid-template-columns: 1fr; gap: 8px; }
@@ -457,26 +468,20 @@
     .modal-footer { padding: 15px !important; justify-content: center !important; }
     .modal-footer button { width: 100%; padding: 12px !important; }
 
-        /* ========================================================================
+    /* ========================================================================
        16. KHUSUS HALAMAN RENCANA TUGAS & RUBRIK
        ======================================================================== */
-    /* Rapikan Header & Tombol Atas */
     .container > div:first-child > div:last-child { width: 100%; flex-direction: column; }
-    
-    /* Ubah Form 3 Kolom Menjadi 1 Kolom */
     div[style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr !important; gap: 15px !important; }
 
-    /* Sembunyikan Header Tabel Rubrik */
     .grid-header-row { display: none !important; }
 
-    /* Sulap Baris Rubrik Jadi Kartu */
     .rubric-grid { 
         display: flex !important; flex-direction: column !important; gap: 15px !important; 
         background: white !important; padding: 20px !important; 
         box-shadow: 0 4px 10px rgba(0,0,0,0.05) !important; border: 2px solid #e2e8f0 !important; 
     }
 
-    /* Munculkan Label Judul di Atas Tiap Input */
     .rubric-grid > div { display: flex; flex-direction: column; }
     .rubric-grid > div::before { 
         font-weight: 800; color: var(--primary-navy); font-size: 0.85rem; 
@@ -490,7 +495,6 @@
     .rubric-grid > div:nth-child(5)::before { content: "Skala 3 (Baik: 70-84)"; }
     .rubric-grid > div:nth-child(6)::before { content: "Skala 4 (Sangat Baik: 85-100)"; }
     
-    /* Percantik Tombol Hapus Kriteria */
     .rubric-grid > div:nth-child(7)::before { content: ""; display: none; }
     .rubric-grid > div:nth-child(7) { margin-top: 10px; padding-top: 15px; border-top: 2px dashed #e2e8f0; }
     .rubric-grid > div:nth-child(7) button { 
@@ -500,29 +504,24 @@
     }
     .rubric-grid > div:nth-child(7) button::after { content: "Hapus Kriteria Ini"; font-family: 'Inter', sans-serif; font-weight: 700; }
 
-    /* Kartu Draft Sementara */
     #draftContainer > div { flex-direction: column !important; align-items: flex-start !important; gap: 15px; }
     #draftContainer > div > div:last-child { width: 100%; justify-content: space-between; }
     #draftContainer > div > div:last-child button { flex: 1; justify-content: center; }
+
     /* ========================================================================
        17. KHUSUS HALAMAN PENILAIAN KELAS
        ======================================================================== */
-    /* Rapikan Header Judul */
     .header-kelas { flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding: 20px 15px !important; }
     .header-kelas button { width: 100%; justify-content: center; }
     
-    /* Ubah Grid 2 Kolom menjadi 1 Kolom */
     .grid-container { grid-template-columns: 1fr !important; padding: 15px !important; gap: 20px !important; }
     
-    /* Sulap Menu Asesmen Vertikal Menjadi Tab Horizontal Bisa Di-scroll */
     .asesmen-menu { flex-direction: row !important; overflow-x: auto !important; max-height: auto !important; white-space: nowrap; padding-bottom: 5px; }
     .asesmen-item { border-bottom: none !important; border-right: 1px solid #f1f5f9; flex: 0 0 auto; justify-content: center; align-items: center; text-align: center; }
     
-    /* Rapikan Header Tabel & Tombol Simpan */
     .table-action-header { flex-direction: column; align-items: flex-start !important; gap: 15px; }
     .table-action-header button { width: 100%; justify-content: center; }
     
-    /* SULAP TABEL MAHASISWA MENJADI KARTU */
     .table-container table, .table-container thead, .table-container tbody, .table-container th, .table-container td, .table-container tr { display: block !important; width: 100% !important; }
     .table-container thead { position: absolute; top: -9999px; left: -9999px; }
     
@@ -536,7 +535,6 @@
     .table-container tbody tr:not(.row-default) td:nth-child(3)::before { content: "Nama Mahasiswa"; }
     .table-container tbody tr:not(.row-default) td:nth-child(4)::before { content: "Nilai"; }
     
-    /* Khusus Tampilan Baris "Beri Default Nilai Sekelas" */
     .row-default { background: #e0f2fe !important; border-color: #bae6fd !important; }
     .row-default td:nth-child(1) { padding-bottom: 0 !important; border-bottom: none !important; text-align: left !important; justify-content: flex-start !important; color: #0369a1 !important; }
     .row-default td:nth-child(2) { padding-top: 5px !important; justify-content: flex-end !important; }
@@ -545,12 +543,10 @@
     /* ========================================================================
        18. PENANGKAL BUG TABEL PREVIEW EXCEL (DI INPUT NILAI)
        ======================================================================== */
-    /* 1. Kembalikan tabel preview Excel dari format Kartu menjadi Tabel Normal */
     #previewArea table { display: table !important; width: 100% !important; }
     #previewArea thead { display: table-header-group !important; }
     #previewArea tbody { display: table-row-group !important; }
     
-    /* 2. Bersihkan baris dan kolom dari gaya kartu */
     #previewArea tr { 
         display: table-row !important; 
         background: transparent !important; border: none !important; 
@@ -563,22 +559,33 @@
         text-align: center !important; vertical-align: middle !important; padding: 12px 8px !important; 
     }
     
-    /* 3. Matikan label palsu ::before agar tidak ada teks aneh yang muncul */
     #previewArea td::before { display: none !important; }
     
-    /* 4. Hidupkan kembali fitur kolom beku (sticky) untuk NIM dan Nama */
-    #studentHead th:first-child, #studentBody td:first-child,
-    #studentHead th:nth-child(2), #studentBody td:nth-child(2) { 
-        position: sticky !important; 
-        background: white !important; 
-        z-index: 10 !important; 
-        max-width: none !important; 
-        overflow: visible !important; 
-        white-space: nowrap !important;
+    /* 1. Biarkan NIM ikut ter-scroll agar tidak memakan tempat di layar sempit */
+    #studentHead th:first-child, #studentBody td:first-child { 
+        position: static !important; 
+        box-shadow: none !important; 
     }
     
-    /* Bedakan warna latar header agar lebih manis */
-    #studentHead th { background: #f8fafc !important; z-index: 11 !important; }
-    #studentBody td:nth-child(2) { text-align: left !important; }
+    /* 2. Jadikan Nama Mahasiswa Sticky, tapi BATASI LEBARNYA dengan ketat! */
+    #studentHead th:nth-child(2), #studentBody td:nth-child(2) { 
+        position: sticky !important; 
+        left: 0 !important; 
+        background: white !important; 
+        z-index: 10 !important; 
+        min-width: 120px !important; 
+        max-width: 120px !important; /* Batasi lebarnya agar nilai tidak tertutup */
+        overflow: hidden !important; 
+        text-overflow: ellipsis !important; /* Beri titik-titik jika nama panjang */
+        white-space: nowrap !important;
+        border-right: 2px solid #cbd5e1 !important; /* Beri garis batas tegas */
+        text-align: left !important;
+    }
+    
+    /* Bedakan warna latar header Nama agar lebih rapi */
+    #studentHead th:nth-child(2) { 
+        background: #f8fafc !important; 
+        z-index: 11 !important; 
+    }
 
 } /* <--- INI ADALAH KURUNG KURAWAL PENUTUP UTAMA UNTUK MODE MOBILE. JANGAN ADA @MEDIA LAGI SETELAH INI */

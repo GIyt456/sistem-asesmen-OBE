@@ -28,12 +28,8 @@
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
-                <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Pantau progres input nilai OBE oleh dosen pengampu pada semester aktif.</p>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="searchKelas" class="form-control" placeholder="Cari Mata Kuliah atau Nama Dosen..." style="width: 300px;">
-                    <button class="btn-dark" onclick="loadRekapNilai()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
-                </div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="searchKelas" onkeyup="cariData()" class="form-control" placeholder="Cari Mata Kuliah atau Nama Dosen..." style="width: 300px;">
             </div>
 
             <div class="card-container">
@@ -105,6 +101,25 @@
                 const filteredDummy = dummyData.filter(d => d.kelas.toLowerCase().includes(PRODI));
                 renderTable(filteredDummy.length > 0 ? filteredDummy : dummyData, tbody);
             }
+        }
+
+        function cariData() {
+            let input = document.getElementById('searchKelas').value.toLowerCase();
+          
+            let rows = document.querySelectorAll('#tableBodyRekap tr');
+
+            rows.forEach(row => {
+                if (row.cells.length < 6) return; 
+
+                let textMK = row.cells[2] ? row.cells[2].textContent.toLowerCase() : '';
+                let textDosen = row.cells[3] ? row.cells[3].textContent.toLowerCase() : '';
+
+                if (textMK.includes(input) || textDosen.includes(input)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
 
         function renderTable(data, tbody) {
