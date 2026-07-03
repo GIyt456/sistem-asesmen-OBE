@@ -13,26 +13,6 @@
     <link rel="stylesheet" href="admin_config.css">
 </head>
 <body>
-    
-    <!-- 1. NAVBAR KHUSUS MOBILE -->
-    <nav class="navbar-mobile">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="hamburger-btn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <img src="../../gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
-                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
-                 onclick="window.location.href='../../index.html'">
-        </div>
-        
-        <div class="profile-btn-mobile" onclick="toggleSidebar()">
-            <img id="mobileNavbarAvatar" src="https://ui-avatars.com/api/?name=K&background=8b0000&color=fff&bold=true" alt="Profil Kaprodi">
-        </div>
-    </nav>
-
-    <!-- 2. OVERLAY -->
-    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
-
     <div id="sidebar-container"></div>
     <div id="navbar-container"></div>
     <div class="main-content">
