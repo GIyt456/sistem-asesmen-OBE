@@ -4,282 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Mahasiswa SI - Sistem OBE</title>
-    <!-- MENGGUNAKAN PATH ABSOLUT -->
+    
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script>
-    
+
     <style>
-        /* --- VARIABEL WARNA & TEMA GLOBAL --- */
-        :root { 
-            --primary-blue: #1e3a8a; /* Biru Gelap SI */
-            --primary-teal: #0097a7; /* Teal Terang SI (Aksentuasi) */
-            --sidebar-bg: #0b4d56;   /* TEAL GELAP KHUSUS SIDEBAR */
-            --primary-red: #8b0000;  /* Merah TI (Untuk Switch Nanti) */
-            --bg-main: #f9fafb; 
-            --text-dark: #111827;
-            --border-light: #e5e7eb;
-            --border-dark: #161923;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        
-        body, html { 
-            display: flex; background: var(--bg-main); height: 100vh; width: 100%; overflow-x: hidden; color: var(--text-dark);
-            animation: transitionIn 0.3s ease-in-out; 
-        }
-        
-        @keyframes transitionIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* SEMBUNYIKAN ELEMEN MOBILE DI DESKTOP */
-        .navbar-mobile { display: none !important; }
-        .mobile-overlay { display: none !important; }
-
-        .main-content { flex: 1; min-width: 0; overflow-y: auto; overflow-x: hidden; padding: 40px 60px; display: flex; flex-direction: column; background: var(--bg-main); }
-        
-        /* =========================================================
-           KUDETA WARNA SIDEBAR (MENGALAHKAN STYLE.CSS BAWAAN)
-        ========================================================= */
-        #sidebar-container { 
-            width: 280px; 
-            min-width: 280px; 
-            height: 100vh; 
-            flex-shrink: 0; 
-            z-index: 1000; 
-            background-color: var(--sidebar-bg) !important; 
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-        }
-        
-        /* Memaksa elemen anak dari template.js untuk patuh pada warna Teal Gelap */
-        #sidebar-container .sidebar, 
-        #sidebar-container > div,
-        .sidebar {
-            background-color: var(--sidebar-bg) !important;
-        }
-        /* ========================================================= */
-
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid var(--border-light); padding-bottom: 20px; }
-        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
-        .header-title span { color: var(--primary-teal); }
-        
-        .badge-prodi { 
-            background: var(--primary-teal); 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 30px; 
-            font-size: 0.9rem; 
-            font-weight: 600; 
-            box-shadow: 0 4px 6px rgba(0, 151, 167, 0.2); 
-            text-transform: uppercase;
-        }
-
-        .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        
-        .btn-primary-si { 
-            background: var(--primary-teal); 
-            color: white; 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 8px; 
-            font-weight: 600; 
-            font-size: 0.95rem; 
-            cursor: pointer; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 10px; 
-            transition: 0.2s; 
-            box-shadow: 0 4px 6px rgba(0, 151, 167, 0.3);
-        }
-        .btn-primary-si:hover { 
-            transform: translateY(-2px); 
-            filter: brightness(0.85);
-        }
-
-        /* --- WADAH TABEL DESKTOP --- */
-        .table-responsive-wrapper { overflow-x: auto; width: 100%; border: 1.5px solid var(--border-light); border-radius: 8px; background: white; margin-top: 15px;}
-        
-        table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left;}
-        th { background: #f3f4f6; color: var(--text-dark); padding: 14px 16px; border-bottom: 2px solid var(--border-light); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
-        td { padding: 14px 16px; border-bottom: 1px solid var(--border-light); font-size: 0.95rem; }
-        tbody tr:hover { background-color: #f9fafb; }
-        
-        /* --- TOMBOL AKSI TABEL --- */
-        .btn-edit, .btn-delete { 
-            height: 32px; 
-            padding: 0 12px; 
-            border-radius: 6px; 
-            font-weight: 600; 
-            font-size: 0.8rem; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center;
-            gap: 6px; 
-            margin: 0 3px; 
-        }
-        .btn-edit { background: #3b82f6; color: white; border: none; }
-        .btn-edit:hover { background: #2563eb; }
-        .btn-delete { background: #ef4444; color: white; border: none; }
-        .btn-delete:hover { background: #dc2626; }
-        
-        .badge-status { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-block; }
-        .status-aktif { background: #d1fae5; color: #065f46; }
-        .status-cuti { background: #fef08a; color: #854d0e; }
-        .status-lulus { background: #dbeafe; color: #1e40af; }
-
-        /* --- MODAL POP-UP STYLES --- */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; animation: fadeIn 0.2s ease; }
-        .modal-box { background: white; padding: 32px; border-radius: 16px; width: 450px; max-width: 90%; border: 2.5px solid var(--border-dark); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
-        .form-control { width: 100%; padding: 12px 16px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
-        .form-control:focus { border-color: var(--primary-teal); }
-        
-        .profile-btn-mobile {
-            width: 36px; height: 36px; border-radius: 50%; 
-            border: 2px solid rgba(255, 255, 255, 0.2); overflow: hidden; 
-            cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-        }
-        .profile-btn-mobile img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* =========================================
-           RESPONSIVE MOBILE (AKTIF KHUSUS DI HP)
-        ========================================= */
+        /* === PERBAIKAN LOKAL (Mencegah Cache & Tabrakan CSS) === */
         @media screen and (max-width: 768px) {
-            
-            /* Navbar Mobile Atas (NAVY GELAP) */
-            .navbar-mobile {
-                display: flex !important; 
-                position: fixed; top: 0; left: 0; width: 100%;
-                background-color: #0f172a; /* Warna Navy Gelap */
-                padding: 12px 20px; align-items: center; justify-content: space-between;
-                z-index: 990; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            /* 1. Memberi jarak aman pada Header & Konten agar tidak mepet tepi */
+            .header-mhs {
+                margin: 20px 20px 10px 20px !important;
             }
-            
-            .mobile-overlay.active { 
-                display: block !important; position: fixed; top: 0; left: 0; 
-                width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); 
-                backdrop-filter: blur(3px); z-index: 999; 
-            }
-            
-            #navbar-container { display: none !important; height: 0 !important; overflow: hidden !important; }
-
-            body, html { height: auto !important; overflow-y: auto !important; overflow-x: hidden !important; width: 100% !important;}
-            
-            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-            
-            .main-content { margin-top: 60px !important; height: auto !important; display: block !important; padding: 20px !important; width: 100% !important; overflow-x: hidden !important;}
-
-            #sidebar-container { 
-                position: fixed; top: 0; left: -320px; height: 100vh; 
-                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 10px 0 25px rgba(0,0,0,0.5);
-            }
-            #sidebar-container.active { left: 0; }
-            
-            /* Penyesuaian Header & Tools di HP */
-            .header-container { flex-direction: column !important; align-items: flex-start !important; gap: 15px; margin-bottom: 20px !important; }
-            .header-title { font-size: 1.6rem !important; }
-            
-            /* Area Judul "Daftar Mahasiswa" dan Tombol Tambah */
-            .main-content > div:nth-child(3) { flex-direction: column; align-items: flex-start !important; gap: 15px; }
-            .main-content > div:nth-child(3) > div:last-child { width: 100%; display: flex; gap: 10px; }
-            .btn-primary-si, .btn-dark { flex: 1; justify-content: center; }
-            
-            /* Area Search & Show Entries */
-            .main-content > div:nth-child(4) { flex-direction: column; align-items: stretch !important; gap: 15px; }
-            .main-content > div:nth-child(4) > div { width: 100%; justify-content: space-between; }
-            #searchBox { flex: 1; }
-
-            /* =========================================
-               SULAP TABEL MAHASISWA MENJADI KARTU (CARD)
-            ========================================= */
-            .table-responsive-wrapper { 
-                border: none !important; 
-                background: transparent !important; 
-                overflow: hidden !important; 
-                padding: 0 !important;
-                margin-top: 10px !important;
-            }
-            
-            table, thead, tbody, th, td, tr { 
-                display: block !important; 
-                width: 100% !important; 
-                min-width: 0 !important; 
-            }
-            
-            thead { display: none !important; }
-            
-            tr { 
-                background: white !important; 
-                border: 1px solid var(--border-light) !important; 
-                border-radius: 12px !important; 
-                margin-bottom: 20px !important; 
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; 
-                overflow: hidden !important;
-            }
-            
-            td { 
-                display: flex !important; 
-                justify-content: space-between !important; 
-                align-items: center !important; 
-                text-align: right !important; 
-                padding: 12px 20px !important; 
-                border: none !important; 
-                border-bottom: 1px dashed var(--border-light) !important; 
-            }
-            
-            td:last-child { 
-                border-bottom: none !important; 
-                flex-direction: column !important; 
-                gap: 10px !important;
-                background: #f8fafc !important; 
-                white-space: normal !important;
-            }
-            
-            td::before { 
-                font-weight: 800; 
-                color: var(--primary-teal); 
-                font-size: 0.75rem; 
-                text-transform: uppercase; 
-                margin-right: 15px;
-            }
-            
-            td:nth-child(1)::before { content: "NO"; }
-            td:nth-child(2)::before { content: "NIM"; }
-            td:nth-child(3)::before { content: "NAMA"; }
-            td:nth-child(4)::before { content: "ANGKATAN"; }
-            td:nth-child(5)::before { content: "STATUS"; }
-            td:nth-child(6)::before { content: "OPSI"; display: none; } 
-
-            td:nth-child(3) { 
-                text-align: right !important; 
-                word-wrap: break-word !important; 
-                white-space: normal !important;
+            .section-mhs {
+                padding: 0 20px 40px 20px !important;
             }
 
-            td .btn-edit, td .btn-delete { 
-                width: 100% !important; 
-                height: 40px !important; 
-                margin: 0 !important; 
-                justify-content: center !important;
-                font-size: 0.95rem !important;
+            /* 2. Merapikan Kartu Mahasiswa (UI/UX Modern) */
+            .tabel-mahasiswa tr { padding: 20px !important; }
+            .tabel-mahasiswa td:nth-child(1) { display: none !important; } /* Sembunyikan No */
+            
+            /* NIM (Di atas, Abu-abu) */
+            .tabel-mahasiswa td:nth-child(2) { 
+                font-size: 0.9rem !important; color: #64748b !important; 
+                font-weight: 700; border: none !important; padding: 0 !important; 
+                margin-bottom: 4px !important; text-align: left !important;
+            }
+            .tabel-mahasiswa td:nth-child(2)::before { display: none !important; }
+            
+            /* NAMA (Besar, Bold, Rata Kiri) */
+            .tabel-mahasiswa td:nth-child(3) { 
+                font-size: 1.15rem !important; color: var(--primary-blue) !important; 
+                font-weight: 800 !important; text-align: left !important; 
+                border-bottom: 1px solid #e2e8f0 !important; padding: 0 0 15px 0 !important; 
+                margin-bottom: 15px !important; white-space: normal !important;
+            }
+            .tabel-mahasiswa td:nth-child(3)::before { display: none !important; }
+            
+            /* ANGKATAN & STATUS (Sejajar Kiri & Kanan) */
+            .tabel-mahasiswa td:nth-child(4), .tabel-mahasiswa td:nth-child(5) { 
+                display: inline-flex !important; width: 48% !important; flex-direction: column !important; 
+                border: none !important; padding: 0 !important; margin-bottom: 20px !important; 
+                text-align: left !important; align-items: flex-start !important;
+            }
+            .tabel-mahasiswa td:nth-child(5) { 
+                align-items: flex-end !important; text-align: right !important; 
+            }
+            
+            /* OPSI TOMBOL (Bawah, Sejajar, SAMA BESAR) */
+            .tabel-mahasiswa td:nth-child(6) { 
+                border: none !important; padding: 0 !important; 
+            }
+            .tabel-mahasiswa td:nth-child(6)::before { display: none !important; }
+            
+            .opsi-buttons { 
+                display: flex !important; flex-direction: row !important; 
+                gap: 10px !important; width: 100% !important; 
+            }
+            .opsi-buttons button { 
+                flex: 1 !important; justify-content: center !important; 
+                height: 42px !important; margin: 0 !important; 
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. NAVBAR KHUSUS MOBILE (Warna Navy Gelap) -->
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
             <button class="hamburger-btn" onclick="toggleSidebar()">
@@ -295,16 +91,14 @@
         </div>
     </nav>
 
-    <!-- 2. OVERLAY GELAP UNTUK LATAR SIDEBAR DI HP -->
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
-
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <!-- WADAH NAVBAR ASLI DARI TEMPLATE.JS -->
         <div id="navbar-container"></div>
 
-        <div class="header-container">
+        <!-- Tambahan class header-mhs agar tidak mepet di HP -->
+        <div class="header-container header-mhs" style="margin: 40px 50px 20px 50px;">
             <div class="header-title-area">
                 <div class="header-subtitle">KELOLA DATA MASTER</div>
                 <h1 class="header-title">DATA <span>MAHASISWA</span></h1>
@@ -312,54 +106,56 @@
             <div class="badge-prodi" id="prodiBadge"><i class="fas fa-users"></i> SISTEM INFORMASI</div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <div>
-                <h3 id="daftarTitle" style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mahasiswa (SI)</h3>
-                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk mahasiswa Program Studi.</p>
-            </div>
-            <div style="display: flex; gap: 12px;">
-                <button class="btn-primary-si" onclick="bukaModalMahasiswa()"><i class="fas fa-plus"></i> Tambah</button>
-                <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                Show 
-                <select id="showEntries" style="padding: 6px 10px; border: 1.5px solid var(--border-light); border-radius: 6px; outline: none; cursor: pointer;">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="25">25</option>
-                </select> entries
-            </div>
+        <!-- Tambahan class section-mhs agar tidak mepet di HP -->
+        <div style="padding: 0 50px 40px 50px;" class="section section-mhs active">
             
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                <input type="text" id="searchBox" placeholder="Cari NIM atau Nama..." style="padding: 8px 12px; border: 1.5px solid var(--border-light); border-radius: 6px; outline: none; font-size: 0.9rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h3 id="daftarTitle" style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Mahasiswa (SI)</h3>
+                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data induk mahasiswa Program Studi.</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn-primary-si btn-action" onclick="bukaModalMahasiswa()"><i class="fas fa-plus"></i> Tambah</button>
+                    <button class="btn-dark btn-action" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
             </div>
-        </div>
 
-        <!-- WADAH TABEL (DIUBAH MENJADI KARTU DI HP OLEH CSS) -->
-        <div class="table-responsive-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%" style="text-align: center;">No</th>
-                        <th width="15%">NIM</th>
-                        <th>Nama Mahasiswa</th>
-                        <th width="15%" style="text-align: center;">Angkatan</th>
-                        <th width="15%" style="text-align: center;">Status</th>
-                        <th width="20%" style="text-align: center;">Opsi</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyMahasiswa">
-                    <!-- Data diload dari JS -->
-                </tbody>
-            </table>
-        </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
+                    Show 
+                    <select id="showEntries" style="padding: 6px 10px; border: 1.5px solid var(--border-color); border-radius: 6px; outline: none; cursor: pointer;">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                    </select> entries
+                </div>
+                
+                <div style="display: flex; align-items: center; flex: 1; min-width: 250px;">
+                    <input type="text" id="searchBox" placeholder="🔍 Cari NIM atau Nama..." style="width: 100%; padding: 10px 15px; border: 1.5px solid var(--border-color); border-radius: 8px; outline: none; font-size: 0.95rem;">
+                </div>
+            </div>
 
-        <div id="pagination-mahasiswa" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.85rem; color: #6b7280; flex-wrap: wrap; gap: 10px;">
-            <div>Loading entries...</div>
+            <div class="table-container">
+                <table class="tabel-mahasiswa">
+                    <thead>
+                        <tr>
+                            <th width="5%" style="text-align: center;">No</th>
+                            <th width="15%">NIM</th>
+                            <th>Nama Mahasiswa</th>
+                            <th width="15%" style="text-align: center;">Angkatan</th>
+                            <th width="15%" style="text-align: center;">Status</th>
+                            <th width="20%" style="text-align: center;">Opsi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyMahasiswa">
+                        <!-- Data diload dari JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="pagination-mahasiswa" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.85rem; color: #6b7280; flex-wrap: wrap; gap: 10px;">
+                <div>Loading entries...</div>
+            </div>
         </div>
     </div>
 
@@ -397,20 +193,18 @@
             
             <div style="display: flex; justify-content: flex-end; gap: 12px;">
                 <button onclick="tutupModalMahasiswa()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanMahasiswa()" class="btn-primary-si"><i class="fas fa-save"></i> Simpan Data</button>
+                <button onclick="simpanMahasiswa()" class="btn-primary-si" style="margin: 0;"><i class="fas fa-save"></i> Simpan Data</button>
             </div>
         </div>
     </div>
 
 <script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
     const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
     
     document.addEventListener("DOMContentLoaded", () => {
-        // Jika TI, timpa warna Navbar, Tombol, dan Sidebar menjadi Merah menggunakan CSS Variable
         if(PRODI === "ti") {
             document.documentElement.style.setProperty('--primary-teal', '#8b0000'); 
-            document.documentElement.style.setProperty('--sidebar-bg', '#3b0000'); // Sidebar Kiri Merah Gelap
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
             document.getElementById('prodiBadge').innerHTML = '<i class="fas fa-users"></i> TEKNIK INFORMATIKA';
             document.getElementById('daftarTitle').innerText = 'Daftar Mahasiswa (TI)';
         } else {
@@ -421,19 +215,16 @@
         const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
         const avatarMobile = document.getElementById("mobileNavbarAvatar");
         if(avatarMobile) {
-            // Menggunakan warna Biru (Navy) untuk Avatar di Navbar
             const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
             avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
         }
     });
 
-    // --- FUNGSI SIDEBAR MOBILE ---
     function toggleSidebar() {
         document.getElementById('sidebar-container').classList.toggle('active');
         document.getElementById('mobileOverlay').classList.toggle('active');
     }
     
-    // --- PENGAMAN SIDEBAR DARI TEMPLATE.JS ---
     document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
             const sidebar = document.getElementById('sidebar-container');
@@ -449,9 +240,7 @@
         }, 600); 
     });
 
-    // --- LOGIKA DATA, PAGINASI, & PENCARIAN MAHASISWA ---
     const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
-
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace('/login/login.html');
     
@@ -467,14 +256,10 @@
         try {
             const res = await fetch(API_URL);
             const fullData = await res.json();
-            
             allDataMahasiswa = fullData.filter(i => i.tipe === 'mahasiswa');
             currentPage = 1;
-            
             renderTablePaginated(); 
-            
         } catch (error) {
-            console.error("Gagal menarik data:", error);
             tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:red; padding: 20px;'>❌ Gagal memuat data dari server n8n.</td></tr>";
         }
     }
@@ -511,16 +296,19 @@
                 angkatanOtomatis = "20" + kodeTahun; 
             }
 
+            // PERHATIKAN CLASS opsi-buttons DITAMBAHKAN DI SINI
             tbody.innerHTML += `
             <tr>
                 <td style="text-align: center;">${noUrut}</td>
                 <td><strong>${item.kode}</strong></td>
                 <td style="font-weight: 600; color: var(--primary-blue);">${namaMhs}</td>
                 <td style="text-align: center;"><span style="background:#f3f4f6; padding: 4px 10px; border-radius:6px; font-weight:600; color:#4b5563;">${angkatanOtomatis}</span></td>
-                <td style="text-align: center;"><span class="badge-status status-aktif">Aktif</span></td>
+                <td style="text-align: center;"><span class="status-aktif" style="display:inline-block;">Aktif</span></td>
                 <td style="text-align: center; white-space: nowrap;">
-                    <button class="btn-edit" onclick="bukaModalMahasiswa('${item.kode}')"><i class="fas fa-edit"></i> Ubah</button>
-                    <button class="btn-delete" onclick="konfirmasiHapus('${item.kode}', '${namaMhs.replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i> Hapus</button>
+                    <div class="opsi-buttons" style="display: flex; gap: 8px; justify-content: center;">
+                        <button class="btn-action btn-edit" style="background:#3b82f6; color:white;" onclick="bukaModalMahasiswa('${item.kode}')"><i class="fas fa-edit"></i> Ubah</button>
+                        <button class="btn-action btn-delete" style="background:#dc2626; color:white;" onclick="konfirmasiHapus('${item.kode}', '${namaMhs.replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i> Hapus</button>
+                    </div>
                 </td>
             </tr>`;
         });
@@ -551,10 +339,6 @@
         renderTablePaginated();
     }
 
-    // ==========================================
-    // 4. FUNGSI MODAL POP-UP (UBAH & TAMBAH)
-    // ==========================================
-    
     document.getElementById('inputNIM').addEventListener('input', function(e) {
         const nimInput = e.target.value;
         if (nimInput.length >= 5) {
@@ -582,10 +366,7 @@
             if(mhsTerpilih) {
                 const parts = mhsTerpilih.label ? mhsTerpilih.label.split('||') : [''];
                 inputNama.value = parts[0];
-                
-                if (nim.length >= 5) {
-                    inputAngkatan.value = "20" + nim.substring(3, 5);
-                }
+                if (nim.length >= 5) inputAngkatan.value = "20" + nim.substring(3, 5);
             }
         } else {
             title.innerText = `Tambah Mahasiswa ${PRODI.toUpperCase()}`;
@@ -610,16 +391,13 @@
         const angkatan = document.getElementById('inputAngkatan').value;
         const status = document.getElementById('inputStatusMahasiswa').value;
 
-        if(!nim || !nama) {
-            alert("⚠️ Peringatan: NIM dan Nama Lengkap wajib diisi!");
-            return;
-        }
+        if(!nim || !nama) return alert("⚠️ Peringatan: NIM dan Nama Lengkap wajib diisi!");
 
         const isEdit = document.getElementById('inputNIM').readOnly;
         const actionType = isEdit ? "UBAH" : "TAMBAH";
-
         const btnSimpan = document.querySelector("#modalMahasiswa .btn-primary-si");
         const originalText = btnSimpan.innerHTML;
+        
         btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btnSimpan.disabled = true;
 
@@ -627,30 +405,12 @@
             const response = await fetch(`${API_BASE}/post-data-mahasiswa`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    aksi: actionType,
-                    nim: nim,
-                    nama: nama,
-                    angkatan: angkatan,
-                    status: status,
-                    prodi: PRODI 
-                })
+                body: JSON.stringify({ aksi: actionType, nim: nim, nama: nama, angkatan: angkatan, status: status, prodi: PRODI })
             });
-
-            if(response.ok) {
-                alert(`✅ Data mahasiswa berhasil di${actionType.toLowerCase()}!`);
-                tutupModalMahasiswa();
-                loadData(); 
-            } else {
-                alert("❌ Gagal menyimpan data ke server n8n.");
-            }
-        } catch(e) {
-            console.error("Error Simpan:", e);
-            alert("❌ Terjadi kesalahan jaringan saat menghubungi server.");
-        } finally {
-            btnSimpan.innerHTML = originalText;
-            btnSimpan.disabled = false;
-        }
+            if(response.ok) { alert(`✅ Data mahasiswa berhasil di${actionType.toLowerCase()}!`); tutupModalMahasiswa(); loadData(); } 
+            else alert("❌ Gagal menyimpan data ke server n8n.");
+        } catch(e) { alert("❌ Terjadi kesalahan jaringan saat menghubungi server."); } 
+        finally { btnSimpan.innerHTML = originalText; btnSimpan.disabled = false; }
     }
 
     async function konfirmasiHapus(nim, nama) {
@@ -659,49 +419,20 @@
                 const response = await fetch(`${API_BASE}/post-data-mahasiswa`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        aksi: "HAPUS", 
-                        nim: nim, 
-                        prodi: PRODI 
-                    })
+                    body: JSON.stringify({ aksi: "HAPUS", nim: nim, prodi: PRODI })
                 });
-
-                if(response.ok) {
-                    alert("✅ Data mahasiswa berhasil dihapus secara permanen!");
-                    loadData(); 
-                } else {
-                    alert("❌ Gagal menghapus data di server n8n.");
-                }
-            } catch(e) {
-                console.error("Error Hapus:", e);
-                alert("❌ Terjadi kesalahan jaringan saat mencoba menghapus.");
-            }
+                if(response.ok) { alert("✅ Data mahasiswa berhasil dihapus secara permanen!"); loadData(); } 
+                else alert("❌ Gagal menghapus data di server n8n.");
+            } catch(e) { alert("❌ Terjadi kesalahan jaringan saat mencoba menghapus."); }
         }
     }
 
-    // ==========================================
-    // 5. EVENT LISTENER SAAT HALAMAN DIBUKA
-    // ==========================================
     window.onload = () => { 
         loadData(); 
-        
         const selectBox = document.getElementById('showEntries');
-        if(selectBox) {
-            selectBox.onchange = (e) => {
-                rowsPerPage = parseInt(e.target.value);
-                currentPage = 1; 
-                renderTablePaginated();
-            }
-        }
-
+        if(selectBox) selectBox.onchange = (e) => { rowsPerPage = parseInt(e.target.value); currentPage = 1; renderTablePaginated(); }
         const searchBox = document.getElementById('searchBox');
-        if(searchBox) {
-            searchBox.oninput = (e) => {
-                searchQuery = e.target.value.toLowerCase();
-                currentPage = 1; 
-                renderTablePaginated();
-            }
-        }
+        if(searchBox) searchBox.oninput = (e) => { searchQuery = e.target.value.toLowerCase(); currentPage = 1; renderTablePaginated(); }
     };
 </script>
 </body>

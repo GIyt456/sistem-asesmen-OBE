@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pemetaan BK - MK - Sistem OBE</title>
     
-    <!-- MENGGUNAKAN PATH ABSOLUT -->
+    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -15,69 +17,30 @@
     
     <style>
         /* =========================================
-           STYLE GLOBAL & TEMA WARNA
+           STYLE KHUSUS MATRIKS (TIDAK ADA DI ADMIN_SI.CSS)
         ========================================= */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root { 
-            --primary-blue: #1e3a8a; /* Biru Gelap SI (Untuk Teks & Aksentuasi) */
-            --primary-red: #8b0000;  /* Merah Gelap TI */
-            --bg-main: #f9fafb; 
-            --text-dark: #111827; 
-            --border-color: #e5e7eb;
-        }
-
-        body, html { 
-            display: flex; 
-            background: var(--bg-main); 
-            height: 100vh; 
-            width: 100%;
-            overflow-x: hidden; 
-            font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-        }
-
-        /* SEMBUNYIKAN ELEMEN MOBILE DI DESKTOP */
-        .navbar-mobile { display: none !important; }
-        .mobile-overlay { display: none !important; }
-
-        .main-content { 
-            flex: 1; 
-            min-width: 0; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            background: var(--bg-main); 
-        }
-        
-        /* SIDEBAR KIRI (Warna otomatis diurus oleh style.css) */
-        #sidebar-container { 
-            width: 280px; 
-            min-width: 280px; 
-            height: 100vh; 
-            flex-shrink: 0; 
-            z-index: 1000; 
-        }
-        
-        .fixed-header { padding: 40px 50px 20px 50px; flex-shrink: 0; background: var(--bg-main); z-index: 10; border-bottom: 1px solid var(--border-color); }
-        .scrollable-content { flex: 1; overflow-y: auto; padding: 30px 50px 40px 50px; overflow-x: hidden; }
-        
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
-        .header-title-area { display: flex; flex-direction: column; }
-        .header-subtitle { color: #64748b; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
-        
-        /* WARNA AKSENTUASI DIKEMBALIKAN KE BIRU GELAP */
-        .header-title span { color: var(--primary-blue); }
-        .badge-prodi { background: var(--primary-blue); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
         
         /* WADAH TABEL DESKTOP */
-        .table-responsive-wrapper { overflow-x: auto; max-height: 550px; border: 1px solid var(--border-color); border-radius: 8px; background: white; }
+        .table-responsive-wrapper { 
+            overflow-x: auto; 
+            max-height: 550px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            background: white; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
         
-        table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: center; }
-        th, td { border: 1px solid var(--border-color); padding: 12px; font-size: 0.9rem; }
-        th { background: #f8fafc; font-weight: 700; color: #475569; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); }
-        td { color: #1e293b; padding: 0; }
+        .table-responsive-wrapper table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: center; }
+        .table-responsive-wrapper th, .table-responsive-wrapper td { border: 1px solid var(--border-color); font-size: 0.9rem; }
+        .table-responsive-wrapper th { background: #f8fafc; font-weight: 700; color: #475569; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); padding: 15px; }
+        
+        /* 🚨 SOLUSI TEKS MENEMPEL: Hapus padding default td, TAPI kembalikan padding khusus kolom 1 🚨 */
+        .table-responsive-wrapper td { color: #1e293b; padding: 0; }
+        .table-responsive-wrapper td:first-child { 
+            padding: 15px 20px !important; /* Memberi jarak napas lega */
+            text-align: left; 
+            line-height: 1.4;
+        }
         
         /* STYLING CHECKBOX DAN BUNGKUS LABEL */
         .bk-label-mobile { display: none; }
@@ -88,138 +51,45 @@
         .cell-wrapper:hover { background: #f1f5f9; }
         input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-blue); margin: 0;}
         
+        /* Tombol Save Khusus Matriks (Agar warnanya dinamis ikut Prodi) */
         .btn-save { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; margin-top: 25px; width: 100%; justify-content: center; font-size: 1rem;}
         .btn-save:hover { filter: brightness(0.85); transform: translateY(-2px); }
         .btn-save:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
-        
-        .profile-btn-mobile {
-            width: 36px; height: 36px; border-radius: 50%; 
-            border: 2px solid rgba(255, 255, 255, 0.2); overflow: hidden; 
-            cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-        }
-        .profile-btn-mobile img { width: 100%; height: 100%; object-fit: cover; }
 
         /* =========================================
            RESPONSIVE MOBILE (AKTIF KHUSUS DI HP)
         ========================================= */
         @media screen and (max-width: 768px) {
-            
-            /* Navbar Mobile Atas (Navy Gelap) */
-            .navbar-mobile {
-                display: flex !important; 
-                position: fixed; top: 0; left: 0; width: 100%;
-                background-color: #0f172a; 
-                padding: 12px 20px; align-items: center; justify-content: space-between;
-                z-index: 990; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            }
-            
-            .mobile-overlay.active { 
-                display: block !important; position: fixed; top: 0; left: 0; 
-                width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); 
-                backdrop-filter: blur(3px); z-index: 999; 
-            }
-            
-            #navbar-container { display: none !important; height: 0 !important; overflow: hidden !important; }
+            .btn-save[onclick="loadData()"] { width: 100% !important; justify-content: center; margin-top: 0 !important; }
 
-            body, html { height: auto !important; overflow-y: auto !important; overflow-x: hidden !important; width: 100% !important;}
+            /* SULAP MATRIKS MENJADI KARTU (CARD) DI HP */
+            .table-responsive-wrapper { border: none !important; box-shadow: none !important; background: transparent !important; max-height: none !important; overflow: hidden !important; width: 100% !important; }
+            .table-responsive-wrapper table, .table-responsive-wrapper thead, .table-responsive-wrapper tbody, .table-responsive-wrapper th, .table-responsive-wrapper td, .table-responsive-wrapper tr { display: block !important; width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+            .table-responsive-wrapper thead { display: none !important; }
+            .table-responsive-wrapper tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 25px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important; }
             
-            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-            
-            .main-content { margin-top: 60px !important; height: auto !important; display: block !important; overflow-x: hidden !important; width: 100% !important;}
-
-            #sidebar-container { 
-                position: fixed; top: 0; left: -320px; height: 100vh; 
-                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 10px 0 25px rgba(0,0,0,0.5);
-            }
-            #sidebar-container.active { left: 0; }
-            
-            .fixed-header { padding: 20px !important; }
-            .scrollable-content { padding: 20px !important; overflow-x: hidden !important; }
-
-            .header-container { flex-direction: column !important; align-items: flex-start !important; gap: 15px; margin-bottom: 20px !important; }
-            .header-title { font-size: 1.6rem !important; }
-            
-            .fixed-header > div:nth-child(2) { flex-direction: column; align-items: flex-start !important; gap: 15px;}
-            .btn-save[onclick="loadData()"] { width: 100% !important; justify-content: center; }
-
-            /* =========================================
-               SULAP MATRIKS MENJADI KARTU (CARD) DI HP
-            ========================================= */
-            .table-responsive-wrapper { 
-                border: none !important; 
-                box-shadow: none !important; 
-                background: transparent !important; 
-                max-height: none !important;
-                overflow: hidden !important; 
-                width: 100% !important;
-            }
-            
-            table, thead, tbody, th, td, tr { 
-                display: block !important; 
-                width: 100% !important; 
-                min-width: 0 !important; 
-                max-width: 100% !important;
-            }
-            
-            thead { display: none !important; }
-            
-            tr { 
-                background: white !important; 
-                border: 1px solid #cbd5e1 !important; 
-                border-radius: 12px !important; 
-                margin-bottom: 25px !important; 
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; 
-                overflow: hidden !important;
-            }
-            
-            td:first-child { 
+            .table-responsive-wrapper td:first-child { 
                 background: #1f2937 !important; 
                 color: #f8fafc !important; 
                 padding: 15px 20px !important; 
                 text-align: left !important; 
                 position: static !important; 
                 border: none !important;
-                border-bottom: 3px solid var(--primary-blue) !important; /* Garis bawah biru gelap */
+                border-bottom: 3px solid var(--primary-blue) !important; 
             }
-            td:first-child .mk-kode-badge { color: #facc15; font-size: 0.8rem; margin-bottom: 5px; font-weight: 800; letter-spacing: 1px;}
+            .table-responsive-wrapper td:first-child .mk-kode-badge { color: #facc15; font-size: 0.8rem; margin-bottom: 5px; font-weight: 800; letter-spacing: 1px;}
+            .table-responsive-wrapper td:not(:first-child) { padding: 0 !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+            .table-responsive-wrapper td:last-child { border-bottom: none !important; }
             
-            td:not(:first-child) { 
-                padding: 0 !important; 
-                border: none !important; 
-                border-bottom: 1px dashed #e2e8f0 !important; 
-            }
-            td:last-child { border-bottom: none !important; }
-            
-            .cell-wrapper {
-                display: flex !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                padding: 15px 20px !important;
-                width: 100% !important;
-                box-sizing: border-box !important;
-            }
-
-            .bk-label-mobile {
-                display: block !important;
-                font-weight: 600;
-                color: #334155;
-                font-size: 0.9rem;
-                flex: 1; 
-                text-align: left;
-                padding-right: 15px;
-                line-height: 1.4;
-                word-wrap: break-word !important; 
-                white-space: normal !important;
-            }
-            
+            .cell-wrapper { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 15px 20px !important; width: 100% !important; box-sizing: border-box !important; }
+            .bk-label-mobile { display: block !important; font-weight: 600; color: #334155; font-size: 0.9rem; flex: 1; text-align: left; padding-right: 15px; line-height: 1.4; word-wrap: break-word !important; white-space: normal !important; }
             input[type="checkbox"] { width: 22px !important; height: 22px !important; flex-shrink: 0 !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. NAVBAR KHUSUS MOBILE (Warna Gelap/Navy) -->
+    <!-- 1. NAVBAR KHUSUS MOBILE (Warna Gelap otomatis dari admin_si.css) -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
             <button class="hamburger-btn" onclick="toggleSidebar()">
@@ -245,7 +115,7 @@
         <div id="navbar-container"></div>
 
         <div class="fixed-header">
-            <div class="header-container">
+            <div class="header-container" style="margin-bottom: 20px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
                     <div class="header-subtitle">PEMETAAN (MAPPING)</div>
                     <h1 class="header-title">MATRIKS <span>BK - MK</span></h1>
@@ -253,7 +123,7 @@
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
             
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
                 <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Mata Kuliah (MK) yang berelasi dengan Bahan Kajian (BK).</p>
                 <button class="btn-save" style="width: auto; margin-top: 0; background: #475569;" onclick="loadData()">
                     <i class="fas fa-sync-alt"></i> Refresh Data
@@ -266,11 +136,11 @@
                 <table id="matriksTable">
                     <thead>
                         <tr id="headerRow">
-                            <th style="min-width: 120px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">BK / MK</th>
+                            <th style="min-width: 120px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">MATA KULIAH (MK) \ BAHAN KAJIAN (BK)</th>
                         </tr>
                     </thead>
                     <tbody id="bodyMatriks">
-                        <tr><td style="text-align: center; padding: 30px;">Memuat data...</td></tr>
+                        <tr><td style="text-align: center; padding: 30px !important;">Memuat data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -297,7 +167,6 @@
         const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
         const avatarMobile = document.getElementById("mobileNavbarAvatar");
         if(avatarMobile) {
-            // Menggunakan warna Biru Gelap / Merah Marun untuk Avatar profil
             const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
             avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
         }
@@ -345,7 +214,7 @@
         const btnSave = document.getElementById("btnSave");
         const tbody = document.getElementById("bodyMatriks");
         if(btnSave) btnSave.disabled = true;
-        tbody.innerHTML = "<tr><td colspan='100%' style='text-align: center; padding: 30px;'><i class='fas fa-spinner fa-spin'></i> Memuat data matriks...</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='100%' style='text-align: center; padding: 30px !important;'><i class='fas fa-spinner fa-spin'></i> Memuat data matriks...</td></tr>";
 
         try {
             const [resBk, resMk, resRelasi] = await Promise.all([
@@ -367,7 +236,7 @@
             }
 
             if (!listBK || listBK.length === 0 || !listMK || listMK.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red; font-weight: bold;'>Data BK atau MK masih KOSONG! Harap isi terlebih dahulu.</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px !important; color: red; font-weight: bold;'>Data BK atau MK masih KOSONG! Harap isi terlebih dahulu.</td></tr>";
                 return;
             }
 
@@ -376,7 +245,7 @@
 
         } catch (error) {
             console.error(error);
-            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red;'>Gagal terhubung ke API. Cek koneksi internet atau link Cloudflare!</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px !important; color: red;'>Gagal terhubung ke API. Cek koneksi internet atau link Cloudflare!</td></tr>";
         }
     }
 
@@ -385,7 +254,7 @@
         const tbody = document.getElementById("bodyMatriks");
         if(!headerRow || !tbody) return;
 
-        headerRow.innerHTML = `<th style="min-width: 250px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">Mata Kuliah (MK) \\ Bahan Kajian (BK)</th>`;
+        headerRow.innerHTML = `<th style="min-width: 250px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">MATA KULIAH (MK) \\ BAHAN KAJIAN (BK)</th>`;
         
         listBK.forEach(bk => {
             headerRow.innerHTML += `<th title="${bk.nama_bk || ''}">${bk.kode_bk}</th>`;
@@ -394,10 +263,10 @@
         tbody.innerHTML = "";
         listMK.forEach(mk => {
             
-            // Header Kartu di HP
+            // Header Kartu di HP & Kolom Pertama di Desktop
             let tr = `<tr>
-                <td style="position: sticky; left: 0; background: #f8fafc; z-index: 5; text-align: left; font-weight: 600; color: var(--text-dark);" title="Kode: ${mk.kode_mk}">
-                    <div class="mk-kode-badge">${mk.kode_mk}</div>
+                <td style="position: sticky; left: 0; background: #f8fafc; z-index: 5; font-weight: 600; color: var(--text-dark);" title="Kode: ${mk.kode_mk}">
+                    <div class="mk-kode-badge" style="color: #64748b; font-size: 0.75rem; margin-bottom: 4px; font-weight: 800;">${mk.kode_mk}</div>
                     ${mk.nama_mk || mk.nama_mata_kuliah || mk.kode_mk}
                 </td>`;
             
@@ -407,7 +276,6 @@
                 const chk = isChecked ? 'checked' : '';
                 const namaBKLengkap = bk.nama_bk || '';
                 
-                // MENGGUNAKAN LABEL: Klik di mana saja pada baris ini akan mencentang kotak!
                 tr += `<td>
                            <label class="cell-wrapper">
                                <span class="bk-label-mobile">${bk.kode_bk} - ${namaBKLengkap}</span>

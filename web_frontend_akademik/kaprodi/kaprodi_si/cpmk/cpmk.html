@@ -4,68 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola CPMK - Sistem OBE</title>
+    
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="../../../js/api_config.js"></script>
-    
-    <style>
-        :root { 
-            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
-            --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
-            --success-green: #10b981; --danger-red: #dc2626;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); }}    
-        
-        .main-content { flex: 1; min-width: 0; overflow-y: auto; padding: 40px 50px; }
-        
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
-        .header-title-area { display: flex; flex-direction: column; }
-        .header-subtitle { color: #64748b; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
-        .header-title span { color: var(--primary-blue); }
-        .badge-prodi { background: var(--primary-blue); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
-        
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 20px; }
-        table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
-        th { background: #f8fafc; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; }
-        td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #1e293b; vertical-align: middle; }
-        
-        .action-buttons { display: flex; gap: 10px; align-items: center; }
-        .btn-action { color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .btn-dark { background: #1e293b; }
-        .btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
-        .btn-download { background: #475569; }
-        .btn-download:hover { background: #334155; transform: translateY(-2px); }
-        .btn-upload { background: var(--success-green); }
-        .btn-upload:hover { background: #059669; transform: translateY(-2px); }
-        
-        /* PAGINATION STYLING */
-        #pagination-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; padding-bottom: 40px; }
-        #pagination-container button { padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s; }
-        #pagination-container button:hover:not(:disabled) { background: #f1f5f9; color: var(--text-dark); }
-        #pagination-container button:disabled { opacity: 0.5; cursor: not-allowed; }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script>
 </head>
 <body>
 
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
+                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
+                 onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()">
+            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
+        </div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <div class="header-container">
-            <div class="header-title-area">
-                <div class="header-subtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title">CAPAIAN PEMBELAJARAN <span>MATA KULIAH (CPMK)</span></h1>
-            </div>
-            <div class="badge-prodi" id="prodiBadge">PRODI</div>
-        </div>
+        <div id="navbar-container"></div>
 
-        <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div class="fixed-header">
+            <div class="header-container" style="margin-bottom: 20px;">
+                <div class="header-title-area">
+                    <div class="header-subtitle">KELOLA KURIKULUM</div>
+                    <h1 class="header-title">CAPAIAN PEMBELAJARAN <span>MATA KULIAH (CPMK)</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                 <div>
                     <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar CPMK</h3>
                     <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500;">Rumusan Capaian Pembelajaran Mata Kuliah</p>
@@ -75,16 +56,18 @@
                     <button class="btn-action btn-download" onclick="exportKeExcel()">
                         <i class="fas fa-file-download"></i> Download Excel
                     </button>
-                    
                     <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;" onchange="uploadExcel()">
                     <button class="btn-action btn-upload" onclick="document.getElementById('fileExcel').click()">
                         <i class="fas fa-file-upload"></i> Impor Excel
                     </button>
                 </div>
             </div>
-            
+        </div>
+        
+        <div class="scrollable-content">
             <div class="table-container">
-                <table>
+                <!-- Gunakan kelas tabel-cpmk agar CSS Mobile bekerja -->
+                <table class="tabel-cpmk">
                     <thead>
                         <tr>
                             <th width="15%">Kode CPMK</th>
@@ -97,25 +80,61 @@
                     </tbody>
                 </table>
             </div>
-            
             <div id="pagination-container"></div>
         </div>
     </div>
 
-<script src="/js/template.js"></script>
-
 <script>
+    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
     const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
     
+    document.addEventListener("DOMContentLoaded", () => {
+        if(PRODI === "ti") {
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+        } else {
+            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+        }
+
+        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+        const avatarMobile = document.getElementById("mobileNavbarAvatar");
+        if(avatarMobile) {
+            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+        }
+    });
+
+    // --- FUNGSI SIDEBAR MOBILE ---
+    function toggleSidebar() {
+        document.getElementById('sidebar-container').classList.toggle('active');
+        document.getElementById('mobileOverlay').classList.toggle('active');
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                    .then(res => res.text())
+                    .then(html => {
+                        sidebar.innerHTML = html;
+                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                    })
+                    .catch(e => console.log('Gagal memuat sidebar darurat'));
+            }
+        }, 600); 
+    });
+
+    // --- API & DATA ---
     const API_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_UPLOAD = `${API_BASE}/upload-master-cpmk`;
 
     const userLogin = localStorage.getItem("user_login");
-        if (!userLogin) window.location.replace("/login/login.html");
+    if (!userLogin) window.location.replace("/login/login.html");
     
     let allData = [];
-    let state = { page: 1, itemsPerPage: 10 }; // 10 Data per halaman
+    let state = { page: 1, itemsPerPage: 10 };
 
     // --- FUNGSI AMBIL DATA ---
     async function loadData() { 
@@ -149,7 +168,7 @@
         const paginatedItems = allData.slice(start, end);
         
         paginatedItems.forEach(cpmk => {
-            const deskripsi = cpmk.deskripsi || cpmk.deskripsi_cpmk || ""; // Menghindari error jika kolom kosong
+            const deskripsi = cpmk.deskripsi || cpmk.deskripsi_cpmk || ""; 
             
             let tr = document.createElement('tr');
             tr.innerHTML = `
@@ -264,9 +283,10 @@
         finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
     }
 
+    // LOAD DATA SAAT HALAMAN DIBUKA
     window.onload = () => {
-            setTimeout(loadData, 400); // Langsung eksekusi analisis saat web dibuka
-        };
+        setTimeout(loadData, 400); 
+    };
 </script>
 </body>
 </html>

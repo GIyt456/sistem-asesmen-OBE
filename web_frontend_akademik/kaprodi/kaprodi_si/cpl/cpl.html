@@ -5,210 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola CPL - Sistem OBE</title>
     
-    <!-- MENGGUNAKAN PATH ABSOLUT ( / ) AGAR TIDAK NYASAR -->
+    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- MENGGUNAKAN PATH ABSOLUT -->
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
-    <style>
-        /* =========================================
-           STYLE KHUSUS ADMIN PANEL SI (EMBEDDED)
-        ========================================= */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root { 
-            --primary-blue: #1e3a8a; 
-            --bg-main: #f9fafb; 
-            --text-dark: #111827; 
-            --border-color: #e5e7eb;
-            --success-green: #10b981; 
-            --danger-red: #dc2626;
-        }
-
-        body, html { 
-            display: flex; 
-            background: var(--bg-main); 
-            height: 100vh; 
-            width: 100%;
-            overflow-x: hidden; 
-            font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-        }
-
-        /* 1. KUNCI UTAMA: SEMBUNYIKAN ELEMEN MOBILE DI DESKTOP */
-        .navbar-mobile { display: none !important; }
-        .mobile-overlay { display: none !important; }
-
-        .main-content { 
-            flex: 1; 
-            overflow-y: auto; 
-            overflow-x: hidden;
-            display: flex; 
-            flex-direction: column;
-            width: 100%;
-        }
-
-        #sidebar-container { width: 280px; min-width: 280px; height: 100vh; flex-shrink: 0; z-index: 1000; }
-
-        /* HEADER DESKTOP */
-        .fixed-header { padding: 40px 50px 20px 50px; flex-shrink: 0; background: var(--bg-main); z-index: 10; border-bottom: 1px solid var(--border-color); }
-        .scrollable-content { flex: 1; overflow-y: auto; padding: 30px 50px 40px 50px; overflow-x: hidden; }
-
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
-        .header-title-area { display: flex; flex-direction: column; }
-        .header-subtitle { color: #64748b; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
-        .header-title span { color: var(--primary-blue); }
-        .badge-prodi { background: var(--primary-blue); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
-        
-        /* TABLE STYLING */
-        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 20px; width: 100%; }
-        table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
-        th { background: #f8fafc; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; position: sticky; top: 0; z-index: 5;}
-        td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #1e293b; vertical-align: middle; }
-        
-        /* BUTTONS */
-        .action-buttons { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .btn-action { color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; white-space: nowrap; }
-        .btn-dark { background: #1e293b; }
-        .btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
-        .btn-download { background: #475569; }
-        .btn-download:hover { background: #334155; transform: translateY(-2px); }
-        .btn-upload { background: var(--success-green); }
-        .btn-upload:hover { background: #059669; transform: translateY(-2px); }
-        
-        /* PAGINATION */
-        #pagination-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; padding-bottom: 40px; flex-wrap: wrap;}
-        #pagination-container button { padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s; }
-        #pagination-container button:hover:not(:disabled) { background: #f1f5f9; color: var(--text-dark); }
-        #pagination-container button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .profile-btn-mobile {
-            width: 36px; height: 36px; border-radius: 50%; 
-            border: 2px solid rgba(255, 255, 255, 0.2); overflow: hidden; 
-            cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
-        }
-        .profile-btn-mobile img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* =========================================
-           RESPONSIVE MOBILE (AKTIF KHUSUS DI HP)
-        ========================================= */
-        @media screen and (max-width: 768px) {
-            
-            /* Munculkan Navbar Mobile */
-            .navbar-mobile {
-                display: flex !important; 
-                position: fixed; top: 0; left: 0; width: 100%;
-                background-color: #0f172a; 
-                padding: 12px 20px; align-items: center; justify-content: space-between;
-                z-index: 990; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            }
-            
-            .mobile-overlay.active { 
-                display: block !important; position: fixed; top: 0; left: 0; 
-                width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); 
-                backdrop-filter: blur(3px); z-index: 999; 
-            }
-            
-            /* Basmi Navbar Bawaan Template.js agar tidak dobel */
-            #navbar-container { display: none !important; height: 0 !important; overflow: hidden !important; }
-
-            body, html { height: auto !important; overflow-y: auto !important; overflow-x: hidden !important; }
-            
-            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
-            
-            .main-content { margin-top: 60px !important; height: auto !important; display: block !important; padding: 0 !important; width: 100% !important; overflow-x: hidden !important;}
-
-            #sidebar-container { 
-                position: fixed; top: 0; left: -320px; height: 100vh; 
-                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 10px 0 25px rgba(0,0,0,0.5);
-            }
-            #sidebar-container.active { left: 0; }
-            
-            /* Sesuikan Header di HP */
-            .fixed-header { padding: 20px !important; }
-            .scrollable-content { padding: 20px !important; overflow-x: hidden !important; }
-
-            .header-container { flex-direction: column !important; align-items: flex-start !important; gap: 15px; margin-bottom: 20px !important; }
-            .header-title { font-size: 1.6rem !important; }
-            
-            /* Penyesuaian Flex Layout Header Actions */
-            .fixed-header > div:nth-child(2) { flex-direction: column; align-items: flex-start !important; gap: 15px;}
-            .action-buttons { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
-            .btn-action { justify-content: center; width: 100%; }
-
-            /* =========================================
-               SULAP TABEL MENJADI KARTU (CARD) DI HP
-            ========================================= */
-            .table-container { 
-                border: none !important; 
-                box-shadow: none !important; 
-                background: transparent !important; 
-                padding: 0 !important; 
-                overflow-x: hidden !important; /* PASTIKAN KONTAINER TIDAK SCROLL */
-            }
-            
-            table, thead, tbody, th, td, tr { 
-                display: block !important; 
-                width: 100% !important; 
-                min-width: 0 !important; /* MEMBUNUH HANTU 700PX DARI DESKTOP */
-            }
-            
-            /* Sembunyikan Header Tabel Bawaan */
-            thead { position: absolute; top: -9999px; left: -9999px; }
-            
-            /* Jadikan setiap baris sebagai Kotak Kartu */
-            tr { 
-                background: white !important; 
-                border: 1px solid #cbd5e1 !important; 
-                border-radius: 12px !important; 
-                margin-bottom: 20px !important; 
-                padding: 15px !important; 
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; 
-            }
-            
-            /* Susun sel-sel tabel ke bawah */
-            td { 
-                display: flex !important; 
-                flex-direction: column !important; 
-                align-items: stretch !important; 
-                text-align: left !important; 
-                padding: 10px 0 !important; 
-                border: none !important; 
-                border-bottom: 1px dashed #e2e8f0 !important; 
-            }
-            td:last-child { border-bottom: none !important; padding-bottom: 0 !important; }
-            
-            /* Beri Label Penjelas di Atas Inputan */
-            td::before { 
-                font-weight: 800; 
-                color: #1e3a8a; 
-                text-transform: uppercase; 
-                font-size: 0.75rem; 
-                margin-bottom: 8px; 
-            }
-            
-            td:nth-child(1)::before { content: "KODE CPL"; }
-            td:nth-child(2)::before { content: "DESKRIPSI CPL"; }
-            td:nth-child(3)::before { content: "AKSI"; }
-            
-            /* Styling Khusus Elemen di Dalam Kartu */
-            td:nth-child(1) { font-size: 1.2rem !important; color: #0f172a !important; font-weight: 800; }
-            td:nth-child(3) > div { flex-direction: column; width: 100%; }
-            td:nth-child(3) .btn-action { width: 100% !important; justify-content: center !important; margin-top: 5px; }
-            textarea { margin-top: 5px; width: 100% !important; max-width: 100% !important; }
-        }
-    </style>
 </head>
 <body>
     
-    <!-- 1. NAVBAR KHUSUS MOBILE (DENGAN PATH GAMBAR ABSOLUTE) -->
+    <!-- 1. NAVBAR KHUSUS MOBILE (Warna otomatis mengikuti CSS) -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
             <button class="hamburger-btn" onclick="toggleSidebar()">
@@ -235,7 +45,7 @@
         <div id="navbar-container"></div>
         
         <div class="fixed-header">
-            <div class="header-container">
+            <div class="header-container" style="margin-bottom: 20px;">
                 <div class="header-title-area">
                     <div class="header-subtitle">KELOLA KURIKULUM</div>
                     <h1 class="header-title">CAPAIAN <span>PEMBELAJARAN (CPL)</span></h1>
@@ -264,7 +74,8 @@
         
         <div class="scrollable-content">
             <div class="table-container">
-                <table>
+                <!-- SUNTIKKAN KELAS tabel-cpl DI SINI -->
+                <table class="tabel-cpl">
                     <thead>
                         <tr>
                             <th width="15%">Kode CPL</th>
@@ -301,7 +112,6 @@
     document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
             const sidebar = document.getElementById('sidebar-container');
-            // Jika template.js gagal memuat profil (berarti salah folder), kita paksa tembak URL absolut!
             if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
                 fetch('/kaprodi/kaprodi_si/sidebar.html')
                     .then(res => res.text())
@@ -311,13 +121,13 @@
                     })
                     .catch(e => console.log('Menggunakan sidebar default'));
             }
-        }, 600); // Tunggu template.js bekerja dulu
+        }, 600); 
     });
 
     // --- 1. VARIABEL API ---
     const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
     
-    document.getElementById('prodiBadge').innerText = "PRODI " + PRODI;
+    document.getElementById('prodiBadge').innerText = "PRODI " + PRODI.toUpperCase();
 
     const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;

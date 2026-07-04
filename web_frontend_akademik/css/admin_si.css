@@ -1,0 +1,374 @@
+/* =======================================================
+   TEMA & VARIABEL GLOBAL (ADMIN PANEL SI)
+======================================================= */
+:root { 
+    --primary-blue: #1e3a8a; /* Biru Gelap SI */
+    --primary-teal: #0097a7; /* Teal Terang SI (Aksentuasi) */
+    --sidebar-bg: #161923;   /* HITAM GELAP KHUSUS SIDEBAR */
+    --bg-main: #f9fafb; 
+    --text-dark: #111827; 
+    --border-color: #e5e7eb;
+}
+
+/* --- WAJIB: Layout Flexbox Desktop --- */
+body { 
+    display: flex; 
+    margin: 0; 
+    background: var(--bg-main); 
+    height: 100vh; 
+    overflow: hidden; 
+    font-family: 'Inter', sans-serif;
+    color: var(--text-dark);
+}
+
+.main-content { 
+    flex: 1; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column;
+}
+
+/* =========================================================
+   KUDETA WARNA SIDEBAR (MENGALAHKAN STYLE.CSS BAWAAN)
+========================================================= */
+#sidebar-container { 
+    width: 280px; 
+    min-width: 280px; 
+    height: 100vh; 
+    flex-shrink: 0; 
+    z-index: 1000; 
+    background-color: var(--sidebar-bg) !important; 
+    box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+}
+
+#sidebar-container .sidebar, 
+#sidebar-container > div,
+.sidebar {
+    background-color: var(--sidebar-bg) !important;
+}
+
+/* =========================================================
+   PENGATUR JARAK KONTEN (YANG BIKIN TEKS NABRAK SIDEBAR)
+========================================================= */
+.fixed-header { 
+    padding: 40px 50px 20px 50px; 
+    flex-shrink: 0; 
+    background: var(--bg-main); 
+    z-index: 10; 
+    border-bottom: 1px solid var(--border-color); 
+}
+
+.scrollable-content { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 30px 50px 40px 50px; 
+    overflow-x: hidden; 
+}
+
+/* =========================================================
+   GAYA KOMPONEN HEADER & JUDUL
+========================================================= */
+.header-container { 
+    display: flex; justify-content: space-between; align-items: flex-start; 
+    margin-bottom: 40px; /* Memperbaiki jarak agar sejajar */
+    border-bottom: 1px solid var(--border-color); padding-bottom: 20px; 
+}
+.header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+.header-title { font-size: 2.2rem; font-weight: 800; margin: 0; letter-spacing: -0.5px; color: var(--text-dark); }
+.header-title span { color: var(--primary-blue); } 
+.badge-prodi { background: var(--primary-blue); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
+
+/* =========================================================
+   GAYA TABEL & TOMBOL GLOBAL
+========================================================= */
+.table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 20px; width: 100%; }
+.table-container table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
+.table-container th { background: #f8fafc; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; position: sticky; top: 0; z-index: 5;}
+.table-container td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #1e293b; vertical-align: middle; }
+
+.action-buttons { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.btn-action { color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; white-space: nowrap; }
+.btn-dark { background: #1e293b; }
+.btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
+.btn-download { background: #475569; }
+.btn-download:hover { background: #334155; transform: translateY(-2px); }
+.btn-upload { background: #10b981; } 
+.btn-upload:hover { background: #059669; transform: translateY(-2px); }
+.btn-primary-si { background: linear-gradient(to right, #1e3a8a, #1e40af); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; box-shadow: 0 2px 4px rgba(30, 58, 138, 0.2); }
+.btn-primary-si:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(30, 58, 138, 0.3); }
+
+#pagination-container { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; padding-bottom: 40px; flex-wrap: wrap;}
+#pagination-container button { padding: 8px 16px; border-radius: 6px; border: 1px solid #cbd5e1; background: white; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s; }
+#pagination-container button:hover:not(:disabled) { background: #f1f5f9; color: var(--text-dark); }
+#pagination-container button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Bagian Admin Panel Config (Dashboard) */
+.section { display: none; animation: fadeIn 0.3s ease; padding: 0 50px 40px 50px; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* =========================================
+   RESPONSIVE MOBILE 
+========================================= */
+.mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
+.mobile-overlay.active { display: block; }
+.navbar-mobile { display: none; } 
+
+@media screen and (max-width: 768px) {
+    body { height: auto !important; overflow-y: auto !important; overflow-x: hidden !important; width: 100% !important;}
+    
+    #navbar-container { display: none !important; height: 0 !important; overflow: hidden !important; }
+    
+    .navbar-mobile {
+        display: flex !important; position: fixed; top: 0; left: 0; width: 100%;
+        background-color: var(--sidebar-bg); padding: 12px 20px; align-items: center; justify-content: space-between;
+        z-index: 990; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+    .profile-btn-mobile { width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.2); overflow: hidden; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .profile-btn-mobile img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .main-content { margin-top: 60px !important; height: auto !important; display: block !important; overflow-x: hidden !important; width: 100% !important; padding: 0 !important; }
+
+    #sidebar-container { position: fixed; top: 0; left: -320px; height: 100vh; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 25px rgba(0,0,0,0.5); }
+    #sidebar-container.active { left: 0; }
+    
+    /* Header Fix */
+    .fixed-header { padding: 20px !important; }
+    .scrollable-content { padding: 20px !important; overflow-x: hidden !important;}
+    
+    .header-container { margin: 0 0 20px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; width: auto !important;}
+    .header-title { font-size: 1.6rem !important; }
+    .fixed-header > div:nth-child(2) { flex-direction: column; align-items: flex-start !important; gap: 15px; padding: 0;}
+    .section { padding: 0 20px 40px 20px !important; width: 100% !important; box-sizing: border-box !important;}
+    
+    .action-buttons { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}
+    .btn-action { justify-content: center; width: 100%; }
+
+    /* Dashboard Chart Anti-Luber */
+    .stat-cards, .dashboard-charts { display: flex !important; flex-direction: column !important; gap: 15px !important; width: 100% !important; }
+    .dashboard-charts > div { width: 100% !important; min-width: 0 !important; padding: 15px !important; box-sizing: border-box !important; overflow: hidden !important;}
+    .chart-wrapper { height: 280px !important; width: 100% !important; position: relative !important; }
+    .mapping-header { flex-direction: column !important; align-items: stretch !important; gap: 15px; }
+    .mapping-header > div { width: 100% !important; }
+    .btn-primary-si { width: 100%; justify-content: center; }
+
+    /* Tabel Menjadi Kartu */
+    .table-container { border: none !important; box-shadow: none !important; background: transparent !important; padding: 0 !important; overflow-x: hidden !important; margin: 0;}
+    .table-container table, .table-container thead, .table-container tbody, .table-container th, .table-container td, .table-container tr { display: block !important; width: 100% !important; min-width: 0 !important; }
+    .table-container thead { position: absolute; top: -9999px; left: -9999px; }
+    .table-container tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; padding: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; }
+    .table-container td { display: flex !important; flex-direction: column !important; align-items: stretch !important; text-align: left !important; padding: 10px 0 !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+    .table-container td:last-child { border-bottom: none !important; padding-bottom: 0 !important; }
+    .table-container td::before { font-weight: 800; color: #1e3a8a; text-transform: uppercase; font-size: 0.75rem; margin-bottom: 8px; }
+
+    /* KARTU KHUSUS CPL */
+    .tabel-cpl td:nth-child(1)::before { content: "KODE CPL"; }
+    .tabel-cpl td:nth-child(2)::before { content: "DESKRIPSI CPL"; }
+    .tabel-cpl td:nth-child(3)::before { content: "AKSI"; }
+    .tabel-cpl td:nth-child(1) { font-size: 1.2rem !important; color: #0f172a !important; font-weight: 800; }
+    .tabel-cpl td:nth-child(3) > div { flex-direction: column; width: 100%; }
+    .tabel-cpl td:nth-child(3) .btn-action { width: 100% !important; justify-content: center !important; margin-top: 5px; }
+    .tabel-cpl textarea { margin-top: 5px; width: 100% !important; max-width: 100% !important; }
+    /* ---------------------------------------------------
+   KARTU KHUSUS MAHASISWA (SCOPED CLASS)
+--------------------------------------------------- */
+.tabel-mahasiswa td:nth-child(1)::before { content: "NO"; }
+.tabel-mahasiswa td:nth-child(2)::before { content: "NIM"; }
+.tabel-mahasiswa td:nth-child(3)::before { content: "NAMA"; }
+.tabel-mahasiswa td:nth-child(4)::before { content: "ANGKATAN"; }
+.tabel-mahasiswa td:nth-child(5)::before { content: "STATUS"; }
+.tabel-mahasiswa td:nth-child(6)::before { content: "OPSI"; display: none; }
+
+.tabel-mahasiswa td:nth-child(3) { text-align: right !important; word-wrap: break-word !important; white-space: normal !important; }
+.tabel-mahasiswa td .btn-edit, .tabel-mahasiswa td .btn-delete { width: 100% !important; height: 40px !important; margin: 0 !important; justify-content: center !important; font-size: 0.95rem !important; }
+/* ---------------------------------------------------
+   KARTU KHUSUS MATA KULIAH (SCOPED CLASS)
+--------------------------------------------------- */
+.tabel-mk td:nth-child(1)::before { content: "KODE MK"; }
+.tabel-mk td:nth-child(2)::before { content: "NAMA MATA KULIAH"; }
+.tabel-mk td:nth-child(3)::before { content: "SKS"; }
+.tabel-mk td:nth-child(4)::before { content: "AKSI"; }
+
+.tabel-mk td:nth-child(1) { font-size: 1.15rem !important; color: #0f172a !important; font-weight: 800; }
+.tabel-mk td:nth-child(3) input { text-align: left !important; width: 100% !important; max-width: 150px !important;}
+.tabel-mk td:nth-child(4) > div { flex-direction: row; width: 100%; gap: 10px; }
+.tabel-mk td:nth-child(4) .btn-action { flex: 1; justify-content: center; margin-top: 5px; height: 42px;}
+.tabel-mk input[type="text"] { margin-top: 5px; width: 100% !important; max-width: 100% !important; }
+/* =======================================================
+   DESAIN MATRIKS CPL-BK-MK & MODAL (SCOPED STYLES)
+======================================================= */
+.matrix-container { background: white; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow: auto; max-height: 70vh; margin-bottom: 20px;}
+.matrix-container table { border-collapse: collapse; width: max-content; min-width: 100%; text-align: left; }  
+
+.matrix-container th { background: #1e293b; color: white; font-size: 0.85rem; font-weight: 700; padding: 18px 15px; position: sticky; top: 0; z-index: 10; border-right: 1px solid #334155; border-bottom: 2px solid #0f172a; text-align: center; }        
+.matrix-container th:first-child { left: 0; z-index: 20; background: #0f172a; min-width: 140px; text-align: left; padding-left: 25px; }        
+
+.matrix-container td { padding: 12px 15px; border: 1px solid var(--border-color); transition: background 0.2s; vertical-align: top; min-width: 200px; }
+.matrix-container td:first-child { position: sticky; left: 0; background: #f8fafc; font-weight: 700; color: var(--primary-red); text-align: left; padding: 18px 25px; z-index: 5; border-right: 2px solid var(--border-color); cursor: help; min-width: 140px; }
+
+/* Sel Matriks & Badges */
+.cell-content { display: flex; flex-direction: column; gap: 6px; min-height: 60px; }
+.mk-badge { background: #e0f2fe; color: #0369a1; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: 1px solid #bae6fd; display: inline-block; white-space: normal; line-height: 1.3; }
+.btn-add-mk { background: #f1f5f9; color: #64748b; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; text-align: center; margin-top: auto; }
+.btn-add-mk:hover { background: #e2e8f0; color: #334155; border-color: #94a3b8; }
+.btn-add-mk.has-data { border: none; background: transparent; padding: 4px; margin-top: 5px; text-align: left; color: var(--primary-blue); }
+.btn-add-mk.has-data:hover { background: transparent; text-decoration: underline; }
+
+/* MODAL MATRIKS KHUSUS */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: 0.2s; }
+.modal-overlay.show { display: flex; opacity: 1; }
+.modal-box-matrix { background: white; width: 500px; max-width: 90%; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; transform: translateY(20px); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; }
+.modal-overlay.show .modal-box-matrix { transform: translateY(0); }
+.modal-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
+.modal-title { font-weight: 800; color: #111827; font-size: 1.1rem; line-height: 1.4; }
+.modal-subtitle { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+.btn-close { background: none; border: none; font-size: 1.5rem; color: #9ca3af; cursor: pointer; transition: 0.2s; }
+.btn-close:hover { color: #ef4444; }
+
+.modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+.mk-checkbox-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
+.mk-checkbox-item:hover { background: #f8fafc; border-color: #cbd5e1; }
+.mk-checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-blue); cursor: pointer; }
+.mk-info { display: flex; flex-direction: column; }
+.mk-kode { font-size: 0.75rem; font-weight: 700; color: #64748b; }
+.mk-nama { font-size: 0.9rem; font-weight: 600; color: #111827; }
+
+.modal-footer { padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc; }
+.btn-cancel { padding: 10px 20px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; color: #475569; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.btn-cancel:hover { background: #f1f5f9; }
+.btn-save-modal { padding: 10px 20px; border-radius: 8px; border: none; background: var(--primary-blue); color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.btn-save-modal:hover { background: #172554; }
+
+@media screen and (max-width: 768px) {
+    .header-matrix { flex-direction: column !important; align-items: flex-start !important; gap: 15px;}
+    .btn-save[onclick="saveAllMapping()"] { width: 100% !important; justify-content: center; }
+}
+/* ---------------------------------------------------
+   KARTU KHUSUS CPMK (SCOPED CLASS)
+--------------------------------------------------- */
+.tabel-cpmk td:nth-child(1)::before { content: "KODE CPMK"; }
+.tabel-cpmk td:nth-child(2)::before { content: "DESKRIPSI CPMK"; }
+.tabel-cpmk td:nth-child(3)::before { content: "AKSI"; }
+
+.tabel-cpmk td:nth-child(1) { font-size: 1.2rem !important; color: var(--primary-blue) !important; font-weight: 800; }
+.tabel-cpmk td:nth-child(3) > div { flex-direction: column; width: 100%; }
+.tabel-cpmk td:nth-child(3) .btn-action { width: 100% !important; justify-content: center !important; margin-top: 5px; }
+.tabel-cpmk textarea { margin-top: 5px; width: 100% !important; max-width: 100% !important; padding: 12px !important; }
+/* ---------------------------------------------------
+   KARTU KHUSUS PROFIL LULUSAN (SCOPED CLASS)
+--------------------------------------------------- */
+.tabel-pl td:nth-child(1)::before { content: "KODE PL"; }
+.tabel-pl td:nth-child(2)::before { content: "PROFIL LULUSAN"; }
+.tabel-pl td:nth-child(3)::before { content: "RUMUSAN DESKRIPSI KOMPETENSI"; }
+.tabel-pl td:nth-child(4)::before { content: "OPSI"; display: none;}
+
+.tabel-pl td:nth-child(1) { font-size: 1.2rem !important; color: var(--primary-blue) !important; font-weight: 800; }
+.tabel-pl td:nth-child(2) { font-size: 1.1rem !important; font-weight: 700; color: var(--text-dark) !important;}
+.tabel-pl td:nth-child(3) { color: #475569 !important; line-height: 1.5; padding-top: 5px !important;}
+.tabel-pl td:nth-child(4) > div { flex-direction: column; width: 100%; }
+.tabel-pl td:nth-child(4) .btn-edit { width: 100% !important; justify-content: center !important; margin-top: 10px; height: 42px;}
+/* ---------------------------------------------------
+   KARTU KHUSUS DAFTAR PROFESI (SCOPED CLASS)
+--------------------------------------------------- */
+.tabel-profesi td:nth-child(1)::before { content: "NO"; display: none; }
+.tabel-profesi td:nth-child(2)::before { content: "PROFESI / PEKERJAAN"; }
+.tabel-profesi td:nth-child(3)::before { content: "PROFIL LULUSAN TERKAIT"; }
+.tabel-profesi td:nth-child(4)::before { content: "OPSI"; display: none; }
+
+.tabel-profesi td:nth-child(1) { display: none !important; } /* Sembunyikan nomor urut di HP agar ringkas */
+.tabel-profesi td:nth-child(2) { font-size: 1.15rem !important; color: var(--primary-blue) !important; font-weight: 800; text-align: left !important; }
+.tabel-profesi td:nth-child(3) { font-size: 0.95rem !important; color: var(--text-dark) !important; text-align: left !important; padding-top: 5px !important; line-height: 1.4; }
+.tabel-profesi td:nth-child(4) .btn-edit { width: 100% !important; justify-content: center !important; margin-top: 10px; height: 42px; display: inline-flex; align-items: center; }
+/* ---------------------------------------------------
+   KARTU KHUSUS MATRIKS CPL - PL (SCOPED CLASS)
+--------------------------------------------------- */
+.tabel-cpl-pl-wrapper { overflow-x: auto; max-height: 550px; border: 1px solid var(--border-color); border-radius: 8px; background: white; margin-bottom: 20px;}
+.tabel-cpl-pl { width: 100%; min-width: 700px; border-collapse: collapse; text-align: center; }
+.tabel-cpl-pl th { background: #f8fafc; font-weight: 700; color: #475569; padding: 15px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
+.tabel-cpl-pl td { border: 1px solid var(--border-color); padding: 0; color: #1e293b; }
+.tabel-cpl-pl td:first-child { padding: 15px 20px !important; text-align: left; font-weight: 800; color: var(--primary-blue); background: #f8fafc; position: sticky; left: 0; z-index: 5; }
+
+/* Label Bungkus Checkbox agar jempol tidak meleset */
+.pl-label-mobile { display: none; }
+.cell-wrapper-cpl { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; padding: 15px; cursor: pointer; transition: 0.2s; }
+.cell-wrapper-cpl:hover { background: #f1f5f9; }
+.chk-matrix { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-blue); margin: 0; }
+
+@media screen and (max-width: 768px) {
+    .btn-save[onclick="simpanMapping()"] { width: 100% !important; justify-content: center; }
+    
+    .tabel-cpl-pl-wrapper { border: none !important; box-shadow: none !important; background: transparent !important; max-height: none !important; overflow: hidden !important; width: 100% !important; margin-bottom: 0 !important;}
+    .tabel-cpl-pl, .tabel-cpl-pl thead, .tabel-cpl-pl tbody, .tabel-cpl-pl th, .tabel-cpl-pl td, .tabel-cpl-pl tr { display: block !important; width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+    .tabel-cpl-pl thead { display: none !important; }
+    .tabel-cpl-pl tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 25px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important; }
+
+    /* Header Kartu = KODE CPL */
+    .tabel-cpl-pl td:first-child { background: #1f2937 !important; color: white !important; padding: 15px 20px !important; text-align: left !important; position: static !important; border: none !important; border-bottom: 3px solid var(--primary-blue) !important; font-size: 1.15rem !important;}
+    
+    /* Baris Checkbox */
+    .tabel-cpl-pl td:not(:first-child) { padding: 0 !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+    .tabel-cpl-pl td:last-child { border-bottom: none !important; }
+
+    .cell-wrapper-cpl { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 15px 20px !important; width: 100% !important; box-sizing: border-box !important; }
+    .pl-label-mobile { display: block !important; font-weight: 600; color: #334155; font-size: 0.9rem; flex: 1; text-align: left; padding-right: 15px; line-height: 1.4; word-wrap: break-word !important; white-space: normal !important; }
+    .chk-matrix { width: 22px !important; height: 22px !important; flex-shrink: 0 !important; }
+}
+/* ---------------------------------------------------
+   KARTU KHUSUS BAHAN KAJIAN (SCOPED CLASS)
+--------------------------------------------------- */
+.tabel-bk td:nth-child(1)::before { content: "KODE BK"; }
+.tabel-bk td:nth-child(2)::before { content: "NAMA BAHAN KAJIAN"; }
+.tabel-bk td:nth-child(3)::before { content: "DESKRIPSI"; }
+.tabel-bk td:nth-child(4)::before { content: "KOMPETENSI"; }
+.tabel-bk td:nth-child(5)::before { content: "KOORDINATOR"; }
+.tabel-bk td:nth-child(6)::before { content: "REFERENSI"; }
+.tabel-bk td:nth-child(7)::before { content: "OPSI"; display: none; }
+
+.tabel-bk td:nth-child(1) { font-size: 1.15rem !important; color: var(--primary-red) !important; font-weight: 800; text-align: left !important; }
+.tabel-bk td:nth-child(2) { font-weight: 800; color: var(--text-dark) !important; font-size: 1.05rem !important; text-align: left !important; }
+.tabel-bk td:nth-child(3), .tabel-bk td:nth-child(4), .tabel-bk td:nth-child(6) { white-space: pre-wrap !important; line-height: 1.5; color: #475569 !important; padding-top: 5px !important; text-align: left !important;}
+.tabel-bk td:nth-child(5) { font-weight: 700; color: var(--primary-blue) !important; text-align: left !important;}
+.tabel-bk td:nth-child(7) .btn-edit { width: 100% !important; justify-content: center !important; margin-top: 15px; height: 42px; display: inline-flex; align-items: center;}
+/* ---------------------------------------------------
+   KARTU KHUSUS MATRIKS CPL - BK (SCOPED CLASS)
+--------------------------------------------------- */
+.tabel-cpl-bk-wrapper { overflow-x: auto; max-height: 550px; border: 1px solid var(--border-color); border-radius: 8px; background: white; margin-bottom: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important; }
+.tabel-cpl-bk { width: 100%; min-width: 700px; border-collapse: collapse; text-align: center; }
+.tabel-cpl-bk th { background: #1e293b !important; font-weight: 700; color: white !important; padding: 20px 15px; position: sticky; top: 0; z-index: 10; border: 1px solid #334155 !important; vertical-align: middle;}
+.tabel-cpl-bk th:first-child { left: 0; z-index: 20; background: #0f172a !important; min-width: 140px; text-align: left; padding-left: 25px; box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;}
+.tabel-cpl-bk td { border: 1px solid var(--border-color) !important; padding: 0 !important; color: #1e293b; }
+.tabel-cpl-bk td:first-child { padding: 15px 25px !important; text-align: left; font-weight: 800; color: var(--primary-blue) !important; background: #f8fafc !important; position: sticky; left: 0; z-index: 5; border-right: 2px solid #cbd5e1 !important; box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;}
+
+/* Wrapper Checkbox Desktop */
+.cell-wrapper-cpl-bk { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; min-height: 60px; padding: 15px; cursor: pointer; transition: 0.2s; }
+.cell-wrapper-cpl-bk:hover { background: #e0f2fe; }
+.bk-label-mobile { display: none !important; }
+.chk-matrix-cpl-bk { transform: scale(1.3); cursor: pointer; accent-color: var(--primary-blue); margin: 0; }
+
+/* =======================================================
+   📱 SULAP MATRIKS CPL-BK MENJADI KARTU LIPAT (HP)
+======================================================= */
+@media screen and (max-width: 768px) {
+    .tabel-cpl-bk-wrapper { border: none !important; box-shadow: none !important; background: transparent !important; max-height: none !important; overflow: hidden !important; width: 100% !important; margin-bottom: 0 !important;}
+    .tabel-cpl-bk, .tabel-cpl-bk thead, .tabel-cpl-bk tbody, .tabel-cpl-bk th, .tabel-cpl-bk td, .tabel-cpl-bk tr { display: block !important; width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+    .tabel-cpl-bk thead { display: none !important; }
+    .tabel-cpl-bk tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important; }
+
+    /* Header Kartu = CPL (Bisa di-klik) */
+    .tabel-cpl-bk td:first-child { background: #1f2937 !important; padding: 15px 20px !important; text-align: left !important; position: static !important; border: none !important; border-bottom: 4px solid var(--primary-red) !important; display: flex !important; justify-content: space-between !important; align-items: center !important; cursor: pointer !important; color: white !important; font-size: 1.15rem !important;}
+    .tabel-cpl-bk td:first-child::after { content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 1.2rem; color: white; transition: transform 0.3s ease; }
+    .tabel-cpl-bk tr.expanded td:first-child::after { transform: rotate(180deg); }
+
+    /* Isi Kartu = BK (Sembunyi by default) */
+    .tabel-cpl-bk td:not(:first-child) { display: none !important; padding: 15px 20px !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; flex-direction: column !important; align-items: stretch !important;}
+    .tabel-cpl-bk tr.expanded td:not(:first-child) { display: flex !important; }
+    .tabel-cpl-bk td:last-child { border-bottom: none !important; }
+
+    .cell-wrapper-cpl-bk { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 15px 20px !important; width: 100% !important; box-sizing: border-box !important; min-height: auto !important;}
+    .bk-label-mobile { display: block !important; font-weight: 600; color: #334155; font-size: 0.9rem; flex: 1; text-align: left; padding-right: 15px; line-height: 1.4; word-wrap: break-word !important; white-space: normal !important; }
+    .chk-matrix-cpl-bk { width: 22px !important; height: 22px !important; flex-shrink: 0 !important; transform: scale(1) !important;}
+}
+
+}

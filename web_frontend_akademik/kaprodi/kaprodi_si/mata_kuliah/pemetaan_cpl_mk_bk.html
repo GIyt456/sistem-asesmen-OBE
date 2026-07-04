@@ -4,62 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matriks Pemetaan CPL-BK-MK - Sistem OBE</title>
+    
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="../../../js/api_config.js"></script>
     
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script>
+
     <style>
-        :root { 
-            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
-            --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
-        
-        #sidebar-container { width: 280px; min-width: 280px; height: 100vh; background: var(--sidebar-bg); flex-shrink: 0; }
-
-        /* KONTEN UTAMA */
-        .main-content { flex: 1; overflow-y: auto; padding: 40px 50px; position: relative; }
-        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
-        .header-subtitle { color: #6b7280; font-size: 0.9rem; font-weight: 500; margin-top: 5px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
-        .header-title span { color: var(--primary-blue); }
-
-        .btn-save { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2); }
-        .btn-save:hover { background: #172554; transform: translateY(-2px); }
+        /* =======================================================
+           TEMA KHUSUS MATRIKS & MODAL 
+        ======================================================= */
+        .btn-save { background: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0, 0.1); }
+        .btn-save:hover { filter: brightness(0.85); transform: translateY(-2px); }
         .btn-save:disabled { background: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        /* DESAIN TABEL MATRIKS */
-        .matrix-container { background: white; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow: auto; max-height: 70vh; }
-        table { border-collapse: collapse; width: max-content; min-width: 100%; text-align: left; }  
+        .matrix-container { background: white; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow: auto; max-height: 70vh; margin-bottom: 20px;}
+        .matrix-container table { border-collapse: collapse; width: max-content; min-width: 100%; text-align: left; }  
 
-        th { background: #1e293b; color: white; font-size: 0.85rem; font-weight: 700; padding: 18px 15px; position: sticky; top: 0; z-index: 10; border-right: 1px solid #334155; border-bottom: 2px solid #0f172a; text-align: center; }        
-        th:first-child { left: 0; z-index: 20; background: #0f172a; min-width: 140px; text-align: left; padding-left: 25px; }        
-        
-        td { padding: 12px 15px; border: 1px solid var(--border-color); transition: background 0.2s; vertical-align: top; min-width: 200px; }
-        td:first-child { position: sticky; left: 0; background: #f8fafc; font-weight: 700; color: var(--primary-red); text-align: left; padding: 18px 25px; z-index: 5; border-right: 2px solid var(--border-color); cursor: help; min-width: 140px; }
-        
-        /* Sel Matriks & Badges */
+        .matrix-container th { background: #1e293b; color: white; font-size: 0.85rem; font-weight: 700; padding: 18px 15px; position: sticky; top: 0; z-index: 10; border-right: 1px solid #334155; border-bottom: 2px solid #0f172a; text-align: center; }        
+        .matrix-container th:first-child { left: 0; z-index: 20; background: #0f172a; min-width: 140px; text-align: left; padding-left: 25px; }        
+
+        .matrix-container td { padding: 12px 15px; border: 1px solid var(--border-color); transition: background 0.2s; vertical-align: top; min-width: 200px; }
+        .matrix-container td:first-child { position: sticky; left: 0; background: #f8fafc; font-weight: 700; color: var(--primary-red); text-align: left; padding: 18px 25px; z-index: 5; border-right: 2px solid var(--border-color); cursor: help; min-width: 140px; }
+
+        /* KELAS WARNA TEKS BK (Pemisah Desktop vs Mobile) */
+        .bk-code-text { font-weight: 800; color: var(--primary-red); font-size: 1.1rem; }
+        .bk-name-text { font-weight: 500; color: #64748b; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+
         .cell-content { display: flex; flex-direction: column; gap: 6px; min-height: 60px; }
         .mk-badge { background: #e0f2fe; color: #0369a1; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: 1px solid #bae6fd; display: inline-block; white-space: normal; line-height: 1.3; }
         .btn-add-mk { background: #f1f5f9; color: #64748b; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; text-align: center; margin-top: auto; }
         .btn-add-mk:hover { background: #e2e8f0; color: #334155; border-color: #94a3b8; }
-        .btn-add-mk.has-data { border: none; background: transparent; padding: 4px; margin-top: 5px; text-align: left; color: #3b82f6; }
+        .btn-add-mk.has-data { border: none; background: transparent; padding: 4px; margin-top: 5px; text-align: left; color: var(--primary-blue); }
         .btn-add-mk.has-data:hover { background: transparent; text-decoration: underline; }
 
-        /* MODAL (POP-UP) STYLING */
+        /* MODAL MATRIKS KHUSUS */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: 0.2s; }
         .modal-overlay.show { display: flex; opacity: 1; }
-        .modal-box { background: white; width: 500px; max-width: 90%; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; transform: translateY(20px); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; }
-        .modal-overlay.show .modal-box { transform: translateY(0); }
+        .modal-box-matrix { background: white; width: 500px; max-width: 90%; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; transform: translateY(20px); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; }
+        .modal-overlay.show .modal-box-matrix { transform: translateY(0); }
         .modal-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
         .modal-title { font-weight: 800; color: #111827; font-size: 1.1rem; line-height: 1.4; }
         .modal-subtitle { font-size: 0.85rem; color: #64748b; font-weight: 500; }
         .btn-close { background: none; border: none; font-size: 1.5rem; color: #9ca3af; cursor: pointer; transition: 0.2s; }
         .btn-close:hover { color: #ef4444; }
-        
+
         .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
         .mk-checkbox-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
         .mk-checkbox-item:hover { background: #f8fafc; border-color: #cbd5e1; }
@@ -73,33 +66,112 @@
         .btn-cancel:hover { background: #f1f5f9; }
         .btn-save-modal { padding: 10px 20px; border-radius: 8px; border: none; background: var(--primary-blue); color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-save-modal:hover { background: #172554; }
+
+        /* =======================================================
+           📱 SULAP MATRIKS MENJADI KARTU LIPAT (ACCORDION) DI HP
+        ======================================================= */
+        @media screen and (max-width: 768px) {
+            .header-matrix { margin: 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px;}
+            .matrix-wrapper { padding: 0 20px 40px 20px !important; }
+            .btn-save[onclick="saveAllMapping()"] { width: 100% !important; justify-content: center; }
+
+            .matrix-container { border: none !important; box-shadow: none !important; background: transparent !important; max-height: none !important; overflow: hidden !important;}
+            .matrix-container table, .matrix-container tbody, .matrix-container tr, .matrix-container td { display: block !important; width: 100% !important; min-width: 0 !important; }
+            .matrix-container thead { display: none !important; } 
+
+            .matrix-container tr {
+                background: white !important; border: 1px solid var(--border-color) !important;
+                border-radius: 12px !important; margin-bottom: 15px !important; 
+                box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;
+            }
+
+            /* --- HEADER KARTU (BISA DIKLIK) --- */
+            .matrix-container td:first-child {
+                position: static !important; 
+                background: #1f2937 !important; padding: 15px 20px !important;
+                border: none !important; border-bottom: 4px solid var(--primary-red) !important;
+                display: flex !important; justify-content: space-between !important; align-items: center !important;
+                cursor: pointer !important; 
+            }
+            
+            /* TULISAN PUTIH HANYA AKTIF SAAT DI HP (Kartu Gelap) */
+            .matrix-container td:first-child .bk-code-text { color: white !important; }
+            .matrix-container td:first-child .bk-name-text { color: #cbd5e1 !important; }
+            
+            .matrix-container td:first-child::after {
+                content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+                font-size: 1.2rem; color: white; transition: transform 0.3s ease;
+            }
+            
+            .matrix-container tr.expanded td:first-child::after { transform: rotate(180deg); }
+
+            /* --- ISI KARTU (SEMBUNYI SECARA DEFAULT) --- */
+            .matrix-container td:not(:first-child) {
+                display: none !important; 
+                padding: 15px 20px !important; border: none !important;
+                border-bottom: 1px dashed var(--border-color) !important;
+                flex-direction: column !important; align-items: stretch !important;
+            }
+            
+            .matrix-container tr.expanded td:not(:first-child) { display: flex !important; }
+            .matrix-container td:last-child { border-bottom: none !important; }
+            .cell-content { min-height: auto !important; }
+
+            .matrix-container td:not(:first-child)::before {
+                content: attr(data-cpl); 
+                font-weight: 800; color: var(--primary-blue); font-size: 0.9rem;
+                margin-bottom: 8px; display: block;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
+                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
+                 onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()">
+            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
+        </div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <div class="header-container">
-            <div>
-                <h1 class="header-title">Susunan <span>Mata Kuliah</span> (CPL - BK - MK)</h1>
-                <p class="header-subtitle">Petakan Mata Kuliah apa saja yang mendukung Bahan Kajian (Baris) untuk mencapai CPL (Kolom).</p>
+        <div id="navbar-container"></div>
+
+        <div class="header-container header-matrix" style="margin: 40px 50px 30px 50px;">
+            <div class="header-title-area">
+                <div class="header-subtitle" style="margin-bottom: 5px;">PEMETAAN (MAPPING)</div>
+                <h1 class="header-title">SUSUNAN <span>MATA KULIAH</span></h1>
+                <p class="header-subtitle" style="text-transform: none; font-weight: normal; margin-top: 10px;">Petakan Mata Kuliah (MK) yang mendukung Bahan Kajian (BK) untuk mencapai CPL.</p>
             </div>
-            <button id="btnSaveAll" class="btn-save" onclick="saveAllMapping()">
-                <i class="fas fa-save"></i> Simpan Seluruh Matriks
+            <button id="btnSaveAll" class="btn-save" onclick="saveAllMapping()" style="margin: 0;">
+                <i class="fas fa-save"></i> Simpan Matriks
             </button>
         </div>
 
-        <div class="matrix-container">
-            <table id="matrixTable">
-                <thead id="matrixHead"><tr><th>Memuat Header...</th></tr></thead>
-                <tbody id="matrixBody"><tr><td style="padding: 30px; text-align: center;">Memuat data...</td></tr></tbody>
-            </table>
+        <div class="matrix-wrapper" style="padding: 0 50px 40px 50px;">
+            <div class="matrix-container">
+                <table id="matrixTable">
+                    <thead id="matrixHead"><tr><th>Memuat Header...</th></tr></thead>
+                    <tbody id="matrixBody"><tr><td style="padding: 30px; text-align: center;">Memuat data...</td></tr></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <!-- MODAL PILIH MATA KULIAH -->
     <div class="modal-overlay" id="mkModal">
-        <div class="modal-box">
+        <div class="modal-box-matrix">
             <div class="modal-header">
                 <div>
                     <div class="modal-subtitle" id="modalTargetCPL">CPL01</div>
@@ -117,36 +189,59 @@
         </div>
     </div>
 
-<script src="/js/template.js"></script>
-
 <script>
-    // --- 1. VARIABEL API & STATE ---
     const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-        
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        if(PRODI === "ti") {
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+            document.documentElement.style.setProperty('--primary-red', '#3b0000'); 
+        }
+
+        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+        const avatarMobile = document.getElementById("mobileNavbarAvatar");
+        if(avatarMobile) {
+            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+        }
+    });
+
+    function toggleSidebar() {
+        document.getElementById('sidebar-container').classList.toggle('active');
+        document.getElementById('mobileOverlay').classList.toggle('active');
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                    .then(res => res.text())
+                    .then(html => {
+                        sidebar.innerHTML = html;
+                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                    })
+                    .catch(e => console.log('Gagal memuat sidebar darurat'));
+            }
+        }, 600); 
+    });
+
     const API_METADATA = `${API_BASE}/get-metadata`;
-    const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
     const API_GET_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
-    const API_MK = `${API_BASE}/get-master-mk?prodi=${PRODI}`;
-    const API_GET_MAPPING = `${API_BASE}/get-mapping-matriks`;
+    const API_GET_MAPPING = `${API_BASE}/get-mapping-matriks?prodi=${PRODI}`;
     const API_SAVE_MAPPING = `${API_BASE}/admin-map-matriks`;
 
-    const userLogin = localStorage.getItem("user_login");
-        if (!userLogin) window.location.replace("/login/login.html");
+    const userLoginCheck = localStorage.getItem("user_login");
+    if (!userLoginCheck) window.location.replace("/login/login.html");
 
     let listCPL = []; 
     let listBK = [];  
     let listMK = [];
-    
-    // Memory State untuk menyimpan data: matrixState["CPL01_BK01"] = ["MK_A", "MK_B"]
     let matrixState = {}; 
-    
-    // Variabel pembantu untuk Modal
     let currentEditCPL = "";
     let currentEditBK = "";
 
-    window.onload = () => {
-            setTimeout(initMatriks, 400); // Langsung eksekusi analisis saat web dibuka
-        };
+    window.onload = () => { setTimeout(initMatriks, 400); };
 
     async function initMatriks() {
         try {
@@ -164,13 +259,15 @@
             listBK = textBk ? JSON.parse(textBk) : [];
 
             const textMap = await resMap.text();
-            const existingMapping = textMap ? JSON.parse(textMap) : [];
+            let existingMapping = [];
+            try {
+                existingMapping = textMap ? JSON.parse(textMap) : [];
+                if (!Array.isArray(existingMapping)) existingMapping = [];
+            } catch(e) { existingMapping = []; }
 
-            // Pisahkan Meta menjadi CPL dan MK
             listCPL = rawMeta.filter(m => m.tipe === 'cpl').sort((a, b) => a.kode.localeCompare(b.kode));
             listMK = rawMeta.filter(m => m.tipe === 'mk').sort((a, b) => a.label.localeCompare(b.label));
 
-            // Bangun Memory State dari Database
             existingMapping.forEach(row => {
                 let key = `${row.kode_cpl}_${row.kode_bk}`;
                 if(!matrixState[key]) matrixState[key] = [];
@@ -185,12 +282,16 @@
         }
     }
 
+    function toggleCard(tdElement) {
+        if (window.innerWidth <= 768) {
+            tdElement.parentElement.classList.toggle('expanded');
+        }
+    }
+
     function renderMatrixTable() {
         const thead = document.getElementById("matrixHead");
         const tbody = document.getElementById("matrixBody");
 
-        // --- RENDER HEADER (CPL) ---
-        // Judul header juga kita ganti dan persempit
         let thHtml = `<tr><th style="min-width: 140px;">KODE BK</th>`;
         listCPL.forEach(cpl => {
             let safeLabel = (cpl.label || cpl.nama || "CPL").replace(/"/g, '&quot;');
@@ -199,7 +300,6 @@
         thHtml += `</tr>`;
         thead.innerHTML = thHtml;
 
-        // --- RENDER BODY (BK + SEL MK) ---
         let tbHtml = '';
         if(listBK.length === 0) {
             tbHtml = `<tr><td colspan="${listCPL.length + 1}" style="text-align: center; padding: 30px;">Master Data BK kosong.</td></tr>`;
@@ -209,16 +309,18 @@
                 let rawName = bk.nama_bk || bk.nama || bk.BK || "Nama tidak tersedia";
                 let safeName = rawName.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-                // Teks Nama BK dihapus dari layar, hanya disisakan Kode BK dan ditaruh di dalam atribut title=""
+                // KELAS BARU UNTUK TEKS (bk-code-text & bk-name-text)
                 tbHtml += `<tr>
-                    <td title="${safeName}" style="cursor: help; vertical-align: middle;">
-                        <i class="fas fa-info-circle" style="color:#9ca3af; font-size:1rem; margin-right:8px;"></i>
-                        <span style="font-weight:800; color:var(--primary-red); font-size: 1rem;">${kodeBahanKajian}</span>
+                    <td title="${safeName}" onclick="toggleCard(this)">
+                        <div style="display: flex; flex-direction: column; width: 85%;">
+                            <span class="bk-code-text">${kodeBahanKajian}</span>
+                            <span class="bk-name-text">${safeName}</span>
+                        </div>
                     </td>`;
                 
                 listCPL.forEach(cpl => {
                     let cellKey = `${cpl.kode}_${kodeBahanKajian}`;
-                    tbHtml += `<td id="cell_${cellKey}">${generateCellHTML(cpl.kode, kodeBahanKajian, safeName)}</td>`;
+                    tbHtml += `<td id="cell_${cellKey}" data-cpl="${cpl.kode}">${generateCellHTML(cpl.kode, kodeBahanKajian, safeName)}</td>`;
                 });
                 tbHtml += `</tr>`;
             });
@@ -226,16 +328,12 @@
         tbody.innerHTML = tbHtml;
     }
 
-    // Fungsi Pembantu: Render isi sel berdasarkan memory state
     function generateCellHTML(cplKode, bkKode, bkNamaRaw) {
         let key = `${cplKode}_${bkKode}`;
         let selectedMKs = matrixState[key] || [];
-        
-        // Escape nama BK agar aman ditaruh di onclick function
         let safeBkNama = bkNamaRaw.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         
         let html = `<div class="cell-content">`;
-        
         if (selectedMKs.length > 0) {
             selectedMKs.forEach(mkKode => {
                 let mkObj = listMK.find(m => m.kode === mkKode);
@@ -246,12 +344,10 @@
         } else {
             html += `<button class="btn-add-mk" onclick="openModal('${cplKode}', '${bkKode}', '${safeBkNama}')"><i class="fas fa-plus"></i> Pilih MK</button>`;
         }
-        
         html += `</div>`;
         return html;
     }
 
-    // --- LOGIKA MODAL ---
     function openModal(cplKode, bkKode, bkNama) {
         currentEditCPL = cplKode;
         currentEditBK = bkKode;
@@ -279,58 +375,38 @@
                 `;
             });
         }
-        
         document.getElementById('modalBodyList').innerHTML = htmlList;
         document.getElementById('mkModal').classList.add('show');
     }
 
-    function closeModal() {
-        document.getElementById('mkModal').classList.remove('show');
-    }
+    function closeModal() { document.getElementById('mkModal').classList.remove('show'); }
 
     function applySelectionToCell() {
         let key = `${currentEditCPL}_${currentEditBK}`;
-        
-        // Ambil semua checkbox yang dicentang di Modal
         let checkedBoxes = document.querySelectorAll('.modal-chk-mk:checked');
         let newSelectedMKs = Array.from(checkedBoxes).map(cb => cb.value);
         
-        // Simpan ke Memory State
         matrixState[key] = newSelectedMKs;
         
-        // Render ulang hanya sel yang bersangkutan (Sangat Cepat!)
         let bkObj = listBK.find(b => (b.kode_bk || b.kode) === currentEditBK);
         let bkNama = bkObj ? (bkObj.nama_bk || bkObj.nama || bkObj.BK || "BK") : currentEditBK;
         
         document.getElementById(`cell_${key}`).innerHTML = generateCellHTML(currentEditCPL, currentEditBK, bkNama);
-        
         closeModal();
     }
 
-    // --- LOGIKA SIMPAN KE DATABASE ---
     async function saveAllMapping() {
         const btnSave = document.getElementById('btnSaveAll');
         btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btnSave.disabled = true;
 
         let fetchPromises = [];
-
-        // Loop melalui seluruh State Memory
         for (const [key, mkArray] of Object.entries(matrixState)) {
-            // Pecah key "CPL01_BK01"
             const [cplKode, bkKode] = key.split('_');
-
-            const payload = {
-                kode_cpl: cplKode,
-                kode_bk: bkKode,
-                mk_list: mkArray, // Mengirimkan array kosong [] juga penting agar n8n menghapus relasi lama jika di-uncheck semua
-                prodi: PRODI
-            };
+            const payload = { kode_cpl: cplKode, kode_bk: bkKode, mk_list: mkArray, prodi: PRODI };
 
             const request = fetch(API_SAVE_MAPPING, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
             fetchPromises.push(request);
         }
@@ -339,10 +415,9 @@
             await Promise.all(fetchPromises);
             alert("✅ Seluruh Susunan Mata Kuliah berhasil disimpan permanen!");
         } catch (error) {
-            console.error(error);
             alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi.");
         } finally {
-            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Seluruh Matriks';
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks';
             btnSave.disabled = false;
         }
     }

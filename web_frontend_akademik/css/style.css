@@ -10,7 +10,7 @@
     --primary-teal: #006064;   /* Tema SI */
     --border-color: #e5e7eb;
     --success-green: #10b981;
-    --sidebar-bg: #111827;     /* Warna default Sidebar */
+    --sidebar-bg: #161923;     /* HITAM GELAP UNTUK SEMUA PRODI (TI & SI) */
 }
 
 /* 2. LAYOUT DASAR */
@@ -19,7 +19,7 @@ body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidde
 .main-content { flex: 1; min-width: 0; overflow-y: auto; padding: 0; }
 .content-wrapper { padding: 40px 50px; }
 
-/* 3. KOMPONEN SIDEBAR (Ini yang sebelumnya terlewat!) */
+/* 3. KOMPONEN SIDEBAR */
 #sidebar-container { flex-shrink: 0; z-index: 10; }
 .sidebar { width: 280px; background: var(--sidebar-bg); color: #9ca3af; display: flex; flex-direction: column; padding: 24px 16px; height: 100vh; flex-shrink: 0; }
 .sidebar-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding: 0 10px; }
@@ -41,8 +41,7 @@ body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidde
 .nav-item.logout { color: #fca5a5; }
 .nav-item.logout:hover { background: rgba(239, 68, 68, 0.15); color: #f87171; }
 
-/* TEMA KHUSUS SIDEBAR SI */
-.sidebar.theme-si { background: var(--primary-teal); }
+/* (KELAS .sidebar.theme-si TELAH DIHAPUS AGAR TIDAK JADI HIJAU LAGI) */
 
 /* 4. HEADER HALAMAN */
 .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
