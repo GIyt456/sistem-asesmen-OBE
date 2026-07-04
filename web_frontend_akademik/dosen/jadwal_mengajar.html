@@ -787,54 +787,93 @@
         async function loadJadwalMengajar() {
             const tbody = document.getElementById("tableBodyJadwal");
             try {
+                // 1. TARIK DATA MATKUL MILIK SENDIRI (N8N METADATA)
                 let prodiArray = userProdiSekarang.split(',');
                 let allMetadata = [];
 
-                // 1. TARIK METADATA SEPERTI DI HALAMAN INPUT NILAI
                 for (let p of prodiArray) {
                     let prodiBersih = p.trim().toLowerCase();
-                    const res = await fetch(`${API_METADATA}?prodi=${prodiBersih}&context=dosen&nidn=${userNidn}`);
+                    // PASTI menggunakan parameter NIDN untuk tahu matkul apa yang diajar user ini
+                    let urlFetch = `${API_METADATA}?prodi=${prodiBersih}&context=dosen&nidn=${userNidn}`;
+
+                    const res = await fetch(urlFetch);
                     let textData = await res.text();
                     if (textData.startsWith('=')) textData = textData.substring(1);
-                    let data = JSON.parse(textData);
-                    data = data.map(item => ({ ...item, prodi_asal: prodiBersih }));
+
+                    let rawJson = JSON.parse(textData);
+                    let data = safeExtractArray(rawJson);
                     allMetadata = allMetadata.concat(data);
                 }
 
-                // Hapus duplikat metadata berdasarkan kode
-                const uniqueMeta = []; const mapMeta = new Map();
-                for (const item of allMetadata) {
-                    if (!mapMeta.has(item.kode)) { mapMeta.set(item.kode, true); uniqueMeta.push(item); }
-                }
-                const daftarMK = uniqueMeta.filter(item => item.tipe === 'mk');
+                // Ambil daftar kode mk yang memang diajar oleh user ini
+                const mkMilikSendiri = allMetadata.filter(item => item.tipe === 'mk').map(item => item.kode);
 
-                // 2. TARIK DATA MASTER MATKUL UNTUK SKS DAN SEMESTER
+                // 2. TARIK DATA MASTER MATKUL
                 const resMatkul = await fetch(API_GET_MATKUL);
                 const jsonMatkul = await resMatkul.json();
                 let dataMatkulRaw = safeExtractArray(jsonMatkul);
 
-                // 3. COCOKKAN DATA DAN BENTUK LIST JADWAL
-                let gabunganData = daftarMK.map(mk => {
-                    const matkulCocok = dataMatkulRaw.find(m => m.kode_mk === mk.kode);
-                    return {
-                        id_kelas: "KL-" + mk.kode,
-                        kode_mk: mk.kode,
-                        nidn: userNidn,
-                        semester: matkulCocok ? matkulCocok.semester : "-",
-                        kelompok: "A",
-                        nama_mk: mk.label,
-                        sks: matkulCocok ? matkulCocok.sks : "-",
-                        prodi: matkulCocok ? matkulCocok.prodi : mk.prodi_asal
-                    };
-                });
+                let gabunganData = [];
 
-                // 4. FILTER ADMIN JIKA DIPERLUKAN
-                if (userRoleSekarang === "admin") {
-                    dataJadwalGlobal = gabunganData.filter(item =>
-                        item.prodi.toLowerCase() === userProdiSekarang.toLowerCase() || item.prodi === "-"
-                    );
+                if (userRoleSekarang === "admin" || userRoleSekarang === "headadmin") {
+                    // JALUR KAPRODI: Tampilkan seluruh Master Matkul (bypass N8N Metadata)
+                    gabunganData = dataMatkulRaw.map(m => {
+                        // Cek apakah kaprodi juga ngajar matkul ini
+                        let diajarSendiri = mkMilikSendiri.includes(m.kode_mk);
+                        return {
+                            id_kelas: "KL-" + m.kode_mk,
+                            kode_mk: m.kode_mk,
+                            nidn: diajarSendiri ? userNidn : "", // Set NIDN hanya jika Kaprodi ngajar kelas ini
+                            semester: m.semester || "-",
+                            kelompok: "A",
+                            nama_mk: m.nama_mk || "MK Tidak Ditemukan",
+                            sks: m.sks || "-",
+                            prodi: m.prodi || "-"
+                        };
+                    });
                 } else {
-                    dataJadwalGlobal = gabunganData;
+                    // JALUR DOSEN BIASA: Tampilkan HANYA matkul miliknya
+                    const myMatkulRaw = allMetadata.filter(item => item.tipe === 'mk');
+
+                    // Filter duplicate
+                    const uniqueMeta = []; const mapMeta = new Map();
+                    for (const item of myMatkulRaw) {
+                        if (item.kode && !mapMeta.has(item.kode)) {
+                            mapMeta.set(item.kode, true);
+                            uniqueMeta.push(item);
+                        }
+                    }
+
+                    gabunganData = uniqueMeta.map(mk => {
+                        const matkulCocok = dataMatkulRaw.find(m => m.kode_mk === mk.kode);
+                        return {
+                            id_kelas: "KL-" + mk.kode,
+                            kode_mk: mk.kode,
+                            nidn: mk.nidn || userNidn,
+                            semester: matkulCocok ? matkulCocok.semester : "-",
+                            kelompok: "A",
+                            nama_mk: mk.label || (matkulCocok ? matkulCocok.nama_mk : "MK Tidak Ditemukan"),
+                            sks: matkulCocok ? matkulCocok.sks : "-",
+                            prodi: matkulCocok ? matkulCocok.prodi : mk.prodi_asal
+                        };
+                    });
+                }
+
+                // 4. FILTER PRODI (Aman dari perbedaan tulisan 'SI' dan 'Sistem Informasi')
+                if (userRoleSekarang === "admin") {
+                    dataJadwalGlobal = gabunganData.filter(item => {
+                        let p = (item.prodi || "").toLowerCase();
+                        let myProdi = userProdiSekarang.toLowerCase();
+
+                        if (p === "-" || p === "") return true;
+
+                        if (myProdi.includes('si') && (p === 'si' || p.includes('sistem'))) return true;
+                        if (myProdi.includes('ti') && (p === 'ti' || p.includes('informa'))) return true;
+
+                        return false;
+                    });
+                } else {
+                    dataJadwalGlobal = gabunganData; // Headadmin & Dosen
                 }
 
                 filteredDataGlobal = dataJadwalGlobal;
@@ -842,7 +881,7 @@
 
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color: red;">Gagal memuat data dari Metadata n8n.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color: red;">Gagal memuat data dari server.</td></tr>`;
             }
         }
 
@@ -888,6 +927,38 @@
                     badgeProdi = '<span style="background:#fce7f3; color:#be185d; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:800; margin-left:8px; vertical-align: middle;">SI</span>';
                 }
 
+                // ==========================================
+                // LOGIKA KEPEMILIKAN & TOMBOL
+                // ==========================================
+                let isMilikSendiri = false;
+                if (kelas.nidn === userNidn) isMilikSendiri = true; // Milik Kaprodi/Dosen tersebut
+                if (userRoleSekarang !== "admin" && userRoleSekarang !== "headadmin") isMilikSendiri = true; // Dosen biasa punya hak penuh pada listnya
+
+                let btnHtml = `
+                    <button class="btn-detail" onclick="bukaModalDetail('${kelas.kode_mk}', '${kelas.nama_mk}', '${kelas.sks}', '${kelas.semester}', '${kelas.id_kelas}', '${kelas.prodi}')" style="display:flex; align-items:center; gap:6px;">
+                        <i class="fas fa-info-circle"></i> Detail
+                    </button>
+                `;
+
+                if (isMilikSendiri) {
+                    // Dosen/Kaprodi yang MEMANG MENGAJAR di kelas ini (Boleh Input Nilai)
+                    btnHtml += `
+                        <button class="btn-penilaian" onclick="localStorage.setItem('draft_mk_terpilih', '${kelas.kode_mk}'); window.location.href='input_nilai.html'">
+                            <i class="fas fa-edit"></i> Input Nilai
+                        </button>
+                        <button class="btn-rps" onclick="bukaRPS('${kelas.kode_mk}')">
+                            <i class="fas fa-book"></i> RPS
+                        </button>
+                    `;
+                } else {
+                    // Kaprodi melihat kelas dosen lain (TIDAK ADA TOMBOL INPUT NILAI)
+                    btnHtml += `
+                        <button class="btn-rps" style="background: #f59e0b;" onclick="bukaRPS('${kelas.kode_mk}')">
+                            <i class="fas fa-search"></i> Review RPS
+                        </button>
+                    `;
+                }
+
                 const tr = document.createElement("tr");
                 const safeId = kelas.kode_mk.replace(/\s+/g, '-');
 
@@ -902,17 +973,7 @@
                     <td style="text-align: center;">${kelas.sks}</td>
                     <td>
                         <div class="action-cell" style="justify-content: center; gap: 8px;">
-                            <button class="btn-detail" onclick="bukaModalDetail('${kelas.kode_mk}', '${kelas.nama_mk}', '${kelas.sks}', '${kelas.semester}', '${kelas.id_kelas}', '${kelas.prodi}')" style="display:flex; align-items:center; gap:6px;">
-                                <i class="fas fa-info-circle"></i> Detail
-                            </button>
-                            
-                            <button class="btn-penilaian" onclick="window.location.href='penilaian_kelas.html?id_kelas=${kelas.id_kelas}&mk=${kelas.kode_mk}'">
-                                <i class="fas fa-edit"></i> Input Nilai
-                            </button>
-                            
-                            <button class="btn-rps" onclick="bukaRPS('${kelas.kode_mk}')">
-                                <i class="fas fa-book"></i> RPS
-                            </button>
+                            ${btnHtml}
                         </div>
                     </td>
                 `;

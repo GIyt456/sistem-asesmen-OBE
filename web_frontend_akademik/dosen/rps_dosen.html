@@ -892,7 +892,13 @@
                 </div>
 
                 <div id="tab-detail" class="tab-content active">
-                    <h3 class="section-title">Detail RPS</h3>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 class="section-title" style="margin: 0; border: none;">Detail RPS</h3>
+                        <button class="btn-action" onclick="simpanRpsLainnya()" id="btnSimpanRumpun">
+                            <i class="fas fa-save"></i> Simpan Detail
+                        </button>
+                    </div>
                     <div class="grid-2-col">
                         <div>
                             <div class="form-group">
@@ -901,8 +907,9 @@
                             </div>
                             <div class="form-group">
                                 <label>Rumpun</label>
-                                <textarea id="dtlRumpun" class="form-control" readonly
-                                    style="resize: vertical; min-height: 80px;"></textarea>
+                                <textarea id="dtlRumpun" class="form-control"
+                                    style="resize: vertical; min-height: 80px;"
+                                    placeholder="Ketik rumpun mata kuliah..."></textarea>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                 <div class="form-group">
@@ -1024,34 +1031,29 @@
                 </div>
 
                 <div id="tab-pustaka" class="tab-content">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 class="section-title" style="margin: 0; border: none;">Pustaka Utama & Pendukung</h3>
+                        <button class="btn-action" onclick="simpanRpsLainnya()" id="btnSimpanPustaka">
+                            <i class="fas fa-save"></i> Simpan Pustaka
+                        </button>
+                    </div>
                     <div class="grid-2-col">
                         <div>
-                            <h3 class="section-title">Pustaka Utama</h3>
-                            <div class="content-box">
-                                <ul class="list-bullet" style="list-style-type: none; margin-left: 0;">
-                                    <li>[1] Computer Networking: A Top-Down Approach, James F. Kurose, Keith W. Ross,
-                                        2021</li>
-                                    <li>[2] Data Communications and Networking, Behrouz A. Forouzan, 2013</li>
-                                    <li>[3] Network Warrior, Gary Donahue (O"Reilly), 2022</li>
-                                </ul>
-                            </div>
+                            <h3 class="section-title" style="font-size: 1rem;">Pustaka Utama</h3>
+                            <textarea id="valPustakaUtama" class="form-control" style="height: 120px; resize: vertical;"
+                                placeholder="1. Judul Buku Utama, Pengarang, Tahun..."></textarea>
 
-                            <h3 class="section-title" style="margin-top: 20px;">Pustaka Pendukung</h3>
-                            <div class="content-box">
-                                <ul class="list-bullet" style="list-style-type: none; margin-left: 0;">
-                                    <li>[1] Top-Down Network Design, Priscilla Oppenheimer, 2011</li>
-                                    <li>[2] CompTIA Security+ Guide to Network Security Fundamentals, Mark Ciampa</li>
-                                    <li>[3] VPC & Networking Documentation, Amazon Web Services (AWS), Microsoft Azure,
-                                        atau Google Cloud</li>
-                                    <li>[4] Request For Comments (RFC), IETF (Internet Engineering Task Force)</li>
-                                </ul>
-                            </div>
+                            <h3 class="section-title" style="margin-top: 20px; font-size: 1rem;">Pustaka Pendukung</h3>
+                            <textarea id="valPustakaPendukung" class="form-control"
+                                style="height: 120px; resize: vertical;"
+                                placeholder="1. Referensi Pendukung, Jurnal..."></textarea>
                         </div>
                         <div>
                             <div class="box-catatan">
                                 <h4>Informasi:</h4>
-                                <p style="color:#64748b;">Referensi pustaka telah ditetapkan secara permanen berdasarkan
-                                    konsorsium bidang keilmuan prodi.</p>
+                                <p style="color:#64748b;">Referensi pustaka kini dapat disesuaikan oleh dosen pengampu
+                                    dan akan tersimpan secara otomatis saat disimpan.</p>
                             </div>
                         </div>
                     </div>
@@ -1183,7 +1185,7 @@
         const API_GET_KELAS = `${API_BASE}/get-kelas-aktif`;
         const API_GET_MATKUL = `${API_BASE}/get-master-matkul`;
         const API_GET_RPS = `${API_BASE}/get-rps-sesi`;
-        const API_SIMPAN_RPS = `${API_BASE}/simpan-rps`;
+        const API_SIMPAN_RPS = `${API_BASE}/simpan-rps-sesi`;
         const API_GET_INFO_MK = `${API_BASE}/get-info-mk`;
         const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
         const API_GET_BOBOT = `${API_BASE}/get-bobot-penilaian`;
@@ -1415,9 +1417,52 @@
                     return;
                 }
 
-                globalDaftarMK.forEach(mk => {
+                // === 1. TARIK DATA PERSETUJUAN SECARA SERENTAK ===
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Menarik data status persetujuan...</td></tr>`;
+
+                const persetujuanPromises = globalDaftarMK.map(mk =>
+                    fetch(`${API_BASE}/persetujuan-rps?kode_mk=${mk.kode_mk}`)
+                        .then(res => res.ok ? res.json() : null)
+                        .catch(() => null)
+                );
+                const persetujuanResults = await Promise.all(persetujuanPromises);
+
+                tbody.innerHTML = ""; // Bersihkan tulisan loading
+
+                // === 2. CETAK TABEL BERSAMAAN DENGAN STATUSNYA ===
+                globalDaftarMK.forEach((mk, index) => {
                     const safeKode = mk.kode_mk.replace(/\s+/g, '-');
-                    const statusAcc = `<span class="badge-status status-pend">Belum Disetujui</span>`;
+
+                    // --- OLAH DATA PERSETUJUAN ---
+                    let dataSetuju = null;
+                    try {
+                        if (persetujuanResults[index]) {
+                            const rawSetuju = safeExtractArray(persetujuanResults[index]);
+                            dataSetuju = rawSetuju[0];
+                        }
+                    } catch (e) { }
+
+                    let strStatus = "Belum Disetujui";
+                    let bgStatus = "#ef4444"; // Merah (Default Pending)
+                    let strCatatan = "-";
+
+                    if (dataSetuju) {
+                        if (dataSetuju.status === 'approved') {
+                            strStatus = "Telah Disetujui";
+                            bgStatus = "#10b981"; // Hijau
+                        } else if (dataSetuju.status === 'revisi') {
+                            strStatus = "Perlu Revisi";
+                            bgStatus = "#f59e0b"; // Oranye
+                        }
+
+                        if (dataSetuju.catatan && dataSetuju.catatan.trim() !== '') {
+                            strCatatan = dataSetuju.catatan;
+                            // Potong teks jika terlalu panjang agar tabel tidak melar/rusak
+                            if (strCatatan.length > 45) strCatatan = strCatatan.substring(0, 45) + "...";
+                        }
+                    }
+
+                    const statusAcc = `<span class="badge-status" style="background:${bgStatus}; display:inline-block; width:100%; max-width:130px;">${strStatus}</span>`;
                     const dosenHtml = `<span class="badge-dosen-blue">${userLogin}</span><br><small style="color:#64748b; font-weight:600; margin-left:5px;">Koordinator</small>`;
 
                     // CEK ROLE: Buat item dropdown "Catatan Revisi" HANYA untuk Admin/Kaprodi
@@ -1439,7 +1484,7 @@
                             <td style="text-align: center; font-weight:bold;">${mk.semester}</td>
                             <td>${dosenHtml}</td>
                             <td style="text-align: center;">${statusAcc}</td>
-                            <td style="text-align: center; color: #64748b;">-</td>
+                            <td style="text-align: left; color: #475569; font-size: 0.8rem; font-style: italic;">${strCatatan}</td>
                             <td style="text-align: center;">
                                 <div class="btn-dropdown-wrapper">
                                     <button class="btn-opsi" onclick="toggleOpsiMenu(event, 'menu-${safeKode}')">
@@ -1468,9 +1513,6 @@
             document.getElementById('valCpl').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--primary-blue);"></i> Menarik pemetaan CPL...';
             document.getElementById('valCpmk').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--primary-blue);"></i> Menarik pemetaan CPMK...';
 
-            // Rumpun dikosongkan sementara sesuai permintaan
-            document.getElementById('dtlRumpun').value = "-";
-
             // 1. SET TANGGAL & JAM OTOMATIS SAAT INI (LIVE)
             const now = new Date();
             const formatTgl = now.toLocaleString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' WIB';
@@ -1495,12 +1537,7 @@
                         });
                         const cleanData = Array.from(uniqueMap.values());
 
-                        // A. Rumpun: Tetap dibiarkan kosong/strip
-                        const elRumpun = document.getElementById('dtlRumpun');
-                        elRumpun.value = "-";
-                        elRumpun.style.height = 'auto';
-
-                        // B. Bahan Kajian: Hanya menarik "kode_bk" saja
+                        // A. Bahan Kajian: Hanya menarik "kode_bk" saja
                         const rawBahanKajian = cleanData
                             .map(item => item.kode_bk)
                             .filter(bk => bk && bk !== 'undefined');
@@ -1651,8 +1688,15 @@
                         document.getElementById('valSyarat').value = data.matkul_syarat || '';
                         document.getElementById('valBatasMhs').value = data.batas_mhs || '50.01';
                         document.getElementById('valBatasMk').value = data.batas_mk || '85.00%';
+                        // --- DATA BARU: RUMPUN & PUSTAKA ---
+                        let rpn = data.rumpun;
+                        let pstU = data.pustaka_utama;
+                        let pstP = data.pustaka_pendukung;
+
+                        document.getElementById('dtlRumpun').value = (rpn && rpn !== 'undefined') ? rpn : '';
+                        document.getElementById('valPustakaUtama').value = (pstU && pstU !== 'undefined') ? pstU : '';
+                        document.getElementById('valPustakaPendukung').value = (pstP && pstP !== 'undefined') ? pstP : '';
                     } else {
-                        // Kosongkan jika belum pernah diisi
                         document.getElementById('valDeskripsi').value = '';
                         document.getElementById('valMediaSoft').value = '';
                         document.getElementById('valMediaHard').value = '';
@@ -1660,13 +1704,16 @@
                         document.getElementById('valSyarat').value = '';
                         document.getElementById('valBatasMhs').value = '50.01';
                         document.getElementById('valBatasMk').value = '85.00%';
+                        document.getElementById('dtlRumpun').value = '';
+                        document.getElementById('valPustakaUtama').value = '';
+                        document.getElementById('valPustakaPendukung').value = '';
                     }
                 }
             } catch (e) { console.warn("Belum ada data di rps_lainnya"); }
 
             // 7. TARIK DATA STATUS & CATATAN PERSETUJUAN RPS
             try {
-                const resPersetujuan = await fetch(`${API_BASE}/get-persetujuan-rps?kode_mk=${kodeMK}`);
+                const resPersetujuan = await fetch(`${API_BASE}/persetujuan-rps?kode_mk=${kodeMK}`);
                 if (resPersetujuan.ok) {
                     // Gunakan fungsi aman untuk bongkar bungkus n8n
                     const jsonPersetujuan = safeExtractArray(await resPersetujuan.json());
@@ -1936,17 +1983,17 @@
 
             let dataPertemuan = [];
             for (let i = 1; i <= 16; i++) {
-                // Hapus continue, agar baris 8 dan 16 tetap tersimpan ke DB
+                // Menambahkan pengamanan teks (replace petik) untuk semua kolom teks bebas
                 dataPertemuan.push({
                     pertemuan: i,
-                    id_cpmk: document.getElementById(`id_cpmk_${i}`).value.trim(),
-                    sub_cpmk: document.getElementById(`sub_cpmk_${i}`).value.trim(),
-                    indikator: document.getElementById(`indikator_${i}`).value.trim(),
-                    assessmen: document.getElementById(`assessmen_${i}`).value.trim(),
-                    materi: document.getElementById(`materi_${i}`).value.trim(),
-                    metode: document.getElementById(`metode_${i}`).value.trim(),
-                    tatap_muka: document.getElementById(`tatap_muka_${i}`).value.trim(),
-                    daring: document.getElementById(`daring_${i}`).value.trim()
+                    id_cpmk: (document.getElementById(`id_cpmk_${i}`).value || '').trim(),
+                    sub_cpmk: (document.getElementById(`sub_cpmk_${i}`).value || '').trim().replace(/'/g, "`"),
+                    indikator: (document.getElementById(`indikator_${i}`).value || '').trim().replace(/'/g, "`"),
+                    assessmen: (document.getElementById(`assessmen_${i}`).value || '').trim().replace(/'/g, "`"),
+                    materi: (document.getElementById(`materi_${i}`).value || '').trim().replace(/'/g, "`"),
+                    metode: (document.getElementById(`metode_${i}`).value || '').trim().replace(/'/g, "`"),
+                    tatap_muka: (document.getElementById(`tatap_muka_${i}`).value || '').trim().replace(/'/g, "`"),
+                    daring: (document.getElementById(`daring_${i}`).value || '').trim().replace(/'/g, "`")
                 });
             }
 
@@ -1977,8 +2024,13 @@
             if (!currentMkDipilih) return;
             const btn1 = document.getElementById("btnSimpanDeskripsi");
             const btn2 = document.getElementById("btnSimpanInfo");
+            const btn3 = document.getElementById("btnSimpanRumpun");
+            const btn4 = document.getElementById("btnSimpanPustaka");
+
             if (btn1) btn1.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             if (btn2) btn2.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            if (btn3) btn3.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            if (btn4) btn4.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
             const payload = {
                 kode_mk: currentMkDipilih,
@@ -1988,7 +2040,11 @@
                 team_teaching: document.getElementById('valTeam').value,
                 matkul_syarat: document.getElementById('valSyarat').value,
                 batas_mhs: document.getElementById('valBatasMhs').value,
-                batas_mk: document.getElementById('valBatasMk').value
+                batas_mk: document.getElementById('valBatasMk').value,
+                // --- DATA BARU KEDALAM PAYLOAD N8N ---
+                rumpun: document.getElementById('dtlRumpun').value,
+                pustaka_utama: document.getElementById('valPustakaUtama').value,
+                pustaka_pendukung: document.getElementById('valPustakaPendukung').value
             };
 
             try {
@@ -2004,6 +2060,8 @@
 
             if (btn1) btn1.innerHTML = '<i class="fas fa-save"></i> Simpan Deskripsi';
             if (btn2) btn2.innerHTML = '<i class="fas fa-save"></i> Simpan Info Tambahan';
+            if (btn3) btn3.innerHTML = '<i class="fas fa-save"></i> Simpan Detail';
+            if (btn4) btn4.innerHTML = '<i class="fas fa-save"></i> Simpan Pustaka';
         }
 
         async function simpanPersetujuan() {
@@ -2020,7 +2078,7 @@
             };
 
             try {
-                const res = await fetch(`${API_BASE}/simpan-persetujuan-rps`, {
+                const res = await fetch(`${API_BASE}/persetujuan-rps`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)

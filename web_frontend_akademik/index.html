@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem OBE - Universitas AKI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             --primary-navy: #0f172a;
@@ -16,8 +18,19 @@
         }
 
         /* KUNCI HALAMAN AGAR TIDAK BISA DI-SCROLL DI DESKTOP */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body, html { height: 100%; overflow: hidden; background-color: #0f172a; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body,
+        html {
+            height: 100%;
+            overflow: hidden;
+            background-color: #0f172a;
+        }
 
         /* =========================================
            BACKGROUND & OVERLAY FULL SCREEN
@@ -26,7 +39,7 @@
             position: relative;
             width: 100%;
             height: 100vh;
-            background-image: url('../gambar/BackgroundUnaki.jpg'); 
+            background-image: url('../gambar/BackgroundUnaki.jpg');
             background-size: cover;
             background-position: center;
             display: flex;
@@ -34,10 +47,14 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .main-wrapper::before {
             content: '';
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(135deg, rgba(255, 197, 97, 0.8) 0%, rgba(0, 2, 93, 0.95) 100%);
             z-index: 1;
         }
@@ -46,56 +63,117 @@
            NAVBAR (BERSIH & RAPI)
         ========================================= */
         .navbar {
-            position: absolute; top: 0; left: 0; width: 100%;
-            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             z-index: 10;
         }
 
-        .nav-right { display: flex; align-items: center; gap: 15px; }
-        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .user-chip {
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 10px;
-            color: #ffffff; backdrop-filter: blur(8px);
-            font-weight: 600; font-size: 0.9rem; text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+            backdrop-filter: blur(8px);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
-        
+
         .btn-logout {
-            background: var(--primary-red); color: white;
-            padding: 8px 20px; border-radius: 50px; border: none;
-            font-weight: 700; font-size: 0.9rem; cursor: pointer;
-            transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: var(--primary-red);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
+
+        .btn-logout:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+        }
 
         .btn-login {
-            background: var(--primary-blue); color: white;
-            padding: 10px 28px; border-radius: 50px; border: none;
-            font-weight: 700; font-size: 0.95rem; cursor: pointer;
-            transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            display: flex; align-items: center; gap: 8px;
+            background: var(--primary-blue);
+            color: white;
+            padding: 10px 28px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .btn-login:hover { background: #172554; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
+
+        .btn-login:hover {
+            background: #172554;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
 
         /* =========================================
            KONTEN TENGAH
         ========================================= */
         .content-container {
-            position: relative; z-index: 2;
-            text-align: center; color: white;
-            max-width: 700px; width: 100%;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+            max-width: 700px;
+            width: 100%;
             padding: 0 20px;
         }
 
-        .hero-title { font-size: 2.8rem; font-weight: 900; margin-bottom: 15px; letter-spacing: -1px; text-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-        .hero-subtitle { font-size: 1.05rem; font-weight: 500; opacity: 0.95; margin-bottom: 40px; line-height: 1.6; text-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .hero-subtitle {
+            font-size: 1.05rem;
+            font-weight: 500;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
 
         /* =========================================
            MENU ACTION
         ========================================= */
         .action-list {
-            display: flex; flex-direction: column; gap: 15px;
-            max-width: 550px; margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 550px;
+            margin: 0 auto;
         }
 
         .action-btn {
@@ -103,79 +181,210 @@
             backdrop-filter: blur(10px);
             border-radius: 12px;
             padding: 16px 20px;
-            display: flex; align-items: center; gap: 20px;
-            cursor: pointer; transition: 0.2s ease;
-            text-align: left; text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: 0.2s ease;
+            text-align: left;
+            text-decoration: none;
             color: var(--text-dark);
-            border: 1px solid rgba(255,255,255,0.5);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
         }
 
         .action-btn:hover {
             transform: scale(1.02);
             background: #ffffff;
-            box-shadow: 0 15px 25px -5px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
         .action-icon {
-            width: 50px; height: 50px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; flex-shrink: 0;
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
         }
 
-        .icon-tutorial { background: #fef3c7; color: #d97706; }
-        .icon-input { background: #e0f2fe; color: #0284c7; }
+        .icon-tutorial {
+            background: #fef3c7;
+            color: #d97706;
+        }
 
-        .action-text { flex: 1; }
-        .action-text h4 { font-size: 1.1rem; font-weight: 800; margin-bottom: 3px; color: #0f172a; }
-        .action-text p { font-size: 0.85rem; color: #64748b; margin: 0; }
+        .icon-input {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
 
-        .action-arrow { color: #94a3b8; font-size: 1.2rem; transition: 0.2s; }
-        .action-btn:hover .action-arrow { color: var(--primary-navy); transform: translateX(5px); }
+        .action-text {
+            flex: 1;
+        }
+
+        .action-text h4 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 3px;
+            color: #0f172a;
+        }
+
+        .action-text p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .action-arrow {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover .action-arrow {
+            color: var(--primary-navy);
+            transform: translateX(5px);
+        }
 
         /* =========================================
            MODAL TUTORIAL
         ========================================= */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: white; width: 700px; max-width: 90%; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); position: relative; }
-        .modal-header { background: #f8fafc; padding: 15px 25px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 30px 25px; display: flex; align-items: center; gap: 20px; min-height: 200px;}
-        .close-btn { background: none; border: none; font-size: 1.2rem; color: #64748b; cursor: pointer; }
-        
-        .step-indicator { background: #002878; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; flex-shrink: 0; }
-        .slider-controls { display: flex; justify-content: center; gap: 15px; padding: 15px; background: #f8fafc; border-top: 1px solid #e5e7eb; }
-        .slider-btn { background: #e2e8f0; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: 0.2s; font-size: 0.9rem; color: #334155; }
-        .slider-btn:hover { background: #002878; color: white; }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            width: 700px;
+            max-width: 90%;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+
+        .modal-header {
+            background: #f8fafc;
+            padding: 15px 25px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 30px 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            min-height: 200px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        .step-indicator {
+            background: #002878;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .slider-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .slider-btn {
+            background: #e2e8f0;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            color: #334155;
+        }
+
+        .slider-btn:hover {
+            background: #002878;
+            color: white;
+        }
 
         /* =========================================
            TAMBAHAN PENYESUAIAN KHUSUS HP
         ========================================= */
         @media screen and (max-width: 768px) {
-            .navbar { position: relative; flex-direction: column; gap: 15px; padding: 15px; } 
-            .hero-title { font-size: 1.8rem; margin-top: 15px; } 
-            .hero-subtitle { font-size: 0.95rem; margin-bottom: 25px; }
+            .navbar {
+                position: relative;
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+                margin-top: 15px;
+            }
+
+            .hero-subtitle {
+                font-size: 0.95rem;
+                margin-bottom: 25px;
+            }
         }
     </style>
 
     <link rel="stylesheet" href="../css_dosen/index_mobile.css">
 
 </head>
+
 <body>
 
     <div class="main-wrapper">
-        
+
         <nav class="navbar header-dashboard">
-            <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 40px; object-fit: contain; filter: brightness(0) invert(1);">
-            
+            <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI"
+                style="height: 40px; object-fit: contain; filter: brightness(0) invert(1);">
+
             <div class="nav-right user-profile-info" id="navRightContainer">
-                
-                <button id="btnLogin" class="btn-login" onclick="window.location.href='../login/login.html'" style="display: none;">
+
+                <button id="btnLogin" class="btn-login" onclick="window.location.href='../login/login.html'"
+                    style="display: none;">
                     Log In <i class="fas fa-sign-in-alt"></i>
                 </button>
 
                 <div id="loggedInState" style="display: none; align-items: center; gap: 15px;">
                     <div class="user-chip">
-                        <i class="fas fa-user-circle" style="color: #ffc561;"></i> 
+                        <i class="fas fa-user-circle" style="color: #ffc561;"></i>
                         <span id="dosenName">Dosen</span>
                     </div>
                     <button class="btn-logout" onclick="logout()">Log Out</button>
@@ -187,11 +396,12 @@
         <div class="content-container content-section">
             <h1 class="hero-title">Sistem Outcome Based Education</h1>
             <p class="hero-subtitle">
-                Platform automasi terpadu untuk mengelola Capaian Pembelajaran Lulusan (CPL), menyusun RPS, dan melakukan asesmen nilai mahasiswa secara real-time.
+                Platform automasi terpadu untuk mengelola Capaian Pembelajaran Lulusan (CPL), menyusun RPS, dan
+                melakukan asesmen nilai mahasiswa secara real-time.
             </p>
 
             <div class="action-list action-buttons-container">
-                
+
                 <div class="action-btn btn" onclick="bukaTutorial()">
                     <div class="action-icon icon-tutorial"><i class="fas fa-play"></i></div>
                     <div class="action-text">
@@ -218,15 +428,19 @@
     <div id="modalTutorial" class="modal-overlay">
         <div class="modal-content modal-content-box">
             <div class="modal-header">
-                <h3 style="margin:0; font-size: 1.1rem; color: #0f172a;"><i class="fas fa-info-circle" style="color: #f59e0b; margin-right: 8px;"></i> Tutorial Alur Asesmen</h3>
+                <h3 style="margin:0; font-size: 1.1rem; color: #0f172a;"><i class="fas fa-info-circle"
+                        style="color: #f59e0b; margin-right: 8px;"></i> Tutorial Alur Asesmen</h3>
                 <button class="close-btn" onclick="tutupTutorial()"><i class="fas fa-times"></i></button>
             </div>
-            
+
             <div class="modal-body">
                 <div class="step-indicator" id="stepAngka">1</div>
                 <div>
-                    <h2 id="stepJudul" style="font-size: 1.4rem; color: #111827; margin-bottom: 8px; font-weight: 800;">Pilih Mata Kuliah</h2>
-                    <p id="stepDeskripsi" style="font-size: 0.95rem; color: #4b5563; line-height: 1.5;">Langkah pertama adalah menekan tombol "Mulai Asesmen", lalu pilih Mata Kuliah yang Anda ampu pada semester ini.</p>
+                    <h2 id="stepJudul" style="font-size: 1.4rem; color: #111827; margin-bottom: 8px; font-weight: 800;">
+                        Pilih Mata Kuliah</h2>
+                    <p id="stepDeskripsi" style="font-size: 0.95rem; color: #4b5563; line-height: 1.5;">Langkah pertama
+                        adalah menekan tombol "Mulai Asesmen", lalu pilih Mata Kuliah yang Anda ampu pada semester ini.
+                    </p>
                 </div>
             </div>
 
@@ -242,10 +456,10 @@
         const userLogin = localStorage.getItem("user_login");
         const userProdi = localStorage.getItem("prodi_aktif");
         const userRoleSekarang = localStorage.getItem("user_role");
-        
+
         const btnLogin = document.getElementById("btnLogin");
         const loggedInState = document.getElementById("loggedInState");
-        
+
         // LOGIKA PENGECEKAN STATUS LOGIN SAAT HALAMAN DIBUKA
         if (userLogin) {
             // Jika SUDAH Login
@@ -258,7 +472,7 @@
                 const btnKembali = document.createElement("a");
                 btnKembali.href = userProdi === "si" ? "../kaprodi/kaprodi_si/admin_config_si.html" : "../kaprodi/kaprodi_ti/admin_config.html";
                 btnKembali.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 4px;"></i> Admin';
-                
+
                 btnKembali.style.background = "#8b0000";
                 btnKembali.style.color = "white";
                 btnKembali.style.padding = "8px 16px";
@@ -269,7 +483,7 @@
                 btnKembali.style.display = "flex";
                 btnKembali.style.alignItems = "center";
                 btnKembali.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
-                
+
                 loggedInState.insertBefore(btnKembali, loggedInState.firstChild);
             }
         } else {
@@ -281,7 +495,7 @@
         // FUNGSI VALIDASI MENU "MULAI ASESMEN & RPS"
         function cekLoginDanMasuk() {
             if (userLogin) {
-                window.location.href = 'dosen/input_nilai.html';
+                window.location.href = 'dosen/jadwal_mengajar.html';
             } else {
                 alert("🔒 Silakan Log In terlebih dahulu untuk masuk ke panel asesmen!");
                 window.location.href = '../login/login.html';
@@ -289,10 +503,10 @@
         }
 
         // FUNGSI LOGOUT (Menghapus data dan refresh halaman landing page)
-        function logout() { 
+        function logout() {
             if (confirm("Apakah Anda yakin ingin keluar?")) {
-                localStorage.clear(); 
-                window.location.replace("../index.html"); 
+                localStorage.clear();
+                window.location.replace("../index.html");
             }
         }
 
@@ -324,16 +538,17 @@
         }
 
         function nextStep() {
-            if(currentStep < tutorialSteps.length - 1) {
+            if (currentStep < tutorialSteps.length - 1) {
                 currentStep++; updateModal();
             }
         }
 
         function prevStep() {
-            if(currentStep > 0) {
+            if (currentStep > 0) {
                 currentStep--; updateModal();
             }
         }
     </script>
 </body>
+
 </html>

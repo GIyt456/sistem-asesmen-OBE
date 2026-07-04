@@ -269,7 +269,6 @@
             color: #64748b;
             font-style: italic;
         }
-        
     </style>
     <link rel="stylesheet" href="css_dosen/index_mobile.css?v=13">
 </head>
@@ -288,12 +287,12 @@
         <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
 
         <div class="nav-menu-wrapper" id="navMenuWrapper">
-            
+
             <div class="sidebar-header-mobile">
                 <p class="sidebar-brand">SISTEM <span>OBE</span></p>
                 <button class="close-menu-btn" onclick="toggleMenu()"><i class="fas fa-times"></i></button>
             </div>
-            
+
             <div class="nav-links">
                 <a href="jadwal_mengajar.html" class="active">Mengajar</a>
                 <a href="input_nilai.html">Input Asesmen</a>
@@ -306,23 +305,35 @@
                 <div class="user-chip">
                     <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i>
                     <div class="user-text-mobile">
-                        <div class="user-label-hp" style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700; line-height: 1; display: none;">DOSEN PENGAMPU</div>
-                        <div id="dosenName" style="font-size: 0.95rem; font-weight: 800; margin-top: 2px; line-height: 1;">Dosen</div>
+                        <div class="user-label-hp"
+                            style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700; line-height: 1; display: none;">
+                            DOSEN PENGAMPU</div>
+                        <div id="dosenName"
+                            style="font-size: 0.95rem; font-weight: 800; margin-top: 2px; line-height: 1;">Dosen</div>
                     </div>
                 </div>
                 <button class="btn-logout" onclick="logout()">Log Out</button>
             </div>
-            
+
         </div>
     </nav>
 
     <div class="header-kelas">
         <h2 id="lblJudulKelas"><i class="fas fa-spinner fa-spin"></i> Memuat Data Kelas...</h2>
-        <button
-            style="background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 6px; font-weight: 600; color: #334155; cursor: pointer; transition: 0.2s;"
-            onclick="window.location.href='jadwal_mengajar.html'">
-            <i class="fas fa-arrow-left"></i> Kembali ke mengajar
-        </button>
+
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <button
+                style="background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 6px; font-weight: 600; color: #334155; cursor: pointer; transition: 0.2s;"
+                onclick="window.location.href='input_nilai.html'">
+                <i class="fas fa-arrow-left"></i> Kembali ke Input Asesmen
+            </button>
+
+            <button
+                style="background: #1e3a8a; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"
+                onclick="lanjutKeRPS()">
+                <i class="fas fa-book-open"></i> Lanjut Susun RPS
+            </button>
+        </div>
     </div>
 
     <div class="grid-container">
@@ -364,7 +375,12 @@
     <script>
         const API_GET_STUDENTS = `${API_BASE}/get-mahasiswa-mk`;
         const API_GET_REPORT = `${API_BASE}/get-report-obe`;
-        const API_SAVE_NILAI = `${API_BASE}/simpan-nilai-kelas`;
+        const API_SIMPAN = `${API_BASE}/simpan-konfigurasi`; // Menyamakan API dengan halaman sebelumnya
+
+        // --- TAMBAHAN MBKM ---
+        const API_GET_MBKM = `${API_BASE}/get-mbkm-data`;
+        let daftarNimMBKM = [];
+        // ---------------------
 
         let currentKodeMk = "";
         let currentIdKelas = "";
@@ -372,6 +388,7 @@
         let dataMahasiswa = [];
         let activeAsesmenIndex = -1;
         let globalReportDB = [];
+        let globalConfigData = []; // Wadah untuk menyimpan konfigurasi 16 pertemuan
 
         document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
 
@@ -396,14 +413,14 @@
         document.addEventListener("DOMContentLoaded", function () {
             const role = localStorage.getItem("user_role");
             const prodi = localStorage.getItem("prodi_aktif") || "ti";
-            
+
             if (role === "admin") {
                 const navContainer = document.getElementById("navRightContainer");
                 const btnAdmin = document.createElement("a");
-                
+
                 btnAdmin.href = prodi === "si" ? "../kaprodi/kaprodi_si/admin_config_si.html" : "../kaprodi/kaprodi_ti/admin_config.html";
                 btnAdmin.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 6px;"></i> Admin';
-                
+
                 // Styling tombol
                 btnAdmin.style.background = "#8b0000";
                 btnAdmin.style.color = "white";
@@ -415,7 +432,7 @@
                 btnAdmin.style.display = "flex";
                 btnAdmin.style.alignItems = "center";
                 btnAdmin.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
-                
+
                 // Sisipkan di atas nama profil
                 navContainer.insertBefore(btnAdmin, navContainer.firstChild);
             }
@@ -428,6 +445,16 @@
             const containerMenu = document.getElementById("menuAsesmenContainer");
             const tbodyMhs = document.getElementById("tableBodyMhs");
             let configData = [];
+
+            // --- TARIK DATA MBKM ---
+            try {
+                const resMbkm = await fetch(API_GET_MBKM);
+                if (resMbkm.ok) {
+                    const jsonMbkm = await resMbkm.json();
+                    const dataMbkm = jsonMbkm.data || jsonMbkm;
+                    daftarNimMBKM = dataMbkm.map(m => String(m.nim).trim());
+                }
+            } catch (e) { console.warn("Gagal menarik data MBKM"); }
 
             // 1. MEMBUAT KERANGKA 16 PERTEMUAN (IDENTIK DENGAN INPUT_NILAI.HTML)
             try {
@@ -492,11 +519,13 @@
 
             renderMenuAsesmen();
 
+            globalConfigData = configData; // Menyimpan bobot pertemuan agar sistem tahu cara menghitung nilai akhir
+
             // 3. TARIK DATA MAHASISWA DAN INJEKSI NILAI LAMA
             try {
                 const resMhs = await fetch(`${API_GET_STUDENTS}?id_kelas=${currentIdKelas}&mk=${currentKodeMk}`);
                 const dataMhsJson = await resMhs.json();
-                const mhsArray = Array.isArray(dataMhsJson) ? dataMhsJson : (dataMhsJson.data || []);
+                let mhsArray = Array.isArray(dataMhsJson) ? dataMhsJson : (dataMhsJson.data || []);
 
                 let draftNilaiRaw = JSON.parse(localStorage.getItem("draft_nilai_mhs_" + currentKodeMk) || "{}");
 
@@ -532,6 +561,13 @@
                         { nim: "25.11.6561", nama: "AFFAN ZAKI WIBOWO", nilai: {} }
                     ];
                 }
+
+                // --- TAMBAHAN BARU: URUTKAN BERDASARKAN NIM ---
+                dataMahasiswa.sort((a, b) => {
+                    // localeCompare dengan opsi numeric memastikan angka diurutkan secara logis 
+                    // (misal: 10 akan diletakkan setelah 2, bukan setelah 1)
+                    return String(a.nim).localeCompare(String(b.nim), undefined, { numeric: true, sensitivity: 'base' });
+                });
 
                 if (activeAsesmenIndex !== -1) renderTabelMahasiswa();
 
@@ -611,14 +647,24 @@
             `;
 
             dataMahasiswa.forEach((mhs, index) => {
-                const nilaiTersimpan = mhs.nilai[idAsesmenAktif] || 0;
+                // --- LOGIKA CEK MBKM ---
+                let isMBKM = daftarNimMBKM.includes(String(mhs.nim).trim());
+                let bgRow = isMBKM ? 'background-color: #fef9c3;' : '';
+                let labelMBKM = isMBKM ? '<span style="background: #eab308; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 8px; vertical-align: middle;">MBKM</span>' : '';
+
+                // Jika MBKM, paksa nilai 0 dan kunci form inputnya
+                let nilaiTersimpan = isMBKM ? 0 : (mhs.nilai[idAsesmenAktif] || 0);
+                let lockInput = isMBKM ? 'readonly style="background:#fef9c3; cursor:not-allowed;" title="Peserta MBKM"' : '';
+                let valTampil = (nilaiTersimpan === 0 && !isMBKM) ? '' : nilaiTersimpan;
+                // -----------------------
+
                 tbody.innerHTML += `
-                    <tr>
+                    <tr style="${bgRow}">
                         <td style="text-align:center;">${index + 1}</td>
                         <td>${mhs.nim}</td>
-                        <td>${mhs.nama}</td>
+                        <td>${mhs.nama} ${labelMBKM}</td>
                         <td style="text-align: center;">
-                            <input type="number" class="input-nilai mhs-score" value="${nilaiTersimpan === 0 ? '' : nilaiTersimpan}" onkeyup="simpanKeMemoriLokal()">
+                            <input type="number" class="input-nilai mhs-score" value="${valTampil}" ${lockInput} onkeyup="simpanKeMemoriLokal()">
                         </td>
                     </tr>
                 `;
@@ -664,34 +710,91 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             btn.disabled = true;
 
+            // 1. REKONSTRUKSI DATA (Menghitung Total Akhir & Grade seperti di Excel)
+            let formattedStudentData = dataMahasiswa.map(mhs => {
+                let finalScore = 0;
+                let detailNilai = [];
+
+                globalConfigData.forEach(cfg => {
+                    let nilaiInput = mhs.nilai[`P${cfg.pertemuan}`] || 0;
+                    let bobotDesimal = (parseFloat(cfg.bobot) || 0) / 100;
+
+                    finalScore += (nilaiInput * bobotDesimal);
+
+                    detailNilai.push({
+                        pertemuan: cfg.pertemuan,
+                        cpmk: cfg.cpmk,
+                        nilai: nilaiInput
+                    });
+                });
+
+                // Kalkulasi Grade Huruf
+                let grade = 'E';
+                if (finalScore >= 85) grade = 'A';
+                else if (finalScore >= 80) grade = 'A-';
+                else if (finalScore >= 75) grade = 'B+';
+                else if (finalScore >= 70) grade = 'B';
+                else if (finalScore >= 65) grade = 'B-';
+                else if (finalScore >= 60) grade = 'C+';
+                else if (finalScore >= 55) grade = 'C';
+                else if (finalScore >= 50) grade = 'D';
+
+                return {
+                    nim: mhs.nim,
+                    nama: mhs.nama,
+                    final: finalScore.toFixed(2),
+                    grade: grade,
+                    detail: detailNilai
+                };
+            });
+
+            const userLogin = localStorage.getItem("user_login");
+            const userNidn = localStorage.getItem("user_nidn");
+
+            // 2. BENTUK PAYLOAD JSON PERSIS SEPERTI INPUT_NILAI
             const payload = {
-                id_kelas: currentIdKelas,
-                kode_mk: currentKodeMk,
-                dosen: localStorage.getItem("user_login"),
-                data_nilai_kelas: dataMahasiswa
+                metadata: {
+                    dosen: userLogin,
+                    nidn: userNidn,
+                    kode_mk: currentKodeMk,
+                    tanggal: new Date().toISOString(),
+                    status: 'final' // Langsung tersimpan sebagai final
+                },
+                data_bobot: globalConfigData,
+                data_nilai: formattedStudentData
             };
 
+            // 3. TEMBAK KE N8N
             try {
-                const res = await fetch(API_SAVE_NILAI, {
+                const res = await fetch(API_SIMPAN, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
                 if (res.ok) {
-                    alert("✅ Seluruh inputan nilai dari 16 pertemuan berhasil disimpan ke database!");
-                    // Bersihkan draft browser agar tidak menumpuk
+                    alert("✅ Seluruh nilai berhasil dihitung dan disimpan ke database!");
                     localStorage.removeItem("draft_nilai_mhs_" + currentKodeMk);
+                    // Tombol lempar halaman sudah dihapus, dosen tetap stay di sini.
                 } else {
-                    alert("⚠️ Data terkirim, namun n8n merespon error.");
+                    alert("⚠️ Data terkirim, namun server merespon error.");
                 }
             } catch (e) {
-                alert("Berhasil disimulasikan. (API n8n belum tersedia/mati).");
+                alert("❌ Gagal terhubung ke webhook n8n.");
             }
 
             btn.innerHTML = '<i class="fas fa-save"></i> Simpan Penilaian';
             btn.disabled = false;
         }
+
+        function lanjutKeRPS() {
+            if (currentKodeMk) {
+                window.location.href = 'rps_dosen.html?mk=' + currentKodeMk;
+            } else {
+                window.location.href = 'rps_dosen.html';
+            }
+        }
+
         // ==========================================
         // FUNGSI NAVIGASI MOBILE & LOGOUT
         // ==========================================
@@ -699,9 +802,10 @@
             document.getElementById('navMenuWrapper').classList.toggle('active');
             document.getElementById('mobileOverlay').classList.toggle('active');
         }
-        function logout() { 
-            localStorage.clear(); 
-            window.location.replace("../login/login.html"); 
+
+        function logout() {
+            localStorage.clear();
+            window.location.replace("../login/login.html");
         }
     </script>
 </body>
