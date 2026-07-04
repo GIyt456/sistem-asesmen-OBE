@@ -122,26 +122,29 @@
             margin-bottom: 25px;
             font-weight: bold;
         }
+
         /* === RESPONSIVE PREVIEW UNTUK LAYAR HP (TIDAK MEMPENGARUHI HASIL CETAK) === */
         @media screen and (max-width: 768px) {
             body {
                 padding: 0;
-                padding-bottom: 75px; /* Memberi ruang agar teks bawah tidak tertutup tombol */
+                padding-bottom: 75px;
+                /* Memberi ruang agar teks bawah tidak tertutup tombol */
             }
 
             .document-container {
                 width: 100%;
                 min-height: auto;
                 padding: 15px 10px;
-                overflow-x: auto; /* Izinkan tabel digeser ke kanan-kiri (Scroll) */
+                overflow-x: auto;
+                /* Izinkan tabel digeser ke kanan-kiri (Scroll) */
                 box-shadow: none;
             }
 
             /* Paksa tabel tetap lebar standar A4 agar teks tidak gepeng saat digeser di HP */
-            .table-print, 
-            #mainDocumentBody table, 
+            .table-print,
+            #mainDocumentBody table,
             #rtmContainer table {
-                min-width: 1000px !important; 
+                min-width: 1000px !important;
             }
 
             /* Sulap tombol aksi menjadi Full-Width di bagian bawah layar (Sticky Footer) */
@@ -151,14 +154,15 @@
                 width: 100%;
                 background: white;
                 padding: 12px 15px;
-                box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+                box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1);
                 justify-content: space-between;
                 border-top: 1px solid #e5e7eb;
                 margin: 0;
                 box-sizing: border-box;
             }
 
-            .btn-back, .btn-print {
+            .btn-back,
+            .btn-print {
                 flex: 1;
                 justify-content: center;
                 padding: 14px;
@@ -210,30 +214,35 @@
                 break-inside: auto !important;
             }
         }
+
         /* ========================================================================
            TRICK ZOOM OUT MOBILE (Layar dipaksa menjadi 850px oleh Viewport)
            ======================================================================== */
         @media screen and (max-width: 900px) {
-            body { 
-                padding-bottom: 180px !important; /* Beri ruang di bawah kertas agar tidak tertutup tombol */
+            body {
+                padding-bottom: 180px !important;
+                /* Beri ruang di bawah kertas agar tidak tertutup tombol */
                 background-color: #e5e7eb;
             }
-            
+
             .page {
-                margin: 20px auto !important; /* Tengahkan kertas A4-nya */
+                margin: 20px auto !important;
+                /* Tengahkan kertas A4-nya */
             }
 
             /* Ubah tombol melayang menjadi Toolbar di bawah layar */
             .no-print {
                 position: fixed !important;
-                bottom: 0 !important; left: 0 !important; right: 0 !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
                 width: 100% !important;
                 background: white !important;
                 padding: 30px 40px !important;
                 border-top: 3px solid #cbd5e1 !important;
-                display: flex !important; 
+                display: flex !important;
                 gap: 20px !important;
-                box-shadow: 0 -5px 25px rgba(0,0,0,0.15) !important;
+                box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15) !important;
                 box-sizing: border-box !important;
                 justify-content: center !important;
             }
@@ -242,16 +251,15 @@
             .no-print button {
                 flex: 1 !important;
                 padding: 30px !important;
-                font-size: 32px !important; 
+                font-size: 32px !important;
                 border-radius: 16px !important;
                 font-weight: 900 !important;
             }
-            
+
             .no-print button i {
                 font-size: 36px !important;
             }
         }
-        
     </style>
 </head>
 
