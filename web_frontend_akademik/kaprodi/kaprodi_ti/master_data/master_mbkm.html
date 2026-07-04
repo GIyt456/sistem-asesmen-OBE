@@ -712,12 +712,13 @@
                 const response = await fetch(API_DELETE_MBKM, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: id })
+                    // UBAH 'id' MENJADI 'id_mbkm' DI SINI AGAR SINKRON DENGAN N8N
+                    body: JSON.stringify({ id_mbkm: id })
                 });
 
                 if (response.ok) {
                     alert("Data berhasil dihapus!");
-                    loadDataMBKM();
+                    loadDataMBKM(); // Refresh tabel setelah hapus
                 } else {
                     alert("Gagal menghapus data. Periksa n8n.");
                 }

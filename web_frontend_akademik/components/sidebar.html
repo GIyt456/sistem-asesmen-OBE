@@ -111,44 +111,44 @@
         <div class="menu-category">MAIN</div>
         <div class="nav-item" data-path="/admin_config.html"><i class="fas fa-home"></i> Home</div>
 
-        <div class="nav-item" onclick="toggleDropdown('submenu-mk', 'chevron-mk')">
-            <i class="fas fa-book"></i> Mata Kuliah
-            <i id="chevron-mk" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-        <div id="submenu-mk" style="display: none; flex-direction: column; margin-top: 2px;">
-            <div class="nav-item" data-path="/mata_kuliah/susunan_mk.html" style="padding-left: 48px; font-size: 0.85rem;">Susunan Mata Kuliah</div>
-            <div class="nav-item" data-path="/mata_kuliah/pemetaan_cpl_mk_bk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan CPL - BK - MK</div>
-        </div>
+        <div class="nav-item" data-path="/KRS/import_krs.html"><i class="fas fa-file-excel"></i> Import KRS Mahasiswa</div>
 
-        <div class="nav-item" data-path="/cpl/cpl.html"><i class="fas fa-graduation-cap"></i> CPL</div>
-        <div class="nav-item" data-path="/cpmk/cpmk.html"><i class="fas fa-file-alt"></i> CPMK</div>
-
-        <div class="nav-item" onclick="toggleDropdown('submenu-skl', 'chevron-skl')">
-            <i class="fas fa-user-graduate"></i> Rumusan SKL
-            <i id="chevron-skl" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        <div class="nav-item" onclick="toggleDropdown('submenu-master', 'chevron-master')">
+            <i class="fas fa-book"></i> Master Data
+            <i id="chevron-master" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
         </div>
-        <div id="submenu-skl" style="display: none; flex-direction: column; margin-top: 2px;">
+        <div id="submenu-master" style="display: none; flex-direction: column; margin-top: 2px;">
+            <div class="nav-item" data-path="/mata_kuliah/susunan_mk.html" style="padding-left: 48px; font-size: 0.85rem;">Mata Kuliah</div>
+            <div class="nav-item" data-path="/cpl/cpl.html" style="padding-left: 48px; font-size: 0.85rem;">CPL</div>
+            <div class="nav-item" data-path="/cpmk/cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">CPMK</div>
+            <div class="nav-item" data-path="/penetapan_bk/perumusan_bk.html" style="padding-left: 48px; font-size: 0.85rem;">Bahan Kajian</div>
             <div class="nav-item" data-path="/rumusan_skl/profil_lulusan.html" style="padding-left: 48px; font-size: 0.85rem;">Profil Lulusan</div>
             <div class="nav-item" data-path="/rumusan_skl/profesi.html" style="padding-left: 48px; font-size: 0.85rem;">Profesi</div>
+        </div>
+
+         <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')">
+            <i class="fas fa-sitemap"></i> Pemetaan (Mapping)
+            <i id="chevron-mapping" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        <div id="submenu-mapping" style="display: none; flex-direction: column; margin-top: 2px;">
+            <div class="nav-item" data-path="/mapping/map_cpl_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan CPL - CPMK</div>
+            <div class="nav-item" data-path="/matriks_kurikulum/matriks_cpl_mk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan MK - CPL</div>
+            <div class="nav-item" data-path="/mapping/map_mk_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan MK - CPMK</div>
+            <div class="nav-item" data-path="/mata_kuliah/pemetaan_cpl_mk_bk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan CPL - BK - MK</div>
+            <div class="nav-item" data-path="/penetapan_bk/pemetaan_cpl_bk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan CPL - BK</div>
+            <div class="nav-item" data-path="/penetapan_bk/pemetaan_bk_mk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan BK - MK</div>
             <div class="nav-item" data-path="/rumusan_skl/pemetaan_cpl_pl.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan CPL - PL</div>
         </div>
 
-        <div class="nav-item" onclick="toggleDropdown('submenu-bk', 'chevron-bk')">
-            <i class="fas fa-layer-group"></i> Bahan Kajian (BK)
-            <i id="chevron-bk" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-        <div id="submenu-bk" style="display: none; flex-direction: column; margin-top: 2px;">
-            <div class="nav-item" data-path="/penetapan_bk/perumusan_bk.html" style="padding-left: 48px; font-size: 0.85rem;">Perumusan BK</div>
-            <div class="nav-item" data-path="/penetapan_bk/pemetaan_cpl_bk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan CPL - BK</div>
-            <div class="nav-item" data-path="/penetapan_bk/pemetaan_bk_mk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan BK - MK</div>
-        </div>
+        <div class="nav-item" data-path="/mekanisme_assesmen/master_bobot.html"><i class="fas fa-balance-scale"></i>Master Bobot</div>
 
-        <div class="nav-item" onclick="toggleDropdown('menu-master', 'chevron-master')">
-            <i class="fas fa-database"></i> Master Data
-            <i id="chevron-master" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        <div class="nav-item" onclick="toggleDropdown('menu-kelola', 'chevron-kelola')">
+            <i class="fas fa-database"></i> Kelola Data
+            <i id="chevron-kelola" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
         </div>
-        <div id="menu-master" style="display: none; flex-direction: column; padding-left: 20px; margin-top: 4px;">
+        <div id="menu-kelola" style="display: none; flex-direction: column; padding-left: 20px; margin-top: 4px;">
             <div class="nav-item" data-path="/master_data/master_tahun.html"><i class="fas fa-calendar-alt"></i> Tahun Kurikulum</div>
+            <div class="nav-item" data-path="/matriks_kurikulum/matriks_struktur.html" style="padding-left: 48px; font-size: 0.85rem;">Struktur Kurikulum</div>
             <div class="nav-item" data-path="/master_data/master_rumpun.html"><i class="fas fa-layer-group"></i> Rumpun MK</div>
             <div class="nav-item" data-path="/master_data/master_jenis_cpl.html"><i class="fas fa-tags"></i> Jenis CPL</div>
             <div class="nav-item" data-path="/master_data/master_rubrik.html"><i class="fas fa-table"></i> Rubrik</div>
@@ -159,34 +159,6 @@
             <div class="nav-item" data-path="/master_data/master_tugas_akhir.html"><i class="fas fa-book-reader"></i> Tugas Akhir</div>
         </div>
 
-
-        <div class="nav-item" onclick="toggleDropdown('menu-assesmen', 'chevron-assesmen')">
-            <i class="fas fa-balance-scale"></i> Mekanisme Assesmen
-            <i id="chevron-assesmen" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-        <div id="menu-assesmen" style="display: none; flex-direction: column; margin-top: 2px;">
-            <div class="nav-item" data-path="/mekanisme_assesmen/master_bobot.html" style="padding-left: 48px; font-size: 0.85rem;">Master Bobot</div>
-        </div>
-
-        <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')">
-            <i class="fas fa-sitemap"></i> Pemetaan (Mapping)
-            <i id="chevron-mapping" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-        <div id="submenu-mapping" style="display: none; flex-direction: column; margin-top: 2px;">
-            <div class="nav-item" data-path="/mapping/map_cpl_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">Mapping CPL - CPMK</div>
-            <div class="nav-item" data-path="/mapping/map_mk_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">Mapping MK - CPMK</div>
-        </div>
-
-        <div class="nav-item" onclick="toggleDropdown('submenu-matriks', 'chevron-matriks')">
-            <i class="fas fa-table"></i> Matriks Kurikulum
-            <i id="chevron-matriks" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-        <div id="submenu-matriks" style="display: none; flex-direction: column; margin-top: 2px;">
-            <div class="nav-item" data-path="/matriks_kurikulum/matriks_cpl_mk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan MK - CPL</div>
-            <div class="nav-item" data-path="/matriks_kurikulum/matriks_struktur.html" style="padding-left: 48px; font-size: 0.85rem;">Struktur Kurikulum</div>
-        </div>
-
-        <div class="nav-item" data-path="/KRS/import_krs.html"><i class="fas fa-file-excel"></i> Import KRS Mahasiswa</div>
 
         <div class="menu-category">EVALUASI & RPS</div>
 

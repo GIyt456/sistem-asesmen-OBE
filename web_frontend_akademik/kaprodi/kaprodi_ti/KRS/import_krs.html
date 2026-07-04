@@ -11,26 +11,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
-    <style>
-        .upload-card { background: #fafafa; border: 2.5px dashed #cbd5e1; border-radius: 16px; padding: 50px 40px; max-width: 600px; text-align: center; margin: 40px auto; transition: 0.3s; }
-        .upload-card:hover { background: #f8fafc; }
-        
-        .file-input-wrapper { margin-bottom: 30px; background: white; padding: 15px; border-radius: 8px; border: 2px solid #e5e7eb; display: flex; align-items: center; justify-content: center;}
-        
-        .btn-upload { width: 100%; justify-content: center; padding: 16px; font-size: 1.05rem; display: inline-flex; align-items: center; gap: 10px; border: none; border-radius: 8px; font-weight: 700; color: white; cursor: pointer; transition: 0.2s;}
-        .btn-upload:hover:not(:disabled) { filter: brightness(0.9); transform: translateY(-2px); }
-
-        body { animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <link rel="stylesheet" href="import_krs.css">
 </head>
 <body>
 
     <div id="sidebar-container"></div>
-    
+    <div id="navbar-container"></div>
     <div class="main-content">
-        <div id="navbar-container"></div>
-
         <div class="content-wrapper">
             <div class="header-container">
                 <div class="header-title-area">
@@ -130,6 +117,28 @@
             btnUpload.disabled = false;
             btnUpload.style.opacity = '1';
         }
+
+        // Fungsi untuk memunculkan dan menyembunyikan sidebar di mobile
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById("sidebar-container");
+            if (sidebar) {
+                // Tambahkan atau hapus class 'show-mobile' yang ada di CSS tadi
+                sidebar.classList.toggle("show-mobile");
+            }
+        }
+
+        // Opsional: Klik di sembarang tempat (luar sidebar) untuk menutupnya
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById("sidebar-container");
+            const toggleBtn = document.getElementById("btnToggleSidebar");
+            
+            // Jika sidebar sedang terbuka, dan user mengklik di luar sidebar & bukan di tombol garis tiga
+            if (sidebar && sidebar.classList.contains("show-mobile")) {
+                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    sidebar.classList.remove("show-mobile");
+                }
+            }
+        });
     </script>
 </body>
 </html>

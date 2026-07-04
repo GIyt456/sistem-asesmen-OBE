@@ -170,6 +170,15 @@ td {
         min-height: 100vh !important;
     }
 
+    #navbar-container {
+        display: block !important;
+        width: 100% !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 9999 !important;
+    }
+
     .main-content {
         position: relative !important;
         width: 100% !important;

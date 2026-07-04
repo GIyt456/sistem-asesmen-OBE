@@ -4,179 +4,228 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapping CPL - CPMK - Sistem OBE</title>
-    <link rel="stylesheet" href="../../../css/style.css">
+    
+    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="../../../js/api_config.js"></script>
+    
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script>
     
     <style>
-        :root { 
-            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
-            --primary-red: #8b0000; --bg-main: #ffffff; --text-dark: #111827; --border-dark: #161923;
-        }
-
-        #sidebar-container { width: 280px; min-width: 280px; height: 100vh; background: var(--sidebar-bg); flex-shrink: 0; }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: #f9fafb; height: 100vh; overflow: hidden; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
-        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
-        .header-title span { color: var(--primary-red); }
-
-        .mapping-panel { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .mapping-panel { background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
         .form-group { margin-bottom: 25px; }
-        .form-group label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 1.05rem; }
-        .select-custom { width: 100%; padding: 14px 16px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 1rem; font-weight: 500; outline: none; background: #f9fafb; cursor: pointer; }
-        .select-custom:focus { border-color: var(--primary-red); }
+        .form-group label { display: block; font-weight: 800; margin-bottom: 15px; font-size: 1.1rem; color: #1e293b; }
+        .select-custom { width: 100%; padding: 15px 20px; border-radius: 10px; border: 2px solid #cbd5e1; font-size: 1rem; font-weight: 600; outline: none; background: #f8fafc; cursor: pointer; color: #334155; transition: 0.2s;}
+        .select-custom:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1);}
 
-        .cpmk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
-        .cpmk-card { border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; transition: 0.2s; background: white; }
-        .cpmk-card:hover { border-color: var(--primary-red); background: #fff5f5; }
-        .cpmk-card input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; margin-top: 2px; accent-color: var(--primary-red); }
+        .cpmk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px; }
+        .cpmk-card { border: 2px solid #e2e8f0; padding: 20px; border-radius: 12px; display: flex; align-items: flex-start; gap: 15px; cursor: pointer; transition: 0.2s; background: white; }
+        .cpmk-card:hover { border-color: var(--primary-blue); background: #f0f9ff; transform: translateY(-3px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .cpmk-card input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; margin-top: 2px; accent-color: var(--primary-blue); }
         .cpmk-info { display: flex; flex-direction: column; }
-        .cpmk-code { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
-        .cpmk-desc { font-size: 0.8rem; color: #6b7280; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .cpmk-code { font-weight: 800; font-size: 1.05rem; color: var(--primary-blue); margin-bottom: 5px;}
+        .cpmk-desc { font-size: 0.85rem; color: #475569; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; font-weight: 500;}
 
-        .btn-save { background: var(--primary-red); color: white; border: none; padding: 14px 24px; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; width: 100%; justify-content: center; margin-top: 30px; }
-        .btn-save:hover { background: #6b0000; transform: translateY(-2px); }
-        .btn-save:disabled { background: #d1d5db; cursor: not-allowed; }
+        /* CSS KHUSUS HP (Anti Mepet) */
+        @media screen and (max-width: 768px) {
+            .header-mapping-cpmk { margin: 20px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-mapping-cpmk { padding: 0 20px 40px 20px !important; }
+            .mapping-panel { padding: 25px 20px !important; }
+            
+            .cpmk-grid { grid-template-columns: 1fr; gap: 15px; }
+            .cpmk-desc { -webkit-line-clamp: unset !important; overflow: visible !important;} /* Di HP biarkan teks utuh */
+        }
     </style>
 </head>
 <body>
 
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
+                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
+                 onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()">
+            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
+        </div>
+    </nav>
+
+    <!-- 2. OVERLAY GELAP UNTUK LATAR SIDEBAR DI HP -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <div class="header-container">
-            <div>
-                <div class="header-subtitle">PEMETAAN (MAPPING)</div>
-                <h1 class="header-title">MAPPING <span>CPL - CPMK</span></h1>
+        <div id="navbar-container"></div>
+
+        <div class="fixed-header">
+            <div class="header-container header-mapping-cpmk" style="margin: 40px 50px 20px 50px; border-bottom: none; padding-bottom: 0;">
+                <div class="header-title-area">
+                    <div class="header-subtitle">PEMETAAN (MAPPING)</div>
+                    <h1 class="header-title">MAPPING <span>CPL - CPMK</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
             </div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 50px 20px 50px;" class="header-mapping-cpmk"></div>
         </div>
 
-        <div class="mapping-panel">
-            <!-- 1. Pilih CPL -->
-            <div class="form-group">
-                <label for="selectCpl"><i class="fas fa-graduation-cap" style="color: var(--primary-red); margin-right: 8px;"></i> Pilih CPL Tujuan</label>
-                <select id="selectCpl" class="select-custom" onchange="checkExistingMapping()">
-                    <option value="">-- Memuat daftar CPL... --</option>
-                </select>
-            </div>
-
-            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-
-            <!-- 2. Pilih CPMK (Grouped) -->
-            <div class="form-group">
-                <label><i class="fas fa-list-check" style="color: var(--primary-red); margin-right: 8px;"></i> CPMK yang Mendukung CPL Ini</label>
-                <div id="cpmkContainer" class="cpmk-grid">
-                    <p style="grid-column: 1 / -1; color: #9ca3af; font-style: italic;">Memuat daftar CPMK...</p>
+        <div class="scrollable-content section-mapping-cpmk" style="padding: 0 50px 40px 50px;">
+            <div class="mapping-panel">
+                <!-- 1. Pilih CPL -->
+                <div class="form-group">
+                    <label for="selectCpl">
+                        <i class="fas fa-graduation-cap dynamic-icon" style="margin-right: 10px;"></i> Pilih CPL Tujuan
+                    </label>
+                    <select id="selectCpl" class="select-custom" onchange="checkExistingMapping()">
+                        <option value="">-- Memuat daftar CPL... --</option>
+                    </select>
                 </div>
-            </div>
 
-            <!-- 3. Tombol Simpan -->
-            <button id="btnSave" class="btn-save" onclick="saveMapping()" disabled>
-                <i class="fas fa-save"></i> Simpan Relasi
-            </button>
+                <hr style="border: 0; border-top: 2px dashed #cbd5e1; margin: 40px 0;">
+
+                <!-- 2. Pilih CPMK -->
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-list-check dynamic-icon" style="margin-right: 10px;"></i> CPMK yang Mendukung CPL Ini
+                    </label>
+                    <p style="font-size: 0.9rem; color: #64748b; font-weight: 500; margin-bottom: 20px; line-height: 1.5;">Pilih CPL di atas terlebih dahulu, kemudian centang kotak-kotak CPMK di bawah ini untuk menghubungkannya.</p>
+                    
+                    <div id="cpmkContainer" class="cpmk-grid">
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #9ca3af; font-weight: 600; border: 2px dashed #e2e8f0; border-radius: 12px;">
+                            <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 15px; color: var(--primary-blue);"></i><br>
+                            Memuat daftar CPMK...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Tombol Simpan -->
+                <button id="btnSave" class="btn-primary-si" style="width: 100%; justify-content: center; padding: 15px; font-size: 1.1rem; margin-top: 40px;" onclick="saveMapping()" disabled>
+                    <i class="fas fa-save" style="font-size: 1.2rem;"></i> Simpan Relasi Pemetaan
+                </button>
+            </div>
         </div>
     </div>
 
-<script src="/js/template.js"></script>
-
 <script>
-    // ========================================================================
-    // 1. DEKLARASI API (HARUS DI PALING ATAS)
-    // ========================================================================
-    const PRODI = localStorage.getItem("prodi_aktif") || "si";
+    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
+    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
     
+    document.addEventListener("DOMContentLoaded", () => {
+        const dynamicIcons = document.querySelectorAll('.dynamic-icon');
+        
+        if(PRODI === "ti") {
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+            // Ganti warna icon
+            dynamicIcons.forEach(icon => icon.style.color = '#8b0000');
+        } else {
+            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+            // Ganti warna icon
+            dynamicIcons.forEach(icon => icon.style.color = '#1e3a8a');
+        }
+
+        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+        const avatarMobile = document.getElementById("mobileNavbarAvatar");
+        if(avatarMobile) {
+            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+        }
+    });
+
+    // --- FUNGSI SIDEBAR MOBILE ---
+    function toggleSidebar() {
+        document.getElementById('sidebar-container').classList.toggle('active');
+        document.getElementById('mobileOverlay').classList.toggle('active');
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                    .then(res => res.text())
+                    .then(html => {
+                        sidebar.innerHTML = html;
+                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                    })
+                    .catch(e => console.log('Gagal memuat sidebar darurat'));
+            }
+        }, 600); 
+    });
+
+    // --- LOGIKA API ---
     const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
     const API_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
-    const API_METADATA = `${API_BASE}/get-metadata`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
 
-    // Penyimpanan data sementara
     let listCPMK = [];
 
-    // ========================================================================
-    // 2. AWAL MULA SAAT WEB DIBUKA
-    // ========================================================================
     const userLogin = localStorage.getItem("user_login");
-        if (!userLogin) window.location.replace("/login/login.html");
+    if (!userLogin) window.location.replace("/login/login.html");
 
-    window.onload = () => {
-        setTimeout(initData, 400); 
-    };
+    window.onload = () => { setTimeout(initData, 400); };
 
-    // ========================================================================
-    // 3. TARIK MASTER CPL & CPMK (Tanpa error gaib lagi)
-    // ========================================================================
     async function initData() {
         const selectCpl = document.getElementById('selectCpl');
         const cpmkContainer = document.getElementById('cpmkContainer');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        
-        if(loadingIndicator) loadingIndicator.style.display = 'block';
 
         try {
             const [resCpl, resCpmk] = await Promise.all([
-                fetch(API_CPL),
-                fetch(API_CPMK)
+                fetch(API_CPL), fetch(API_CPMK)
             ]);
 
             const dataCpl = await resCpl.json();
             listCPMK = await resCpmk.json();
 
-            // Isi Dropdown CPL
             if (selectCpl) {
-                selectCpl.innerHTML = '<option value="" disabled selected>-- Pilih CPL --</option>';
+                selectCpl.innerHTML = '<option value="" disabled selected>-- Silakan Pilih CPL yang Tersedia --</option>';
                 if (dataCpl.length > 0) {
                     dataCpl.forEach(cpl => {
-                        selectCpl.innerHTML += `<option value="${cpl.kode_cpl}">${cpl.kode_cpl} - ${cpl.deskripsi || 'Tanpa Deskripsi'}</option>`;
+                        // Memotong deskripsi CPL jika terlalu panjang di dropdown
+                        const desc = cpl.deskripsi || '';
+                        const shortDesc = desc.length > 60 ? desc.substring(0, 60) + '...' : desc;
+                        selectCpl.innerHTML += `<option value="${cpl.kode_cpl}">${cpl.kode_cpl} - ${shortDesc}</option>`;
                     });
                 } else {
-                    selectCpl.innerHTML = '<option value="">Data CPL Kosong (Cek N8N)</option>';
+                    selectCpl.innerHTML = '<option value="">Data CPL Kosong. Harap isi data CPL terlebih dahulu.</option>';
                 }
             }
 
-            // Gambar Kotak Checkbox CPMK
             if (cpmkContainer) {
                 cpmkContainer.innerHTML = '';
                 if (listCPMK.length > 0) {
                     listCPMK.forEach(cpmk => {
-                        // Simpan info "parent" (CPL asalnya) di atribut data-parent
                         const parentInfo = cpmk.kode_cpl_ref || cpmk.parent || cpmk.kode_cpl || '';
                         
                         cpmkContainer.innerHTML += `
                             <label class="cpmk-card">
                                 <input type="checkbox" class="cpmk-checkbox" value="${cpmk.kode_cpmk}" data-parent="${parentInfo}" disabled>
-                                <div>
-                                    <div style="font-weight: 700; color: #1e293b;">${cpmk.kode_cpmk}</div>
-                                    <div style="font-size: 0.85rem; color: #64748b; margin-top: 4px; line-height: 1.4;">${cpmk.deskripsi || '-'}</div>
+                                <div class="cpmk-info">
+                                    <div class="cpmk-code">${cpmk.kode_cpmk}</div>
+                                    <div class="cpmk-desc" title="${cpmk.deskripsi_cpmk || cpmk.deskripsi || ''}">${cpmk.deskripsi_cpmk || cpmk.deskripsi || 'Tidak ada deskripsi.'}</div>
                                 </div>
                             </label>
                         `;
                     });
                 } else {
-                    cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1;">Master Data CPMK Kosong.</div>';
+                    cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; padding: 20px; font-weight:bold; text-align:center;">Data CPMK Kosong. Harap isi data CPMK terlebih dahulu.</div>';
                 }
             }
 
         } catch (error) {
-            console.error("Error Fetching Data:", error);
-            if(selectCpl) selectCpl.innerHTML = '<option value="">Gagal terhubung ke API</option>';
-            if(cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1;">Gagal menarik data Master dari N8N. Pastikan Link Benar!</div>';
-        } finally {
-            if(loadingIndicator) loadingIndicator.style.display = 'none';
-        }
+            if(selectCpl) selectCpl.innerHTML = '<option value="">❌ Gagal terhubung ke API (Cek n8n!)</option>';
+            if(cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; padding:20px; text-align:center; font-weight:bold;">❌ Gagal menarik data dari server. Pastikan n8n menyala!</div>';
+        } 
     }
 
-    // ========================================================================
-    // 4. CEK RELASI SAAT DROPDOWN CPL DIPILIH
-    // ========================================================================
     function checkExistingMapping() {
         const cplId = document.getElementById('selectCpl').value;
         const btnSave = document.getElementById('btnSave');
@@ -184,12 +233,10 @@
 
         if (!cplId) return;
 
-        // Reset & aktifkan checkbox
         checkboxes.forEach(cb => {
             cb.checked = false;
             cb.disabled = false; 
             
-            // Jurus Kebal-Badai: Cek apakah CPMK ini punya CPL yang sedang dipilih
             const parentCpmk = cb.getAttribute('data-parent');
             if (parentCpmk && parentCpmk.trim().toLowerCase() === cplId.trim().toLowerCase()) {
                 cb.checked = true;
@@ -199,49 +246,34 @@
         if (btnSave) btnSave.disabled = false;
     }
 
-    // ========================================================================
-    // 5. SIMPAN RELASI SATU PER SATU KE N8N
-    // ========================================================================
     async function saveMapping() {
         const cplId = document.getElementById('selectCpl').value;
         const btnSave = document.getElementById('btnSave');
         const selectedCpmk = Array.from(document.querySelectorAll('.cpmk-checkbox:checked')).map(cb => cb.value);
 
-        if (!cplId) {
-            alert("Silakan pilih CPL terlebih dahulu!");
-            return;
-        }
+        if (!cplId) { alert("Silakan pilih CPL terlebih dahulu!"); return; }
 
         btnSave.disabled = true;
-        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px;"></i> Sedang Menyimpan Relasi...';
 
         try {
-            // Karena ini 1-to-N (1 CPMK dimiliki oleh 1 CPL), kita update satu per satu seperti kodemu sebelumnya
             let fetchPromises = [];
             for (const cpmkId of selectedCpmk) {
                 const req = fetch(API_UPDATE, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        tipe: 'mapping', 
-                        kode: cpmkId, 
-                        value: cplId 
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tipe: 'mapping', kode: cpmkId, value: cplId, prodi: PRODI })
                 });
                 fetchPromises.push(req);
             }
             
             await Promise.all(fetchPromises);
             alert("✅ Pemetaan CPL - CPMK Berhasil Disimpan!");
-            
-            // Refresh layar agar parent terbarunya langsung terbaca
             initData(); 
             
-        } catch (e) { 
-            alert("Terjadi kesalahan jaringan."); 
-        } finally { 
+        } catch (e) { alert("❌ Terjadi kesalahan jaringan. Gagal menyimpan."); } 
+        finally { 
             btnSave.disabled = false; 
-            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Pemetaan';
+            btnSave.innerHTML = '<i class="fas fa-save" style="font-size: 1.2rem;"></i> Simpan Relasi Pemetaan';
         }
     }
 </script>
