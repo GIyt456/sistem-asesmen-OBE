@@ -18,6 +18,8 @@
             flex-direction: column;
         }
 
+        #sidebar-container { width: 280px; min-width: 280px; height: 100vh; background: var(--sidebar-bg); flex-shrink: 0; }
+
         /* --- Tambahan Tema TI (Merah Gelap) --- */
         .btn-primary-ti { background: linear-gradient(to right, #8b0000, #5c0000); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; box-shadow: 0 2px 4px rgba(139, 0, 0, 0.2); }
         .btn-primary-ti:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(139, 0, 0, 0.3); }
@@ -49,23 +51,24 @@
         padding: 0 !important;
     }
 
-    /* 2. Sembunyikan Sidebar dengan metode Geser (Drawer) */
+    /* 2. Sembunyikan Sidebar (Mode Geser/Drawer) */
     #sidebar-container {
         display: block !important;
         position: fixed !important;
         top: 0 !important;
-        left: -100% !important; /* Sembunyikan ke kiri luar layar */
+        left: -100% !important; 
         width: 260px !important;
         height: 100vh !important;
         z-index: 10000 !important;
         transition: left 0.3s ease-in-out !important;
-        background-color: #111827 !important;
-        box-shadow: 4px 0 15px rgba(0,0,0,0.3) !important;
+        background-color: var(--sidebar-bg, #161923) !important;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.5) !important;       
+        overflow-x: hidden !important; /* Haramkan geser kanan-kiri */
+        overflow-y: auto !important;   /* Halalkan scroll atas-bawah kalau menu banyak */
     }
 
-    /* Class pemicu dari fungsi JavaScript garis tiga */
     #sidebar-container.show-mobile {
-        left: 0 !important; /* Geser masuk ke layar */
+        left: 0 !important;
     }
 
     /* 3. Aktifkan Navbar Melayang di Atas */
@@ -93,8 +96,8 @@
     /* 5. Otomatis Tumpuk Grid/Flexbox Statis (Card Dashboard) Menjadi Kebawah */
     /* Menargetkan container flex/grid baris ringkasan/card statistik */
     .dashboard-grid, 
-    div[style*="display: grid"], 
-    div[style*="display: flex"]:not(.mobile-navbar-content) {
+    .main-content div[style*="display: grid"], 
+    .main-content div[style*="display: flex"]:not(.mobile-navbar-content) {
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
