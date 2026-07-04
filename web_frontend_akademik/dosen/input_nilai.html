@@ -701,6 +701,11 @@
         const API_METADATA = `${API_BASE}/get-metadata`;
         const API_GET_STUDENTS = `${API_BASE}/get-mahasiswa-mk`;
         const PRODI = localStorage.getItem("prodi_aktif") || "ti";
+
+        // --- TAMBAHAN MBKM ---
+        const API_GET_MBKM = `${API_BASE}/get-mbkm-data`;
+        let daftarNimMBKM = [];
+        // ---------------------
         const API_GET_MASTER_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
         const API_GET_KOMPONEN = `${API_BASE}/get-master-komponen`;
 
@@ -875,6 +880,17 @@
         async function loadMetadata() {
             await cekMKSudahInput();
             try { const resKomp = await fetch(API_GET_KOMPONEN); if (resKomp.ok) { daftarKomponenMaster = await resKomp.json(); } } catch (e) { }
+
+            // --- TAMBAHAN TARIK DATA MBKM ---
+            try {
+                const resMbkm = await fetch(API_GET_MBKM);
+                if (resMbkm.ok) {
+                    const jsonMbkm = await resMbkm.json();
+                    const dataMbkm = jsonMbkm.data || jsonMbkm;
+                    daftarNimMBKM = dataMbkm.map(m => String(m.nim).trim());
+                }
+            } catch (e) { console.warn("Gagal menarik data MBKM"); }
+            // --------------------------------
 
             let prodiArray = userProdi.split(',');
             allMetadata = [];
@@ -1317,6 +1333,24 @@
                 }
             } catch (e) { console.warn("Gagal tarik mhs."); }
 
+            // --- FILTER: KECUALIKAN MBKM DARI CETAK EXCEL ---
+            if (Array.isArray(listMahasiswa)) {
+                listMahasiswa = listMahasiswa.filter(mhs => {
+                    const nimMhs = String(mhs.nim || mhs.NIM || "").trim();
+                    return !daftarNimMBKM.includes(nimMhs);
+                });
+
+                // --- URUTKAN BERDASARKAN NIM (KECIL KE BESAR) ---
+                listMahasiswa.sort((a, b) => {
+                    const nimA = String(a.nim || a.NIM || "").trim();
+                    const nimB = String(b.nim || b.NIM || "").trim();
+                    // localeCompare dengan numeric:true mengurutkan angka secara cerdas dan natural
+                    return nimA.localeCompare(nimB, undefined, { numeric: true });
+                });
+                // ------------------------------------------------
+            }
+            // -------------------------------------------------
+
             if (!Array.isArray(listMahasiswa) || listMahasiswa.length === 0) {
                 alert("Data KRS Kosong. Template akan diisi 1 baris contoh.");
                 listMahasiswa = [{ nim: "22320001", nama: "Contoh: Fulan" }];
@@ -1390,27 +1424,46 @@
                 const nim = m[0] || '-'; const nama = m[1] || '-';
                 if (nim === '-' && nama === '-') return;
 
+                // --- LOGIKA CEK MBKM ---
+                let isMBKM = daftarNimMBKM.includes(String(nim).trim());
+                let bgRow = isMBKM ? '#fef9c3' : 'white'; // Warna kuning pastel jika MBKM
+                let labelMBKM = isMBKM ? '<span style="background: #eab308; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 8px; vertical-align: middle;">MBKM</span>' : '';
+                // -----------------------
+
                 let htmlNilaiInputs = "";
                 configData.forEach((config, colIndex) => {
                     let nilaiMentah = parseFloat(m[colIndex + 2]) || 0;
 
-                    // JIKA PERTEMUAN INI ADALAH MATERI/LIBUR, KUNCI INPUT EXCEL JUGA
                     let isBebas = true;
                     let b = (config.bentuk || "").toLowerCase();
                     if (b === 'uts' || b === 'uas' || b === 'tugas' || b === 'attitude' || b === 'kehadiran') isBebas = false;
-                    let lockInput = isBebas ? 'readonly style="background:#f1f5f9;"' : '';
 
-                    htmlNilaiInputs += `<td style="padding: 8px; text-align: center; border-bottom: 1px solid #e5e7eb;">
-                        <input type="number" value="${isBebas ? 0 : nilaiMentah}" ${lockInput} oninput="recalculateRow(${rowIndex})" class="cell-input" data-mhs="${rowIndex}" data-col="${colIndex}" style="width:55px; text-align:center; border:1px solid #cbd5e1; border-radius:4px; padding:4px;">
+                    // --- LOGIKA KUNCI INPUT ---
+                    let lockInput = '';
+                    let valTampil = isBebas ? 0 : nilaiMentah;
+
+                    if (isMBKM) {
+                        // Jika MBKM, KUNCI TOTAL semua input dan paksa nilainya 0
+                        lockInput = 'readonly style="background:#fef9c3; cursor:not-allowed;" title="Peserta MBKM"';
+                        valTampil = 0;
+                    } else if (isBebas) {
+                        // Jika bukan MBKM tapi baris Materi/Libur, kunci biasa
+                        lockInput = 'readonly style="background:#f1f5f9; cursor:not-allowed;"';
+                    }
+                    // --------------------------
+
+                    htmlNilaiInputs += `<td style="padding: 8px; text-align: center; border-bottom: 1px solid #e5e7eb; background: ${bgRow};">
+                        <input type="number" value="${valTampil}" ${lockInput} oninput="recalculateRow(${rowIndex})" class="cell-input" data-mhs="${rowIndex}" data-col="${colIndex}" style="width:55px; text-align:center; border:1px solid #cbd5e1; border-radius:4px; padding:4px;">
                     </td>`;
                 });
 
+                // Cetak baris tabel dengan warna yang sudah disesuaikan
                 tbody.innerHTML += `<tr id="row-${rowIndex}">
-                    <td style="padding: 12px; position: sticky; left: 0; background: white; z-index: 10;">${nim}</td>
-                    <td style="text-align:left; padding: 12px; position: sticky; left: 100px; background: white; z-index: 10;">${nama}</td>
+                    <td style="padding: 12px; position: sticky; left: 0; background: ${bgRow}; z-index: 10; border-bottom: 1px solid #e5e7eb;">${nim}</td>
+                    <td style="text-align:left; padding: 12px; position: sticky; left: 100px; background: ${bgRow}; z-index: 10; border-bottom: 1px solid #e5e7eb;">${nama} ${labelMBKM}</td>
                     ${htmlNilaiInputs}
-                    <td id="final-${rowIndex}" style="text-align:center; font-weight:800;">0.00</td>
-                    <td id="grade-${rowIndex}" style="text-align:center;">-</td>
+                    <td id="final-${rowIndex}" style="text-align:center; font-weight:800; background: ${bgRow}; border-bottom: 1px solid #e5e7eb;">0.00</td>
+                    <td id="grade-${rowIndex}" style="text-align:center; background: ${bgRow}; border-bottom: 1px solid #e5e7eb;">-</td>
                 </tr>`;
             });
 

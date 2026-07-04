@@ -579,6 +579,24 @@
                     document.getElementById('printSyarat').innerText = data.matkul_syarat || '-';
                     document.getElementById('printBatasMhs').innerText = data.batas_mhs || '50.01';
                     document.getElementById('printBatasMk').innerText = data.batas_mk || '85.00%';
+
+                    // --- TAMBAHAN BARU: RUMPUN & PUSTAKA ---
+                    if (data.rumpun) {
+                        document.getElementById('printRumpun').innerText = data.rumpun;
+                    }
+                    if (data.pustaka_utama) {
+                        // Menggunakan replace agar baris baru (Enter) berubah menjadi tag <br> di HTML Cetak
+                        document.getElementById('printPustakaUtama').innerHTML = data.pustaka_utama.replace(/\n/g, '<br>');
+                    } else {
+                        document.getElementById('printPustakaUtama').innerText = '-';
+                    }
+
+                    if (data.pustaka_pendukung) {
+                        document.getElementById('printPustakaPendukung').innerHTML = data.pustaka_pendukung.replace(/\n/g, '<br>');
+                    } else {
+                        document.getElementById('printPustakaPendukung').innerText = '-';
+                    }
+                    // ---------------------------------------
                 }
             } catch (e) { console.error("Gagal menarik data rps_lainnya", e); }
 
