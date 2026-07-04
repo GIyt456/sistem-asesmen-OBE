@@ -8,76 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="../../../js/api_config.js"></script>
-
-    <style>
-        :root { 
-            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
-            --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
-        
-        #sidebar-container { width: 280px; min-width: 280px; height: 100vh; background: var(--sidebar-bg); flex-shrink: 0; }
-
-        /* KONTEN UTAMA */
-        .main-content { flex: 1; overflow-y: auto; padding: 40px 50px; position: relative; }
-        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
-        .header-subtitle { color: #6b7280; font-size: 0.9rem; font-weight: 500; margin-top: 5px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
-        .header-title span { color: var(--primary-blue); }
-
-        .btn-save { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2); }
-        .btn-save:hover { background: #172554; transform: translateY(-2px); }
-        .btn-save:disabled { background: #9ca3af; cursor: not-allowed; transform: none; box-shadow: none; }
-
-        /* DESAIN TABEL MATRIKS */
-        .matrix-container { background: white; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow: auto; max-height: 70vh; }
-        table { border-collapse: collapse; width: max-content; min-width: 100%; text-align: left; }  
-
-        th { background: #1e293b; color: white; font-size: 0.85rem; font-weight: 700; padding: 18px 15px; position: sticky; top: 0; z-index: 10; border-right: 1px solid #334155; border-bottom: 2px solid #0f172a; text-align: center; }        
-        th:first-child { left: 0; z-index: 20; background: #0f172a; min-width: 140px; text-align: left; padding-left: 25px; }        
-        
-        td { padding: 12px 15px; border: 1px solid var(--border-color); transition: background 0.2s; vertical-align: top; min-width: 200px; }
-        td:first-child { position: sticky; left: 0; background: #f8fafc; font-weight: 700; color: var(--primary-red); text-align: left; padding: 18px 25px; z-index: 5; border-right: 2px solid var(--border-color); cursor: help; min-width: 140px; }
-        
-        /* Sel Matriks & Badges */
-        .cell-content { display: flex; flex-direction: column; gap: 6px; min-height: 60px; }
-        .mk-badge { background: #e0f2fe; color: #0369a1; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: 1px solid #bae6fd; display: inline-block; white-space: normal; line-height: 1.3; }
-        .btn-add-mk { background: #f1f5f9; color: #64748b; border: 1px dashed #cbd5e1; border-radius: 6px; padding: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; text-align: center; margin-top: auto; }
-        .btn-add-mk:hover { background: #e2e8f0; color: #334155; border-color: #94a3b8; }
-        .btn-add-mk.has-data { border: none; background: transparent; padding: 4px; margin-top: 5px; text-align: left; color: #3b82f6; }
-        .btn-add-mk.has-data:hover { background: transparent; text-decoration: underline; }
-
-        /* MODAL (POP-UP) STYLING */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000; display: none; justify-content: center; align-items: center; opacity: 0; transition: 0.2s; }
-        .modal-overlay.show { display: flex; opacity: 1; }
-        .modal-box { background: white; width: 500px; max-width: 90%; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; transform: translateY(20px); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; }
-        .modal-overlay.show .modal-box { transform: translateY(0); }
-        .modal-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; }
-        .modal-title { font-weight: 800; color: #111827; font-size: 1.1rem; line-height: 1.4; }
-        .modal-subtitle { font-size: 0.85rem; color: #64748b; font-weight: 500; }
-        .btn-close { background: none; border: none; font-size: 1.5rem; color: #9ca3af; cursor: pointer; transition: 0.2s; }
-        .btn-close:hover { color: #ef4444; }
-        
-        .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
-        .mk-checkbox-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
-        .mk-checkbox-item:hover { background: #f8fafc; border-color: #cbd5e1; }
-        .mk-checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary-blue); cursor: pointer; }
-        .mk-info { display: flex; flex-direction: column; }
-        .mk-kode { font-size: 0.75rem; font-weight: 700; color: #64748b; }
-        .mk-nama { font-size: 0.9rem; font-weight: 600; color: #111827; }
-
-        .modal-footer { padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc; }
-        .btn-cancel { padding: 10px 20px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; color: #475569; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn-cancel:hover { background: #f1f5f9; }
-        .btn-save-modal { padding: 10px 20px; border-radius: 8px; border: none; background: var(--primary-blue); color: white; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn-save-modal:hover { background: #172554; }
-    </style>
+    <link rel="stylesheet" href="pemetaan_cpl_mk_bk.css">
 </head>
 <body>
     <div id="sidebar-container"></div>
-
+    <div id="navbar-container"></div>
     <div class="main-content">
         <div class="header-container">
             <div>
@@ -346,6 +281,28 @@
             btnSave.disabled = false;
         }
     }
+
+    // Fungsi untuk memunculkan dan menyembunyikan sidebar di mobile
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById("sidebar-container");
+            if (sidebar) {
+                // Tambahkan atau hapus class 'show-mobile' yang ada di CSS tadi
+                sidebar.classList.toggle("show-mobile");
+            }
+        }
+
+        // Opsional: Klik di sembarang tempat (luar sidebar) untuk menutupnya
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById("sidebar-container");
+            const toggleBtn = document.getElementById("btnToggleSidebar");
+            
+            // Jika sidebar sedang terbuka, dan user mengklik di luar sidebar & bukan di tombol garis tiga
+            if (sidebar && sidebar.classList.contains("show-mobile")) {
+                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    sidebar.classList.remove("show-mobile");
+                }
+            }
+        });
 </script>
 </body>
 </html>

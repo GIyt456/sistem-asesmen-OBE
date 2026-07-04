@@ -35,7 +35,7 @@
     <div id="sidebar-container"></div>
     <div id="navbar-container"></div>
     <div class="main-content">
-        <div class="content-wrapper">
+        <div class="content-wrapper" style="padding-top: 0px !important;">
             <div class="header-container" style="margin-bottom: 20px;">
                 <div class="header-title-area">
                     <div class="header-subtitle">EVALUASI & RPS</div>
@@ -166,20 +166,22 @@
 
                 sortedNim.forEach(nim => {
                     let mhs = mhsData[nim];
+                    
+                    // Kita gabungkan info NO, NIM, dan NAMA ke dalam satu baris header kartu via atribut data-mhs
                     let rowHtml = `<tr>
-                        <td style="font-weight: bold; color: #475569;">${no++}</td>
-                        <td class="text-left" style="text-align: left;">
+                        <td class="col-nomor" data-label="NO">${no++}</td>
+                        <td class="col-identitas" data-mhs="${nim} - ${mhs.nama || '-'}">
                             <div style="font-weight: 800; color: ${warnaTeksCpl}; font-size: 0.95rem;">${nim}</div>
                             <div style="font-size: 0.85rem; font-weight: 600; color: #1e293b; margin-top: 2px;">${mhs.nama || '-'}</div>
                         </td>`;
                     
                     cplList.forEach(cpl => {
                         let skor = mhs.nilai_cpl[cpl] || 0;
-                        // Warna Badges nilai: Hijau (Lulus >= 60), Merah (Gagal < 60), Abu-abu (Belum ada nilai)
                         let color = skor >= 60 ? 'background: #dcfce7; color: #166534; border: 1px solid #bbf7d0;' : (skor > 0 ? 'background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;' : 'background: #f1f5f9; color: #94a3b8;');
                         let skorTampil = skor > 0 ? skor : '-';
                         let badgeClass = skor > 0 ? 'display: inline-block; padding: 4px 12px; border-radius: 6px; font-weight: bold;' : '';
-                        rowHtml += `<td><span style="${badgeClass} ${color}">${skorTampil}</span></td>`;
+                        
+                        rowHtml += `<td class="col-nilai" data-label="${cpl}"><span style="${badgeClass} ${color}">${skorTampil}</span></td>`;
                     });
                     
                     rowHtml += `</tr>`;

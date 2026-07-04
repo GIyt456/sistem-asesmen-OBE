@@ -18,28 +18,28 @@
         }
 
 /* =========================================
-   PENYESUAIAN MOBILE EVALUASI CPL (Maks 768px)
+   PENYESUAIAN MOBILE (LIST VIEW & FIX SCROLL)
    ========================================= */
 @media (max-width: 768px) {
-    /* 1. Reset Body & Buka Scroll Vertikal */
-    html, body {
-        display: block !important;
-        width: 100vw !important;
-        max-width: 100vw !important;
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        height: auto !important;
+    /* 1. OBAT ANTI TERPOTONG & SCROLL MACET (GARANSI 100%) */
+    html, body { 
+        display: block !important; 
+        width: 100vw !important; 
+        max-width: 100vw !important; 
+        overflow-x: hidden !important; 
+        overflow-y: auto !important; 
+        height: auto !important; 
         min-height: 100vh !important;
         margin: 0 !important;
         padding: 0 !important;
     }
-
-    /* 2. Sembunyikan Sidebar (Drawer Mode) */
+    
+    /* 2. Sembunyikan Sidebar (Mode Geser/Drawer) */
     #sidebar-container {
         display: block !important;
         position: fixed !important;
         top: 0 !important;
-        left: -100% !important;
+        left: -100% !important; 
         width: 260px !important;
         height: 100vh !important;
         z-index: 10000 !important;
@@ -51,89 +51,145 @@
     #sidebar-container.show-mobile {
         left: 0 !important;
     }
-
-    /* 3. Navbar Melayang di Atas */
-    #navbar-container {
+    
+    .main-content, .content-wrapper { 
         display: block !important;
         width: 100% !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        z-index: 9999 !important;
-    }
-
-    /* 4. Amankan Konten Utama dari Navbar */
-    .main-content {
-        display: block !important;
-        width: 100% !important;
-        margin: 0 !important;
-        margin-top: 65px !important;
-        padding: 15px !important;
+        max-width: 100vw !important;
         box-sizing: border-box !important;
+        overflow-y: visible !important; 
+        overflow-x: hidden !important;
+        height: auto !important;
+        max-height: none !important; 
+        flex: none !important; 
     }
 
-    /* 5. Susun Ulang Header */
+    .main-content {
+        margin-top: 65px !important; 
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding: 15px !important; 
+    }
+
+    /* Susun Ulang Header & Filter */
     .header-container {
         display: flex !important;
         flex-direction: column !important;
         align-items: flex-start !important;
-        gap: 10px !important;
+        width: 100% !important;
         margin-bottom: 15px !important;
     }
 
-    .badge-prodi {
-        align-self: flex-start !important;
-    }
-
-    /* 6. Tumpuk Area Filter (Pilih Angkatan & Tombol) */
     .filter-container {
+        display: flex !important;
         flex-direction: column !important;
         align-items: stretch !important;
+        width: 100% !important;
         gap: 15px !important;
         padding: 15px !important;
+        box-sizing: border-box !important;
     }
 
-    .filter-container > div,
-    .filter-container select,
+    .filter-container > div, 
+    .filter-container select, 
     .filter-container button {
         width: 100% !important;
         box-sizing: border-box !important;
     }
 
-    /* 7. PERLAKUAN KHUSUS TABEL EVALUASI */
-    .table-responsive {
+    /* =========================================
+       3. SULAP TABEL MENJADI LIST VIEW (KIRI-KANAN RAPI)
+       ========================================= */
+    .table-responsive { 
+        padding: 0 !important; 
+        background: transparent !important; 
+        box-shadow: none !important; 
+        border: none !important; 
         width: 100% !important;
-        max-width: 100vw !important;
-        padding: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        border: none !important;
-        overflow-x: auto !important; /* Izinkan geser horizontal */
-        -webkit-overflow-scrolling: touch !important;
+        overflow: visible !important; 
     }
     
-    .table-master {
-        min-width: 600px !important; /* Tabel tetap memanjang ke kanan */
-    }
-
-    /* Sedikit perkecil font agar lebih muat di layar */
-    th, td {
-        padding: 10px !important;
-        font-size: 0.8rem !important;
-    }
-
-    /* Kunci Kolom Pertama (NIM & Nama) agar tidak ikut tergeser */
-    th:first-child, td:first-child {
-        position: sticky !important;
-        left: 0 !important;
-        z-index: 20 !important;
-        background-color: white !important; /* Background putih menutupi data yang lewat di bawahnya */
-        box-shadow: 2px 0 5px rgba(0,0,0,0.1) !important;
+    .table-cpl, .table-cpl tbody {
+        display: block !important; 
+        width: 100% !important; 
+        min-width: 0 !important; 
+        box-sizing: border-box !important;
     }
     
-    th:first-child {
-        background-color: #111827 !important; /* Warna header bawaan agar serasi */
-        color: white !important;
-        z-index: 21 !important;
+    .table-cpl thead { 
+        display: none !important; 
+    }
+
+    /* CARD UTAMA (Bungkus per Mahasiswa) */
+    .table-cpl tr {
+        display: flex !important;
+        flex-direction: column !important;
+        background: #ffffff !important;
+        margin-bottom: 25px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.06) !important;
+        border: 1px solid #e2e8f0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important; 
+    }
+
+    /* 1. SEMBUNYIKAN KOLOM NOMOR BIASA DI MOBILE */
+    .table-cpl td.col-nomor {
+        display: none !important;
+    }
+
+    /* 2. SULAP KOLOM IDENTITAS MENJADI HEADER CARD (NIM - NAMA) */
+    .table-cpl td.col-identitas {
+        display: flex !important;
+        align-items: flex-start !important; /* DIUBAH ke flex-start agar kalau teksnya jadi 2 baris, posisinya rapi dari atas */
+        width: 100% !important;
+        padding: 14px 15px !important;
+        background: #1e293b !important; 
+        border-bottom: 2px solid #0f172a !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Sembunyikan elemen div identitas bawaan asli HTML agar tidak double */
+    .table-cpl td.col-identitas > div {
+        display: none !important;
+    }
+
+    /* Teks header putih tebal mengambil dari atribut data-mhs */
+    .table-cpl td.col-identitas::before {
+        content: attr(data-mhs) !important;
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        color: #ffffff !important; /* Warna teks putih solid */
+        text-align: left !important;
+        margin-right: 0 !important; /* Reset margin */
+        display: block !important;            /* Paksa teks bertindak sebagai block container */
+        width: 100% !important;               /* Penuhi lebar ruang kartu */
+        white-space: normal !important;       /* Izinkan teks turun membuat baris baru */
+        overflow-wrap: break-word !important;
+    }
+
+    /* 3. ATUR BARIS NILAI CPL (LABEL KIRI - BADGE KANAN) */
+    .table-cpl td.col-nilai {
+        display: flex !important;
+        justify-content: space-between !important; 
+        align-items: center !important;
+        width: 100% !important;
+        padding: 12px 15px !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Hilangkan garis bawah pada nilai terakhir di dalam card */
+    .table-cpl tr td.col-nilai:last-child {
+        border-bottom: none !important;
+    }
+
+    /* Label CPL otomatis mengambil dari atribut data-label di HTML */
+    .table-cpl td.col-nilai::before {
+        content: attr(data-label) !important;
+        font-size: 0.85rem !important;
+        font-weight: 700 !important;
+        color: #64748b !important;
     }
 }

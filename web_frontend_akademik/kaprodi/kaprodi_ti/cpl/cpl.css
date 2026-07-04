@@ -64,7 +64,7 @@
         display: block !important;
         position: fixed !important;
         top: 0 !important;
-        left: -100% !important; /* Disembunyikan di luar layar */
+        left: -100% !important; 
         width: 260px !important;
         height: 100vh !important;
         z-index: 10000 !important;
@@ -76,7 +76,7 @@
     #sidebar-container.show-mobile {
         left: 0 !important;
     }
-
+    
     /* 3. Munculkan Navbar Melayang di Atas */
     #navbar-container {
         display: block !important;

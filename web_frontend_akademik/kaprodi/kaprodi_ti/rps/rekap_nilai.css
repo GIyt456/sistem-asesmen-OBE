@@ -155,8 +155,27 @@ body {
 
     /* 7. UBAH TABEL MENJADI CARD (MOBILE FRIENDLY) */
     
+    .table-master {
+        width: 100% !important;
+        min-width: 0 !important; /* INI KUNCI UTAMANYA */
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    div[style*="display: flex; gap: 10px;"], 
+    #searchKelas, 
+    .btn-dark {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
     /* Hapus box pembungkus tabel bawaan */
     .card-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
         padding: 0 !important;
         background: transparent !important;
         border: none !important;
