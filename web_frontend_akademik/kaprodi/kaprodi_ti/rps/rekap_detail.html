@@ -10,37 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/api_config.js"></script>
-    <script src="/js/template.js"></script> 
-    <style>
-        .table-responsive { overflow-x: auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 40px; }
-        .table-nilai { width: 100%; border-collapse: collapse; min-width: 1300px; }
-        .table-nilai th, .table-nilai td { padding: 12px 8px; border: 1px solid #e5e7eb; text-align: center; font-size: 0.9rem; }
-        .table-nilai th { background-color: #111827; font-weight: 700; color: white; position: sticky; top: 0; z-index: 2; font-size: 0.85rem; text-transform: uppercase; }
-        
-        /* Kolom lengket (Sticky) untuk No dan NIM agar tidak hilang saat di-scroll ke kanan */
-        .table-nilai th.sticky-col, .table-nilai td.sticky-col { position: sticky; left: 0; background-color: white; z-index: 3; border-right: 2px solid #cbd5e1; }
-        .table-nilai th.sticky-col { background-color: #111827; } /* Header sticky tetap gelap */
-        .table-nilai th.sticky-col:nth-child(2), .table-nilai td.sticky-col:nth-child(2) { left: 40px; }
-        
-        .grade-badge { padding: 6px 12px; border-radius: 6px; font-weight: 800; color: white; font-size: 0.9rem; }
-        
-        body { animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        @media print {
-            #sidebar-container, #navbar-container, .btn-action, .header-container { display: none !important; }
-            .main-content { padding: 0 !important; }
-            .table-responsive { box-shadow: none; border: none; overflow: visible; }
-        }
-    </style>
+    <script src="/js/template.js"></script>
+    <link rel="stylesheet" href="rekap_detail.css">
 </head>
 <body>
 
     <div id="sidebar-container"></div>
-    
+    <div id="navbar-container"></div>
     <div class="main-content">
-        <div id="navbar-container"></div>
-
         <div class="content-wrapper">
             <div class="header-container">
                 <div class="header-title-area">
@@ -220,6 +197,28 @@
                 console.error(error);
             }
         }
+
+        // Fungsi untuk memunculkan dan menyembunyikan sidebar di mobile
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById("sidebar-container");
+            if (sidebar) {
+                // Tambahkan atau hapus class 'show-mobile' yang ada di CSS tadi
+                sidebar.classList.toggle("show-mobile");
+            }
+        }
+
+        // Opsional: Klik di sembarang tempat (luar sidebar) untuk menutupnya
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById("sidebar-container");
+            const toggleBtn = document.getElementById("btnToggleSidebar");
+            
+            // Jika sidebar sedang terbuka, dan user mengklik di luar sidebar & bukan di tombol garis tiga
+            if (sidebar && sidebar.classList.contains("show-mobile")) {
+                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
+                    sidebar.classList.remove("show-mobile");
+                }
+            }
+        });
 
         window.onload = () => {
             setTimeout(loadDetailNilai, 400);

@@ -1,0 +1,293 @@
+.table-responsive { overflow-x: auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 40px; }
+        .table-nilai { width: 100%; border-collapse: collapse; min-width: 1300px; }
+        .table-nilai th, .table-nilai td { padding: 12px 8px; border: 1px solid #e5e7eb; text-align: center; font-size: 0.9rem; }
+        .table-nilai th { background-color: #111827; font-weight: 700; color: white; position: sticky; top: 0; z-index: 2; font-size: 0.85rem; text-transform: uppercase; }
+        
+        /* Kolom lengket (Sticky) untuk No dan NIM agar tidak hilang saat di-scroll ke kanan */
+        .table-nilai th.sticky-col, .table-nilai td.sticky-col { position: sticky; left: 0; background-color: white; z-index: 3; border-right: 2px solid #cbd5e1; }
+        .table-nilai th.sticky-col { background-color: #111827; } /* Header sticky tetap gelap */
+        .table-nilai th.sticky-col:nth-child(2), .table-nilai td.sticky-col:nth-child(2) { left: 40px; }
+        
+        .grade-badge { padding: 6px 12px; border-radius: 6px; font-weight: 800; color: white; font-size: 0.9rem; }
+        
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media print {
+            #sidebar-container, #navbar-container, .btn-action, .header-container { display: none !important; }
+            .main-content { padding: 0 !important; }
+            .table-responsive { box-shadow: none; border: none; overflow: visible; }
+        }
+
+/* =========================================
+   PENYESUAIAN MOBILE DETAIL NILAI (Maks 768px)
+   ========================================= */
+@media (max-width: 768px) {
+    /* 1. Reset Layar & Buka Kunci Scroll */
+    html, body {
+        display: block !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* 2. Sembunyikan Sidebar ke Drawer */
+    #sidebar-container {
+        display: block !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: -100% !important;
+        width: 260px !important;
+        height: 100vh !important;
+        z-index: 10000 !important;
+        transition: left 0.3s ease-in-out !important;
+        background-color: #161923 !important;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.5) !important;
+    }
+    #sidebar-container.show-mobile { left: 0 !important; }
+
+    #navbar-container {
+        display: block !important;
+        width: 100% !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 9999 !important;
+    }
+
+    /* 3. Amankan Main Content dari Navbar */
+    .main-content {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        margin-top: 65px !important;
+        padding: 15px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Rapikan Info Matkul di Atas */
+    .info-card { width: 100% !important; padding: 15px !important; box-sizing: border-box !important; }
+    .info-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
+
+    /* =========================================
+       4. SULAP TABEL 20 KOLOM JADI KARTU MEWAH
+       ========================================= */
+    .table-responsive { 
+        width: 100% !important; 
+        padding: 0 !important; 
+        background: transparent !important; 
+        box-shadow: none !important; 
+        border: none !important; 
+        overflow: visible !important; 
+    }
+    
+    .table-nilai, .table-nilai tbody { 
+        display: block !important; 
+        width: 100% !important; 
+        min-width: 0 !important; /* Hancurkan 1300px */
+        box-sizing: border-box !important; 
+    }
+    
+    .table-nilai thead { display: none !important; }
+    .table-nilai tbody { counter-reset: mhs-counter; }
+
+    /* BUNGKUS KARTU PER MAHASISWA */
+    .table-nilai tr {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        background: white !important;
+        margin-bottom: 25px !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08) !important;
+        border: 1px solid #e2e8f0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        position: relative !important;
+        padding-top: 40px !important; /* Ruang untuk Header Hitam */
+        overflow: hidden !important;
+    }
+
+    /* HEADER NOMOR URUT (Otomatis) */
+    .table-nilai tr::before {
+        counter-increment: mhs-counter;
+        content: "Data Mahasiswa #" counter(mhs-counter);
+        position: absolute !important;
+        top: 0 !important; left: 0 !important; width: 100% !important;
+        background: #0f172a !important; color: white !important;
+        padding: 10px 15px !important; font-size: 0.85rem !important; font-weight: 700 !important;
+        box-sizing: border-box !important; z-index: 10;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    .table-nilai td:nth-child(1) {
+        display: none !important;
+    }
+
+    /* 2. Jadikan Kolom 2 sebagai Baris Identitas (Karena NIM & Nama tergabung di sini) */
+    .table-nilai td:nth-child(2) {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 12px 15px !important;
+        box-sizing: border-box !important;
+        border-bottom: 4px solid #cbd5e1 !important;
+        background: #f8fafc !important;
+        text-align: right !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+    }
+    
+    /* Beri label "Mahasiswa" karena NIM & Nama menyatu */
+    .table-nilai td:nth-child(2)::before { 
+        content: "Mahasiswa"; 
+        font-size: 0.85rem; 
+        font-weight: 800; 
+        color: #64748b; 
+        margin-right: 15px; 
+    }
+
+    /* BAGIAN B: GRID NILAI PERTEMUAN 1 - 16 (4 Kolom x 4 Baris) */
+    .table-nilai td:nth-child(n+3):nth-child(-n+18) {
+        width: 25% !important; /* Membagi sisa ruang menjadi 4 kotak sejajar */
+        display: inline-flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 12px 5px !important;
+        box-sizing: border-box !important;
+        border-right: 1px solid #f1f5f9 !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        background: white !important;
+    }
+    
+    /* Hilangkan garis pemisah kanan di setiap ujung baris grid */
+    .table-nilai td:nth-child(6), 
+    .table-nilai td:nth-child(10), 
+    .table-nilai td:nth-child(14), 
+    .table-nilai td:nth-child(18) { 
+        border-right: none !important; 
+    }
+
+    /* Label Otomatis untuk P1 sampai P16 */
+    .table-nilai td:nth-child(n+3):nth-child(-n+18)::before {
+        font-size: 0.7rem !important;
+        font-weight: 800 !important;
+        color: #94a3b8 !important;
+        margin-bottom: 6px !important;
+    }
+    .table-nilai td:nth-child(3)::before { content: "P1"; }
+    .table-nilai td:nth-child(4)::before { content: "P2"; }
+    .table-nilai td:nth-child(5)::before { content: "P3"; }
+    .table-nilai td:nth-child(6)::before { content: "P4"; }
+    .table-nilai td:nth-child(7)::before { content: "P5"; }
+    .table-nilai td:nth-child(8)::before { content: "P6"; }
+    .table-nilai td:nth-child(9)::before { content: "P7"; }
+    .table-nilai td:nth-child(10)::before { content: "UTS"; color: #dc2626 !important; }
+    .table-nilai td:nth-child(11)::before { content: "P9"; }
+    .table-nilai td:nth-child(12)::before { content: "P10"; }
+    .table-nilai td:nth-child(13)::before { content: "P11"; }
+    .table-nilai td:nth-child(14)::before { content: "P12"; }
+    .table-nilai td:nth-child(15)::before { content: "P13"; }
+    .table-nilai td:nth-child(16)::before { content: "P14"; }
+    .table-nilai td:nth-child(17)::before { content: "P15"; }
+    .table-nilai td:nth-child(18)::before { content: "UAS"; color: #dc2626 !important; }
+
+    /* Warnai Latar UTS (Kolom 10) dan UAS (Kolom 18) agar sangat mencolok */
+    .table-nilai td:nth-child(10), 
+    .table-nilai td:nth-child(18) {
+        background: #fff1f2 !important; 
+        border-bottom: 2px solid #fecaca !important;
+    }
+
+    /* BAGIAN C: FOOTER (NILAI TOTAL & GRADE) */
+    .table-nilai td:nth-child(19), 
+    .table-nilai td:nth-child(20) {
+        width: 50% !important;
+        display: inline-flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 15px !important;
+        box-sizing: border-box !important;
+        background: #1e293b !important; /* Warna gelap kontras di bawah */
+        color: white !important;
+        border: none !important;
+    }
+    
+    .table-nilai td:nth-child(19) { border-right: 1px solid #334155 !important; }
+    
+    /* Label Footer */
+    .table-nilai td:nth-child(19)::before { content: "TOTAL SKOR"; font-size: 0.75rem; color: #cbd5e1; margin-bottom: 5px; font-weight: 700;}
+    .table-nilai td:nth-child(20)::before { content: "GRADE"; font-size: 0.75rem; color: #cbd5e1; margin-bottom: 5px; font-weight: 700;}
+    
+    /* Perbesar angka Total dan Grade */
+    .table-nilai td:nth-child(19) { font-size: 1.35rem !important; font-weight: 900 !important; color: #fbbf24 !important; /* Warna emas */ }
+    .table-nilai td:nth-child(20) span { font-size: 1.2rem !important; padding: 6px 20px !important; }
+
+    /* =========================================
+       5. PERLAKUAN KHUSUS 3 BARIS PERTAMA (TARGET & BOBOT)
+       ========================================= */
+    /* Mundurkan penghitung agar Mahasiswa #1 dimulai di baris ke-4 */
+    .table-nilai tbody {
+        counter-reset: mhs-counter 0 !important; 
+    }
+    .table-nilai tbody tr:nth-child(n+4) {
+        counter-increment: mhs-counter !important;
+    }
+
+    /* Ubah Tampilan Card Spesial untuk 3 Baris Pertama */
+    .table-nilai tbody tr:nth-child(-n+3) {
+        padding-top: 0 !important; /* Hilangkan ruang header hitam */
+        background: #eff6ff !important; 
+        border: 2px solid #93c5fd !important; 
+    }
+
+    /* Sembunyikan Header Hitam 'Data Mahasiswa' pada 3 baris ini */
+    .table-nilai tbody tr:nth-child(-n+3)::before {
+        display: none !important;
+    }
+
+    /* Jadikan Kolom 2 (Tulisan Target CPL, dll) sebagai Judul Card Biru */
+    .table-nilai tbody tr:nth-child(-n+3) td:nth-child(2) {
+        background: #2563eb !important; 
+        color: white !important;
+        justify-content: center !important;
+        text-align: center !important;
+        font-size: 1.05rem !important;
+        font-weight: 800 !important;
+        border-bottom: none !important;
+        border-radius: 8px 8px 0 0 !important;
+    }
+
+    /* Sembunyikan Label "Mahasiswa" pada 3 judul biru ini */
+    .table-nilai tbody tr:nth-child(-n+3) td:nth-child(2)::before {
+        display: none !important;
+    }
+
+    /* HAPUS Kolom Total Skor dan Grade untuk Target CPL (karena target tidak butuh ini) */
+    .table-nilai tbody tr:nth-child(-n+3) td:nth-child(19),
+    .table-nilai tbody tr:nth-child(-n+3) td:nth-child(20) {
+        display: none !important;
+    }
+
+    /* Hilangkan background merah pada UTS/UAS untuk baris target agar tetap biru kalem */
+    .table-nilai tbody tr:nth-child(-n+3) td:nth-child(10),
+    .table-nilai tbody tr:nth-child(-n+3) td:nth-child(18) {
+        background: transparent !important;
+        border-bottom: 1px solid #bfdbfe !important;
+    }
+    
+    /* Ganti garis-garis grid menjadi biru muda menyesuaikan tema card target */
+    .table-nilai tbody tr:nth-child(-n+3) td:nth-child(n+3):nth-child(-n+18) {
+        border-right: 1px solid #bfdbfe !important;
+        border-bottom: 1px solid #bfdbfe !important;
+        color: #1e40af !important;
+    }
+}

@@ -6,63 +6,147 @@
     <title>Rekap Nilai Dosen - Sistem OBE</title>
     
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
+    
     <style>
-        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 30px; }
+        /* MANTRA ANTI-BOCOR LAYAR GLOBAL */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border-color); margin-bottom: 30px; }
         .table-master { width: 100%; border-collapse: collapse; }
-        .table-master th, .table-master td { padding: 15px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: middle; }
-        .table-master th { background: #111827; color: white; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+        .table-master th, .table-master td { padding: 15px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: middle; font-size: 0.9rem;}
+        .table-master th { background: #1e293b; color: white; font-weight: 700; text-transform: uppercase; border-bottom: 3px solid #0f172a;}
         .text-center { text-align: center !important; }
 
-        /* Progress Bar Sederhana */
-        .progress-bg { background: #e5e7eb; border-radius: 10px; height: 10px; width: 100%; overflow: hidden; margin-top: 5px; }
-        .progress-bar { background: #10b981; height: 100%; border-radius: 10px; transition: width 0.5s ease; }
-        .progress-text { font-size: 0.8rem; font-weight: 600; color: #4b5563; }
-        .status-danger { color: #dc2626; background: #fee2e2; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
-        .status-success { color: #059669; background: #d1fae5; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
+        /* Progress Bar Keren */
+        .progress-bg { background: #e2e8f0; border-radius: 10px; height: 10px; width: 100%; overflow: hidden; margin-top: 8px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
+        .progress-bar { background: #10b981; height: 100%; border-radius: 10px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 4px rgba(16, 185, 129, 0.4);}
+        .progress-text { font-size: 0.85rem; font-weight: 800; color: #334155; }
         
-        body { animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .status-danger { color: #dc2626; background: #fef2f2; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; border: 1px solid #fecaca;}
+        .status-warn { color: #d97706; background: #fffbeb; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; border: 1px solid #fde68a;}
+        .status-success { color: #059669; background: #ecfdf5; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; border: 1px solid #a7f3d0;}
+        
+        /* =========================================
+           📱 SULAP KARTU HP (ANTI POTONG FINAL)
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            /* 1. Kunci Lebar Layar Mutlak */
+            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
+            
+            /* 2. Pangkas Margin Inline dari Desktop */
+            .main-content { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; padding-top: 15px !important;}
+            .header-rekap-dosen { margin-left: 15px !important; margin-right: 15px !important; width: calc(100% - 30px) !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px;}
+            .section-rekap-dosen { padding-left: 15px !important; padding-right: 15px !important; width: 100% !important; box-sizing: border-box !important;}
+            .card-container { padding: 0 !important; background: transparent !important; box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important;}
+            
+            /* 3. Rapikan Kolom Pencarian */
+            .search-wrapper { width: 100% !important; max-width: 100% !important; margin: 0 !important;}
+            #searchKelas { width: 100% !important; box-sizing: border-box !important;}
+
+            /* 4. Hancurkan Sifat Bawaan Table (Penyebab Terpotong) */
+            .table-master, .table-master tbody, .table-master tr, .table-master td { 
+                display: block !important; 
+                width: 100% !important; 
+                min-width: 0 !important; 
+                max-width: 100% !important; 
+                box-sizing: border-box !important; 
+                white-space: normal !important;
+                word-wrap: break-word !important;
+            }
+            .table-master thead { display: none !important; }
+            
+            .table-master tr { background: white !important; border: 1px solid var(--border-color) !important; border-radius: 12px !important; margin-bottom: 20px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;}
+            
+            .table-master td { display: flex !important; text-align: right !important; padding: 15px 20px !important; border-bottom: 1px dashed #e2e8f0 !important; justify-content: space-between !important; align-items: center !important; border-left: none !important; border-right: none !important; border-top: none !important;}
+            .table-master td:last-child { border-bottom: none !important; }
+            
+            /* Sembunyikan No */
+            .table-master td:nth-child(1) { display: none !important; }
+            
+            /* Kelas / Grup */
+            .table-master td:nth-child(2)::before { content: "Kelas / Grup"; font-weight: 800; color: #64748b; }
+            .table-master td:nth-child(2) strong { color: #1e293b !important; font-size: 1.05rem !important;}
+            
+            /* Jadikan MATA KULIAH sebagai Header Kartu */
+            .table-master td:nth-child(3) { 
+                background: #1e293b !important; 
+                border-bottom: 4px solid var(--primary-blue) !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+            }
+            .table-master td:nth-child(3) div { color: white !important; }
+            .table-master td:nth-child(3) div:first-child { color: #facc15 !important; font-size: 1.15rem !important; margin-bottom: 3px;}
+            .table-master td:nth-child(3) div:last-child { line-height: 1.4; font-size: 0.95rem !important;}
+            
+            /* Dosen */
+            .table-master td:nth-child(4) { flex-direction: column !important; align-items: flex-start !important; gap: 5px; text-align: left !important;}
+            .table-master td:nth-child(4)::before { content: "Dosen Pengampu"; font-weight: 800; color: #64748b; font-size: 0.85rem;}
+            
+            /* Progress Bar */
+            .table-master td:nth-child(5) { flex-direction: column !important; align-items: stretch !important; gap: 8px;}
+            .table-master td:nth-child(5) > div:first-child::before { content: "Status Progress"; font-weight: 800; color: #64748b; margin-right: auto; }
+            
+            /* Tombol Detail */
+            .table-master td:nth-child(6) { display: block !important; padding: 20px !important;}
+            .btn-primary-si { width: 100% !important; box-sizing: border-box !important;}
+        }
     </style>
 </head>
 <body>
 
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi"></div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
 
     <div class="main-content">
         <div id="navbar-container"></div>
 
-        <div class="content-wrapper">
-            <div class="header-container">
+        <div class="fixed-header">
+            <div class="header-container header-rekap-dosen" style="margin: 30px 50px 15px 50px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
-                    <div class="header-subtitle">EVALUASI & RPS</div>
-                    <h1 class="header-title">REKAP NILAI <span>DOSEN</span></h1>
+                    <div class="header-subtitle" style="margin-bottom: 5px;">EVALUASI & RPS</div>
+                    <h1 class="header-title" style="font-size: 2rem;">REKAP NILAI <span>DOSEN</span></h1>
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
-
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="searchKelas" onkeyup="cariData()" class="form-control" placeholder="Cari Mata Kuliah atau Nama Dosen..." style="width: 300px;">
+            
+            <div class="header-rekap-dosen" style="display: flex; gap: 15px; margin: 0 50px 15px 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                <div class="search-wrapper" style="position: relative; flex: 1;">
+                    <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                    <input type="text" id="searchKelas" onkeyup="cariData()" class="form-control" placeholder="Cari Mata Kuliah atau Dosen..." style="width: 100%; padding-left: 45px; border: 2px solid #cbd5e1; font-weight: 600; margin-bottom: 0;">
+                </div>
             </div>
+        </div>
 
+        <div class="scrollable-content section-rekap-dosen" style="padding: 0 50px 40px 50px;">
             <div class="card-container">
                 <table class="table-master">
                     <thead>
                         <tr>
                             <th width="5%" class="text-center">No</th>
                             <th width="10%">Kelas</th>
-                            <th width="25%">Mata Kuliah</th>
+                            <th width="30%">Mata Kuliah</th>
                             <th width="25%">Dosen Pengampu</th>
                             <th width="20%">Progres Input Nilai</th>
-                            <th width="15%" class="text-center">Aksi</th>
+                            <th width="10%" class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="tableBodyRekap">
-                        <tr><td colspan="6" class="text-center" style="color: #6b7280; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data kelas aktif...</td></tr>
+                        <tr><td colspan="6" class="text-center" style="color: #64748b; padding: 40px;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); margin-bottom: 15px;"></i><br>Memuat data kelas aktif...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -70,29 +154,52 @@
     </div>
 
     <script>
-        // DETEKSI PRODI DINAMIS
         const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-        
         const API_REKAP = `${API_BASE}/get-rekap-nilai?prodi=${PRODI}`;
 
-        // SATPAM HALAMAN
         const userLogin = localStorage.getItem("user_login");
         if (!userLogin) window.location.replace("/login/login.html");
 
-        // Set Label Prodi UI
         document.addEventListener("DOMContentLoaded", () => {
-            const badge = document.getElementById("prodiBadge");
-            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
-            
-            if(PRODI === "si") {
-                badge.style.background = "var(--primary-teal)";
-                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+            if(PRODI === "ti") {
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+                document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+            } else {
+                document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+                document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
             }
+
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if(avatarMobile) {
+                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+            }
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebar.innerHTML = html;
+                            if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar darurat'));
+                }
+            }, 600); 
         });
         
         async function loadRekapNilai() {
             const tbody = document.getElementById('tableBodyRekap');
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color: #6b7280; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Menarik data rekap nilai...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color: #64748b; padding: 40px;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); margin-bottom: 15px;"></i><br>Menarik data rekap nilai dari Database...</td></tr>`;
             
             try {
                 const res = await fetch(API_REKAP);
@@ -101,28 +208,19 @@
                 const data = await res.json();
                 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center">Belum ada data kelas aktif untuk prodi ini.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color: #dc2626; font-weight: bold; padding: 30px;">Belum ada data kelas aktif untuk prodi ini.</td></tr>`;
                     return;
                 }
                 
                 renderTable(data, tbody);
 
             } catch (error) {
-                console.log("n8n gagal memuat, menampilkan data fallback.");
-                const dummyData = [
-                    { kelas: "TI-A", kode_mk: "2023W276", nama_mk: "AI Programming", dosen: "Harries Arizonia Ismail", persentase: 100 },
-                    { kelas: "TI-B", kode_mk: "2023P065", nama_mk: "Cyber Security", dosen: "Dosen Pengampu TI", persentase: 45 },
-                    { kelas: "SI-A", kode_mk: "2023F075", nama_mk: "Metodologi Riset", dosen: "Dosen Pengampu SI", persentase: 0 }
-                ];
-                // Filter dummy data agar masuk akal saat presentasi offline
-                const filteredDummy = dummyData.filter(d => d.kelas.toLowerCase().includes(PRODI));
-                renderTable(filteredDummy.length > 0 ? filteredDummy : dummyData, tbody);
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="color: red; font-weight: bold; padding: 30px;">❌ Gagal terhubung ke Server n8n.</td></tr>`;
             }
         }
 
         function cariData() {
             let input = document.getElementById('searchKelas').value.toLowerCase();
-          
             let rows = document.querySelectorAll('#tableBodyRekap tr');
 
             rows.forEach(row => {
@@ -147,9 +245,9 @@
                 
                 if (item.persentase === 0) {
                     statusBadge = `<span class="status-danger"><i class="fas fa-times-circle"></i> Belum Input</span>`;
-                    barColor = "#dc2626"; 
+                    barColor = "#ef4444"; 
                 } else if (item.persentase < 100) {
-                    statusBadge = `<span style="color:#d97706; font-size:0.75rem; font-weight:bold;"><i class="fas fa-clock"></i> Proses Input</span>`;
+                    statusBadge = `<span class="status-warn"><i class="fas fa-clock"></i> Proses Input</span>`;
                     barColor = "#f59e0b"; 
                 } else {
                     statusBadge = `<span class="status-success"><i class="fas fa-check-circle"></i> Selesai</span>`;
@@ -157,15 +255,15 @@
 
                 tbody.innerHTML += `
                     <tr>
-                        <td class="text-center" style="font-weight: bold; color: #475569;">${index + 1}</td>
-                        <td><strong style="color: var(--text-dark);">${item.kelas}</strong></td>
+                        <td class="text-center" style="font-weight: 800; color: #64748b; font-size: 1.1rem;">${index + 1}</td>
+                        <td><strong style="color: var(--text-dark); font-size: 1.05rem;">${item.kelas || '-'}</strong></td>
                         <td>
-                            <div style="font-weight: 700; color: ${PRODI === 'si' ? 'var(--primary-teal)' : 'var(--primary-red)'};">${item.kode_mk}</div>
-                            <div style="font-size: 0.85rem; font-weight: 500;">${item.nama_mk}</div>
+                            <div style="font-weight: 900; color: var(--primary-blue); font-size: 1.1rem;">${item.kode_mk}</div>
+                            <div style="font-size: 0.9rem; font-weight: 600; color: #475569; margin-top: 4px;">${item.nama_mk}</div>
                         </td>
-                        <td style="color: #4b5563; font-weight: 500;">${item.dosen}</td>
+                        <td style="color: #334155; font-weight: 700;">${item.dosen}</td>
                         <td>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                                 <span class="progress-text">${item.persentase}%</span>
                                 ${statusBadge}
                             </div>
@@ -174,8 +272,8 @@
                             </div>
                         </td>
                         <td class="text-center">
-                            <button class="btn-action btn-dark" style="width: 100%; justify-content: center; background: #2563eb; border: none;" onclick="window.location.href='rekap_detail.html?kode_mk=${item.kode_mk}&nama_mk=${encodeURIComponent(item.nama_mk)}&dosen=${encodeURIComponent(item.dosen)}'">
-                                <i class="fas fa-search"></i> Detail
+                            <button class="btn-primary-si" style="width: 100%; justify-content: center; padding: 12px; font-weight:bold; font-size:1rem;" onclick="window.location.href='rekap_detail.html?kode_mk=${item.kode_mk}&nama_mk=${encodeURIComponent(item.nama_mk)}&dosen=${encodeURIComponent(item.dosen)}'">
+                                <i class="fas fa-search"></i> Detail Nilai
                             </button>
                         </td>
                     </tr>
@@ -183,9 +281,7 @@
             });
         }
 
-        window.onload = () => {
-            setTimeout(loadRekapNilai, 400);
-        };
+        window.onload = () => { setTimeout(loadRekapNilai, 400); };
     </script>
 </body>
 </html>
