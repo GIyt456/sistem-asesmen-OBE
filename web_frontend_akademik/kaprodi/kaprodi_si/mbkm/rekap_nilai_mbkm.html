@@ -753,8 +753,8 @@
                                 <option value="3">Semester 3</option>
                                 <option value="4">Semester 4</option>
                                 <option value="5">Semester 5</option>
-                                <option value="6" selected>Semester 6</option>
-                                <option value="7">Semester 7</option>
+                                <option value="6">Semester 6</option>
+                                <option value="7" selected>Semester 7</option>
                                 <option value="8">Semester 8</option>
                             </select>
                             <button class="btn-outline" onclick="loadDefaultMK()"><i class="fas fa-download"></i>
@@ -882,14 +882,14 @@
 
     </div>
     <script>
-        const BASE_N8N_URL = "https://contained-reply-followed-integrate.trycloudflare.com/webhook";
-        const API_MBKM_LIST = `${BASE_N8N_URL}/get-mbkm-data`;
-        const API_MK_MASTER = `${BASE_N8N_URL}/get-master-matkul`;
-        const API_CHECK_NILAI = `${BASE_N8N_URL}/get-nilai-mhs`;
-        const API_SAVE_REKAP = `${BASE_N8N_URL}/save-nilai-mbkm`;
 
-        const API_GET_BOBOT = `${BASE_N8N_URL}/get-bobot-mbkm`;
-        const API_GET_NILAI_DETAIL = `${BASE_N8N_URL}/get-nilai-mbkm-detail`;
+        const API_MBKM_LIST = `${API_BASE}/get-mbkm-data`;
+        const API_MK_MASTER = `${API_BASE}/get-master-matkul`;
+        const API_CHECK_NILAI = `${API_BASE}/get-nilai-mhs`;
+        const API_SAVE_REKAP = `${API_BASE}/save-nilai-mbkm`;
+
+        const API_GET_BOBOT = `${API_BASE}/get-bobot-mbkm`;
+        const API_GET_NILAI_DETAIL = `${API_BASE}/get-nilai-mbkm-detail`;
 
         let dataPendaftarMBKM = [];
         let allDataMK = [];
@@ -927,19 +927,33 @@
         async function initData() {
             const inputSearch = document.getElementById("mhsSearch");
             try {
-                const [resMhs, resMk] = await Promise.all([
+                // --- PERUBAHAN: Menambahkan tarikan data dari master_mahasiswa ---
+                const [resMhs, resMk, resMasterMhs] = await Promise.all([
                     fetch(API_MBKM_LIST).catch(() => null),
-                    fetch(API_MK_MASTER).catch(() => null)
+                    fetch(API_MK_MASTER).catch(() => null),
+                    fetch(`${API_BASE}/get-mahasiswa-db`).catch(() => null)
                 ]);
 
                 let jsonMhs = { data: [] };
                 let jsonMk = { data: [] };
+                let jsonMasterMhs = { data: [] };
 
                 if (resMhs && resMhs.ok) jsonMhs = await resMhs.json();
                 if (resMk && resMk.ok) jsonMk = await resMk.json();
+                if (resMasterMhs && resMasterMhs.ok) jsonMasterMhs = await resMasterMhs.json();
 
                 dataPendaftarMBKM = safeExtractArray(jsonMhs);
                 allDataMK = safeExtractArray(jsonMk);
+                let dataMasterMhs = safeExtractArray(jsonMasterMhs);
+
+                // --- INJEKSI PRODI ASLI KE DATA MBKM ---
+                dataPendaftarMBKM.forEach(pendaftar => {
+                    let mhsRef = dataMasterMhs.find(m => String(m.nim) === String(pendaftar.nim));
+                    if (mhsRef && (mhsRef.prodi || mhsRef.program_studi)) {
+                        pendaftar.prodi = mhsRef.prodi || mhsRef.program_studi;
+                    }
+                });
+                // ---------------------------------------
 
                 inputSearch.disabled = false;
                 inputSearch.placeholder = "Pilih / Ketik NIM atau Nama Peserta...";
@@ -959,7 +973,24 @@
             document.getElementById("tableContainer").style.display = "block";
 
             document.getElementById("lblNim").innerText = mhs.nim || "-";
-            document.getElementById("lblNama").innerText = mhs.nama || mhs.nama_mahasiswa || "-";
+
+            // --- LOGIKA STIKER PRODI (DENGAN FALLBACK NIM) ---
+            let prodiText = (mhs.prodi || "").toLowerCase();
+            if (!prodiText) {
+                let nimStr = String(mhs.nim).toLowerCase();
+                if (nimStr.includes('.11.') || nimStr.startsWith('222')) prodiText = 'ti';
+                else if (nimStr.includes('.12.') || nimStr.startsWith('223')) prodiText = 'si';
+            }
+
+            let badgeProdi = '';
+            if (prodiText === 'ti' || prodiText.includes('informa')) {
+                badgeProdi = '<span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:800; margin-left:8px; vertical-align: middle;">TI</span>';
+            } else if (prodiText === 'si' || prodiText.includes('sistem')) {
+                badgeProdi = '<span style="background:#fce7f3; color:#be185d; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:800; margin-left:8px; vertical-align: middle;">SI</span>';
+            }
+            // -------------------------------------------------
+
+            document.getElementById("lblNama").innerHTML = `${mhs.nama || mhs.nama_mahasiswa || "-"} ${badgeProdi}`;
             document.getElementById("lblProgram").innerText = mhs.program || "-";
             document.getElementById("lblMitra").innerText = mhs.mitra || "-";
 
@@ -1452,9 +1483,25 @@
                 // PENYESUAIAN PENCARIAN NAMA YANG AMAN
                 const namaStr = mhs.nama || mhs.nama_mahasiswa || "-";
 
+                // --- LOGIKA STIKER PRODI (DENGAN FALLBACK NIM) ---
+                let prodiText = (mhs.prodi || "").toLowerCase();
+                if (!prodiText) {
+                    let nimStr = String(mhs.nim).toLowerCase();
+                    if (nimStr.includes('.11.') || nimStr.startsWith('222')) prodiText = 'ti';
+                    else if (nimStr.includes('.12.') || nimStr.startsWith('223')) prodiText = 'si';
+                }
+
+                let badgeProdi = '';
+                if (prodiText === 'ti' || prodiText.includes('informa')) {
+                    badgeProdi = '<span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-size:0.6rem; font-weight:800; margin-left:5px; vertical-align: middle;">TI</span>';
+                } else if (prodiText === 'si' || prodiText.includes('sistem')) {
+                    badgeProdi = '<span style="background:#fce7f3; color:#be185d; padding:2px 6px; border-radius:4px; font-size:0.6rem; font-weight:800; margin-left:5px; vertical-align: middle;">SI</span>';
+                }
+                // -------------------------------------------------
+
                 const div = document.createElement("div");
                 div.className = "dropdown-item";
-                div.innerHTML = `<strong>${mhs.nim}</strong> <span>${namaStr} - ${mhs.program || 'MBKM'}</span>`;
+                div.innerHTML = `<strong>${mhs.nim}</strong> <span>${namaStr} ${badgeProdi} - ${mhs.program || 'MBKM'}</span>`;
                 div.onclick = function (e) {
                     e.stopPropagation();
                     searchInputMhs.value = `${mhs.nim} - ${namaStr}`;

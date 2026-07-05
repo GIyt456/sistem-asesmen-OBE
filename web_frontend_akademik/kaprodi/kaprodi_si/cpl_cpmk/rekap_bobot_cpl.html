@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekap Bobot CPL Kurikulum - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script> 
+    
+    <style>
+        .dashboard-container { display: flex; flex-direction: column; gap: 30px; margin-top: 20px; }
+        .card-box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; overflow-x: auto; }
+        
+        .section-header { margin-top: 0; margin-bottom: 20px; color: #0f172a; font-size: 1.2rem; font-weight: 800; border-left: 5px solid #2563eb; padding-left: 15px; text-transform: uppercase; }
+        
+        /* Desain Tabel Super Rapi ala Excel */
+        .table-excel { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 0.9rem; }
+        .table-excel th, .table-excel td { border: 1px solid #cbd5e1; padding: 10px 8px; text-align: center; vertical-align: middle; }
+        .table-excel th { background: #f1f5f9; color: #1e293b; font-weight: 800; }
+        .table-excel th.sticky-col, .table-excel td.sticky-col { position: sticky; left: 0; background: white; z-index: 2; border-right: 2px solid #94a3b8; text-align: left; }
+        .table-excel th.sticky-col { background: #f1f5f9; }
+        
+        .cell-bobot { background: #dcfce7; color: #166534; font-weight: 700; }
+        .cell-empty { color: #cbd5e1; }
+        
+        /* Tabel Grand Total yang lebih mencolok */
+        .table-summary { border-collapse: collapse; width: 100%; max-width: 600px; font-size: 1rem; }
+        .table-summary th, .table-summary td { border: 1px solid #cbd5e1; padding: 12px; }
+        .table-summary th { background: #1e293b; color: white; text-align: left; }
+        .table-summary td:nth-child(2), .table-summary td:nth-child(3) { text-align: right; font-weight: bold; font-family: monospace; font-size: 1.1rem; }
+        .text-danger { color: #dc2626 !important; }
+        .text-success { color: #059669 !important; }
+        
+        body { animation: transitionIn 0.3s ease-in-out; }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+    <div class="main-content">
+        <div id="navbar-container"></div>
+
+        <div class="content-wrapper">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">EVALUASI KURIKULUM</div>
+                    <h1 class="header-title">REKAP BOBOT <span>CPL</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
+            <p style="color: #64748b; margin-bottom: 25px;">Memantau distribusi beban pemenuhan Capaian Pembelajaran Lulusan (CPL) pada setiap mata kuliah dan semester.</p>
+
+            <div class="dashboard-container">
+                
+                <!-- TABEL 1: DETAIL PER MATAKULIAH -->
+                <div class="card-box">
+                    <h3 class="section-header">1. Distribusi Bobot per Mata Kuliah</h3>
+                    <table class="table-excel">
+                        <thead id="headTableMK">
+                            <tr>
+                                <th>Smt</th>
+                                <th class="sticky-col">Kode & Nama Mata Kuliah</th>
+                                <!-- Kolom CPL akan di-generate via JS -->
+                            </tr>
+                        </thead>
+                        <tbody id="bodyTableMK">
+                            <tr><td colspan="15"><i class="fas fa-spinner fa-spin"></i> Memuat data dan menghitung agregat...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- TABEL 2: AGREGAT PER SEMESTER -->
+                <div class="card-box">
+                    <h3 class="section-header">2. Akumulasi Bobot per Semester</h3>
+                    <table class="table-excel">
+                        <thead id="headTableSemester">
+                            <tr>
+                                <th class="sticky-col" style="background:#1e293b; color:white;">SEMESTER</th>
+                                <!-- Kolom CPL akan di-generate via JS -->
+                            </tr>
+                        </thead>
+                        <tbody id="bodyTableSemester">
+                            <tr><td colspan="15" class="cell-empty">Menunggu data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- TABEL 3: GRAND TOTAL (TARGET VS SEMENTARA) -->
+                <div class="card-box" style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <h3 class="section-header">3. Grand Total CPL Kurikulum</h3>
+                        <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">
+                            Bandingkan total bobot yang sedang berjalan saat ini dengan Target Bobot Kurikulum yang ideal.
+                        </p>
+                        <table class="table-summary">
+                            <thead>
+                                <tr>
+                                    <th>Kode CPL</th>
+                                    <th style="text-align: right;">Total keseluruhan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyTableSummary">
+                                <tr><td colspan="3">Menghitung...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // SATPAM & TEMA DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        // Target CPL Asumsi (Seperti di gambar referensi Excel)
+        const TARGET_CPL = {
+            'CPL01': 470, 'CPL02': 165, 'CPL03': 490, 'CPL04': 710, 'CPL05': 750,
+            'CPL06': 600, 'CPL07': 170, 'CPL08': 655, 'CPL09': 890, 'CPL10': 200, 'CPL11': 300
+        };
+
+        // Ganti nama CPL mengikuti prodi aktif (Contoh: TI-CPL01 atau SI-CPL01)
+        const prefixCPL = PRODI === 'si' ? 'SI-CPL' : 'TI-CPL';
+        const numCPL = 11; // Diasumsikan selalu ada 11 CPL
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            
+            if(PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+                const headers = document.querySelectorAll('.section-header');
+                headers.forEach(h => h.style.borderLeftColor = "var(--primary-teal)");
+            }
+        });
+
+        async function loadRekapBobot() {
+            // Karena belum ada API khusus, kita gunakan fungsi dummy
+            // Nanti, data ini diganti dengan "const res = await fetch(API_BARU); const dataMK = await res.json();"
+            try {
+                let dataMK = loadRekapBobot(); 
+                renderTabel(dataMK); 
+            } catch(e) {
+                console.error("Gagal memproses data", e);
+            }
+        }
+
+        function renderTabel(dataMK) {
+            // 1. Generate Header Dinamis
+            let cplKeys = [];
+            for(let i=1; i<=numCPL; i++) {
+                let code = i < 10 ? `CPL0${i}` : `CPL${i}`;
+                cplKeys.push(code);
+            }
+            
+            let headerHtmlMK = `<tr><th>Smt</th><th class="sticky-col">Kode & Nama Matakuliah</th>`;
+            let headerHtmlSmt = `<tr><th class="sticky-col" style="background:#1e293b; color:white;">SEMESTER</th>`;
+            
+            cplKeys.forEach(c => {
+                let label = c.replace('CPL0', 'CPL ').replace('CPL', 'CPL ');
+                headerHtmlMK += `<th>${label}</th>`;
+                headerHtmlSmt += `<th>${label}</th>`;
+            });
+            headerHtmlMK += `</tr>`; headerHtmlSmt += `</tr>`;
+            
+            document.getElementById('headTableMK').innerHTML = headerHtmlMK;
+            document.getElementById('headTableSemester').innerHTML = headerHtmlSmt;
+
+            // 2. Render Tabel 1 & Hitung Agregat
+            let htmlMK = '';
+            let agregatSemester = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{} };
+            let grandTotal = {};
+            
+            cplKeys.forEach(c => { grandTotal[c] = 0; });
+            for(let s=1; s<=8; s++) { cplKeys.forEach(c => { agregatSemester[s][c] = 0; }); }
+
+            dataMK.forEach(mk => {
+                htmlMK += `<tr>
+                    <td style="font-weight:bold; color:#475569; background:${mk.smt % 2 === 0 ? '#fee2e2' : '#fef9c3'}">${mk.smt}</td>
+                    <td class="sticky-col"><span style="color:#64748b; font-size:0.8rem; margin-right:8px;">${mk.kode}</span> <b>${mk.nama}</b></td>`;
+                
+                cplKeys.forEach(c => {
+                    let val = mk.bobot[c] || 0;
+                    if(val > 0) {
+                        htmlMK += `<td class="cell-bobot">${val.toFixed(2).replace('.',',')}</td>`;
+                        agregatSemester[mk.smt][c] += val;
+                        grandTotal[c] += val;
+                    } else {
+                        htmlMK += `<td class="cell-empty">-</td>`;
+                    }
+                });
+                htmlMK += `</tr>`;
+            });
+            document.getElementById('bodyTableMK').innerHTML = htmlMK;
+
+            // 3. Render Tabel 2 (Akumulasi Semester)
+            let htmlSmt = '';
+            for(let s=1; s<=8; s++) {
+                htmlSmt += `<tr><td class="sticky-col" style="font-weight:bold;">Semester ${s}</td>`;
+                cplKeys.forEach(c => {
+                    let val = agregatSemester[s][c];
+                    htmlSmt += val > 0 ? `<td style="font-weight:bold; color:#0f172a;">${val.toFixed(2).replace('.',',')}</td>` : `<td class="cell-empty">0,00</td>`;
+                });
+                htmlSmt += `</tr>`;
+            }
+            document.getElementById('bodyTableSemester').innerHTML = htmlSmt;
+
+            // 4. Render Tabel 3 (Grand Total Target vs Berjalan)
+            let htmlSummary = '';
+            cplKeys.forEach(c => {
+                let current = grandTotal[c];
+                
+                // Format Label CPL (NILAI CPL01)
+                let labelCPL = `NILAI CPL${c.replace('CPL0', '').replace('CPL', '')}`; 
+                if(c.replace('CPL', '') < 10) labelCPL = `NILAI CPL0${c.replace('CPL0', '')}`;
+
+                // Beri warna hijau jika ada nilainya, abu-abu jika 0
+                let colorClass = current > 0 ? 'text-success' : 'cell-empty';
+                
+                htmlSummary += `<tr>
+                    <td><b>${labelCPL}</b></td>
+                    <td class="${colorClass}" style="text-align: right;">${current.toFixed(2).replace('.',',')}</td>
+                </tr>`;
+            });
+            document.getElementById('bodyTableSummary').innerHTML = htmlSummary;
+        }
+
+        // Dummy Data untuk mensimulasikan struktur (Mirip gambar Excel Anda)
+        // Semester, Kode, Nama, Object Bobot per CPL (Sesuai output n8n idealnya)
+        async function loadRekapBobot() {
+            const tbodyMK = document.getElementById('bodyTableMK');
+            tbodyMK.innerHTML = `<tr><td colspan="15" style="padding:30px;"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Menarik, memecah, dan mengkalkulasi bobot dari N8N...</td></tr>`;
+            
+            try {
+                // Endpoint baru yang akan kita buat di n8n
+                const res = await fetch(`${API_BASE}/get-rekap-bobot?prodi=${PRODI}`);
+                if (!res.ok) throw new Error("Gagal load API N8N");
+                const dataFlat = await res.json();
+                
+                if(!dataFlat || dataFlat.length === 0 || !dataFlat[0].kode) {
+                     tbodyMK.innerHTML = `<tr><td colspan="15" style="padding:20px; color:#dc2626;">Belum ada mapping bobot untuk prodi ini.</td></tr>`;
+                     document.getElementById('bodyTableSemester').innerHTML = `<tr><td colspan="15" class="cell-empty">Belum ada data</td></tr>`;
+                     return;
+                }
+
+                // JURUS GROUPING JAVASCRIPT: Mengubah deretan baris SQL menjadi Object yang terstruktur
+                let mkMap = {};
+                
+                dataFlat.forEach(item => {
+                    let key = item.kode;
+                    
+                    if(!mkMap[key]) {
+                        mkMap[key] = {
+                            smt: parseInt(item.smt) || 0,
+                            kode: item.kode,
+                            nama: item.nama,
+                            bobot: {}
+                        };
+                    }
+                    
+                    // Regex Cerdas: Mengambil "CPL02" dari format kotor seperti "SI-CPL02-G1"
+                    if(item.cpl) {
+                        let match = item.cpl.match(/CPL(\d+)/);
+                        if(match) {
+                            let cplKey = match[0]; // Menghasilkan CPL01, CPL02, dst
+                            mkMap[key].bobot[cplKey] = (mkMap[key].bobot[cplKey] || 0) + parseFloat(item.total_bobot);
+                        }
+                    }
+                });
+
+                // Mengubah Map kembali menjadi Array dan Mengurutkannya (Sort) berdasarkan Semester, lalu Kode MK
+                let dataMK = Object.values(mkMap).sort((a, b) => {
+                    if(a.smt === b.smt) return a.kode.localeCompare(b.kode);
+                    return a.smt - b.smt;
+                });
+
+                // Lempar ke fungsi perenderan tabel
+                renderTabel(dataMK);
+
+            } catch(e) {
+                console.error("Gagal memproses data", e);
+                tbodyMK.innerHTML = `<tr><td colspan="15" style="color:red; padding:20px;"><i class="fas fa-wifi"></i> Error: Gagal terhubung ke N8N atau API belum siap.</td></tr>`;
+            }
+        }
+
+        window.onload = () => { setTimeout(loadRekapBobot, 400); };
+    </script>
+</body>
+</html>

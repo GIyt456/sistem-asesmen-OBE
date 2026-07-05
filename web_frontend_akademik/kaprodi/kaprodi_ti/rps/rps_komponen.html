@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master bentuk Penilaian - OBE</title>
+    <title>Master komponen Penilaian - OBE</title>
     
     <!-- PANGGIL CSS GLOBAL -->
     <link rel="stylesheet" href="/css/style.css">
@@ -47,11 +47,11 @@
         <div class="main-content" style="padding: 40px;">
             <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                 <div>
-                    <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a; font-weight: 800;">Master <span style="color: #8b0000;">bentuk Penilaian</span></h1>
-                    <p style="margin: 0; color: #64748b; font-size: 1.05rem;">Kelola bentuk penilaian (Tugas, UTS, UAS, dll).</p>
+                    <h1 style="margin: 0 0 8px 0; font-size: 2.2rem; color: #0f172a; font-weight: 800;">Master <span style="color: #8b0000;">komponen Penilaian</span></h1>
+                    <p style="margin: 0; color: #64748b; font-size: 1.05rem;">Kelola komponen penilaian (Tugas, UTS, UAS, dll).</p>
                 </div>
                 <button class="btn-primary-red" onclick="openModal()">
-                    <i class="fas fa-plus"></i> Tambah bentuk
+                    <i class="fas fa-plus"></i> Tambah komponen
                 </button>
             </div>
 
@@ -60,12 +60,12 @@
                     <thead>
                         <tr>
                             <th width="10%" class="text-center">ID</th>
-                            <th width="65%">NAMA bentuk PENILAIAN</th>
+                            <th width="65%">NAMA komponen PENILAIAN</th>
                             <th width="25%" class="text-center">AKSI</th>
                         </tr>
                     </thead>
                     <tbody id="bodyTable">
-                        <tr><td colspan="3" class="text-center" style="padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Memuat data bentuk...</td></tr>
+                        <tr><td colspan="3" class="text-center" style="padding: 30px; color: #64748b;"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Memuat data komponen...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -75,10 +75,10 @@
     <div id="modalTambah" class="modal-overlay">
         <div class="modal-box">
             <h3 id="modalTitle" style="margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; color: #0f172a; font-weight: 800;">
-                Tambah bentuk Penilaian
+                Tambah komponen Penilaian
             </h3>
             <div class="form-group">
-                <label style="display: block; font-weight: 700; color: #334155; margin-bottom: 8px;">Nama bentuk:</label>
+                <label style="display: block; font-weight: 700; color: #334155; margin-bottom: 8px;">Nama komponen:</label>
                 <input type="text" id="inputNamaKomponen" class="form-control" placeholder="Contoh: Ujian Akhir Semester (UAS)">
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px;">
@@ -104,7 +104,7 @@
                 const data = await res.json();
 
                 if (!data || data.length === 0) {
-                    bodyTbl.innerHTML = `<tr><td colspan="3" class="text-center" style="padding:20px;">Belum ada data referensi bentuk penilaian.</td></tr>`;
+                    bodyTbl.innerHTML = `<tr><td colspan="3" class="text-center" style="padding:20px;">Belum ada data referensi komponen penilaian.</td></tr>`;
                     return;
                 }
 
@@ -135,7 +135,7 @@
         function openModal(id = "", nama = "") {
             currentEditId = id; // Jika id kosong (""), berarti mode Tambah
             document.getElementById("inputNamaKomponen").value = nama;
-            document.getElementById("modalTitle").innerText = id ? "Edit bentuk Penilaian" : "Tambah bentuk Penilaian";
+            document.getElementById("modalTitle").innerText = id ? "Edit komponen Penilaian" : "Tambah komponen Penilaian";
             document.getElementById("modalTambah").style.display = "flex";
         }
 
@@ -146,7 +146,7 @@
         // 3. FUNGSI SIMPAN & UPDATE DATA (CREATE / UPDATE)
         async function simpanData() {
             const nama = document.getElementById("inputNamaKomponen").value.trim();
-            if(!nama) return alert("⚠️ Nama bentuk tidak boleh kosong!");
+            if(!nama) return alert("⚠️ Nama komponen tidak boleh kosong!");
 
             const btnSimpan = document.getElementById("btnSimpanModal");
             btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
@@ -165,7 +165,7 @@
                 });
 
                 if(res.ok) {
-                    alert("✅ Data bentuk berhasil disimpan!");
+                    alert("✅ Data komponen berhasil disimpan!");
                     closeModal();
                     loadData(); // Segarkan tabel
                 } else {
@@ -181,13 +181,13 @@
 
         // 4. FUNGSI HAPUS DATA (DELETE)
         async function hapusData(id, nama) {
-            if(!confirm(`Apakah Anda yakin ingin menghapus bentuk "${nama}"? Data yang sudah digunakan di RPS mungkin akan terdampak.`)) return;
+            if(!confirm(`Apakah Anda yakin ingin menghapus komponen "${nama}"? Data yang sudah digunakan di RPS mungkin akan terdampak.`)) return;
 
             try {
                 // Gunakan GET untuk hapus demi kesederhanaan URL query
                 const res = await fetch(`${API_HAPUS_KOMPONEN}?id=${id}`);
                 if(res.ok) {
-                    alert("✅ bentuk berhasil dihapus!");
+                    alert("✅ komponen berhasil dihapus!");
                     loadData(); // Segarkan tabel
                 } else {
                     alert("❌ Gagal menghapus data.");

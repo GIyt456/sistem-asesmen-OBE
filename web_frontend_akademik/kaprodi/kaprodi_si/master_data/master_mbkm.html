@@ -561,8 +561,7 @@
 
     </div>
     <script>
-        // URL BARU N8N
-        // const BASE_N8N_URL = "https://contained-reply-followed-integrate.trycloudflare.com";
+
         const API_GET_MHS = `${API_BASE}/get-mahasiswa-db`;
         const API_SAVE_MBKM = `${API_BASE}/save-mbkm-data`;
         const API_UPDATE_MBKM = `${API_BASE}/update-mbkm-data`;
@@ -609,9 +608,22 @@
 
                 listPendaftarAktif.forEach(item => {
                     const row = document.createElement("tr");
+
+                    // --- LOGIKA STIKER PRODI DARI DATABASE ---
+                    let mhsRef = dataMahasiswa.find(m => String(m.nim) === String(item.nim));
+                    let prodiText = mhsRef ? (mhsRef.prodi || "").toLowerCase() : "";
+
+                    let badgeProdi = '';
+                    if (prodiText === 'ti' || prodiText.includes('informa')) {
+                        badgeProdi = '<span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:800; margin-left:8px; vertical-align: middle;">TI</span>';
+                    } else if (prodiText === 'si' || prodiText.includes('sistem')) {
+                        badgeProdi = '<span style="background:#fce7f3; color:#be185d; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:800; margin-left:8px; vertical-align: middle;">SI</span>';
+                    }
+                    // -----------------------------------------
+
                     row.innerHTML = `
                         <td><strong>${item.nim}</strong></td>
-                        <td>${item.nama}</td>
+                        <td>${item.nama} ${badgeProdi}</td>
                         <td><span class="badge">${item.program}</span></td>
                         <td>${item.mitra}</td>
                         <td>
@@ -713,12 +725,13 @@
                 const response = await fetch(API_DELETE_MBKM, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: id })
+                    // UBAH 'id' MENJADI 'id_mbkm' DI SINI AGAR SINKRON DENGAN N8N
+                    body: JSON.stringify({ id_mbkm: id })
                 });
 
                 if (response.ok) {
                     alert("Data berhasil dihapus!");
-                    loadDataMBKM();
+                    loadDataMBKM(); // Refresh tabel setelah hapus
                 } else {
                     alert("Gagal menghapus data. Periksa n8n.");
                 }
@@ -795,9 +808,20 @@
             }
 
             dataFiltered.forEach(mhs => {
+                // --- LOGIKA STIKER PRODI ---
+                let prodiText = (mhs.prodi || "").toLowerCase();
+                let badgeProdi = '';
+
+                if (prodiText === 'ti' || prodiText.includes('informa')) {
+                    badgeProdi = '<span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-size:0.6rem; font-weight:800; margin-left:5px; vertical-align: middle;">TI</span>';
+                } else if (prodiText === 'si' || prodiText.includes('sistem')) {
+                    badgeProdi = '<span style="background:#fce7f3; color:#be185d; padding:2px 6px; border-radius:4px; font-size:0.6rem; font-weight:800; margin-left:5px; vertical-align: middle;">SI</span>';
+                }
+                // ---------------------------
+
                 const div = document.createElement("div");
                 div.className = "dropdown-item";
-                div.innerHTML = `<strong>${mhs.nim}</strong> <span>${mhs.nama_mahasiswa}</span>`;
+                div.innerHTML = `<strong>${mhs.nim}</strong> <span>${mhs.nama_mahasiswa} ${badgeProdi}</span>`;
 
                 div.onclick = function (e) {
                     e.stopPropagation();
