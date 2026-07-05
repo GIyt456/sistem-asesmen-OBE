@@ -159,6 +159,45 @@
             <div class="nav-item" data-path="/master_data/master_tugas_akhir.html"><i class="fas fa-book-reader"></i> Tugas Akhir</div>
         </div>
 
+        <div class="nav-item" onclick="toggleDropdown('menu-periksa', 'chevron-periksa')">
+            <i class="fas fa-shield-alt"></i> Periksa Data
+            <i id="chevron-periksa" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        <div id="menu-periksa" style="display: none; flex-direction: column; padding-left: 20px; margin-top: 4px;">
+            <!-- <div class="nav-item" data-path="/periksa_data/cek_live_data.html"><i class="fas fa-cloud-download-alt"></i> Cek Live Data</div> -->
+            <div class="nav-item" data-path="/periksa_data/rps_duplikat.html"><i class="fas fa-copy"></i> RPS Duplikat</div>
+            <div class="nav-item" data-path="/periksa_data/makul_duplikat.html"><i class="fas fa-clone"></i> Makul Duplikat</div>
+            <!-- <div class="nav-item" data-path="/periksa_data/mengajar_salah.html"><i class="fas fa-exclamation-triangle"></i> Mengajar Salah</div> -->
+            <div class="nav-item" data-path="/periksa_data/mengajar_duplikat.html"><i class="fas fa-users-slash"></i> Mengajar Duplikat</div>
+        </div>
+
+        <div class="nav-item" onclick="toggleDropdown('menu-assesmen', 'chevron-assesmen')">
+            <i class="fas fa-balance-scale"></i> Mekanisme Assesmen
+            <i id="chevron-assesmen" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        <div id="menu-assesmen" style="display: none; flex-direction: column; margin-top: 2px;">
+            <div class="nav-item" data-path="/mekanisme_assesmen/master_bobot.html" style="padding-left: 48px; font-size: 0.85rem;">Master Bobot</div>
+        </div>
+
+        <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')">
+            <i class="fas fa-sitemap"></i> Pemetaan (Mapping)
+            <i id="chevron-mapping" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        <div id="submenu-mapping" style="display: none; flex-direction: column; margin-top: 2px;">
+            <div class="nav-item" data-path="/mapping/map_cpl_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">Mapping CPL - CPMK</div>
+            <div class="nav-item" data-path="/mapping/map_mk_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">Mapping MK - CPMK</div>
+        </div>
+
+        <div class="nav-item" onclick="toggleDropdown('submenu-matriks', 'chevron-matriks')">
+            <i class="fas fa-table"></i> Matriks Kurikulum
+            <i id="chevron-matriks" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+        </div>
+        <div id="submenu-matriks" style="display: none; flex-direction: column; margin-top: 2px;">
+            <div class="nav-item" data-path="/matriks_kurikulum/matriks_cpl_mk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan MK - CPL</div>
+            <div class="nav-item" data-path="/matriks_kurikulum/matriks_struktur.html" style="padding-left: 48px; font-size: 0.85rem;">Struktur Kurikulum</div>
+        </div>
+
+        <div class="nav-item" data-path="/KRS/import_krs.html"><i class="fas fa-file-excel"></i> Import KRS Mahasiswa</div>
 
         <div class="menu-category">EVALUASI & RPS</div>
 
@@ -178,6 +217,7 @@
             <a href="#" data-path="/cpl_cpmk/grafik_cpl.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Grafik Rerata CPL</a>
             <a href="#" data-path="/cpl_cpmk/portofolio_mk.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Portofolio Mata Kuliah</a>
             <a href="#" data-path="/cpl_cpmk/portofolio_angkatan.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Portofolio Angkatan</a>
+            <a href="#" data-path="/cpl_cpmk/rekap_bobot_cpl.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Rekap bobot CPL</a>
             <a href="#" data-path="/cpl_cpmk/skpi.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Cetak SKPI</a>
         </div>
 
@@ -212,6 +252,7 @@
             <a href="#" data-path="/cpl_cpmk/grafik_cpl.html" class="dropdown-item">Grafik Rerata CPL</a>
             <a href="#" data-path="/cpl_cpmk/portofolio_mk.html" class="dropdown-item">Portofolio Mata Kuliah</a>
             <a href="#" data-path="/cpl_cpmk/portofolio_angkatan.html" class="dropdown-item">Portofolio Angkatan</a>
+            <a href="#" data-path="/cpl_cpmk/rekap_bobot_cpl.html" class="dropdown-item">Rekap bobot CPL</a>
             <a href="#" data-path="/cpl_cpmk/skpi.html" class="dropdown-item">Cetak SKPI</a>
         </div>
 
