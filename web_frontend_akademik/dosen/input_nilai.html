@@ -1311,8 +1311,6 @@
                     bobotHtml += `
                         <div style="margin-bottom: 8px; display: flex; gap: 5px; align-items: center;">
                             <input type="number" value="${bobotItem}" ${lockAttr} style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" oninput="updateRowOnlyBobot(${i}, ${idx}, this.value)">
-                            ${idx === row.bobot.length - 1 && row.cpmk.length > 1 ? `<button onclick="tambahBobot(${i})" class="btn-action" style="padding: 6px 10px; background: #e0f2fe; color: #0369a1;" title="Tambah Bobot"><i class="fas fa-plus"></i></button>` : ''}
-                            ${idx > 0 ? `<button onclick="hapusBobot(${i}, ${idx})" class="btn-action" style="padding: 6px 10px; background: #fee2e2; color: #ef4444;" title="Hapus Bobot"><i class="fas fa-times"></i></button>` : ''}
                         </div>
                     `;
                 });
@@ -1402,7 +1400,7 @@
         function tambahCPMK(i) {
             configData[i].cpl.push("-");
             configData[i].cpmk.push("");
-            // Tidak otomatis menambah bobot
+            configData[i].bobot.push(0); // <-- Kini otomatis menambah kolom bobot sejajar
             renderTableAsesmen();
             hitungDanValidasiKuota();
         }
@@ -1410,20 +1408,10 @@
         function hapusCPMK(i, idx) {
             configData[i].cpl.splice(idx, 1);
             configData[i].cpmk.splice(idx, 1);
-            // Tidak otomatis menghapus bobot
-            renderTableAsesmen();
-            hitungDanValidasiKuota();
-        }
-
-        // FUNGSI BARU: Tambah & Hapus Bobot Tersendiri
-        function tambahBobot(i) {
-            configData[i].bobot.push(0);
-            renderTableAsesmen();
-            hitungDanValidasiKuota();
-        }
-
-        function hapusBobot(i, idx) {
-            configData[i].bobot.splice(idx, 1);
+            // Ikut menghapus bobot yang sejajar (jika ada) agar tabel tetap rapi
+            if (configData[i].bobot.length > idx) {
+                configData[i].bobot.splice(idx, 1);
+            }
             renderTableAsesmen();
             hitungDanValidasiKuota();
         }
