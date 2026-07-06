@@ -16,8 +16,12 @@
     <script src="/js/template.js"></script> 
     
     <style>
+        /* MANTRA ANTI-BOCOR LAYAR GLOBAL */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        html, body { max-width: 100vw; overflow-x: hidden; }
+
         /* =========================================
-           ✨ BEAUTIFY MATRIKS & FORM (ANTI-CACHE) ✨
+           ✨ BEAUTIFY MATRIKS & FORM DESKTOP
            ========================================= */
         .btn-save-bobot { background: var(--primary-blue); color: white; border: none; padding: 14px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;}
         .btn-save-bobot:hover { filter: brightness(0.85); transform: translateY(-2px); }
@@ -28,7 +32,7 @@
         .select-matkul:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1); }
 
         .table-bobot-wrapper { overflow-x: auto; background: white; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
-        .tabel-bobot { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; } /* Memaksa scroll di HP agar layout isian angka tidak hancur */
+        .tabel-bobot { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; } 
         
         .tabel-bobot th { background: #1e293b !important; color: white !important; font-weight: 700; padding: 18px 10px !important; border-bottom: 2px solid #0f172a !important; border-right: 1px solid #334155 !important; text-align: center; vertical-align: middle; font-size: 0.85rem; }
         .tabel-bobot th.bg-darker { background: #0f172a !important; letter-spacing: 1px;} 
@@ -41,43 +45,95 @@
         .col-mk { font-weight: 700 !important; }
         .col-cpmk { background: #f1f5f9 !important; font-weight: 700 !important; color: #334155 !important;}
 
-        /* Gaya Kotak Input Angka Keren */
         .input-bobot { width: 70px; padding: 10px 5px; border: 2px solid #cbd5e1; border-radius: 8px; text-align: center; font-size: 0.95rem; font-weight: 700; color: #1e293b; transition: all 0.2s; background: #f8fafc; outline: none;}
         .input-bobot:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15); transform: translateY(-2px); }
         
-        /* Gaya Kotak Total Responsif */
         .col-total { font-size: 1.4rem !important; font-weight: 900 !important; transition: 0.3s; }
         .total-ok { color: #059669 !important; background: #ecfdf5 !important; } 
         .total-warn { color: #dc2626 !important; background: #fef2f2 !important; box-shadow: inset 0 0 0 2px #f87171;} 
 
+        /* Kelas Penolong */
+        .show-mobile { display: none; }
+        .mobile-total-panel { display: none; }
+
         /* =========================================
-           📱 PENYESUAIAN MOBILE ANTI-MEPET
+           📱 SULAP KARTU HP (ANTI SCROLL SAMPING)
            ========================================= */
         @media screen and (max-width: 768px) {
-            .header-bobot-mhs { margin: 20px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
-            .section-bobot-mhs { padding: 0 20px 40px 20px !important; }
+            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
+            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
             
-            /* Panel kontrol menyusun ke bawah di HP */
-            .control-panel { flex-direction: column !important; align-items: stretch !important; padding: 20px !important; gap: 15px !important;}
-            .btn-save-bobot { width: 100% !important; justify-content: center !important; }
+            .header-bobot-mhs { margin: 15px 15px 10px 15px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-bobot-mhs { padding: 0 15px 100px 15px !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important;} 
+            
+            .control-panel { padding: 15px !important; margin: 0 0 15px 0 !important; flex-direction: column !important; align-items: stretch !important; gap: 15px !important; border: none !important; box-shadow: none !important; width: 100% !important;}
+            .select-matkul { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important;}
+            .btn-save-bobot { width: 100% !important; justify-content: center !important; margin-top: 0 !important; padding: 16px !important; font-size: 1.1rem !important;}
+
+            /* Sembunyikan Elemen yang Hanya Berguna di Desktop */
+            .hide-mobile { display: none !important; }
+            .show-mobile { display: inline-block !important; }
+
+            .table-bobot-wrapper { border: none !important; box-shadow: none !important; background: transparent !important; margin: 0 !important; padding: 0 !important; width: 100% !important; overflow: hidden !important;}
+            
+            /* PEMBUNUHAN KARAKTER TABEL 900PX */
+            .tabel-bobot, .tabel-bobot tbody, .tabel-bobot tr { 
+                display: block !important; 
+                width: 100% !important; 
+                min-width: 0 !important; /* INI PENYELAMATNYA */
+                max-width: 100% !important; 
+                box-sizing: border-box !important;
+            }
+            .tabel-bobot thead { display: none !important; }
+            
+            /* TR Menjadi Kotak Kartu */
+            .tabel-bobot tr { background: white !important; border: 1px solid var(--border-color) !important; border-radius: 12px !important; margin-bottom: 20px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;}
+            
+            /* Header Kartu (Berisi Label CPL & CPMK) */
+            .tabel-bobot td.col-cpmk { 
+                display: flex !important; flex-direction: column; align-items: flex-start; 
+                padding: 15px 20px !important; background: #1e293b !important; color: white !important; 
+                border-bottom: 4px solid var(--primary-blue) !important; 
+                text-align: left !important; width: 100% !important; box-sizing: border-box !important;
+            }
+            .mobile-cpl-badge { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 8px; font-weight: 800;}
+            .cpmk-title { display: block !important; font-size: 1.15rem; font-weight: 800; color: #facc15;}
+
+            /* Barisan Input Form Ke Bawah */
+            .tabel-bobot td.input-cell { 
+                display: flex !important; justify-content: space-between !important; align-items: center !important; 
+                padding: 12px 20px !important; border-bottom: 1px dashed #e2e8f0 !important; 
+                background: white !important; width: 100% !important; box-sizing: border-box !important;
+            }
+            .tabel-bobot td.input-cell:last-child { border-bottom: none !important; }
+            .tabel-bobot td.input-cell::before { content: attr(data-label); font-weight: 800; color: #475569; font-size: 1.05rem;}
+            
+            .input-bobot { width: 90px !important; padding: 12px !important; font-size: 1.15rem !important; }
+
+            /* Panel Sticky "Total Bobot" di Bawah Layar HP */
+            .mobile-total-panel.active {
+                display: flex !important;
+                position: fixed; bottom: 0; left: 0; width: 100%;
+                background: white; border-top: 1px solid var(--border-color);
+                padding: 15px 25px; box-shadow: 0 -10px 25px rgba(0,0,0,0.1);
+                justify-content: space-between; align-items: center; z-index: 999;
+                box-sizing: border-box !important;
+            }
+            .mobile-total-label { font-weight: 800; color: #1e293b; font-size: 0.95rem; margin-bottom: 2px;}
+            .mobile-total-value { font-size: 1.6rem; font-weight: 900; }
+            .mobile-total-value.ok { color: #10b981; }
+            .mobile-total-value.warn { color: #dc2626; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. NAVBAR KHUSUS MOBILE -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="hamburger-btn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
-                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
-                 onclick="window.location.href='/index.html'">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
         </div>
-        <div class="profile-btn-mobile" onclick="toggleSidebar()">
-            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
-        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi"></div>
     </nav>
 
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
@@ -87,10 +143,10 @@
         <div id="navbar-container"></div>
 
         <div class="fixed-header">
-            <div class="header-container header-bobot-mhs" style="margin: 40px 50px 20px 50px; border-bottom: none; padding-bottom: 0;">
+            <div class="header-container header-bobot-mhs" style="margin: 30px 50px 20px 50px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
-                    <div class="header-subtitle">MEKANISME ASESMEN</div>
-                    <h1 class="header-title">MASTER <span>BOBOT</span></h1>
+                    <div class="header-subtitle" style="margin-bottom: 5px;">MEKANISME ASESMEN</div>
+                    <h1 class="header-title" style="font-size: 2rem;">MASTER <span>BOBOT</span></h1>
                 </div>
                 <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
             </div>
@@ -98,7 +154,6 @@
         </div>
 
         <div class="scrollable-content section-bobot-mhs" style="padding: 0 50px 40px 50px;">
-            
             <div class="control-panel">
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
                     <label style="font-weight: 700; color: #475569; font-size: 0.95rem;">
@@ -140,8 +195,16 @@
         </div>
     </div>
 
+    <!-- PANEL STICKY TOTAL BOBOT KHUSUS MOBILE -->
+    <div id="mobileTotalPanel" class="mobile-total-panel">
+        <div>
+            <div class="mobile-total-label">TOTAL BOBOT MK</div>
+            <div style="font-size: 0.8rem; color: #64748b; font-weight: 600;">Pastikan nilainya pas 100%</div>
+        </div>
+        <div id="mobileTotalValue" class="mobile-total-value warn">0%</div>
+    </div>
+
 <script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
     const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
     
     document.addEventListener("DOMContentLoaded", () => {
@@ -149,6 +212,7 @@
             document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
             document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
         } else {
+            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
             document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
         }
 
@@ -160,7 +224,6 @@
         }
     });
 
-    // --- FUNGSI SIDEBAR MOBILE ---
     function toggleSidebar() {
         document.getElementById('sidebar-container').classList.toggle('active');
         document.getElementById('mobileOverlay').classList.toggle('active');
@@ -181,7 +244,6 @@
         }, 600); 
     });
 
-    // --- LOGIKA API ---
     const API_GET_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
     const API_SAVE_BOBOT = `${API_BASE}/admin-save-bobot`;
 
@@ -219,10 +281,12 @@
     async function loadDataBobot() {
         const tbody = document.getElementById('tableBody'); 
         const kodeMkTerpilih = document.getElementById('selectMk').value;
+        const mobilePanel = document.getElementById('mobileTotalPanel');
 
         if (!kodeMkTerpilih) return;
 
         tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px !important;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue);"></i><br><br>Memuat form bobot...</td></tr>';
+        mobilePanel.classList.remove('active'); // Sembunyikan panel total saat loading
 
         try {
             const res = await fetch(API_GET_BOBOT);
@@ -259,28 +323,34 @@
                 let cplKey = row.kode_mk + '_' + row.cpl;
                 let tr = `<tr data-rowid="${index}" data-mk="${row.kode_mk}" data-cpmk="${row.cpmk || row.kode_cpmk}">`;
 
+                // ELEMEN DESKTOP (Di-hide di Mobile)
                 if (!renderedCpl[cplKey]) {
-                    tr += `<td class="col-cpl" rowspan="${cplCount[cplKey]}">${row.cpl}</td>`;
+                    tr += `<td class="col-cpl hide-mobile" rowspan="${cplCount[cplKey]}">${row.cpl}</td>`;
                     renderedCpl[cplKey] = true;
                 }
 
                 if (index === 0) {
-                    tr += `<td class="col-mk" rowspan="${data.length}">${row.kode_mk}</td>`;
-                    tr += `<td style="text-align: left; font-weight: 600;" rowspan="${data.length}">${row.nama_mk}</td>`;
+                    tr += `<td class="col-mk hide-mobile" rowspan="${data.length}">${row.kode_mk}</td>`;
+                    tr += `<td class="hide-mobile" style="text-align: left; font-weight: 600;" rowspan="${data.length}">${row.nama_mk}</td>`;
                 }
 
+                // HEADER KARTU DI MOBILE / KOLOM CPMK DI DESKTOP
                 tr += `
-                    <td class="col-cpmk">${row.cpmk || row.kode_cpmk}</td>
-                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="attitude" value="${row.attitude || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
-                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="kehadiran" value="${row.kehadiran || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
-                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="tugas" value="${row.tugas || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
-                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="uts" value="${row.uts || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
-                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="uas" value="${row.uas || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
+                    <td class="col-cpmk">
+                        <div class="mobile-cpl-badge show-mobile"><i class="fas fa-tag"></i> ${row.cpl}</div>
+                        <span class="cpmk-title">${row.cpmk || row.kode_cpmk}</span>
+                    </td>
+                    <td class="input-cell" data-label="Attitude"><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="attitude" value="${row.attitude || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
+                    <td class="input-cell" data-label="Kehadiran"><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="kehadiran" value="${row.kehadiran || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
+                    <td class="input-cell" data-label="Tugas"><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="tugas" value="${row.tugas || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
+                    <td class="input-cell" data-label="UTS"><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="uts" value="${row.uts || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
+                    <td class="input-cell" data-label="UAS"><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="uas" value="${row.uas || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
                 `;
 
+                // TOTAL KESELURUHAN (Hanya muncul di Desktop)
                 if (!renderedMkTotal) {
                     const warnaWarna = totalMK === 100 ? 'total-ok' : 'total-warn';
-                    tr += `<td id="total-mk-${row.kode_mk}" class="col-total ${warnaWarna}" rowspan="${data.length}">${totalMK}%</td>`;
+                    tr += `<td id="total-mk-${row.kode_mk}" class="col-total hide-mobile ${warnaWarna}" rowspan="${data.length}">${totalMK}%</td>`;
                     renderedMkTotal = true;
                 }
 
@@ -289,6 +359,10 @@
             });
 
             tbody.innerHTML = html;
+
+            // Munculkan dan Inisialisasi Panel Total di Mobile
+            mobilePanel.classList.add('active');
+            hitungTotalMK(kodeMkTerpilih);
 
         } catch (error) {
             tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px !important; color: red; font-weight:bold;">❌ Gagal memuat data dari API.</td></tr>';
@@ -300,6 +374,7 @@
         let sum = 0;
         inputs.forEach(input => { sum += (parseInt(input.value) || 0); });
 
+        // Update Text di Desktop
         const totalCell = document.getElementById(`total-mk-${kodeMk}`);
         if (totalCell) {
             totalCell.innerText = sum + "%";
@@ -309,6 +384,19 @@
             } else {
                 totalCell.classList.remove('total-ok');
                 totalCell.classList.add('total-warn');
+            }
+        }
+        
+        // Update Panel Sticky di Mobile
+        const mobileVal = document.getElementById('mobileTotalValue');
+        if (mobileVal) {
+            mobileVal.innerText = sum + "%";
+            if (sum === 100) {
+                mobileVal.classList.remove('warn');
+                mobileVal.classList.add('ok');
+            } else {
+                mobileVal.classList.remove('ok');
+                mobileVal.classList.add('warn');
             }
         }
     }
