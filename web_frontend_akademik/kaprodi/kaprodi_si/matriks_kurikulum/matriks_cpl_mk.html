@@ -20,19 +20,19 @@
            ✨ BEAUTIFY MATRIKS DESKTOP (ANTI-CACHE) ✨
            ========================================= */
         .tabel-matriks-cpl-mk-wrapper { 
-            overflow: auto; 
-            max-height: 70vh; 
-            border: 1px solid var(--border-color); 
+            overflow: auto !important; 
+            max-height: 68vh !important; /* Ditinggikan agar pas di layar */
+            border: 1px solid var(--border-color) !important; 
             border-radius: 12px; 
             background: white; 
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
-            margin-bottom: 20px;
+            margin-bottom: 0 !important;
         }
         .tabel-matriks-cpl-mk { 
             width: 100%; 
-            border-collapse: separate; 
-            border-spacing: 0; 
-            white-space: nowrap; 
+            border-collapse: separate !important; 
+            border-spacing: 0 !important; 
+            white-space: nowrap !important; 
         }
         .tabel-matriks-cpl-mk th { 
             background: #1e293b !important; /* Navy Gelap */
@@ -59,12 +59,12 @@
         }
 
         /* STICKY KOLOM 1: SEMESTER */
-        .tabel-matriks-cpl-mk th.sticky-col-1 { position: sticky; left: 0; z-index: 20; background: #0f172a !important; min-width: 60px; max-width: 60px;}
-        .tabel-matriks-cpl-mk td.sticky-col-1 { position: sticky; left: 0; z-index: 5; background: #f8fafc !important; font-weight: 600; border-right: 1px solid #cbd5e1 !important; min-width: 60px; max-width: 60px;}
+        .tabel-matriks-cpl-mk th.sticky-col-1 { position: sticky; left: 0; z-index: 20 !important; background: #0f172a !important; min-width: 60px; max-width: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;}
+        .tabel-matriks-cpl-mk td.sticky-col-1 { position: sticky; left: 0; z-index: 5 !important; background: #f8fafc !important; font-weight: 600; border-right: 1px solid #cbd5e1 !important; min-width: 60px; max-width: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;}
 
         /* STICKY KOLOM 2: KODE MK */
-        .tabel-matriks-cpl-mk th.sticky-col-2 { position: sticky; left: 60px; z-index: 20; background: #0f172a !important; min-width: 100px;}
-        .tabel-matriks-cpl-mk td.sticky-col-2 { position: sticky; left: 60px; z-index: 5; background: #f8fafc !important; font-weight: 800; color: var(--primary-blue) !important; border-right: 2px solid #cbd5e1 !important; }
+        .tabel-matriks-cpl-mk th.sticky-col-2 { position: sticky; left: 60px; z-index: 20 !important; background: #0f172a !important; min-width: 100px; box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;}
+        .tabel-matriks-cpl-mk td.sticky-col-2 { position: sticky; left: 60px; z-index: 5 !important; background: #f8fafc !important; font-weight: 800; color: var(--primary-blue) !important; border-right: 2px solid #cbd5e1 !important; box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;}
 
         /* GAYA CHECKMARK DAN HOVER */
         .tabel-matriks-cpl-mk .check-mark { color: #10b981; font-weight: 900; font-size: 1.2rem; }
@@ -73,14 +73,13 @@
         .tabel-matriks-cpl-mk tbody tr:hover td.sticky-col-2 { background-color: #e0f2fe !important; }
 
         @media screen and (max-width: 768px) {
-            .header-matriks-mk { margin: 20px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
-            .section-matriks-mk { padding: 0 20px 40px 20px !important; }
+            .header-matriks-mk { margin: 15px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-matriks-mk { padding: 0 20px 20px 20px !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. NAVBAR KHUSUS MOBILE -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
             <button class="hamburger-btn" onclick="toggleSidebar()">
@@ -95,24 +94,24 @@
         </div>
     </nav>
 
-    <!-- 2. OVERLAY GELAP UNTUK LATAR SIDEBAR DI HP -->
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
-
     <div id="sidebar-container"></div>
 
-    <div class="main-content">
+    <!-- PANGKAS PADDING ATAS -->
+    <div class="main-content" style="padding-top: 20px;">
         <div id="navbar-container"></div>
 
         <div class="fixed-header">
-            <div class="header-container header-matriks-mk" style="margin: 40px 50px 20px 50px; border-bottom: none; padding-bottom: 0;">
+            <!-- PANGKAS MARGIN ATAS MENJADI 0 -->
+            <div class="header-container header-matriks-mk" style="margin: 0 50px 15px 50px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
-                    <div class="header-subtitle">MATRIKS KURIKULUM</div>
-                    <h1 class="header-title">PEMETAAN <span>CPL - MK</span></h1>
+                    <div class="header-subtitle" style="margin-bottom: 5px;">MATRIKS KURIKULUM</div>
+                    <h1 class="header-title" style="font-size: 2rem;">PEMETAAN <span>CPL - MK</span></h1>
                 </div>
                 <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
             </div>
             
-            <div class="header-matriks-mk" style="display: flex; justify-content: space-between; align-items: center; margin: 0 50px 20px 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+            <div class="header-matriks-mk" style="display: flex; justify-content: space-between; align-items: center; margin: 0 50px 15px 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
                 <p style="color: #6b7280; font-size: 0.95rem; margin: 0;">
                     Tabel di bawah ini menunjukkan sebaran Capaian Pembelajaran Lulusan (CPL) pada setiap Mata Kuliah.
                 </p>
@@ -122,8 +121,7 @@
             </div>
         </div>
 
-        <div class="scrollable-content section-matriks-mk" style="padding: 0 50px 40px 50px;">
-            <!-- KOTAK UNTUK MENAMPILKAN TABEL MATRIKS -->
+        <div class="scrollable-content section-matriks-mk" style="padding: 0 50px 20px 50px;">
             <div class="tabel-matriks-cpl-mk-wrapper" id="areaTabel">
                 <p style="padding: 50px; text-align: center; color: #6b7280; font-weight: 600;">
                     <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; color: var(--primary-blue);"></i><br>
@@ -134,14 +132,15 @@
     </div>
 
 <script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
     const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
     
     document.addEventListener("DOMContentLoaded", () => {
+        // PERBAIKAN BINGKAI WARNA: PAKSA BIRU JIKA SI
         if(PRODI === "ti") {
             document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
             document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
         } else {
+            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
             document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
         }
 
@@ -153,7 +152,6 @@
         }
     });
 
-    // --- FUNGSI SIDEBAR MOBILE ---
     function toggleSidebar() {
         document.getElementById('sidebar-container').classList.toggle('active');
         document.getElementById('mobileOverlay').classList.toggle('active');
@@ -174,7 +172,6 @@
         }, 600); 
     });
 
-    // --- LOGIKA API ---
     const API_METADATA = `${API_BASE}/get-metadata?prodi=${PRODI}`;
     const API_MATRIKS = `${API_BASE}/matriks-kurikulum?prodi=${PRODI}`; 
     
@@ -229,12 +226,10 @@
         `;
         
         daftarCPL.forEach(cpl => {
-            // Kita potong kata "SI-CPL" atau "TI-CPL" agar headernya lebih muat banyak
             let labelSingkat = cpl.kode.replace('SI-CPL', '').replace('TI-CPL', '').replace('CPL', '');
             if(labelSingkat.startsWith('-') || labelSingkat.startsWith('0')) {
-                labelSingkat = labelSingkat.substring(1); // Menghilangkan 0 atau strip di depan
+                labelSingkat = labelSingkat.substring(1); 
             }
-            // Jika hasilnya kosong, kembalikan ke kode awal
             if(labelSingkat === '') labelSingkat = cpl.kode;
 
             html += `<th title="${cpl.label || cpl.nama || ''}">${labelSingkat}</th>`;

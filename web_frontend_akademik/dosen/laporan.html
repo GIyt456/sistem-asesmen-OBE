@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Output Nilai - Universitas AKI</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PANGGIL JQUERY & SELECT2 UNTUK DROPDOWN SEARCH -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script src="/js/api_config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root { 
+            --navy: #0f172a; 
+            --blue: #1e3a8a; 
+            --red: #8b0000; 
+            --bg: #f8fafc; 
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: #111827; }
+        
+        .container { max-width: 1250px; margin: 30px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 24px; border: 1px solid #e2e8f0; }
+        
+        .table-wrapper { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 800px; }
+        th, td { padding: 10px 12px; border: 1px solid #e2e8f0; text-align: center; font-size: 0.85rem; }
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; }
+        .success { background: #dcfce7; color: #166534; }
+        .danger { background: #fee2e2; color: #991b1b; }
+        
+        .grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        
+        /* STYLE UNTUK SELECT2 */
+        .select2-container--default .select2-selection--single {
+            height: 42px; border: 1px solid #cbd5e1; border-radius: 6px; display: flex; align-items: center; font-family: 'Inter', sans-serif; font-weight: 500;
+        }
+        .select2-selection__arrow { top: 8px !important; }
+        
+        /* STYLE UNTUK PAGINATION */
+        .pagination-container { display: flex; justify-content: flex-end; align-items: center; margin-top: 15px; gap: 10px; }
+        .btn-page { padding: 8px 16px; border: 1px solid #cbd5e1; background: white; cursor: pointer; border-radius: 6px; font-weight: 600; color: #475569; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
+        .btn-page:hover { background: #f1f5f9; color: var(--navy); }
+        .btn-page:disabled { opacity: 0.5; cursor: not-allowed; }
+        #pageInfo { font-size: 0.95rem; font-weight: bold; color: var(--navy); background: #f1f5f9; padding: 6px 16px; border-radius: 6px; border: 1px solid #e2e8f0;}
+
+        /* NAVBAR DOSEN (STANDAR) */
+        .navbar {
+            background-color: var(--navy); padding: 15px 40px; 
+            display: flex; justify-content: space-between; align-items: center; color: white;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .nav-links { display: flex; gap: 30px; font-weight: 500; font-size: 0.95rem; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; transition: 0.3s; padding-bottom: 4px; opacity: 0.8; }
+        .nav-links a:hover, .nav-links a.active { opacity: 1; font-weight: 800; border-bottom: 2px solid #ffc561; }
+        
+        .nav-user { display: flex; align-items: center; gap: 16px; font-weight: 600; }
+        .user-chip { background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; color: #ffffff; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-logout { background: var(--red); color: white; padding: 8px 24px; border-radius: 50px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; }
+        .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
+
+        .chart-wrapper { position: relative; width: 100%; height: 400px; }
+        .hamburger-btn, .close-menu-btn, .mobile-overlay, .sidebar-header-mobile { display: none; }
+        .nav-menu-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 40px; flex: 1; }
+
+        @media screen and (max-width: 768px) {
+            body, html { overflow-x: hidden; width: 100%; position: relative; }
+            .card { width: 100%; max-width: 100%; overflow: hidden; box-sizing: border-box; }
+            .chart-wrapper { width: 100%; max-width: 100%; overflow: hidden; display: flex; justify-content: center; height: 320px; }
+            canvas { max-width: 100% !important; }
+            .table-wrapper { width: 100%; max-width: 100%; overflow-x: auto; }
+            .grid-top { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 15px; }
+
+            .sticky-nim { position: sticky; left: 0; z-index: 11 !important; background: white; min-width: 90px; max-width: 90px; border-right: none !important; }
+            .sticky-nama { position: sticky; left: 90px; z-index: 11 !important; background: white; min-width: 140px; max-width: 140px; border-right: 2px solid #cbd5e1 !important; }
+            .sticky-bobot { position: sticky; left: 0; z-index: 11 !important; background: #f1f5f9; min-width: 230px; max-width: 230px; border-right: 2px solid #cbd5e1 !important; }
+            
+            th.sticky-nim { background: #0f172a !important; z-index: 12 !important; border-right: 1px solid rgba(255,255,255,0.2) !important; }
+            th.sticky-nama { background: #0f172a !important; z-index: 12 !important; border-right: 2px solid #cbd5e1 !important; }
+
+            .navbar { padding: 15px 20px; justify-content: flex-start; gap: 15px; }
+            .nav-links { display: none !important; }
+            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+            
+            .nav-menu-wrapper { position: fixed; top: 0; left: -320px; width: 280px; height: 100vh; background: #0f172a; flex-direction: column; align-items: flex-start; padding: 0; box-shadow: 10px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 1000; overflow-y: auto; display: flex !important; }
+            .nav-menu-wrapper.active { left: 0; }
+            .sidebar-header-mobile { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .close-menu-btn { background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; }
+            
+            .nav-links.active { flex-direction: column; gap: 10px; width: 100%; padding: 20px; display: flex !important; align-items: flex-start; }
+            .nav-links.active a { display: block; width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.05); border-radius: 8px; border: none; margin-bottom: 5px; }
+            .nav-links.active a.active { background: rgba(255, 255, 255, 0.1); border-left: 4px solid #ffc561; border-radius: 0 8px 8px 0; }
+            
+            .nav-user { padding: 20px; width: 100%; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); flex-direction: column; justify-content: center; gap: 12px; }
+            .user-chip { width: 100%; justify-content: flex-start; }
+            .btn-logout { width: 100%; }
+
+            .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
+            .mobile-overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+            <img src="../gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 40px; object-fit: contain; cursor: pointer; filter: brightness(0) invert(1);" onclick="window.location.href='index.html'">
+        </div>
+
+        <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+
+        <div class="nav-menu-wrapper" id="navMenuWrapper">
+            <div class="sidebar-header-mobile">
+                <p class="sidebar-brand" style="font-size: 1.3rem; font-weight: 900; color: white; margin: 0;">SISTEM <span style="color:#ffc561;">OBE</span></p>
+                <button class="close-menu-btn" onclick="toggleMenu()"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="nav-links" id="navLinksContainer">
+                <a href="../dosen/jadwal_mengajar.html">Mengajar</a>
+                <a href="../dosen/input_nilai.html">Input Asesmen</a>
+                <a href="../dosen/rps_dosen.html">Penyusunan RPS</a>
+                <a href="../dosen/laporan.html" class="active">Output Nilai</a>
+            </div>
+
+            <div class="nav-user" id="navRightContainer">
+                <div class="user-chip">
+                    <i class="fas fa-user-circle" style="font-size: 1.2rem; color: #ffc561;"></i>
+                    <div class="user-text-mobile">
+                        <div id="dosenName" style="font-size: 0.95rem; font-weight: 800; line-height: 1;">Dosen</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">Log Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="card">
+            <h2 style="color: var(--navy); margin-top:0; margin-bottom:15px; font-weight: 800;"><i class="fas fa-university"></i> Laporan Capaian OBE</h2>
+            <!-- UBAH JADI SELECT2 COMPATIBLE -->
+            <select id="pilihMK" style="width: 100%; max-width: 500px;"></select>
+        </div>
+
+        <div class="grid-top" style="margin-bottom: 24px;">
+            <div class="card" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h3 style="margin-top:0; color:var(--navy); width: 100%;"><i class="fas fa-chart-pie"></i> Visualisasi Capaian</h3>
+                <div class="chart-wrapper">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div class="card" style="margin-bottom: 0;">
+                    <h3 style="margin-top:0; color:var(--navy);"><i class="fas fa-tasks"></i> Evaluasi Kelas</h3>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>CPL (CPMK)</th><th>Rata-rata</th><th>Status</th></tr></thead>
+                            <tbody id="bodyEvaluasi">
+                                <tr><td colspan="3" style="color: #64748b;">Pilih mata kuliah terlebih dahulu.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- KOTAK REKOMENDASI REMIDI OTOMATIS -->
+                <div class="card" id="cardRemidi" style="display: none; border-left: 5px solid #dc2626; background: #fff5f5;">
+                    <h3 style="margin-top:0; color:#991b1b;"><i class="fas fa-exclamation-triangle"></i> Daftar Mahasiswa Remidi</h3>
+                    <p style="font-size: 0.85rem; color: #7f1d1d; margin-bottom: 15px;">Sistem mendeteksi capaian CPL mahasiswa di bawah standar (75%). Berikut rincian pertemuan yang harus diperbaiki oleh masing-masing mahasiswa:</p>
+                    <div id="listRemidi" style="max-height: 250px; overflow-y: auto; border-radius: 8px; border: 1px solid #fca5a5;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:0; color:var(--navy);"><i class="fas fa-users"></i> Detail Capaian Mahasiswa</h3>
+            <div class="table-wrapper">
+                <table id="tableDetail">
+                    <thead></thead>
+                    <tbody id="bodyDetail">
+                        <tr><td colspan="10" style="color: #64748b; padding: 30px;">Pilih mata kuliah terlebih dahulu.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- TOMBOL PAGINATION -->
+            <div class="pagination-container" id="paginationControls" style="display: none;">
+                <button class="btn-page" id="btnPrev" onclick="gantiHalaman(-1)"><i class="fas fa-chevron-left"></i> Sebelumnya</button>
+                <span id="pageInfo">Halaman 1 / 1</span>
+                <button class="btn-page" id="btnNext" onclick="gantiHalaman(1)">Selanjutnya <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_METADATA = `${API_BASE}/get-metadata`;
+        const API_GET_REPORT = `${API_BASE}/get-report-obe`;    
+        const TARGET_PASS = 75;
+
+        // VARIABEL PAGINATION
+        let dataMahasiswaLengkap = []; 
+        let currentPage = 1;
+        const rowsPerPage = 10; 
+
+        // VARIABEL GLOBAL RENDER
+        let globalGroupMap = {};
+        let globalSortedGroups = [];
+        let globalRemidiAnalysis = {};
+
+        // ==========================================
+        // 1. AUTHENTIKASI & DETEKSI ROLE (GLOBAL)
+        // ==========================================
+        let userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
+        let userNidn = localStorage.getItem("user_nidn");
+        let userProdi = localStorage.getItem("prodi_aktif") || "ti";
+        let userRoleSekarang = localStorage.getItem("user_role");
+
+        document.getElementById("dosenName").innerText = userLogin;
+
+        const isKaprodi = (
+            userRoleSekarang === "admin" || 
+            userRoleSekarang === "headadmin" || 
+            (userLogin && userLogin.toLowerCase().includes("kaprodi"))
+        );
+
+        if (isKaprodi) {
+            const navRightContainer = document.getElementById("navRightContainer");
+            const btnKembali = document.createElement("a");
+            btnKembali.href = userProdi.includes("si") ? "../kaprodi/kaprodi_si/admin_config_si.html" : "../kaprodi/kaprodi_ti/admin_config.html";
+            btnKembali.innerHTML = '<i class="fas fa-shield-alt" style="margin-right: 4px;"></i> Kembali ke Admin';
+            
+            btnKembali.style.background = "#8b0000"; btnKembali.style.color = "white"; btnKembali.style.padding = "8px 16px";
+            btnKembali.style.borderRadius = "50px"; btnKembali.style.fontWeight = "bold"; btnKembali.style.textDecoration = "none";
+            btnKembali.style.fontSize = "0.9rem"; btnKembali.style.display = "flex"; btnKembali.style.alignItems = "center";
+            btnKembali.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)";
+            
+            navRightContainer.insertBefore(btnKembali, navRightContainer.firstChild);
+        }
+
+        // ==========================================
+        // 2. FUNGSI INISIALISASI & METADATA
+        // ==========================================
+        async function init() {
+            await loadMetadata();
+        }
+
+        async function loadMetadata() {
+            const selectMK = $('#pilihMK'); 
+            try {
+                // LOGIKA CERDAS NIDN KOSONG UNTUK KAPRODI
+                let urlFetch = `${API_METADATA}?prodi=${userProdi}`;
+                if (!isKaprodi) urlFetch += `&context=dosen&nidn=${userNidn}`;
+
+                const res = await fetch(urlFetch);
+                let textData = await res.text();
+                if (textData.startsWith('=')) textData = textData.substring(1);
+                
+                let parsedJson = JSON.parse(textData);
+                let data = Array.isArray(parsedJson) ? parsedJson : (parsedJson.data || []);
+                data = data.map(item => item.json ? item.json : item);
+
+                // Kumpulkan data ke array untuk Select2 format
+                let select2Data = [];
+                
+                if(Array.isArray(data)) {
+                    const mkTersimpan = new Set(); 
+                    data.forEach(item => {
+                        if (item.tipe === 'mk') {
+                            // Filter Prodi Kaprodi
+                            let itemProdi = (item.parent || "").toLowerCase();
+                            let currentProdi = (userProdi || "").toLowerCase();
+                            
+                            if (itemProdi.includes(currentProdi) || currentProdi.includes(itemProdi)) {
+                                if (!mkTersimpan.has(item.kode)) {
+                                    mkTersimpan.add(item.kode); 
+                                    // Masukkan format Select2 Object
+                                    select2Data.push({
+                                        id: item.kode,
+                                        text: `[${item.kode}] ${item.label}`
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // HANCURKAN SELECT2 LAMA JIKA ADA
+                if (selectMK.hasClass("select2-hidden-accessible")) {
+                    selectMK.select2('destroy');
+                }
+                
+                // KOSONGKAN ELEMEN
+                selectMK.empty();
+
+                // INISIALISASI SELECT2 DENGAN DATA OBJECT (Cepat & Anti Gagal)
+                selectMK.select2({
+                    data: select2Data,
+                    placeholder: "Pilih atau Cari Mata Kuliah...",
+                    allowClear: true,
+                    width: '100%'
+                });
+
+                // Terapkan deteksi ganti select
+                selectMK.off('select2:select').on('select2:select', function (e) {
+                    loadLaporan();
+                });
+
+                // Set Value Kosong di Awal (Agar tulisan placeholder muncul)
+                selectMK.val(null).trigger('change');
+
+                // Kembalikan Draf Lama Jika Ada
+                const lastMK = localStorage.getItem("draft_mk_terpilih");
+                if (lastMK) {
+                    if (selectMK.find(`option[value="${lastMK}"]`).length) {
+                        selectMK.val(lastMK).trigger('change.select2');
+                        loadLaporan();
+                    }
+                }
+
+            } catch (e) {
+                console.error("Gagal load metadata", e);
+                selectMK.html('<option value="">⚠️ Error Koneksi API Metadata</option>');
+            }
+        }
+
+        // ==========================================
+        // 3. FUNGSI TARIK DATA LAPORAN & HITUNG
+        // ==========================================
+        async function loadLaporan() {
+            const mkKode = document.getElementById("pilihMK").value;
+            if(!mkKode) return;
+            localStorage.setItem("draft_mk_terpilih", mkKode);
+
+            document.getElementById("cardRemidi").style.display = "none";
+            document.getElementById("listRemidi").innerHTML = "";
+
+            try {
+                const res = await fetch(`${API_GET_REPORT}?mk=${mkKode}`);
+                const textData = await res.text();
+                if (!textData) throw new Error("Respons kosong.");
+                
+                const flatData = JSON.parse(textData);
+                if(!Array.isArray(flatData)) throw new Error("n8n gagal mengeksekusi SQL.");
+
+                if(flatData.length === 0) {
+                    document.getElementById("bodyDetail").innerHTML = `<tr><td colspan="10" style="color:red; text-align:center; padding: 20px;">Data nilai belum diinput untuk mata kuliah ini.</td></tr>`;
+                    document.getElementById("bodyEvaluasi").innerHTML = `<tr><td colspan="3" style="color:red; text-align:center;">Tidak ada data.</td></tr>`;
+                    document.getElementById("paginationControls").style.display = "none";
+                    if(window.myChart) window.myChart.destroy();
+                    return;
+                }
+
+                processDataForPagination(flatData);
+            } catch (e) {
+                document.getElementById("bodyDetail").innerHTML = `<tr><td colspan="10" style="color:red; font-weight:bold; padding: 20px;">⚠️ Error: ${e.message}</td></tr>`;
+            }
+        }
+
+        // ==========================================
+        // 4. PEMROSESAN PAGINATION & RENDER 
+        // ==========================================
+        function processDataForPagination(flatData) {
+            const studentMap = {};
+            globalGroupMap = {}; 
+            globalRemidiAnalysis = {}; 
+
+            flatData.forEach(row => {
+                const groupKey = `${row.kode_cpl}|${row.kode_cpmk}`;
+                const pNum = row.pertemuan;
+                
+                if (!globalGroupMap[groupKey]) {
+                    globalGroupMap[groupKey] = { cpl: row.kode_cpl, cpmk: row.kode_cpmk, p: [], bobot: {}, bentuk: {} };
+                }
+                if (!globalGroupMap[groupKey].p.includes(pNum)) {
+                    globalGroupMap[groupKey].p.push(pNum);
+                    globalGroupMap[groupKey].p.sort((a, b) => a - b);
+                }
+                globalGroupMap[groupKey].bobot[pNum] = parseFloat(row.bobot_maks_pertemuan) || 0;
+                globalGroupMap[groupKey].bentuk[pNum] = row.bentuk_penilaian || "Evaluasi";
+
+                if (!globalRemidiAnalysis[`${groupKey}_P${pNum}`]) {
+                    globalRemidiAnalysis[`${groupKey}_P${pNum}`] = {
+                        cpl: row.kode_cpl, cpmk: row.kode_cpmk, pNum: pNum, 
+                        bentuk: row.bentuk_penilaian || "Evaluasi",
+                        bobotAsli: parseFloat(row.bobot_maks_pertemuan) || 0,
+                        totalNilaiAsliSatuKelas: 0, jumlahSiswa: 0
+                    };
+                }
+
+                const nim = row.nim;
+                if (!studentMap[nim]) studentMap[nim] = { nama: row.nama, nilai: {} };
+                
+                const nilaiAsliSiswa = parseFloat(row.nilai_asli) || 0;
+                const poinKonversi = parseFloat(row.poin_pertemuan) || 0;
+
+                studentMap[nim].nilai[`${groupKey}_P${pNum}`] = { asli: nilaiAsliSiswa, poin: poinKonversi };
+                
+                globalRemidiAnalysis[`${groupKey}_P${pNum}`].totalNilaiAsliSatuKelas += nilaiAsliSiswa;
+                globalRemidiAnalysis[`${groupKey}_P${pNum}`].jumlahSiswa++;
+            });
+
+            globalSortedGroups = Object.keys(globalGroupMap).sort();
+            
+            // Konversi ke Array untuk Pagination
+            dataMahasiswaLengkap = Object.keys(studentMap).sort().map(nim => {
+                return { nim: nim, ...studentMap[nim] };
+            });
+
+            // Siapkan Header
+            renderHeaderTabel();
+
+            // Set Halaman Kembali ke 1 saat mengganti matkul
+            currentPage = 1;
+            renderTabelMahasiswa();
+
+            // Perhitungan Visualisasi Chart dan Remidi Keseluruhan
+            calculateAndRenderSummary(globalGroupMap, studentMap, globalSortedGroups);
+        }
+
+        function renderHeaderTabel() {
+            const thead = document.querySelector("#tableDetail thead");
+            let h1 = `<th class="sticky-nim" rowspan="3" style="background:#0f172a; color:white; vertical-align:middle;">NIM</th>
+                      <th class="sticky-nama" rowspan="3" style="background:#0f172a; color:white; vertical-align:middle; text-align:left;">NAMA</th>`;
+            let h2 = ``; let h3 = ``;
+
+            globalSortedGroups.forEach(key => {
+                const item = globalGroupMap[key];
+                const numP = item.p.length;
+                const totalColspan = numP + 3;
+
+                h1 += `<th colspan="${totalColspan}" style="background:#1e3a8a; color:white;">${item.cpl}</th>`;
+                h2 += `<th colspan="${numP}" style="background:#334155; color:white;">${item.cpmk}</th>
+                       <th rowspan="2" style="background:#1e3a8a; color:white; vertical-align:middle;">TOTAL</th>
+                       <th rowspan="2" style="background:#1e3a8a; color:white; vertical-align:middle;">%</th>
+                       <th rowspan="2" style="background:#1e3a8a; color:white; vertical-align:middle;">CAPAIAN</th>`;
+                item.p.forEach(pNum => { h3 += `<th style="background:#475569; color:white;">P${pNum}</th>`; });
+            });
+            thead.innerHTML = `<tr>${h1}</tr><tr>${h2}</tr><tr>${h3}</tr>`;
+        }
+
+        function renderTabelMahasiswa() {
+            const body = document.getElementById("bodyDetail");
+            body.innerHTML = "";
+
+            // Pasang Baris Bobot (%)
+            let bobotRow = `<tr><td colspan="2" class="sticky-bobot" style="text-align:right; font-weight:bold; color: #1e3a8a;">BOBOT PENILAIAN (%)</td>`;
+            globalSortedGroups.forEach(key => {
+                const item = globalGroupMap[key];
+                let sumBobot = 0;
+                item.p.forEach(pNum => {
+                    const b = item.bobot[pNum] || 0; sumBobot += b;
+                    bobotRow += `<td style="font-weight:bold; background:#f1f5f9; color:#1e3a8a;">${b}</td>`;
+                });
+                bobotRow += `<td style="font-weight:bold; background:#e2e8f0;">${sumBobot}</td><td colspan="2" style="background:#e2e8f0;"></td>`;
+            });
+            body.innerHTML += bobotRow + "</tr>";
+
+            // LOGIKA PAGINATION
+            const totalPages = Math.ceil(dataMahasiswaLengkap.length / rowsPerPage) || 1;
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const currentData = dataMahasiswaLengkap.slice(startIndex, endIndex);
+
+            // Cetak Baris Mahasiswa yang disaring Pagination
+            currentData.forEach(mhs => {
+                let rowHTML = `<tr><td class="sticky-nim" style="font-weight:bold; background: white;">${mhs.nim}</td><td class="sticky-nama" style="text-align:left; background: white;">${mhs.nama}</td>`;
+                
+                globalSortedGroups.forEach(key => {
+                    const item = globalGroupMap[key];
+                    let totalPoin = 0; let totalBobot = 0;
+
+                    item.p.forEach(pNum => {
+                        const dataNilai = mhs.nilai[`${key}_P${pNum}`];
+                        totalPoin += dataNilai ? dataNilai.poin : 0;
+                        totalBobot += item.bobot[pNum];
+                    });
+                    
+                    const persen = totalBobot > 0 ? ((totalPoin / totalBobot) * 100).toFixed(2) : "0.00";
+                    const isLulusCPL = persen >= TARGET_PASS;
+
+                    item.p.forEach(pNum => {
+                        const dataNilai = mhs.nilai[`${key}_P${pNum}`];
+                        const nilaiAsli = dataNilai ? dataNilai.asli : 0; 
+                        let cellStyle = "";
+                        
+                        // JAGA INTEGRITAS LOGIKA REMIDI: Sorotan Merah
+                        if (!isLulusCPL && nilaiAsli < TARGET_PASS && item.bobot[pNum] > 0) {
+                            cellStyle = "background: #fee2e2; color: #b91c1c; font-weight: 800; border: 2px solid #ef4444;";
+                        }
+                        rowHTML += `<td style="${cellStyle}">${nilaiAsli}</td>`; 
+                    });
+
+                    rowHTML += `
+                        <td style="font-weight:bold; background:#f8fafc;">${totalPoin.toFixed(1)}</td>
+                        <td style="font-weight:bold; color:${isLulusCPL ? '#16a34a' : '#dc2626'}">${persen}%</td>
+                        <td><span class="badge ${isLulusCPL ? 'success' : 'danger'}">${isLulusCPL ? 'TERPENUHI' : 'TIDAK'}</span></td>`;
+                });
+                body.innerHTML += `${rowHTML}</tr>`;
+            });
+
+            // Render Tombol Pagination
+            document.getElementById("paginationControls").style.display = dataMahasiswaLengkap.length > rowsPerPage ? "flex" : "none";
+            document.getElementById("pageInfo").innerText = `Halaman ${currentPage} / ${totalPages}`;
+            document.getElementById("btnPrev").disabled = currentPage === 1;
+            document.getElementById("btnNext").disabled = currentPage === totalPages;
+        }
+
+        // FUNGSI GANTI HALAMAN
+        function gantiHalaman(step) {
+            currentPage += step;
+            renderTabelMahasiswa();
+        }
+
+        // ==========================================
+        // 5. RENDERING SUMMARY (KESELURUHAN)
+        // ==========================================
+        function calculateAndRenderSummary(structureMap, studentMap, sortedGroups) {
+            const summaryMap = {};
+            sortedGroups.forEach(key => { summaryMap[key] = { sumPersen: 0, count: 0 }; });
+            
+            // JAGA INTEGRITAS LOGIKA REMIDI: Daftar Mahasiswa yang Butuh Remidi Keseluruhan
+            const listRemidiMhs = [];
+
+            Object.keys(studentMap).forEach(nim => {
+                const mhs = studentMap[nim];
+                sortedGroups.forEach(key => {
+                    let studentPoin = 0; let cplBobot = 0;
+                    
+                    let pertemuanLemah = []; // Cek pertemuan lemah buat remidi
+
+                    structureMap[key].p.forEach(pNum => {
+                        cplBobot += (structureMap[key].bobot[pNum] || 0);
+                        if(mhs.nilai[`${key}_P${pNum}`]) {
+                            let poin = mhs.nilai[`${key}_P${pNum}`].poin;
+                            let asli = mhs.nilai[`${key}_P${pNum}`].asli;
+                            studentPoin += poin;
+
+                            if (asli < TARGET_PASS && structureMap[key].bobot[pNum] > 0) {
+                                pertemuanLemah.push(`P${pNum} (Nilai: ${asli})`);
+                            }
+                        }
+                    });
+
+                    const persen = cplBobot > 0 ? (studentPoin / cplBobot) * 100 : 0;
+                    summaryMap[key].sumPersen += Math.min(persen, 100);
+                    summaryMap[key].count++;
+
+                    // Mendaftarkan anak yang remidi ke list
+                    if (persen < TARGET_PASS && pertemuanLemah.length > 0) {
+                        listRemidiMhs.push({
+                            nim: nim, nama: mhs.nama,
+                            cpl: structureMap[key].cpl, cpmk: structureMap[key].cpmk,
+                            capaian: persen.toFixed(2), pertemuan: pertemuanLemah.join("<br>")
+                        });
+                    }
+                });
+            });
+
+            // Cetak Evaluasi Kelas
+            const labels = [], dataRata = [];
+            const tbodyEval = document.getElementById("bodyEvaluasi");
+            tbodyEval.innerHTML = "";
+
+            sortedGroups.forEach(key => {
+                const rata = (summaryMap[key].sumPersen / summaryMap[key].count).toFixed(2);
+                const labelTampil = `${structureMap[key].cpl} (${structureMap[key].cpmk})`;
+                labels.push(labelTampil); dataRata.push(rata);
+                const isLulus = rata >= TARGET_PASS;
+                tbodyEval.innerHTML += `<tr><td style="font-weight:bold; color:#0f172a;">${labelTampil}</td><td style="font-weight:bold; color:${isLulus ? '#16a34a':'#dc2626'}">${rata}%</td><td><span class="badge ${isLulus ? 'success':'danger'}">${isLulus ? 'TERCAPAI' : 'DI BAWAH TARGET'}</span></td></tr>`;
+            });
+            renderChart(labels, dataRata);
+
+            // Cetak Daftar Remidi
+            if (listRemidiMhs.length > 0) {
+                let remidiHTML = `<table style="width: 100%; border-collapse: collapse; background: white; font-size: 0.85rem; margin: 0;">
+                    <thead style="background: #fee2e2; color: #991b1b;"><tr><th style="padding: 10px; border: 1px solid #fca5a5; width: 15%;">NIM</th><th style="padding: 10px; border: 1px solid #fca5a5; width: 35%; text-align: left;">Nama Mahasiswa</th><th style="padding: 10px; border: 1px solid #fca5a5; width: 25%;">Gagal di CPL (CPMK)</th><th style="padding: 10px; border: 1px solid #fca5a5; width: 25%;">Pertemuan Remidi</th></tr></thead><tbody>`;
+                listRemidiMhs.forEach(rm => {
+                    remidiHTML += `<tr><td style="padding: 10px; border: 1px solid #fca5a5; font-weight: bold; text-align: center; color: #1e293b;">${rm.nim}</td><td style="padding: 10px; border: 1px solid #fca5a5; text-align: left; font-weight: 600; color: #1e293b;">${rm.nama}</td><td style="padding: 10px; border: 1px solid #fca5a5; text-align: center;"><div style="font-weight: bold; color: #0f172a;">${rm.cpl}</div><div style="font-size: 0.75rem; color: #64748b;">${rm.cpmk}</div><div style="font-size: 0.75rem; color: #dc2626; margin-top: 4px;">Capaian: ${rm.capaian}%</div></td><td style="padding: 10px; border: 1px solid #fca5a5; text-align: center; color: #b91c1c; font-weight: 700; background: #fff1f2; line-height: 1.5;">${rm.pertemuan}</td></tr>`;
+                });
+                remidiHTML += `</tbody></table>`;
+                document.getElementById("cardRemidi").style.display = "block";
+                document.getElementById("listRemidi").innerHTML = remidiHTML;
+            } else {
+                document.getElementById("cardRemidi").style.display = "none"; document.getElementById("listRemidi").innerHTML = "";
+            }
+        }
+
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if(window.myChart) window.myChart.destroy();
+            const isMobile = window.innerWidth <= 768;
+            window.myChart = new Chart(ctx, { type: 'radar', data: { labels: labels, datasets: [{ label: 'Capaian Kelas (%)', data: data, backgroundColor: 'rgba(30, 58, 138, 0.2)', borderColor: '#1e3a8a', pointBackgroundColor: '#1e3a8a', borderWidth: 2 }, { label: 'Target Lulus (75%)', data: labels.map(() => TARGET_PASS), borderColor: '#8b0000', borderDash: [5, 5], fill: false, pointRadius: 0, borderWidth: 2 }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: isMobile ? 10 : 20 }, scales: { r: { min: 0, max: 100, ticks: { stepSize: 20, backdropColor: 'transparent', font: { size: isMobile ? 8 : 11 } }, pointLabels: { font: { size: isMobile ? 9 : 12, family: "'Inter', sans-serif" } } } }, plugins: { legend: { position: 'bottom', labels: { font: { size: isMobile ? 10 : 12, family: "'Inter', sans-serif" }, boxWidth: isMobile ? 12 : 40 } } } } });
+        }
+
+        function toggleMenu() { document.getElementById('navMenuWrapper').classList.toggle('active'); document.getElementById('mobileOverlay').classList.toggle('active'); }
+        function logout() { localStorage.clear(); window.location.replace("../login/login.html"); }
+        
+        window.onload = function() {
+            // Tunggu sebentar untuk memastikan library JQuery & Select2 sudah ke-load penuh
+            setTimeout(() => {
+                init();
+            }, 100);
+        };
+    </script>
+</body>
+</html>

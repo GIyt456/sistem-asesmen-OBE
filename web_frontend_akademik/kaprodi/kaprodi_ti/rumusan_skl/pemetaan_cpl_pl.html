@@ -4,86 +4,192 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pemetaan CPL - Profil Lulusan - Sistem OBE</title>
+    
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="../../../js/api_config.js"></script>
+    
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script>
     
     <style>
-        :root { 
-            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
-            --primary-blue: #1e3a8a; --primary-red: #8b0000; --bg-main: #f9fafb; --text-dark: #111827; --border-color: #e5e7eb;
+        /* Tombol Save Khusus Agar Warnanya Menyesuaikan Prodi */
+        .btn-save-mapping { background: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; font-size: 0.95rem; }
+        .btn-save-mapping:hover { filter: brightness(0.85); transform: translateY(-2px); }
+        .btn-save-mapping:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+        
+        /* =========================================
+           ✨ BEAUTIFY MATRIKS DESKTOP ✨
+           ========================================= */
+        @media screen and (min-width: 769px) {
+            .tabel-cpl-pl-wrapper {
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+                border-radius: 12px !important;
+                overflow: hidden !important;
+                border: none !important;
+            }
+            .tabel-cpl-pl th {
+                background: #1e293b !important; /* Header Gelap Elegan */
+                color: white !important;
+                text-align: center !important;
+                vertical-align: middle !important;
+                padding: 20px 15px !important;
+                border: 1px solid #334155 !important;
+            }
+            .tabel-cpl-pl th:first-child {
+                background: #0f172a !important; /* Ujung kiri lebih gelap */
+                color: white !important;
+                z-index: 20 !important;
+                box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;
+            }
+            .tabel-cpl-pl td {
+                text-align: center !important;
+                vertical-align: middle !important;
+                padding: 0 !important; /* Hapus padding agar hover full cell */
+                border: 1px solid var(--border-color) !important;
+            }
+            .tabel-cpl-pl td:first-child {
+                text-align: left !important;
+                background: #f8fafc !important;
+                color: var(--primary-blue) !important;
+                font-weight: 800 !important;
+                padding: 15px 25px !important;
+                border-right: 2px solid #cbd5e1 !important;
+                box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;
+            }
+            .cell-wrapper-cpl {
+                display: flex; justify-content: center; align-items: center;
+                width: 100%; height: 100%; min-height: 60px;
+                cursor: pointer; transition: all 0.2s ease;
+            }
+            .cell-wrapper-cpl:hover {
+                background: #e0f2fe; /* Efek hover biru muda menyala */
+            }
+            .pl-label-mobile {
+                display: none !important; /* PASTIKAN TEKS BOCOR SEMBUNYI DI DESKTOP */
+            }
+            .chk-matrix {
+                transform: scale(1.3); /* Besarkan checkbox agar mudah diklik */
+                cursor: pointer;
+            }
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .main-content { flex: 1; overflow-y: auto; padding: 40px 50px; }
-        .header-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
-        .header-title span { color: var(--primary-blue); }
-
-        .btn-save { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .btn-save:hover { background: #172554; transform: translateY(-2px); }
-
-        /* Matriks Styling */
-        .matrix-container { background: white; border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: auto; max-height: 70vh; }
-        table { border-collapse: collapse; width: max-content; min-width: 100%; text-align: center; }
-        
-        th { background: #1e293b; color: white; font-size: 0.85rem; font-weight: 700; padding: 18px 15px; position: sticky; top: 0; z-index: 10; border-right: 1px solid #334155; }
-        th:first-child { left: 0; z-index: 20; background: #0f172a; min-width: 150px; text-align: left; padding-left: 25px; }
-        
-        td { padding: 15px; border: 1px solid var(--border-color); }
-        td:first-child { position: sticky; left: 0; background: #f8fafc; font-weight: 800; color: var(--primary-blue); text-align: left; padding-left: 25px; z-index: 5; border-right: 2px solid var(--border-color); cursor: help; }
-        
-        .chk-matrix { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-blue); }
+        /* Mobile Adjustments */
+        @media screen and (max-width: 768px) {
+            .btn-save-mapping { width: 100%; margin-top: 0 !important; }
+            .header-mapping-mhs { margin: 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px;}
+            .section-mapping-mhs { padding: 0 20px 40px 20px !important; }
+        }
     </style>
 </head>
 <body>
 
-<div id="sidebar-container"></div>
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
+                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
+                 onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()">
+            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
+        </div>
+    </nav>
+
+    <!-- 2. OVERLAY GELAP UNTUK LATAR SIDEBAR DI HP -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+    <div id="sidebar-container"></div>
 
     <div class="main-content">
+        <div id="navbar-container"></div>
+
         <div class="fixed-header">
-            <div class="header-container">
+            <div class="header-container header-mapping-mhs" style="margin: 40px 50px 20px 50px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
                     <div class="header-subtitle">PEMETAAN (MAPPING)</div>
                     <h1 class="header-title">MATRIKS <span>CPL - PROFIL LULUSAN</span></h1>
                 </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
             
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="header-mapping-mhs" style="display: flex; justify-content: space-between; align-items: center; margin: 0 50px 20px 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
                 <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Profil Lulusan (PL) yang berelasi dengan Capaian Pembelajaran Lulusan (CPL).</p>
-                <button class="btn-save" style="width: auto; margin-top: 0; background: #475569;" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-save-mapping" style="background: #475569;" onclick="loadData()">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+                    <button id="btnSaveTop" class="btn-save-mapping" onclick="simpanMapping()" disabled>
+                        <i class="fas fa-save"></i> Simpan Matriks
+                    </button>
+                </div>
             </div>
         </div>
-        <br>
 
-        <div class="scrollable-content">
-            <div style="overflow-x: auto; max-height: 550px; border: 1px solid var(--border-color); border-radius: 8px; background: white;">
-                <table id="matriksTable">
+        <div class="scrollable-content section-mapping-mhs" style="padding: 0 50px 40px 50px;">
+            <div class="tabel-cpl-pl-wrapper">
+                <!-- SUNTIKKAN KELAS tabel-cpl-pl -->
+                <table id="matriksTable" class="tabel-cpl-pl">
                     <thead>
                         <tr id="headerRow">
                             <th style="min-width: 120px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">CPL / PL</th>
                         </tr>
                     </thead>
                     <tbody id="bodyMatriks">
-                        <tr><td style="text-align: center; padding: 30px;">Memuat data...</td></tr>
+                        <tr><td style="text-align: center; padding: 50px !important;">Memuat data...</td></tr>
                     </tbody>
                 </table>
             </div>
-            <br>
-
-            <button id="btnSave" class="btn-save" onclick="simpanMapping()" disabled><i class="fas fa-save"></i> Simpan Matriks</button>
         </div>
     </div>
 
-    <script src="/js/template.js"></script>
-
 <script>
-    const PRODI = localStorage.getItem("prodi_aktif") || "ti";
+    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
+    const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        if(PRODI === "ti") {
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+        } else {
+            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+        }
 
+        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+        const avatarMobile = document.getElementById("mobileNavbarAvatar");
+        if(avatarMobile) {
+            const avatarColor = PRODI === "ti" ? "1e3a8a" : "8b0000";
+            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+        }
+    });
+
+    // --- FUNGSI SIDEBAR MOBILE ---
+    function toggleSidebar() {
+        document.getElementById('sidebar-container').classList.toggle('active');
+        document.getElementById('mobileOverlay').classList.toggle('active');
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                    .then(res => res.text())
+                    .then(html => {
+                        sidebar.innerHTML = html;
+                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                    })
+                    .catch(e => console.log('Gagal memuat sidebar darurat'));
+            }
+        }, 600); 
+    });
+
+    // --- LOGIKA DATA ---
     const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
     const API_PL = `${API_BASE}/get-master-pl?prodi=${PRODI}`;
     const API_RELASI = `${API_BASE}/get-mapping-cpl-pl?prodi=${PRODI}`;
@@ -93,48 +199,40 @@
     let listPL = [];
 
     const userLogin = localStorage.getItem("user_login");
-            if (!userLogin) window.location.replace("/login/login.html");
+    if (!userLogin) window.location.replace("/login/login.html");
 
-    window.onload = () => {
-        setTimeout(loadData, 400); 
-    };
+    window.onload = () => { setTimeout(loadData, 400); };
 
     async function loadData() {
-        const btnSave = document.getElementById("btnSave");
+        const btnSaveTop = document.getElementById("btnSaveTop");
         const tbody = document.getElementById("bodyMatriks");
-        if(btnSave) btnSave.disabled = true;
+        if(btnSaveTop) btnSaveTop.disabled = true;
 
         try {
             const [resCpl, resPl, resRelasi] = await Promise.all([
-                fetch(API_CPL),
-                fetch(API_PL),
-                fetch(API_RELASI)
+                fetch(API_CPL), fetch(API_PL), fetch(API_RELASI)
             ]);
 
             listCPL = await resCpl.json();
             listPL = await resPl.json();
 
-            // KEBAL BADAI: Kalau relasi kosong, anggap array []
             let relasiExisting = [];
             try {
                 relasiExisting = await resRelasi.json();
                 if (!Array.isArray(relasiExisting)) relasiExisting = [];
-            } catch (e) {
-                console.warn("Info: Data relasi saat ini masih kosong di database.");
-                relasiExisting = [];
-            }
+            } catch (e) { relasiExisting = []; }
 
             if (!listCPL || listCPL.length === 0 || !listPL || listPL.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red; font-weight: bold;'>Data CPL atau PL masih KOSONG! Harap isi terlebih dahulu.</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 50px !important; color: red; font-weight: bold;'>Data CPL atau PL masih KOSONG! Harap isi terlebih dahulu.</td></tr>";
                 return;
             }
 
             renderMatriks(relasiExisting);
-            if(btnSave) btnSave.disabled = false;
+            if(btnSaveTop) btnSaveTop.disabled = false;
 
         } catch (error) {
             console.error(error);
-            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red;'>Gagal terhubung ke API. Cek n8n!</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 50px !important; color: red;'>Gagal terhubung ke API. Cek n8n!</td></tr>";
         }
     }
 
@@ -143,28 +241,35 @@
         const tbody = document.getElementById("bodyMatriks");
         if(!headerRow || !tbody) return;
 
-        // Render Judul Kolom (PL)
-        headerRow.innerHTML = `<th style="min-width: 120px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">CPL / PL</th>`;
+        // Render Judul Kolom yang Dipercantik
+        headerRow.innerHTML = `<th style="min-width: 150px; position: sticky; left: 0;">CPL \\ PL</th>`;
         listPL.forEach(pl => {
             headerRow.innerHTML += `
-                <th title="${pl.nama_profil || pl.kode_pl}">
-                    <div style="font-weight: 800; font-size: 1.05rem; margin-bottom: 5px;">${pl.kode_pl}</div>
-                    <div style="font-size: 0.85rem; font-weight: 500; white-space: normal; max-width: 200px; margin: 0 auto; line-height: 1.3;">
+                <th title="${pl.nama_profil || pl.kode_pl}" style="min-width: 180px;">
+                    <div style="font-weight: 800; font-size: 1.15rem; margin-bottom: 6px; color: #bae6fd;">${pl.kode_pl}</div>
+                    <div style="font-size: 0.75rem; font-weight: 500; white-space: normal; line-height: 1.4; color: #f8fafc; opacity: 0.9;">
                         ${pl.nama_profil || ''}
                     </div>
                 </th>`;
         });
 
-        // Render Baris (CPL)
         tbody.innerHTML = "";
         listCPL.forEach(cpl => {
-            let tr = `<tr class="cpl-row">
-                <td style="position: sticky; left: 0; background: #f8fafc; z-index: 5; white-space: nowrap;" title="${cpl.deskripsi || ''}">${cpl.kode_cpl}</td>`;
+            let tr = `<tr>
+                <td style="position: sticky; left: 0; z-index: 5;" title="${cpl.deskripsi || ''}">${cpl.kode_cpl}</td>`;
             
             listPL.forEach(pl => {
                 const isChecked = relasiExisting.some(r => r.kode_cpl === cpl.kode_cpl && r.kode_pl === pl.kode_pl);
                 const chk = isChecked ? 'checked' : '';
-                tr += `<td><input type="checkbox" class="chk-matrix" data-cpl="${cpl.kode_cpl}" data-pl="${pl.kode_pl}" ${chk}></td>`;
+                const namaPL = pl.nama_profil || '';
+                
+                // Sel yang responsif, menutupi seluruh kotak untuk diklik
+                tr += `<td>
+                           <label class="cell-wrapper-cpl">
+                               <span class="pl-label-mobile">${pl.kode_pl} - ${namaPL}</span>
+                               <input type="checkbox" class="chk-matrix" data-cpl="${cpl.kode_cpl}" data-pl="${pl.kode_pl}" ${chk}>
+                           </label>
+                       </td>`;
             });
             
             tr += `</tr>`;
@@ -172,25 +277,17 @@
         });
     }
 
-    function applyMapping(data) {
-        if (!Array.isArray(data)) return;
-        data.forEach(m => {
-            const cb = document.getElementById(`${m.kode_pl}_${m.kode_cpl}`);
-            if (cb) cb.checked = true;
-        });
-    }
-
-    async function saveMapping() {
-        const btn = document.getElementById('btnSave');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-        btn.disabled = true;
+    async function simpanMapping() {
+        const btnTop = document.getElementById('btnSaveTop');
+        const originalText = btnTop.innerHTML;
+        btnTop.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btnTop.disabled = true;
 
         let promises = [];
         listPL.forEach(pl => {
             const checked = document.querySelectorAll(`.chk-matrix[data-pl="${pl.kode_pl}"]:checked`);
             const cplList = Array.from(checked).map(c => c.getAttribute('data-cpl'));
 
-            // Mengirim per PL agar n8n bisa melakukan Delete-then-Insert dengan aman
             promises.push(fetch(`${API_BASE}/admin-map-cpl-pl`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -202,7 +299,7 @@
             await Promise.all(promises);
             alert("✅ Pemetaan CPL - Profil Lulusan berhasil disimpan!");
         } catch (e) { alert("❌ Gagal menyimpan."); }
-        finally { btn.innerHTML = '<i class="fas fa-save"></i> Simpan Pemetaan'; btn.disabled = false; }
+        finally { btnTop.innerHTML = originalText; btnTop.disabled = false; }
     }
 </script>
 </body>

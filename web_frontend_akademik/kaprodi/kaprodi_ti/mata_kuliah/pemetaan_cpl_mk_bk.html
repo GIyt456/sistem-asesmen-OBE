@@ -25,41 +25,64 @@
             .tabel-cpl-bk-wrapper {
                 box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
                 border-radius: 12px !important;
-                overflow: hidden !important;
-                border: none !important;
+                /* PERBAIKAN: Izinkan scroll dan beri batas tinggi layar */
+                overflow: auto !important; 
+                max-height: 68vh !important; 
+                border: 1px solid var(--border-color) !important;
+                background: white;
+            }
+            .tabel-cpl-bk {
+                width: 100%;
+                /* PERBAIKAN: Agar border tidak bertabrakan dengan sticky & teks tidak melipat */
+                border-collapse: separate !important; 
+                border-spacing: 0 !important;
+                white-space: nowrap !important;
             }
             .tabel-cpl-bk th {
                 background: #1e293b !important; /* Header Gelap Elegan */
                 color: white !important;
                 text-align: center !important;
                 vertical-align: middle !important;
-                padding: 20px 15px !important;
-                border: 1px solid #334155 !important;
+                padding: 15px !important;
+                border-bottom: 2px solid #0f172a !important;
+                border-right: 1px solid #334155 !important;
+                /* Mengambangkan Header ke atas */
+                position: sticky; 
+                top: 0;
+                z-index: 10;
             }
             .tabel-cpl-bk th:first-child {
                 background: #0f172a !important; /* Ujung kiri lebih gelap */
                 color: white !important;
-                z-index: 20 !important;
                 box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;
+                /* Mengunci Header Pojok Kiri Atas */
+                position: sticky; 
+                left: 0;
+                z-index: 20 !important;
             }
             .tabel-cpl-bk td {
                 text-align: center !important;
                 vertical-align: middle !important;
-                padding: 0 !important; /* Hapus padding agar hover bisa full 1 kotak */
-                border: 1px solid var(--border-color) !important;
+                padding: 0 !important; 
+                border-bottom: 1px solid var(--border-color) !important;
+                border-right: 1px solid var(--border-color) !important;
             }
             .tabel-cpl-bk td:first-child {
                 text-align: left !important;
                 background: #f8fafc !important;
                 color: var(--primary-blue) !important;
                 font-weight: 800 !important;
-                padding: 15px 25px !important;
+                padding: 12px 25px !important;
                 border-right: 2px solid #cbd5e1 !important;
                 box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;
+                /* Mengunci Kolom Kiri CPL */
+                position: sticky; 
+                left: 0;
+                z-index: 5;
             }
             .cell-wrapper-cpl-bk {
                 display: flex; justify-content: center; align-items: center;
-                width: 100%; height: 100%; min-height: 60px;
+                width: 100%; height: 100%; min-height: 50px;
                 cursor: pointer; transition: all 0.2s ease;
             }
             .cell-wrapper-cpl-bk:hover {
@@ -79,7 +102,7 @@
            ========================================= */
         @media screen and (max-width: 768px) {
             .btn-save-mapping { width: 100%; margin-top: 0 !important; }
-            .header-mapping-mhs { margin: 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px;}
+            .header-mapping-mhs { margin: 15px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px;}
             .section-mapping-mhs { padding: 0 20px 40px 20px !important; }
 
             .tabel-cpl-bk-wrapper { border: none !important; box-shadow: none !important; background: transparent !important; max-height: none !important; overflow: hidden !important; width: 100% !important; margin-bottom: 0 !important;}
@@ -120,19 +143,19 @@
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
 
-    <div class="main-content">
+    <div class="main-content" style="padding-top: 20px;">
         <div id="navbar-container"></div>
 
         <div class="fixed-header">
-            <div class="header-container header-mapping-mhs" style="margin: 40px 50px 20px 50px; border-bottom: none; padding-bottom: 0;">
+            <div class="header-container header-mapping-mhs" style="margin: 0 50px 15px 50px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
-                    <div class="header-subtitle">PEMETAAN (MAPPING)</div>
-                    <h1 class="header-title">MATRIKS <span>CPL - BK</span></h1>
+                    <div class="header-subtitle" style="margin-bottom: 5px;">PEMETAAN (MAPPING)</div>
+                    <h1 class="header-title" style="font-size: 2rem;">MATRIKS <span>CPL - BK</span></h1>
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
             
-            <div class="header-mapping-mhs" style="display: flex; justify-content: space-between; align-items: center; margin: 0 50px 20px 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+            <div class="header-mapping-mhs" style="display: flex; justify-content: space-between; align-items: center; margin: 0 50px 15px 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
                 <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Bahan Kajian (BK) yang berelasi dengan Capaian Pembelajaran Lulusan (CPL).</p>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn-save-mapping" style="background: #475569;" onclick="loadData()">
@@ -145,7 +168,7 @@
             </div>
         </div>
 
-        <div class="scrollable-content section-mapping-mhs" style="padding: 0 50px 40px 50px;">
+        <div class="scrollable-content section-mapping-mhs" style="padding: 0 50px 20px 50px;">
             <div class="tabel-cpl-bk-wrapper">
                 <table id="matriksTable" class="tabel-cpl-bk">
                     <thead>
@@ -162,7 +185,7 @@
     </div>
 
 <script>
-    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+    const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
     
     document.addEventListener("DOMContentLoaded", () => {
         if(PRODI === "ti") {
@@ -175,7 +198,7 @@
         const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
         const avatarMobile = document.getElementById("mobileNavbarAvatar");
         if(avatarMobile) {
-            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+            const avatarColor = PRODI === "ti" ? "1e3a8a" : "8b0000";
             avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
         }
     });

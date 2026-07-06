@@ -6,139 +6,225 @@
     <title>Detail Nilai Mahasiswa - Sistem OBE</title>
     
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
+    
     <style>
-        .table-responsive { overflow-x: auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 40px; }
-        .table-nilai { width: 100%; border-collapse: collapse; min-width: 1300px; }
-        .table-nilai th, .table-nilai td { padding: 12px 8px; border: 1px solid #e5e7eb; text-align: center; font-size: 0.9rem; }
-        .table-nilai th { background-color: #111827; font-weight: 700; color: white; position: sticky; top: 0; z-index: 2; font-size: 0.85rem; text-transform: uppercase; }
+        .btn-cetak { background: #10b981; color: white; padding: 12px 24px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;}
+        .btn-cetak:hover { background: #059669; transform: translateY(-2px); }
+
+        /* =========================================
+           ✨ BEAUTIFY TABEL DESKTOP
+           ========================================= */
+        @media screen and (min-width: 769px) {
+            .table-responsive { 
+                overflow: auto !important; 
+                max-height: 65vh !important; 
+                background: white; 
+                border-radius: 12px; 
+                box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); 
+                border: 1px solid var(--border-color); 
+                margin-bottom: 40px; 
+            }
+            .table-nilai { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; white-space: nowrap;}
+            
+            .table-nilai th { 
+                background-color: #1e293b !important; 
+                font-weight: 700; color: white; position: sticky; top: 0; z-index: 10; 
+                font-size: 0.85rem; text-transform: uppercase; padding: 15px 8px; 
+                border-bottom: 2px solid #0f172a; border-right: 1px solid #334155;
+                text-align: center; vertical-align: middle;
+            }
+            .table-nilai td { 
+                padding: 12px 8px; border-bottom: 1px solid #e5e7eb; border-right: 1px solid #e5e7eb; 
+                text-align: center; font-size: 0.9rem; background: white; color: #1e293b;
+            }
+            
+            .table-nilai th.sticky-col-1 { position: sticky; left: 0; z-index: 20; background: #0f172a !important; min-width: 50px; max-width: 50px; box-shadow: 2px 0 5px rgba(0,0,0,0.2);}
+            .table-nilai td.sticky-col-1 { position: sticky; left: 0; z-index: 5; background: #f8fafc; font-weight: 700; color: #475569; border-right: 1px solid #cbd5e1; min-width: 50px; max-width: 50px; box-shadow: 2px 0 5px rgba(0,0,0,0.05);}
+            
+            .table-nilai th.sticky-col-2 { position: sticky; left: 50px; z-index: 20; background: #0f172a !important; min-width: 250px; box-shadow: 2px 0 5px rgba(0,0,0,0.2);}
+            .table-nilai td.sticky-col-2 { position: sticky; left: 50px; z-index: 5; background: #f8fafc; border-right: 2px solid #cbd5e1; text-align: left !important; box-shadow: 2px 0 5px rgba(0,0,0,0.05);}
+            
+            .table-nilai tbody tr:hover td { background-color: #f0f9ff !important; }
+            .table-nilai tbody tr:hover td.sticky-col-1, 
+            .table-nilai tbody tr:hover td.sticky-col-2 { background-color: #e0f2fe !important; }
+        }
+
+        .grade-badge { padding: 6px 14px; border-radius: 6px; font-weight: 900; color: white; font-size: 1rem; text-shadow: 0 1px 1px rgba(0,0,0,0.2); }
         
-        /* Kolom lengket (Sticky) untuk No dan NIM agar tidak hilang saat di-scroll ke kanan */
-        .table-nilai th.sticky-col, .table-nilai td.sticky-col { position: sticky; left: 0; background-color: white; z-index: 3; border-right: 2px solid #cbd5e1; }
-        .table-nilai th.sticky-col { background-color: #111827; } /* Header sticky tetap gelap */
-        .table-nilai th.sticky-col:nth-child(2), .table-nilai td.sticky-col:nth-child(2) { left: 40px; }
-        
-        .grade-badge { padding: 6px 12px; border-radius: 6px; font-weight: 800; color: white; font-size: 0.9rem; }
-        
-        body { animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        /* =========================================
+           📱 SULAP TABEL MENJADI KARTU DI MOBILE
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            .header-detail-mhs { margin: 15px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-detail-mhs { padding: 0 20px 20px 20px !important; }
+            .info-mk-container { flex-direction: column !important; gap: 15px; align-items: stretch !important; margin: 0 20px 15px 20px !important;}
+            .btn-cetak { width: 100% !important; justify-content: center !important;}
+
+            .table-responsive { overflow: visible !important; max-height: none !important; background: transparent !important; border: none !important; box-shadow: none !important; margin-bottom: 10px !important; padding: 0 !important;}
+            .table-nilai, .table-nilai tbody, .table-nilai tr, .table-nilai td { display: block !important; width: 100% !important; min-width: 0 !important;}
+            .table-nilai thead { display: none !important; }
+            
+            .table-nilai tr { border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; background: white !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;}
+            .table-nilai td { display: flex !important; justify-content: space-between !important; align-items: center !important; text-align: right !important; padding: 12px 20px !important; border-bottom: 1px dashed #cbd5e1 !important; border-right: none !important; background: transparent !important;}
+            
+            /* Teks Label dari JS (P1, UTS, UAS, dll) */
+            .table-nilai td::before { content: attr(data-label); font-weight: 800; color: #475569; text-align: left; }
+            
+            /* Sembunyikan Nomor */
+            .table-nilai td:nth-child(1) { display: none !important; }
+            
+            /* Header Kartu (NIM & Nama) */
+            .table-nilai td:nth-child(2) { background: #1e293b !important; color: white !important; flex-direction: column !important; align-items: flex-start !important; border-bottom: 4px solid var(--primary-blue) !important; padding: 15px 20px !important; text-align: left !important;}
+            .table-nilai td:nth-child(2)::before { display: none !important; }
+            .table-nilai td:nth-child(2) div { color: white !important; }
+            .table-nilai td:nth-child(2) div:first-child { color: #facc15 !important; font-size: 1.15rem !important; } 
+        }
 
         @media print {
-            #sidebar-container, #navbar-container, .btn-action, .header-container { display: none !important; }
-            .main-content { padding: 0 !important; }
-            .table-responsive { box-shadow: none; border: none; overflow: visible; }
+            #sidebar-container, #navbar-container, .navbar-mobile, .btn-cetak, .fixed-header { display: none !important; }
+            .main-content { padding: 0 !important; margin: 0 !important;}
+            .table-responsive { box-shadow: none !important; border: none !important; overflow: visible !important; max-height: none !important;}
         }
     </style>
 </head>
 <body>
 
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi"></div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
     
-    <div class="main-content">
+    <div class="main-content" style="padding-top: 20px;">
         <div id="navbar-container"></div>
 
-        <div class="content-wrapper">
-            <div class="header-container">
+        <div class="fixed-header">
+            <div class="header-container header-detail-mhs" style="margin: 0 50px 15px 50px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
-                    <div class="header-subtitle">EVALUASI & RPS</div>
-                    <h1 class="header-title">DETAIL <span>NILAI KELAS</span></h1>
+                    <div class="header-subtitle" style="margin-bottom: 5px;">EVALUASI & RPS</div>
+                    <h1 class="header-title" style="font-size: 2rem;">DETAIL <span>NILAI KELAS</span></h1>
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+            <div class="info-mk-container" style="display: flex; justify-content: space-between; align-items: center; margin: 0 50px 15px 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
                 <div>
-                    <h2 id="labelMK" style="margin: 0 0 5px 0; font-size: 1.6rem; color: var(--text-dark); font-weight: 800;">Memuat Mata Kuliah...</h2>
-                    <p style="margin: 0; color: #64748b; font-size: 1.05rem; font-weight: 500;">Dosen Pengampu: <strong style="color: #1e293b;" id="labelDosen">-</strong></p>
+                    <h2 id="labelMK" style="margin: 0 0 5px 0; font-size: 1.4rem; color: var(--text-dark); font-weight: 800;">Memuat Mata Kuliah...</h2>
+                    <p style="margin: 0; color: #64748b; font-size: 0.95rem; font-weight: 600;">Dosen Pengampu: <strong style="color: var(--primary-blue);" id="labelDosen">-</strong></p>
                 </div>
-                <button class="btn-dark" style="background: #10b981; border: none; padding: 12px 24px;" onclick="window.print()">
+                <button class="btn-cetak" onclick="window.print()">
                     <i class="fas fa-print"></i> Cetak Laporan
                 </button>
             </div>
+        </div>
 
+        <div class="scrollable-content section-detail-mhs" style="padding: 0 50px 20px 50px;">
             <div class="table-responsive">
                 <table class="table-nilai">
                     <thead>
                         <tr>
-                            <th class="sticky-col" style="min-width: 40px;">No</th>
-                            <th class="sticky-col" style="min-width: 250px; text-align: left;">NIM & Nama Mahasiswa</th>
+                            <th class="sticky-col-1">NO</th>
+                            <th class="sticky-col-2">NIM & NAMA MAHASISWA</th>
                             <th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th><th>P7</th>
-                            <th id="headerUTS" style="background: #7f1d1d;">UTS</th>
+                            <th id="headerUTS" style="background: #0f766e !important;">UTS</th>
                             <th>P9</th><th>P10</th><th>P11</th><th>P12</th><th>P13</th><th>P14</th><th>P15</th>
-                            <th id="headerUAS" style="background: #7f1d1d;">UAS</th>
-                            <th style="background: #166534; font-size: 0.95rem;">NILAI AKHIR</th>
-                            <th style="background: #166534;">GRADE</th>
+                            <th id="headerUAS" style="background: #0f766e !important;">UAS</th>
+                            <th style="background: #15803d !important; font-size: 0.95rem;">NILAI AKHIR</th>
+                            <th style="background: #15803d !important; font-size: 0.95rem;">GRADE</th>
                         </tr>
                     </thead>
                     <tbody id="bodyDetailNilai">
-                        <tr><td colspan="20" style="padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Memuat data nilai dari server...</td></tr>
+                        <tr><td colspan="20" style="padding: 50px; color: #64748b; text-align: center; font-weight: 600;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); margin-bottom: 15px; display: block;"></i>Memuat data nilai dari server...</td></tr>
                     </tbody>
                 </table>
             </div>
-
         </div>
     </div>
 
     <script>
-        // DETEKSI PRODI DINAMIS
         const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-    
         const API_GET_DETAIL = `${API_BASE}/get-detail-kelas`;
 
-        // SATPAM HALAMAN
         const userLogin = localStorage.getItem("user_login");
         if (!userLogin) window.location.replace("/login/login.html");
 
-        // Ambil parameter dari URL (?kode_mk=...&nama_mk=...&dosen=...)
         const urlParams = new URLSearchParams(window.location.search);
         const paramKodeMK = urlParams.get('kode_mk');
         const paramDosen = urlParams.get('dosen') || "Belum Dinamai";
         const paramNamaMK = urlParams.get('nama_mk') || "";
 
-        // UI Setup
         document.addEventListener("DOMContentLoaded", () => {
             const badge = document.getElementById("prodiBadge");
-            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+            if(badge) badge.innerText = PRODI === "si" ? "SISTEM INFORMASI" : "TEKNIK INFORMATIKA";
             
-            // Tema warna bergantung pada prodi yang login
-            const warnaUtama = PRODI === 'si' ? 'var(--primary-teal)' : 'var(--primary-red)';
-            const warnaHeaderUjian = PRODI === 'si' ? '#0f766e' : '#7f1d1d'; // Teal tua vs Merah gelap
-
-            if(PRODI === "si") {
-                badge.style.background = "var(--primary-teal)";
-                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+            if(PRODI === "ti") {
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+                document.getElementById("headerUTS").style.setProperty('background', '#7f1d1d', 'important');
+                document.getElementById("headerUAS").style.setProperty('background', '#7f1d1d', 'important');
+            } else {
+                document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+                document.getElementById("headerUTS").style.setProperty('background', '#1d4ed8', 'important'); 
+                document.getElementById("headerUAS").style.setProperty('background', '#1d4ed8', 'important');
             }
 
-            document.getElementById("labelMK").innerHTML = `<span style="color: ${warnaUtama};">[${paramKodeMK}]</span> ${paramNamaMK}`;
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if(avatarMobile) {
+                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+            }
+
+            document.getElementById("labelMK").innerHTML = `<span style="color: var(--primary-blue);">[${paramKodeMK}]</span> ${paramNamaMK}`;
             document.getElementById("labelDosen").innerText = paramDosen;
-            document.getElementById("headerUTS").style.background = warnaHeaderUjian;
-            document.getElementById("headerUAS").style.background = warnaHeaderUjian;
         });
 
-        // Penentuan Warna Grade
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebar.innerHTML = html;
+                            if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar darurat'));
+                }
+            }, 600); 
+        });
+
         function getGradeColor(grade) {
-            if(grade === 'A' || grade === 'A-') return 'background: #16a34a;'; // Hijau
-            if(grade.includes('B')) return 'background: #3b82f6;'; // Biru
-            if(grade.includes('C')) return 'background: #f59e0b;'; // Kuning
-            return 'background: #ef4444;'; // Merah (D/E)
+            if(grade === 'A' || grade === 'A-') return 'background: #16a34a; box-shadow: 0 2px 5px rgba(22,163,74,0.3);'; 
+            if(grade.includes('B')) return 'background: #2563eb; box-shadow: 0 2px 5px rgba(37,99,235,0.3);'; 
+            if(grade.includes('C')) return 'background: #f59e0b; box-shadow: 0 2px 5px rgba(245,158,11,0.3);'; 
+            return 'background: #dc2626; box-shadow: 0 2px 5px rgba(220,38,38,0.3);'; 
         }
 
         async function loadDetailNilai() {
             const tbody = document.getElementById("bodyDetailNilai");
             
             if(!paramKodeMK) {
-                tbody.innerHTML = `<tr><td colspan="20" style="color: red; padding: 30px; text-align: center;">Kode Mata Kuliah tidak ditemukan di URL! Kembali ke halaman sebelumnya.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="20" style="color: red; padding: 40px; text-align: center; font-weight:bold;">Kode Mata Kuliah tidak ditemukan di URL! Kembali ke halaman sebelumnya.</td></tr>`;
                 return;
             }
 
-            const warnaKolomUjian = PRODI === 'si' ? 'background: #f0fdfa;' : 'background: #fff5f5;';
-            const warnaTeksNim = PRODI === 'si' ? 'var(--primary-teal)' : 'var(--primary-red)';
-
-            tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Menarik detail nilai dan metadata RPS dari database...</td></tr>`;
+            const warnaKolomUjian = PRODI === 'si' ? 'background: #eff6ff !important;' : 'background: #fef2f2 !important;';
 
             try {
                 const res = await fetch(`${API_GET_DETAIL}?kode_mk=${paramKodeMK}`);
@@ -147,14 +233,14 @@
                 const rawText = await res.text();
                 
                 if (!rawText || rawText.trim() === "" || rawText.includes("empty_database")) {
-                    tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #dc2626; padding: 30px; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Belum ada data nilai mahasiswa di kelas ini.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #dc2626; padding: 40px; font-weight: 800;"><i class="fas fa-exclamation-triangle" style="margin-right:8px;"></i> Belum ada data nilai mahasiswa di kelas ini.</td></tr>`;
                     return;
                 }
 
                 const data = JSON.parse(rawText);
 
                 if(!data || data.length === 0 || !data[0].nim) {
-                    tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #dc2626; padding: 30px; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> Belum ada data nilai mahasiswa di kelas ini.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: #dc2626; padding: 40px; font-weight: 800;"><i class="fas fa-exclamation-triangle" style="margin-right:8px;"></i> Belum ada data nilai mahasiswa di kelas ini.</td></tr>`;
                     return;
                 }
 
@@ -162,52 +248,54 @@
                 let urutanMhs = 1;
 
                 data.forEach((mhs) => {
-                    
-                    // CEK JIKA INI ADALAH BARIS HEADER INJEKSI (CPL / CPMK / BOBOT)
+                    // BARIS HEADER INJEKSI (CPL / CPMK / BOBOT) -> JADI KARTU HEADER DI MOBILE
                     if (mhs.nim === '0_HEADER_CPL' || mhs.nim === '1_HEADER_CPMK' || mhs.nim === '2_HEADER_BOBOT') {
                         let isBobot = mhs.nim === '2_HEADER_BOBOT';
-                        // Memberikan warna background abu-abu sedikit lebih gelap khusus untuk baris Bobot agar menjadi pembatas yang jelas
-                        let bgStyle = isBobot ? 'background: #e2e8f0; color: #0f172a; font-weight: 800;' : 'background: #f8fafc; color: #475569; font-weight: 700; font-size: 0.85rem;';
+                        let bgStyle = isBobot ? 'background: #e2e8f0 !important; color: #0f172a !important; font-weight: 800;' : 'background: #f1f5f9 !important; color: #475569 !important; font-weight: 700; font-size: 0.85rem;';
                         
+                        let titleMobile = mhs.nim === '0_HEADER_CPL' ? 'Target CPL' : (mhs.nim === '1_HEADER_CPMK' ? 'Target CPMK' : 'Bobot (%)');
+
                         let htmlHeader = `
                             <tr>
-                                <td class="sticky-col" style="${bgStyle} border-right: none;"></td>
-                                
-                                <td class="sticky-col" style="${bgStyle} text-align: left;">
-                                    <div style="font-size: 0.9rem;">${mhs.nama_mahasiswa}</div>
+                                <td class="sticky-col-1" style="${bgStyle} border-right: none !important;"></td>
+                                <td class="sticky-col-2" style="${bgStyle} text-align: left !important;">
+                                    <div style="font-size: 1.15rem; font-weight: 900; color: #facc15;"><i class="fas fa-bullseye" style="margin-right: 5px;"></i> ${titleMobile}</div>
                                 </td>`;
                         
                         for(let p = 1; p <= 16; p++) {
-                            let val = (mhs[`p${p}`] !== null && mhs[`p${p}`] !== '0') ? mhs[`p${p}`] : '<span style="color:#cbd5e1;">-</span>';
-                            htmlHeader += `<td style="${bgStyle} text-align: center;">${val}</td>`;
+                            let labelP = (p === 8) ? 'UTS' : (p === 16 ? 'UAS' : `P${p}`);
+                            let val = (mhs[`p${p}`] !== null && mhs[`p${p}`] !== '0' && mhs[`p${p}`] !== '') ? mhs[`p${p}`] : '<span style="color:#cbd5e1;">-</span>';
+                            // MENAMBAHKAN DATA-LABEL AGAR MUNCUL TEKS DI KARTU MOBILE
+                            htmlHeader += `<td data-label="${labelP}" style="${bgStyle} text-align: center;">${val}</td>`;
                         }
                         
-                        htmlHeader += `<td style="${bgStyle} text-align: center;">${mhs.nilai_total}</td><td style="${bgStyle} text-align: center;">-</td></tr>`;
+                        htmlHeader += `<td data-label="NILAI AKHIR" style="${bgStyle} text-align: center;">${mhs.nilai_total}</td><td data-label="GRADE" style="${bgStyle} text-align: center;">-</td></tr>`;
                         tbody.innerHTML += htmlHeader;
                     } 
-                    // JIKA INI ADALAH BARIS MAHASISWA ASLI
+                    // BARIS MAHASISWA ASLI -> JADI KARTU MAHASISWA DI MOBILE
                     else {
                         let htmlRow = `
                             <tr>
-                                <td class="sticky-col" style="font-weight: 700; color: #475569; text-align: center;">${urutanMhs++}</td>
-                                <td class="sticky-col" style="text-align: left;">
-                                    <div style="font-weight: 800; color: ${warnaTeksNim}; font-size: 0.95rem;">${mhs.nim || '-'}</div>
-                                    <div style="font-size: 0.85rem; font-weight: 500; color: #475569; margin-top: 2px;">${mhs.nama_mahasiswa || '-'}</div>
+                                <td class="sticky-col-1" style="text-align: center;">${urutanMhs++}</td>
+                                <td class="sticky-col-2">
+                                    <div style="font-weight: 900; color: var(--primary-blue); font-size: 1.05rem;">${mhs.nim || '-'}</div>
+                                    <div style="font-size: 0.85rem; font-weight: 600; color: #f8fafc; margin-top: 4px;">${mhs.nama_mahasiswa || '-'}</div>
                                 </td>`;
 
                         for(let p = 1; p <= 16; p++) {
+                            let labelP = (p === 8) ? 'UTS' : (p === 16 ? 'UAS' : `P${p}`);
                             let nilaiP = mhs[`p${p}`] !== null ? mhs[`p${p}`] : '<span style="color:#cbd5e1;">-</span>';
                             let bgUjian = (p === 8 || p === 16) ? warnaKolomUjian : '';
-                            let fontWeight = (p === 8 || p === 16) ? 'font-weight: bold;' : '';
+                            let fontWeight = (p === 8 || p === 16) ? 'font-weight: 900; color: var(--primary-blue);' : 'font-weight: 600;';
                             
-                            htmlRow += `<td style="${bgUjian} ${fontWeight} text-align: center;">${nilaiP}</td>`;
+                            htmlRow += `<td data-label="${labelP}" style="${bgUjian} ${fontWeight} text-align: center;">${nilaiP}</td>`;
                         }
 
                         let badgeStyle = getGradeColor(mhs.grade || 'E');
                         htmlRow += `
-                                <td style="font-weight: 900; font-size: 1.15rem; background: #f8fafc; color: #0f172a; text-align: center;">${mhs.nilai_total || 0}</td>
-                                <td style="background: #f8fafc; text-align: center;">
-                                    <span class="grade-badge" style="display: inline-block; padding: 4px 12px; border-radius: 6px; font-weight: bold; ${badgeStyle}">${mhs.grade || '-'}</span>
+                                <td data-label="NILAI AKHIR" style="font-weight: 900; font-size: 1.2rem; background: #f8fafc !important; color: #0f172a; text-align: center;">${mhs.nilai_total || 0}</td>
+                                <td data-label="GRADE" style="background: #f8fafc !important; text-align: center;">
+                                    <span class="grade-badge" style="${badgeStyle}">${mhs.grade || '-'}</span>
                                 </td>
                             </tr>`;
                         
@@ -216,14 +304,11 @@
                 });
 
             } catch(error) {
-                tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: red; padding: 30px;"><i class="fas fa-wifi"></i> Terjadi kesalahan saat memuat data. Pastikan n8n aktif.</td></tr>`;
-                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="20" style="text-align: center; color: red; padding: 40px; font-weight:bold;">❌ Terjadi kesalahan saat memuat data. Pastikan n8n aktif.</td></tr>`;
             }
         }
 
-        window.onload = () => {
-            setTimeout(loadDetailNilai, 400);
-        };
+        window.onload = () => { setTimeout(loadDetailNilai, 400); };
     </script>
 </body>
 </html>

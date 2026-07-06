@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pemenuhan CPL per Angkatan - Sistem OBE</title>
     
+    <!-- MEMANGGIL FILE CSS EKSTERNAL & ADMIN -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -13,219 +16,117 @@
     <script src="/js/template.js"></script> 
     
     <style>
-        /* =========================================
-           STYLE GLOBAL & TEMA WARNA
-        ========================================= */
-        :root { 
-            --primary-blue: #1e3a8a; /* Biru Gelap SI */
-            --primary-teal: #0097a7; /* Teal Terang SI */
-            --sidebar-bg: #0b4d56;   /* TEAL GELAP KHUSUS SIDEBAR */
-            --primary-red: #8b0000;  /* Merah TI */
-            --bg-main: #f9fafb; 
-            --text-dark: #111827; 
-            --border-color: #e5e7eb;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        
-        body, html { 
-            display: flex; 
-            background: var(--bg-main); 
-            height: 100vh; 
-            width: 100%;
-            overflow-x: hidden; 
-            color: var(--text-dark);
-            animation: transitionIn 0.3s ease-in-out; 
-        }
-        
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* SEMBUNYIKAN ELEMEN MOBILE DI DESKTOP */
-        .navbar-mobile { display: none !important; }
-        .mobile-overlay { display: none !important; }
-
-        .main-content { 
-            flex: 1; 
-            min-width: 0; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            background: var(--bg-main); 
-        }
-
-        /* =========================================================
-           KUDETA WARNA SIDEBAR (MENGALAHKAN STYLE.CSS BAWAAN)
-        ========================================================= */
-        #sidebar-container { 
-            width: 280px; 
-            min-width: 280px; 
-            height: 100vh; 
-            flex-shrink: 0; 
-            z-index: 1000; 
-            background-color: var(--sidebar-bg) !important; 
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-        }
-        
-        #sidebar-container .sidebar, 
-        #sidebar-container > div,
-        .sidebar {
-            background-color: var(--sidebar-bg) !important;
-        }
-
-        .content-wrapper { flex: 1; overflow-y: auto; padding: 40px 50px 40px 50px; overflow-x: hidden; }
-
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .header-title-area { display: flex; flex-direction: column; }
-        .header-subtitle { color: #64748b; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); }
-        .header-title span { color: var(--primary-teal); } /* Default warna SI */
-        .badge-prodi { background: var(--primary-teal); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
-
         /* KONTROL PENCARIAN & FILTER */
-        .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
+        .filter-container { background: white; padding: 15px 20px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
         
-        .btn-analisis { background: #1e293b; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-analisis { background: #1e293b; color: white; padding: 10px 20px; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; font-weight: 700; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap;}
         .btn-analisis:hover { background: #0f172a; transform: translateY(-2px); }
         
-        .btn-cetak { background: #10b981; color: white; padding: 10px 20px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .btn-cetak { background: #10b981; color: white; padding: 10px 20px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap;}
         .btn-cetak:hover { background: #059669; transform: translateY(-2px); }
 
-        /* WADAH TABEL DESKTOP */
-        .table-responsive { overflow-x: auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 40px;}
-        .table-cpl { width: 100%; border-collapse: collapse; min-width: 1200px; } /* Memaksa tabel lebar di desktop */
-        .table-cpl th, .table-cpl td { padding: 15px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; vertical-align: middle; }
-        .table-cpl th { background: #111827; color: white; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; position: sticky; top: 0; z-index: 2; }
-        .text-left { text-align: left !important; }
+        /* =========================================
+           ✨ BEAUTIFY MATRIKS DESKTOP (ANTI-CACHE) ✨
+           ========================================= */
+        @media screen and (min-width: 769px) {
+            .table-responsive { 
+                overflow: auto !important; 
+                max-height: 55vh !important; 
+                border: 1px solid var(--border-color) !important; 
+                border-radius: 12px; 
+                background: white; 
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
+                margin-bottom: 0 !important;
+            }
+            .table-cpl { 
+                width: 100%; 
+                border-collapse: separate !important; 
+                border-spacing: 0 !important; 
+                white-space: nowrap !important; 
+            }
+            .table-cpl th { 
+                background: #1e293b !important; 
+                color: white !important; 
+                font-weight: 700; 
+                padding: 15px 15px !important; 
+                position: sticky; 
+                top: 0; 
+                z-index: 10; 
+                border-bottom: 2px solid #0f172a !important; 
+                border-right: 1px solid #334155 !important; 
+                text-align: center; 
+                vertical-align: middle; 
+                font-size: 0.85rem;
+            }
+            .table-cpl td { 
+                border-bottom: 1px solid var(--border-color) !important; 
+                border-right: 1px solid var(--border-color) !important; 
+                padding: 12px 15px !important; 
+                font-size: 0.9rem; 
+                text-align: center; 
+                color: #1e293b; 
+                background: white; 
+                vertical-align: middle;
+            }
 
-        .profile-btn-mobile {
-            width: 36px; height: 36px; border-radius: 50%; 
-            border: 2px solid rgba(255, 255, 255, 0.2); overflow: hidden; 
-            cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            /* STICKY KOLOM 1: NO URUT */
+            .table-cpl th.sticky-col-1 { position: sticky; left: 0; z-index: 20 !important; background: #0f172a !important; min-width: 50px; max-width: 50px; box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;}
+            .table-cpl td.sticky-col-1 { position: sticky; left: 0; z-index: 5 !important; background: #f8fafc !important; font-weight: 600; border-right: 1px solid #cbd5e1 !important; min-width: 50px; max-width: 50px; box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;}
+
+            /* STICKY KOLOM 2: NIM & NAMA MAHASISWA */
+            .table-cpl th.sticky-col-2 { position: sticky; left: 50px; z-index: 20 !important; background: #0f172a !important; min-width: 250px; box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;}
+            .table-cpl td.sticky-col-2 { position: sticky; left: 50px; z-index: 5 !important; background: #f8fafc !important; border-right: 2px solid #cbd5e1 !important; box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important; text-align: left !important;}
+
+            .table-cpl tbody tr:hover td { background-color: #f0f9ff !important; }
+            .table-cpl tbody tr:hover td.sticky-col-1,
+            .table-cpl tbody tr:hover td.sticky-col-2 { background-color: #e0f2fe !important; }
         }
-        .profile-btn-mobile img { width: 100%; height: 100%; object-fit: cover; }
 
         /* =========================================
-           RESPONSIVE MOBILE (AKTIF KHUSUS DI HP)
-        ========================================= */
+           📱 KARTU LIPAT UNTUK MOBILE
+           ========================================= */
         @media screen and (max-width: 768px) {
+            .header-eval-mhs { margin: 15px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-eval-mhs { padding: 0 20px 20px 20px !important; }
             
-            /* Navbar Mobile Atas (Navy Gelap) */
-            .navbar-mobile {
-                display: flex !important; 
-                position: fixed; top: 0; left: 0; width: 100%;
-                background-color: #0f172a; /* Warna diubah menjadi Navy Gelap */
-                padding: 12px 20px; align-items: center; justify-content: space-between;
-                z-index: 990; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            }
+            .filter-container { flex-direction: column; align-items: stretch; margin: 0 20px 15px 20px !important; padding: 15px !important;}
+            .filter-container > div { flex-direction: column; align-items: stretch !important; width: 100% !important; gap: 10px !important; }
+            .filter-container input { width: 100% !important; margin-bottom: 5px; }
             
-            .mobile-overlay.active { 
-                display: block !important; position: fixed; top: 0; left: 0; 
-                width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); 
-                backdrop-filter: blur(3px); z-index: 999; 
-            }
-            
-            #navbar-container { display: none !important; height: 0 !important; overflow: hidden !important; }
+            /* PERBAIKAN: Tombol Cetak dikembalikan dan disesuaikan lebarnya di HP */
+            .btn-analisis, .btn-cetak { width: 100% !important; justify-content: center !important; }
+            .btn-cetak { margin-top: 5px; }
 
-            body, html { height: auto !important; overflow-y: auto !important; overflow-x: hidden !important; width: 100% !important;}
+            .table-responsive { overflow: visible !important; max-height: none !important; border: none !important; box-shadow: none !important; background: transparent !important; margin-top: 10px !important;}
+            .table-cpl, .table-cpl thead, .table-cpl tbody, .table-cpl th, .table-cpl td, .table-cpl tr { display: block !important; width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
             
-            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+            .table-cpl thead { display: none !important; }
+            .table-cpl tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important; }
             
-            .content-wrapper { margin-top: 60px !important; height: auto !important; display: block !important; padding: 20px !important; width: 100% !important; overflow-x: hidden !important;}
-
-            #sidebar-container { 
-                position: fixed; top: 0; left: -320px; height: 100vh; 
-                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                box-shadow: 10px 0 25px rgba(0,0,0,0.5);
-            }
-            #sidebar-container.active { left: 0; }
+            .table-cpl td { position: static !important; box-shadow: none !important; }
+            .table-cpl td:nth-child(1) { display: none !important; }
             
-            /* Penyesuaian Header & Filter di HP */
-            .header-container { flex-direction: column !important; align-items: flex-start !important; gap: 15px; margin-bottom: 20px !important; }
-            .header-title { font-size: 1.6rem !important; }
+            .table-cpl td:nth-child(2) { background: #1f2937 !important; color: #f8fafc !important; padding: 15px 20px !important; text-align: left !important; border: none !important; border-bottom: 4px solid var(--primary-blue) !important;}
+            .table-cpl td:nth-child(2) div:first-child { color: #facc15 !important; font-size: 1.1rem !important; } 
+            .table-cpl td:nth-child(2) div:last-child { color: white !important; font-size: 1rem !important; margin-top: 5px !important; } 
             
-            .filter-container { flex-direction: column; align-items: stretch; gap: 15px; padding: 15px !important; }
-            .filter-container > div { flex-direction: column; align-items: stretch !important; }
-            #inputAngkatan { width: 100% !important; }
-
-            /* =========================================
-               SULAP TABEL CPL MENJADI KARTU (CARD)
-            ========================================= */
-            .table-responsive { 
-                border: none !important; 
-                box-shadow: none !important; 
-                background: transparent !important; 
-                overflow: hidden !important; 
-                padding: 0 !important;
-                margin-top: 10px !important;
-            }
+            .table-cpl td:not(:nth-child(1)):not(:nth-child(2)) { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 12px 20px !important; border: none !important; border-bottom: 1px dashed #cbd5e1 !important; }
+            .table-cpl td:last-child { border-bottom: none !important; }
             
-            table, thead, tbody, th, td, tr { 
-                display: block !important; 
-                width: 100% !important; 
-                min-width: 0 !important; /* MEMBUNUH LEBAR KAKU 1200PX DARI DESKTOP */
-            }
-            
-            /* Sembunyikan Header Tabel Bawaan (Thead) */
-            thead { display: none !important; }
-            
-            /* Jadikan setiap baris (Mahasiswa) sebagai Kotak Kartu */
-            tr { 
-                background: white !important; 
-                border: 1px solid var(--border-color) !important; 
-                border-radius: 12px !important; 
-                margin-bottom: 20px !important; 
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; 
-                overflow: hidden !important;
-            }
-            
-            /* Sel Pertama (No Urut) dihilangkan di Mobile agar tidak nyampah */
-            td:nth-child(1) { display: none !important; }
-            
-            /* Sel Kedua (NIM & NAMA) Menjadi Header Kartu Gelap */
-            td:nth-child(2) { 
-                background: #1f2937 !important; 
-                color: #f8fafc !important; 
-                padding: 15px 20px !important; 
-                text-align: left !important; 
-                border: none !important;
-                border-bottom: 4px solid var(--primary-teal) !important;
-            }
-            td:nth-child(2) div:first-child { color: #facc15 !important; font-size: 1.1rem !important; } /* NIM kuning */
-            td:nth-child(2) div:last-child { color: white !important; font-size: 1rem !important; margin-top: 5px !important; } /* Nama putih */
-            
-            /* Sel-sel nilai CPL disusun ke bawah */
-            td:not(:nth-child(1)):not(:nth-child(2)) { 
-                display: flex !important; 
-                justify-content: space-between !important; 
-                align-items: center !important; 
-                padding: 12px 20px !important; 
-                border: none !important; 
-                border-bottom: 1px dashed var(--border-color) !important; 
-            }
-            td:last-child { border-bottom: none !important; }
-            
-            /* MUNCULKAN TEKS LABEL KODE CPL DI HP MENGGUNAKAN ATRIBUT DATA-CPL DARI JS */
-            td:not(:nth-child(1)):not(:nth-child(2))::before { 
-                content: attr(data-cpl); /* Menarik teks label CPL dari atribut HTML */
-                font-weight: 800; 
-                color: #334155; 
-                font-size: 0.9rem; 
-            }
-            
-            /* Pastikan badge nilai tidak gepeng */
-            td span { margin: 0 !important; width: 65px; text-align: center; }
+            .table-cpl td:not(:nth-child(1)):not(:nth-child(2))::before { content: attr(data-cpl); font-weight: 800; color: #334155; font-size: 0.9rem; }
+            .table-cpl td span { margin: 0 !important; width: 65px; text-align: center; }
         }
 
         @media print {
-            #sidebar-container, #navbar-container, .navbar-mobile, .filter-container, .header-container { display: none !important; }
-            .content-wrapper { padding: 0 !important; margin: 0 !important;}
-            .table-responsive { box-shadow: none; border: none; padding: 0; }
+            #sidebar-container, #navbar-container, .navbar-mobile, .filter-container, .fixed-header { display: none !important; }
+            .main-content { padding: 0 !important; margin: 0 !important;}
+            .table-responsive { box-shadow: none; border: none; padding: 0; max-height: none !important; overflow: visible !important;}
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. NAVBAR KHUSUS MOBILE (Warna Navy Gelap) -->
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
             <button class="hamburger-btn" onclick="toggleSidebar()">
@@ -235,7 +136,6 @@
                  style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
                  onclick="window.location.href='/index.html'">
         </div>
-        
         <div class="profile-btn-mobile" onclick="toggleSidebar()">
             <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
         </div>
@@ -245,48 +145,47 @@
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
     <div id="sidebar-container"></div>
-    
-    <div class="main-content">
-        <!-- WADAH NAVBAR ASLI DARI TEMPLATE.JS -->
+
+    <div class="main-content" style="padding-top: 20px;">
         <div id="navbar-container"></div>
 
-        <div class="content-wrapper">
-            <div class="header-container" style="margin-bottom: 20px;">
+        <div class="fixed-header">
+            <div class="header-container header-eval-mhs" style="margin: 0 50px 15px 50px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
-                    <div class="header-subtitle">EVALUASI & RPS</div>
-                    <h1 class="header-title">EVALUASI <span>CPL ANGKATAN</span></h1>
+                    <div class="header-subtitle" style="margin-bottom: 5px;">EVALUASI & RPS</div>
+                    <h1 class="header-title" style="font-size: 2rem;">EVALUASI <span>CPL ANGKATAN</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
             </div>
-
-            <p style="margin: 0 0 20px 0; color: #64748b; font-size: 0.95rem;">Memantau tingkat pemenuhan Capaian Pembelajaran Lulusan (CPL) dari setiap individu mahasiswa dalam satu angkatan secara detail.</p>
-
-            <div class="filter-container">
+            
+            <div class="filter-container" style="margin: 0 50px 15px 50px;">
                 <div style="display: flex; gap: 15px; align-items: center; width: 100%;">
-                    <label style="font-weight: 700; color: #1e293b; white-space: nowrap;"><i class="fas fa-users"></i> Angkatan:</label>
-                    <input type="number" id="inputAngkatan" placeholder="Contoh: 2025" value="2025" style="padding: 10px 15px; border-radius: 6px; border: 1px solid #cbd5e1; font-weight: bold; outline: none; flex: 1;">
+                    <label style="font-weight: 700; color: #1e293b; white-space: nowrap;"><i class="fas fa-users" style="color: var(--primary-blue); margin-right: 5px;"></i> Angkatan:</label>
+                    <input type="number" id="inputAngkatan" placeholder="Contoh: 2025" value="2025" style="padding: 10px 15px; border-radius: 8px; border: 2px solid #cbd5e1; font-weight: 700; outline: none; flex: 1; font-size: 1rem; color: var(--primary-blue);">
                     
                     <button class="btn-analisis" onclick="loadEvalCPL()">
-                        <i class="fas fa-search"></i> Analisis
+                        <i class="fas fa-search"></i> Analisis Data
                     </button>
                 </div>
-
+                <!-- TOMBOL CETAK TELAH KEMBALI DI HP -->
                 <button class="btn-cetak" onclick="window.print()">
-                    <i class="fas fa-print"></i> Cetak
+                    <i class="fas fa-print"></i> Cetak Rekap
                 </button>
             </div>
+        </div>
 
+        <div class="scrollable-content section-eval-mhs" style="padding: 0 50px 20px 50px;">
             <div class="table-responsive">
                 <table class="table-cpl">
                     <thead id="headTable">
                         <tr>
-                            <th width="5%">NO</th>
-                            <th width="25%" class="text-left">NIM & NAMA MAHASISWA</th>
+                            <th width="5%" class="sticky-col-1">NO</th>
+                            <th width="25%" class="text-left sticky-col-2">NIM & NAMA MAHASISWA</th>
                             <th>DATA CPL</th>
                         </tr>
                     </thead>
                     <tbody id="bodyTable">
-                        <tr><td colspan="15" style="padding: 40px; color: #64748b; text-align: center;"><i class="fas fa-info-circle"></i> Silakan ketik tahun angkatan dan klik "Analisis Data".</td></tr>
+                        <tr><td colspan="15" style="padding: 40px; color: #64748b; text-align: center; font-weight: 600;"><i class="fas fa-info-circle" style="color: var(--primary-blue); margin-right: 8px;"></i> Silakan ketik tahun angkatan dan klik "Analisis Data".</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -294,46 +193,34 @@
     </div>
 
     <script>
-        // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
         const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
         const API_EVAL_CPL = `${API_BASE}/get-eval-cpl`;
-        let warnaTeksCpl = '#0097a7'; 
         
         document.addEventListener("DOMContentLoaded", () => {
             const userLogin = localStorage.getItem("user_login");
             if (!userLogin) window.location.replace("/login/login.html");
 
-            const badge = document.getElementById("prodiBadge");
-            const titleSpan = document.querySelector('.header-title span');
-            
-            // Jika TI, timpa warna menggunakan CSS Variable
             if(PRODI === "ti") {
-                document.documentElement.style.setProperty('--primary-teal', '#8b0000'); // Navbar & Aksentuasi Merah
-                document.documentElement.style.setProperty('--sidebar-bg', '#3b0000'); // Sidebar Merah Gelap
-                badge.innerText = "TEKNIK INFORMATIKA";
-                warnaTeksCpl = '#8b0000';
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+                document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
             } else {
-                // Pastikan jika SI, sidebarnya tetap Teal Gelap
-                document.documentElement.style.setProperty('--sidebar-bg', '#0b4d56');
-                badge.innerText = "SISTEM INFORMASI";
+                document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+                document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
             }
 
             const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
             const avatarMobile = document.getElementById("mobileNavbarAvatar");
             if(avatarMobile) {
-                // Menggunakan warna Biru (Navy) untuk Avatar di Navbar
                 const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
                 avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
             }
         });
 
-        // --- FUNGSI SIDEBAR MOBILE ---
         function toggleSidebar() {
             document.getElementById('sidebar-container').classList.toggle('active');
             document.getElementById('mobileOverlay').classList.toggle('active');
         }
         
-        // --- PENGAMAN SIDEBAR DARI TEMPLATE.JS ---
         document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => {
                 const sidebar = document.getElementById('sidebar-container');
@@ -349,7 +236,6 @@
             }, 600); 
         });
 
-        // --- FUNGSI ANALISIS DATA CPL ---
         async function loadEvalCPL() {
             const inputThn = document.getElementById("inputAngkatan").value;
             const angkatan = inputThn ? inputThn.trim() : "2025"; 
@@ -357,29 +243,27 @@
             const headTbl = document.getElementById("headTable");
             const bodyTbl = document.getElementById("bodyTable");
             
-            bodyTbl.innerHTML = `<tr><td colspan="15" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Mengkalkulasi data CPL Angkatan ${angkatan}...</td></tr>`;
+            bodyTbl.innerHTML = `<tr><td colspan="15" style="text-align: center; padding: 50px; color: #64748b; font-weight: 600;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); display: block; margin-bottom: 15px;"></i> Mengkalkulasi data CPL Angkatan ${angkatan}...</td></tr>`;
 
             try {
-                // Mengirim parameter pencarian & identitas prodi ke N8N
                 const res = await fetch(`${API_EVAL_CPL}?angkatan=${angkatan}&prodi=${PRODI}`);
                 if(!res.ok) throw new Error("Gagal mengambil data");
                 
                 const rawText = await res.text();
                 if (!rawText || rawText.trim() === "" || rawText.includes("empty_database")) {
-                    bodyTbl.innerHTML = `<tr><td colspan="15" style="text-align: center; color: #dc2626; padding: 30px; font-weight:bold;"><i class="fas fa-exclamation-circle"></i> Tidak ada rekap nilai untuk angkatan ${angkatan} di program studi ini.</td></tr>`;
-                    headTbl.innerHTML = `<tr><th>NO</th><th class="text-left">NIM & NAMA MAHASISWA</th><th>DATA CPL</th></tr>`;
+                    bodyTbl.innerHTML = `<tr><td colspan="15" style="text-align: center; color: #dc2626; padding: 40px; font-weight:bold;"><i class="fas fa-exclamation-circle"></i> Tidak ada rekap nilai untuk angkatan ${angkatan} di program studi ini.</td></tr>`;
+                    headTbl.innerHTML = `<tr><th class="sticky-col-1">NO</th><th class="text-left sticky-col-2">NIM & NAMA MAHASISWA</th><th>DATA CPL</th></tr>`;
                     return;
                 }
 
                 const data = JSON.parse(rawText);
 
                 if (data.length === 0 || !data[0].nim) {
-                    bodyTbl.innerHTML = `<tr><td colspan="15" style="text-align: center; color: #dc2626; padding: 30px; font-weight:bold;"><i class="fas fa-exclamation-circle"></i> Tidak ada rekap nilai untuk angkatan ${angkatan} di program studi ini.</td></tr>`;
-                    headTbl.innerHTML = `<tr><th>NO</th><th class="text-left">NIM & NAMA MAHASISWA</th><th>DATA CPL</th></tr>`;
+                    bodyTbl.innerHTML = `<tr><td colspan="15" style="text-align: center; color: #dc2626; padding: 40px; font-weight:bold;"><i class="fas fa-exclamation-circle"></i> Tidak ada rekap nilai untuk angkatan ${angkatan} di program studi ini.</td></tr>`;
+                    headTbl.innerHTML = `<tr><th class="sticky-col-1">NO</th><th class="text-left sticky-col-2">NIM & NAMA MAHASISWA</th><th>DATA CPL</th></tr>`;
                     return;
                 }
 
-                // Mengelompokkan data berdasarkan NIM
                 let mhsData = {};
                 let cplSet = new Set();
 
@@ -397,13 +281,19 @@
 
                 let cplList = Array.from(cplSet).sort();
 
-                // Generate Header Kolom CPL Dinamis (Untuk Desktop)
-                let headHtml = `<tr><th width="5%">NO</th><th width="25%" class="text-left">NIM & NAMA MAHASISWA</th>`;
-                cplList.forEach(cpl => { headHtml += `<th>${cpl}</th>`; });
+                let headHtml = `<tr>
+                    <th width="5%" class="sticky-col-1">NO</th>
+                    <th width="25%" class="text-left sticky-col-2">NIM & NAMA MAHASISWA</th>`;
+                cplList.forEach(cpl => { 
+                    let labelSingkat = cpl.replace('SI-CPL', '').replace('TI-CPL', '').replace('CPL', '');
+                    if(labelSingkat.startsWith('-') || labelSingkat.startsWith('0')) labelSingkat = labelSingkat.substring(1);
+                    if(labelSingkat === '') labelSingkat = cpl;
+                    
+                    headHtml += `<th title="${cpl}">${labelSingkat}</th>`; 
+                });
                 headHtml += `</tr>`;
                 headTbl.innerHTML = headHtml;
 
-                // Generate Body Baris Mahasiswa (Diubah CSS-nya jadi Kartu di Mobile)
                 bodyTbl.innerHTML = "";
                 let no = 1;
                 let sortedNim = Object.keys(mhsData).sort();
@@ -411,21 +301,18 @@
                 sortedNim.forEach(nim => {
                     let mhs = mhsData[nim];
                     let rowHtml = `<tr>
-                        <td style="font-weight: bold; color: #475569;">${no++}</td>
-                        <td class="text-left" style="text-align: left;">
-                            <div>${nim}</div>
-                            <div>${mhs.nama || '-'}</div>
+                        <td class="sticky-col-1" style="font-weight: bold; color: #475569;">${no++}</td>
+                        <td class="text-left sticky-col-2" style="text-align: left;">
+                            <div style="font-weight:900;">${nim}</div>
+                            <div style="color: #475569; font-weight:600; font-size: 0.85rem; margin-top: 2px;">${mhs.nama || '-'}</div>
                         </td>`;
                     
                     cplList.forEach(cpl => {
                         let skor = mhs.nilai_cpl[cpl] || 0;
-                        // Warna Badges nilai: Hijau (Lulus >= 60), Merah (Gagal < 60), Abu-abu (Belum ada nilai)
                         let color = skor >= 60 ? 'background: #dcfce7; color: #166534; border: 1px solid #bbf7d0;' : (skor > 0 ? 'background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;' : 'background: #f1f5f9; color: #94a3b8;');
                         let skorTampil = skor > 0 ? skor : '-';
-                        let badgeClass = skor > 0 ? 'display: inline-block; padding: 4px 12px; border-radius: 6px; font-weight: bold;' : '';
+                        let badgeClass = skor > 0 ? 'display: inline-block; padding: 6px 14px; border-radius: 6px; font-weight: 800;' : '';
                         
-                        // SUNTIKKAN SIFAT AJAIB: data-cpl="${cpl}"
-                        // Ini akan ditangkap oleh CSS Mobile ::before untuk menampilkan label seperti "SI-CPL01" di sebelah nilai!
                         rowHtml += `<td data-cpl="${cpl}"><span style="${badgeClass} ${color}">${skorTampil}</span></td>`;
                     });
                     
@@ -435,13 +322,11 @@
 
             } catch (e) {
                 console.error(e);
-                bodyTbl.innerHTML = `<tr><td colspan="15" style="text-align: center; color: red; padding: 30px; font-weight:bold;">Error: Gagal terhubung ke N8N.</td></tr>`;
+                bodyTbl.innerHTML = `<tr><td colspan="15" style="text-align: center; color: red; padding: 40px; font-weight:bold;">❌ Error: Gagal terhubung ke N8N. Periksa Tunnel Cloudflare.</td></tr>`;
             }
         }
 
-        window.onload = () => {
-            setTimeout(loadEvalCPL, 400); 
-        };
+        window.onload = () => { setTimeout(loadEvalCPL, 400); };
     </script>
 </body>
 </html>

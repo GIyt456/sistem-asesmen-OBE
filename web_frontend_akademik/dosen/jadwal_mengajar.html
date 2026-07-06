@@ -595,8 +595,8 @@
                 <a href="jadwal_mengajar.html" class="active">Mengajar</a>
                 <a href="input_nilai.html">Input Asesmen</a>
                 <a href="rps_dosen.html">Penyusunan RPS</a>
-                <a href="../kaprodi/laporan.html">Laporan OBE</a>
-                <a href="portofolio.html">Portofolio</a>
+                <a href="../dosen/laporan.html">Output nilai</a>
+                <!-- <a href="portofolio.html">Portofolio</a> -->
             </div>
 
             <div class="nav-user" id="navRightContainer">
@@ -745,6 +745,7 @@
         // API CONFIG (Mengikuti sumber data yang sama dengan input_nilai.html)
         const API_METADATA = `${API_BASE}/get-metadata`;
         const API_GET_MATKUL = `${API_BASE}/get-master-matkul`;
+        const API_GET_KELAS_AKTIF = `${API_BASE}/get-kelas-aktif`; // API Tambahan untuk menarik kelompok
 
         // Sesi Login
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
@@ -813,19 +814,30 @@
                 const jsonMatkul = await resMatkul.json();
                 let dataMatkulRaw = safeExtractArray(jsonMatkul);
 
+                // 3. TARIK DATA KELAS AKTIF (Untuk mendapatkan nama Kelompok yang akurat)
+                let dataKelasAktif = [];
+                try {
+                    const resKelas = await fetch(API_GET_KELAS_AKTIF);
+                    const jsonKelas = await resKelas.json();
+                    dataKelasAktif = safeExtractArray(jsonKelas);
+                } catch (e) {
+                    console.warn("Gagal menarik data kelas aktif", e);
+                }
+
                 let gabunganData = [];
 
                 if (userRoleSekarang === "admin" || userRoleSekarang === "headadmin") {
                     // JALUR KAPRODI: Tampilkan seluruh Master Matkul (bypass N8N Metadata)
                     gabunganData = dataMatkulRaw.map(m => {
-                        // Cek apakah kaprodi juga ngajar matkul ini
                         let diajarSendiri = mkMilikSendiri.includes(m.kode_mk);
+                        let kelasMatch = dataKelasAktif.find(k => k.kode_mk === m.kode_mk); // Cari kecocokan di kelas_aktif
+
                         return {
                             id_kelas: "KL-" + m.kode_mk,
                             kode_mk: m.kode_mk,
-                            nidn: diajarSendiri ? userNidn : "", // Set NIDN hanya jika Kaprodi ngajar kelas ini
+                            nidn: diajarSendiri ? userNidn : "",
                             semester: m.semester || "-",
-                            kelompok: "A",
+                            kelompok: kelasMatch && kelasMatch.kelompok ? kelasMatch.kelompok : "A", // Ambil dari DB atau fallback ke 'A'
                             nama_mk: m.nama_mk || "MK Tidak Ditemukan",
                             sks: m.sks || "-",
                             prodi: m.prodi || "-"
@@ -835,7 +847,6 @@
                     // JALUR DOSEN BIASA: Tampilkan HANYA matkul miliknya
                     const myMatkulRaw = allMetadata.filter(item => item.tipe === 'mk');
 
-                    // Filter duplicate
                     const uniqueMeta = []; const mapMeta = new Map();
                     for (const item of myMatkulRaw) {
                         if (item.kode && !mapMeta.has(item.kode)) {
@@ -846,12 +857,14 @@
 
                     gabunganData = uniqueMeta.map(mk => {
                         const matkulCocok = dataMatkulRaw.find(m => m.kode_mk === mk.kode);
+                        let kelasMatch = dataKelasAktif.find(k => k.kode_mk === mk.kode); // Cari kecocokan di kelas_aktif
+
                         return {
                             id_kelas: "KL-" + mk.kode,
                             kode_mk: mk.kode,
                             nidn: mk.nidn || userNidn,
                             semester: matkulCocok ? matkulCocok.semester : "-",
-                            kelompok: "A",
+                            kelompok: kelasMatch && kelasMatch.kelompok ? kelasMatch.kelompok : "A", // Ambil dari DB atau fallback ke 'A'
                             nama_mk: mk.label || (matkulCocok ? matkulCocok.nama_mk : "MK Tidak Ditemukan"),
                             sks: matkulCocok ? matkulCocok.sks : "-",
                             prodi: matkulCocok ? matkulCocok.prodi : mk.prodi_asal
@@ -941,7 +954,7 @@
                 `;
 
                 if (isMilikSendiri) {
-                    // Dosen/Kaprodi yang MEMANG MENGAJAR di kelas ini (Boleh Input Nilai)
+                    // Dosen/Kaprodi yang MEMANG MENGAJAR di kelas ini
                     btnHtml += `
                         <button class="btn-penilaian" onclick="localStorage.setItem('draft_mk_terpilih', '${kelas.kode_mk}'); window.location.href='input_nilai.html'">
                             <i class="fas fa-edit"></i> Input Nilai
@@ -951,8 +964,11 @@
                         </button>
                     `;
                 } else {
-                    // Kaprodi melihat kelas dosen lain (TIDAK ADA TOMBOL INPUT NILAI)
+                    // Kaprodi melihat kelas dosen lain (SEKARANG BISA INPUT NILAI JUGA)
                     btnHtml += `
+                        <button class="btn-penilaian" onclick="localStorage.setItem('draft_mk_terpilih', '${kelas.kode_mk}'); window.location.href='input_nilai.html'">
+                            <i class="fas fa-edit"></i> Input Nilai
+                        </button>
                         <button class="btn-rps" style="background: #f59e0b;" onclick="bukaRPS('${kelas.kode_mk}')">
                             <i class="fas fa-search"></i> Review RPS
                         </button>
