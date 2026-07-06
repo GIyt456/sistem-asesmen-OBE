@@ -22,15 +22,34 @@
     /* 1. AREA SCROLL MENU (Hanya area menu yang bisa discroll) */
     .nav-menu {
         flex: 1;
-        overflow-y: auto;
+        /* PAKSA MUNCUL TERUS meskipun isinya belum penuh */
+        overflow-y: scroll !important; 
         padding-bottom: 20px;
+        
+        /* BAHASA KHUSUS MOZILLA FIREFOX */
+        scrollbar-width: thin !important; 
+        scrollbar-color: #64748b #1a1d27 !important;
     }
     
-    /* 2. CUSTOM SCROLLBAR GELAP ELEGAN */
-    .nav-menu::-webkit-scrollbar { width: 6px; }
-    .nav-menu::-webkit-scrollbar-track { background: transparent; }
-    .nav-menu::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-    .nav-menu::-webkit-scrollbar-thumb:hover { background: #475569; }
+    /* 2. CUSTOM SCROLLBAR TERLIHAT (RAMAH DOSEN) - Chrome/Edge/Safari */
+    .nav-menu::-webkit-scrollbar { 
+        width: 14px !important; /* Dipertebal lagi biar makin nyata */
+        display: block !important; /* Paksa render */
+    }
+    .nav-menu::-webkit-scrollbar-track { 
+        background: rgba(255, 255, 255, 0.08) !important; /* Terangkan sedikit rel-nya */
+        border-radius: 10px !important;
+        margin: 5px !important; 
+    }
+    .nav-menu::-webkit-scrollbar-thumb { 
+        background: #7b8a9e !important; /* Warna abu-abu yang lebih menyala */
+        border-radius: 10px !important; 
+        /* Trik border agar kelihatan seperti tombol pil (pill button) di dalam rel */
+        border: 3px solid #161923 !important; 
+    }
+    .nav-menu::-webkit-scrollbar-thumb:hover { 
+        background: #cbd5e1 !important; /* Menyala keputihan saat digeser */
+    }
 
     /* 3. PERCANTIK ITEM MENU (Efek Hover & Jarak) */
     .nav-item {
@@ -170,34 +189,6 @@
             <!-- <div class="nav-item" data-path="/periksa_data/mengajar_salah.html"><i class="fas fa-exclamation-triangle"></i> Mengajar Salah</div> -->
             <div class="nav-item" data-path="/periksa_data/mengajar_duplikat.html"><i class="fas fa-users-slash"></i> Mengajar Duplikat</div>
         </div>
-
-        <div class="nav-item" onclick="toggleDropdown('menu-assesmen', 'chevron-assesmen')">
-            <i class="fas fa-balance-scale"></i> Mekanisme Assesmen
-            <i id="chevron-assesmen" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-        <div id="menu-assesmen" style="display: none; flex-direction: column; margin-top: 2px;">
-            <div class="nav-item" data-path="/mekanisme_assesmen/master_bobot.html" style="padding-left: 48px; font-size: 0.85rem;">Master Bobot</div>
-        </div>
-
-        <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')">
-            <i class="fas fa-sitemap"></i> Pemetaan (Mapping)
-            <i id="chevron-mapping" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-        <div id="submenu-mapping" style="display: none; flex-direction: column; margin-top: 2px;">
-            <div class="nav-item" data-path="/mapping/map_cpl_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">Mapping CPL - CPMK</div>
-            <div class="nav-item" data-path="/mapping/map_mk_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">Mapping MK - CPMK</div>
-        </div>
-
-        <div class="nav-item" onclick="toggleDropdown('submenu-matriks', 'chevron-matriks')">
-            <i class="fas fa-table"></i> Matriks Kurikulum
-            <i id="chevron-matriks" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-        <div id="submenu-matriks" style="display: none; flex-direction: column; margin-top: 2px;">
-            <div class="nav-item" data-path="/matriks_kurikulum/matriks_cpl_mk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan MK - CPL</div>
-            <div class="nav-item" data-path="/matriks_kurikulum/matriks_struktur.html" style="padding-left: 48px; font-size: 0.85rem;">Struktur Kurikulum</div>
-        </div>
-
-        <div class="nav-item" data-path="/KRS/import_krs.html"><i class="fas fa-file-excel"></i> Import KRS Mahasiswa</div>
 
         <div class="menu-category">EVALUASI & RPS</div>
 
