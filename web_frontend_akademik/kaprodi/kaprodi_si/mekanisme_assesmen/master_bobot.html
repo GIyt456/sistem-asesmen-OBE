@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Bobot - Sistem OBE</title>
-    
-    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/admin_si.css">
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -16,285 +12,256 @@
     <script src="/js/template.js"></script> 
     
     <style>
-        /* =========================================
-           ✨ BEAUTIFY MATRIKS & FORM (ANTI-CACHE) ✨
-           ========================================= */
-        .btn-save-bobot { background: var(--primary-blue); color: white; border: none; padding: 14px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;}
-        .btn-save-bobot:hover { filter: brightness(0.85); transform: translateY(-2px); }
-        .btn-save-bobot:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
-
-        .control-panel { background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 25px; display: flex; gap: 20px; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .select-matkul { padding: 14px 20px; border: 2px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 1rem; flex: 1; cursor: pointer; background: #f8fafc; font-weight: 600; color: #334155; transition: 0.2s; }
-        .select-matkul:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1); }
-
-        .table-bobot-wrapper { overflow-x: auto; background: white; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
-        .tabel-bobot { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; } /* Memaksa scroll di HP agar layout isian angka tidak hancur */
-        
-        .tabel-bobot th { background: #1e293b !important; color: white !important; font-weight: 700; padding: 18px 10px !important; border-bottom: 2px solid #0f172a !important; border-right: 1px solid #334155 !important; text-align: center; vertical-align: middle; font-size: 0.85rem; }
-        .tabel-bobot th.bg-darker { background: #0f172a !important; letter-spacing: 1px;} 
-        .tabel-bobot th.bg-primary { background: var(--primary-blue) !important; font-size: 1rem; border-right: none !important;}
-
-        .tabel-bobot td { border-bottom: 1px solid #e5e7eb !important; border-right: 1px solid #e5e7eb !important; padding: 15px 10px !important; font-size: 0.9rem; text-align: center; vertical-align: middle; background: white; color: #1e293b;}
-        .tabel-bobot td:last-child { border-right: none !important; }
-        
-        .col-cpl { color: var(--primary-blue) !important; font-weight: 800 !important; background: #f8fafc !important; }
-        .col-mk { font-weight: 700 !important; }
-        .col-cpmk { background: #f1f5f9 !important; font-weight: 700 !important; color: #334155 !important;}
-
-        /* Gaya Kotak Input Angka Keren */
-        .input-bobot { width: 70px; padding: 10px 5px; border: 2px solid #cbd5e1; border-radius: 8px; text-align: center; font-size: 0.95rem; font-weight: 700; color: #1e293b; transition: all 0.2s; background: #f8fafc; outline: none;}
-        .input-bobot:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15); transform: translateY(-2px); }
-        
-        /* Gaya Kotak Total Responsif */
-        .col-total { font-size: 1.4rem !important; font-weight: 900 !important; transition: 0.3s; }
-        .total-ok { color: #059669 !important; background: #ecfdf5 !important; } 
-        .total-warn { color: #dc2626 !important; background: #fef2f2 !important; box-shadow: inset 0 0 0 2px #f87171;} 
-
-        /* =========================================
-           📱 PENYESUAIAN MOBILE ANTI-MEPET
-           ========================================= */
-        @media screen and (max-width: 768px) {
-            .header-bobot-mhs { margin: 20px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
-            .section-bobot-mhs { padding: 0 20px 40px 20px !important; }
-            
-            /* Panel kontrol menyusun ke bawah di HP */
-            .control-panel { flex-direction: column !important; align-items: stretch !important; padding: 20px !important; gap: 15px !important;}
-            .btn-save-bobot { width: 100% !important; justify-content: center !important; }
+        :root { 
+            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
+            --primary-red: #8b0000; --bg-main: #ffffff; --text-dark: #111827; --border-dark: #161923;
         }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { display: flex; animation: transitionIn 0.3s ease-in-out; background: #f9fafb; height: 100vh; overflow: hidden; color: var(--text-dark); }
+        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .main-content { flex: 1; overflow-y: auto; padding: 30px 40px; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; border-bottom: 1px solid #e5e7eb; padding-bottom: 15px; }
+        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
+        .header-title span { color: var(--primary-red); }
+
+        .table-container { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); overflow-x: auto; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th { background: var(--sidebar-bg); color: white; text-align: center; padding: 12px 10px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; border: 1px solid #374151; position: sticky; top: 0; z-index: 10; }
+        td { padding: 10px; border: 1px solid #e5e7eb; font-size: 0.85rem; text-align: center; vertical-align: middle; }
+        
+        td.text-left { text-align: left; font-weight: 500; }
+        .col-cpl { color: var(--primary-red); font-weight: 700; }
+        .col-mk { font-weight: 700; }
+        .col-cpmk { background: #f3f4f6; font-weight: 600; }
+
+        .input-bobot { width: 60px; padding: 6px; border: 1px solid #d1d5db; border-radius: 4px; text-align: center; font-size: 0.85rem; transition: 0.2s; background: #f8fafc; }
+        .input-bobot:focus { border-color: var(--primary-red); outline: none; box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1); background: white; }
+        
+        .col-total { font-weight: 800; font-size: 1rem; }
+        .total-ok { color: #059669; } 
+        .total-warn { color: #dc2626; } 
+
+        .btn-save { background: var(--primary-red); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .btn-save:hover { background: #6b0000; }
     </style>
 </head>
 <body>
 
-    <!-- 1. NAVBAR KHUSUS MOBILE -->
-    <nav class="navbar-mobile">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="hamburger-btn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
-                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
-                 onclick="window.location.href='/index.html'">
-        </div>
-        <div class="profile-btn-mobile" onclick="toggleSidebar()">
-            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
-        </div>
-    </nav>
-
-    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <div id="navbar-container"></div>
-
-        <div class="fixed-header">
-            <div class="header-container header-bobot-mhs" style="margin: 40px 50px 20px 50px; border-bottom: none; padding-bottom: 0;">
-                <div class="header-title-area">
-                    <div class="header-subtitle">MEKANISME ASESMEN</div>
-                    <h1 class="header-title">MASTER <span>BOBOT</span></h1>
-                </div>
-                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
+        <div class="header-container">
+            <div>
+                <div class="header-subtitle">MEKANISME ASSESMEN</div>
+                <h1 class="header-title">MASTER <span>BOBOT</span></h1>
             </div>
-            <div style="border-bottom: 1px solid var(--border-color); margin: 0 50px 20px 50px;" class="header-bobot-mhs"></div>
         </div>
 
-        <div class="scrollable-content section-bobot-mhs" style="padding: 0 50px 40px 50px;">
-            
-            <div class="control-panel">
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                    <label style="font-weight: 700; color: #475569; font-size: 0.95rem;">
-                        <i class="fas fa-book-open" style="color: var(--primary-blue); margin-right: 5px;"></i> Pilih Mata Kuliah:
-                    </label>
-                    <select id="selectMk" class="select-matkul" onchange="loadDataBobot()">
+        <div class="table-container">
+           <div class="control-panel" style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; display: flex; gap: 15px; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="font-weight: 600; color: #475569;">Pilih Mata Kuliah:</div>
+                    <select id="selectMk" onchange="loadDataBobot()" style="padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 8px; outline: none; font-size: 0.95rem; flex: 1; cursor: pointer; background: #f8fafc; font-weight: 500;">
                         <option value="" disabled selected>-- Memuat Daftar Mata Kuliah... --</option>
                     </select>
-                </div>
-                <button class="btn-save-bobot" onclick="simpanBobot()" style="margin-top: 25px;">
-                    <i class="fas fa-save" style="font-size: 1.2rem;"></i> Simpan Perubahan
+                <button class="btn-save" onclick="simpanBobot()">
+                    <i class="fas fa-save"></i> Simpan Perubahan
                 </button>
             </div>
 
-            <div class="table-bobot-wrapper">
-                <table id="bobotTable" class="tabel-bobot">
-                    <thead>
-                        <tr>
-                            <th rowspan="2">CPL</th>
-                            <th rowspan="2">KODE MK</th>
-                            <th rowspan="2" style="min-width: 250px;">NAMA MK</th>
-                            <th rowspan="2">CPMK</th>
-                            <th colspan="5" class="bg-darker">KOMPONEN PENILAIAN (%)</th>
-                            <th rowspan="2" class="bg-primary">TOTAL</th>
-                        </tr>
-                        <tr>
-                            <th>Attitude</th>
-                            <th>Kehadiran</th>
-                            <th>Tugas</th>
-                            <th>UTS</th>
-                            <th>UAS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <tr><td colspan="10" style="text-align: center; padding: 40px !important; font-weight: 600; color: #64748b;"><i class="fas fa-arrow-up" style="margin-right: 8px; color: var(--primary-blue);"></i> Silakan pilih Mata Kuliah di atas terlebih dahulu.</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <table id="bobotTable">
+                <thead id="tableHead">
+                    <tr>
+                        <th rowspan="2">CPL</th>
+                        <th rowspan="2">KODE MK</th>
+                        <th rowspan="2">NAMA MK</th>
+                        <th rowspan="2">CPMK</th>
+                        <!-- Kolom Komponen Akan Di-Generate Otomatis di Sini -->
+                        <th rowspan="2" style="background: var(--primary-red);">TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="10" style="text-align: center; padding: 20px;">Memuat data dari database...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
 <script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
-    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        if(PRODI === "ti") {
-            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
-            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
-        } else {
-            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
-        }
-
-        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
-        const avatarMobile = document.getElementById("mobileNavbarAvatar");
-        if(avatarMobile) {
-            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
-            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
-        }
-    });
-
-    // --- FUNGSI SIDEBAR MOBILE ---
-    function toggleSidebar() {
-        document.getElementById('sidebar-container').classList.toggle('active');
-        document.getElementById('mobileOverlay').classList.toggle('active');
-    }
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        setTimeout(() => {
-            const sidebar = document.getElementById('sidebar-container');
-            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
-                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
-                    .then(res => res.text())
-                    .then(html => {
-                        sidebar.innerHTML = html;
-                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
-                    })
-                    .catch(e => console.log('Gagal memuat sidebar darurat'));
-            }
-        }, 600); 
-    });
-
-    // --- LOGIKA API ---
+    const PRODI = localStorage.getItem("prodi_aktif") || "ti";
     const API_GET_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
+    const API_GET_KOMPONEN = `${API_BASE}/get-master-komponen`;
     const API_SAVE_BOBOT = `${API_BASE}/admin-save-bobot`;
 
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace("/login/login.html");
 
-    window.onload = () => { initMatkulDropdown(); };
+    let komponenMasterList = []; 
+    let allBobotData = []; 
 
+    window.onload = () => {
+        initDataPenting();
+    };
+
+    // 1. Menarik Komponen Penilaian dan Matkul Secara Berurutan
+    async function initDataPenting() {
+        try {
+            // Ambil Master Komponen dulu
+            const resKomp = await fetch(API_GET_KOMPONEN);
+            komponenMasterList = await resKomp.json();
+
+            if (!komponenMasterList || komponenMasterList.length === 0) {
+                alert("Peringatan: Belum ada komponen penilaian (UTS, UAS, dll) yang dibuat. Buat dulu di Master Komponen.");
+                return;
+            }
+
+            renderDynamicHeader(); 
+            initMatkulDropdown(); 
+
+        } catch (error) {
+            console.error("Gagal menarik master komponen", error);
+        }
+    }
+
+    // 2. Mencetak Header Tabel Secara Dinamis
+    function renderDynamicHeader() {
+        const thead = document.getElementById('tableHead');
+        let trTop = `
+            <tr>
+                <th rowspan="2">CPL</th>
+                <th rowspan="2">KODE MK</th>
+                <th rowspan="2">NAMA MK</th>
+                <th rowspan="2">CPMK</th>
+                <th colspan="${komponenMasterList.length}" style="background: #2d3748; border-bottom: 1px solid #4a5568;">KOMPONEN PENILAIAN (%)</th>
+                <th rowspan="2" style="background: var(--primary-red);">TOTAL</th>
+            </tr>
+        `;
+        let trBottom = `<tr>`;
+        komponenMasterList.forEach(k => {
+            trBottom += `<th>${k.nama_komponen}</th>`;
+        });
+        trBottom += `</tr>`;
+
+        thead.innerHTML = trTop + trBottom;
+    }
+
+    // 3. Menarik Daftar Matkul dari API Bobot Dinamis
     async function initMatkulDropdown() {
         const selectMk = document.getElementById('selectMk');
         try {
             const res = await fetch(API_GET_BOBOT);
-            const data = await res.json();
+            allBobotData = await res.json();
             
             let uniqueMk = [];
             let seen = new Set();
             
-            data.forEach(row => {
+            allBobotData.forEach(row => {
                 if (!seen.has(row.kode_mk)) {
                     seen.add(row.kode_mk);
                     uniqueMk.push({ kode_mk: row.kode_mk, nama_mk: row.nama_mk });
                 }
             });
 
-            selectMk.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah yang Tersedia --</option>';
+            selectMk.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah --</option>';
             uniqueMk.forEach(mk => {
                 selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
             });
 
         } catch (error) {
-            if(selectMk) selectMk.innerHTML = '<option value="">❌ Gagal memuat daftar matkul. Cek n8n!</option>';
+            if(selectMk) selectMk.innerHTML = '<option value="">Gagal memuat daftar matkul</option>';
         }
     }
 
-    async function loadDataBobot() {
+    // 4. Render Tabel Data
+    function loadDataBobot() {
         const tbody = document.getElementById('tableBody'); 
         const kodeMkTerpilih = document.getElementById('selectMk').value;
 
-        if (!kodeMkTerpilih) return;
+        if (!kodeMkTerpilih) {
+            tbody.innerHTML = `<tr><td colspan="${komponenMasterList.length + 5}" style="text-align: center; padding: 30px; font-weight: 500; color: #64748b;"><i class="fas fa-arrow-up"></i> Silakan pilih Mata Kuliah terlebih dahulu untuk mengatur master bobot.</td></tr>`;
+            return;
+        }
 
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px !important;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue);"></i><br><br>Memuat form bobot...</td></tr>';
+        const dataMK = allBobotData.filter(row => row.kode_mk === kodeMkTerpilih);
+        tbody.innerHTML = ''; 
+        
+        if (dataMK.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${komponenMasterList.length + 5}" style="text-align: center; padding: 20px; color: #dc2626;">Belum ada pemetaan CPMK untuk Mata Kuliah ini di database.</td></tr>`;
+            return;
+        }
 
-        try {
-            const res = await fetch(API_GET_BOBOT);
-            const allData = await res.json();
-            const data = allData.filter(row => row.kode_mk === kodeMkTerpilih);
-            tbody.innerHTML = ''; 
-            
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px !important; color: #dc2626; font-weight:bold;">Belum ada pemetaan CPMK untuk Mata Kuliah ini di database.</td></tr>';
-                return;
-            }
+        // Cari tahu jumlah baris per CPL untuk fungsi Rowspan (agar UI tidak hancur)
+        let cplCount = {};
+        let unikCpmkList = [];
+        let seenCpmk = new Set();
 
-            let cplCount = {};
-            let totalMK = 0;
-
-            data.forEach((row) => {
-                let cplKey = row.kode_mk + '_' + row.cpl;
+        dataMK.forEach((row) => {
+            let cplKey = row.kode_mk + '_' + row.cpl;
+            if (!seenCpmk.has(row.cpmk)) {
+                seenCpmk.add(row.cpmk);
+                unikCpmkList.push({ cpmk: row.cpmk, cpl: row.cpl, cplKey: cplKey });
                 if (!cplCount[cplKey]) cplCount[cplKey] = 0;
                 cplCount[cplKey]++;
+            }
+        });
 
-                let a = parseInt(row.attitude) || 0;
-                let k = parseInt(row.kehadiran) || 0;
-                let t = parseInt(row.tugas) || 0;
-                let u1 = parseInt(row.uts) || 0;
-                let u2 = parseInt(row.uas) || 0;
-                totalMK += (a + k + t + u1 + u2);
+        // Susun ulang nilai bobot menjadi Dictionary [cpmk][id_komponen] = nilai_bobot
+        let dictNilai = {};
+        dataMK.forEach((row) => {
+            if(!dictNilai[row.cpmk]) dictNilai[row.cpmk] = {};
+            dictNilai[row.cpmk][row.id_komponen] = parseFloat(row.bobot) || 0;
+        });
+
+        let renderedCpl = {};
+        let renderedMkTotal = false;
+        let html = '';
+
+        // Hitung Grand Total Default (hanya hitung dari komponen yang ada)
+        let grandTotal = 0;
+        unikCpmkList.forEach(c => {
+            komponenMasterList.forEach(k => {
+                grandTotal += dictNilai[c.cpmk] && dictNilai[c.cpmk][k.id_komponen] ? dictNilai[c.cpmk][k.id_komponen] : 0;
+            });
+        });
+
+        unikCpmkList.forEach((row, index) => {
+            let tr = `<tr data-rowid="${index}" data-mk="${kodeMkTerpilih}" data-cpmk="${row.cpmk}">`;
+
+            if (!renderedCpl[row.cplKey]) {
+                tr += `<td class="text-left col-cpl" rowspan="${cplCount[row.cplKey]}" style="vertical-align: middle;">${row.cpl}</td>`;
+                renderedCpl[row.cplKey] = true;
+            }
+
+            if (index === 0) {
+                tr += `<td class="text-left col-mk" rowspan="${unikCpmkList.length}" style="vertical-align: middle;">${kodeMkTerpilih}</td>`;
+                tr += `<td class="text-left" rowspan="${unikCpmkList.length}" style="vertical-align: middle;">${dataMK[0].nama_mk}</td>`;
+            }
+
+            tr += `<td class="col-cpmk"><strong>${row.cpmk}</strong></td>`;
+            
+            // Loop untuk membuat input berdasarkan jumlah Komponen Dinamis
+            komponenMasterList.forEach(k => {
+                let nilaiAktual = dictNilai[row.cpmk] && dictNilai[row.cpmk][k.id_komponen] ? dictNilai[row.cpmk][k.id_komponen] : 0;
+                tr += `<td><input type="number" class="input-bobot" data-mk="${kodeMkTerpilih}" data-idkomponen="${k.id_komponen}" value="${nilaiAktual}" min="0" max="100" oninput="hitungTotalMK('${kodeMkTerpilih}')"></td>`;
             });
 
-            let renderedCpl = {};
-            let renderedMkTotal = false;
-            let html = '';
+            if (!renderedMkTotal) {
+                const warnaWarna = grandTotal === 100 ? 'total-ok' : 'total-warn';
+                tr += `<td id="total-mk-${kodeMkTerpilih}" class="col-total ${warnaWarna}" rowspan="${unikCpmkList.length}" style="vertical-align: middle;">${grandTotal}%</td>`;
+                renderedMkTotal = true;
+            }
 
-            data.forEach((row, index) => {
-                let cplKey = row.kode_mk + '_' + row.cpl;
-                let tr = `<tr data-rowid="${index}" data-mk="${row.kode_mk}" data-cpmk="${row.cpmk || row.kode_cpmk}">`;
+            tr += `</tr>`;
+            html += tr;
+        });
 
-                if (!renderedCpl[cplKey]) {
-                    tr += `<td class="col-cpl" rowspan="${cplCount[cplKey]}">${row.cpl}</td>`;
-                    renderedCpl[cplKey] = true;
-                }
-
-                if (index === 0) {
-                    tr += `<td class="col-mk" rowspan="${data.length}">${row.kode_mk}</td>`;
-                    tr += `<td style="text-align: left; font-weight: 600;" rowspan="${data.length}">${row.nama_mk}</td>`;
-                }
-
-                tr += `
-                    <td class="col-cpmk">${row.cpmk || row.kode_cpmk}</td>
-                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="attitude" value="${row.attitude || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
-                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="kehadiran" value="${row.kehadiran || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
-                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="tugas" value="${row.tugas || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
-                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="uts" value="${row.uts || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
-                    <td><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-field="uas" value="${row.uas || 0}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>
-                `;
-
-                if (!renderedMkTotal) {
-                    const warnaWarna = totalMK === 100 ? 'total-ok' : 'total-warn';
-                    tr += `<td id="total-mk-${row.kode_mk}" class="col-total ${warnaWarna}" rowspan="${data.length}">${totalMK}%</td>`;
-                    renderedMkTotal = true;
-                }
-
-                tr += `</tr>`;
-                html += tr;
-            });
-
-            tbody.innerHTML = html;
-
-        } catch (error) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px !important; color: red; font-weight:bold;">❌ Gagal memuat data dari API.</td></tr>';
-        }
+        tbody.innerHTML = html;
     }
 
+    // 5. Menghitung Interaktif Semua Input di Layar
     function hitungTotalMK(kodeMk) {
         const inputs = document.querySelectorAll(`input[data-mk="${kodeMk}"]`);
         let sum = 0;
@@ -313,85 +280,69 @@
         }
     }
 
+    // 6. Menyimpan ke N8N secara Vertikal/Dinamis
     async function simpanBobot() {
-        const btnSave = document.querySelector('.btn-save-bobot');
-        const oriText = btnSave.innerHTML;
+        const btnSave = document.querySelector('.btn-save');
+        const kodeMkTerpilih = document.getElementById('selectMk').value;
         
-        const rows = document.querySelectorAll('tbody tr[data-mk]');
-        if(rows.length === 0) {
-            alert("Silakan pilih Mata Kuliah terlebih dahulu!");
+        if (!kodeMkTerpilih) return alert("Pilih mata kuliah terlebih dahulu.");
+
+        const inputs = document.querySelectorAll(`input[data-mk="${kodeMkTerpilih}"]`);
+        let totalMK = 0;
+        inputs.forEach(input => totalMK += (parseInt(input.value) || 0));
+
+        if (totalMK !== 100) {
+            alert(`⚠️ Gagal Menyimpan! Total bobot untuk mata kuliah ini adalah ${totalMK}%. Total keseluruhan harus tepat 100%.`);
             return;
         }
 
-        let mkList = [];
-        rows.forEach(row => {
-            const mk = row.getAttribute('data-mk');
-            if (!mkList.includes(mk)) mkList.push(mk);
-        });
+        let dataUntukDisimpan = [];
+        const barisCpmk = document.querySelectorAll(`tr[data-mk="${kodeMkTerpilih}"]`);
 
-        let dataBobotData = [];
-        let mkError = [];
-
-        mkList.forEach(kodeMk => {
-            const inputs = document.querySelectorAll(`input[data-mk="${kodeMk}"]`);
-            let totalMK = 0;
-            inputs.forEach(input => totalMK += (parseInt(input.value) || 0));
-
-            if (totalMK === 100) {
-                const mkRows = document.querySelectorAll(`tr[data-mk="${kodeMk}"]`);
-                mkRows.forEach(row => {
-                    const kodeCpmk = row.getAttribute('data-cpmk');
-                    const a = parseInt(row.querySelector('input[data-field="attitude"]')?.value) || 0;
-                    const k = parseInt(row.querySelector('input[data-field="kehadiran"]')?.value) || 0;
-                    const t = parseInt(row.querySelector('input[data-field="tugas"]')?.value) || 0;
-                    const u = parseInt(row.querySelector('input[data-field="uts"]')?.value) || 0;
-                    const uas = parseInt(row.querySelector('input[data-field="uas"]')?.value) || 0;
-
-                    dataBobotData.push({
-                        kode_mk: kodeMk,
-                        kode_cpmk: kodeCpmk,
-                        prodi: PRODI,
-                        attitude: a,
-                        kehadiran: k,
-                        tugas: t,
-                        uts: u,
-                        uas: uas
-                    });
+        barisCpmk.forEach(tr => {
+            const kodeCpmk = tr.getAttribute('data-cpmk');
+            
+            // Loop setiap kotak input di baris tersebut
+            const kotakInput = tr.querySelectorAll('input.input-bobot');
+            kotakInput.forEach(input => {
+                const idKomp = input.getAttribute('data-idkomponen');
+                const nilaiKomp = parseInt(input.value) || 0;
+                
+                // Meskipun 0, kita lempar ke database untuk menjaga integrasi jika di-edit 
+                dataUntukDisimpan.push({
+                    kode_mk: kodeMkTerpilih,
+                    kode_cpmk: kodeCpmk,
+                    id_komponen: idKomp,
+                    prodi: PRODI,
+                    bobot: nilaiKomp
                 });
-            } else if (totalMK > 0 && totalMK !== 100) {
-                mkError.push(kodeMk);
-            }
+            });
         });
 
-        if (mkError.length > 0) {
-            alert(`⚠️ GAGAL MENYIMPAN!\n\nTotal seluruh bobot CPMK untuk Mata Kuliah ini belum pas 100%. Saat ini totalnya masih salah. Harap perbaiki angka di dalam kotak.`);
-            return;
-        }
-
-        if (dataBobotData.length === 0) {
-            alert("❌ Belum ada perubahan data valid yang bisa disimpan.");
-            return;
-        }
-
-        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin fa-lg" style="margin-right:8px;"></i> Menyimpan...';
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btnSave.disabled = true;
 
         try {
-            for (const payload of dataBobotData) {
+            // Karena n8n di setup menampung satu-satu (looping payload)
+            for (const payload of dataUntukDisimpan) {
                 await fetch(API_SAVE_BOBOT, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ body: payload }) // Bungkus dg "body:" agar sesuai parameter n8n Anda
                 });
             }
 
             alert("✅ Sempurna! Master Bobot berhasil disimpan ke Database!");
+            
+            // Reload metadata baru dari API setelah simpan
+            const resRefresh = await fetch(API_GET_BOBOT);
+            allBobotData = await resRefresh.json();
             loadDataBobot(); 
 
         } catch (error) {
             alert("❌ Gagal terhubung ke server n8n.");
         } finally {
-            btnSave.innerHTML = oriText;
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
             btnSave.disabled = false;
         }
     }
