@@ -438,6 +438,7 @@
                 <div>
                     <h2 id="stepJudul" style="font-size: 1.4rem; color: #111827; margin-bottom: 8px; font-weight: 800;">
                         Pilih Mata Kuliah</h2>
+                    <img id="stepGambar" src="" alt="Ilustrasi Tutorial" style="width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     <p id="stepDeskripsi" style="font-size: 0.95rem; color: #4b5563; line-height: 1.5;">Langkah pertama
                         adalah menekan tombol "Mulai Asesmen", lalu pilih Mata Kuliah yang Anda ampu pada semester ini.
                     </p>
@@ -512,11 +513,61 @@
 
         // LOGIKA TUTORIAL SLIDER (Tetap Utuh)
         const tutorialSteps = [
-            { judul: "Langkah 1: Pilih Mata Kuliah", desc: "Masuk ke menu Input Nilai, dan pilih mata kuliah yang Anda ampu. Sistem akan otomatis menampilkan ketetapan Master Bobot dari Kaprodi." },
-            { judul: "Langkah 2: Tentukan Bobot (100%)", desc: "Tentukan rencana asesmen Anda. Isi bobot untuk Tugas, Kuis, UTS, dan UAS. Pastikan total bobot yang Anda buat tepat 100%." },
-            { judul: "Langkah 3: Upload Nilai Mahasiswa", desc: "Download template Excel, isi nilai mahasiswa secara offline, lalu upload kembali. Sistem akan menghitung Nilai Akhir secara otomatis." },
-            { judul: "Langkah 4: Penyusunan RPS", desc: "Setelah nilai tersimpan, tekan tombol Lanjut. Anda akan diarahkan untuk mengisi Rencana Pembelajaran Semester (RPS) untuk 16 kali pertemuan." },
-            { judul: "Langkah 5: Rencana Tugas & Rubrik", desc: "Sistem OBE kami cerdas. Berdasarkan RPS yang Anda buat, sistem akan otomatis meminta Anda menyusun Rubrik untuk pertemuan yang memiliki metode 'Tugas' atau 'Presentasi'." }
+            { 
+                judul: "Pilih Mata Kuliah Terlebih Dahulu", 
+                desc: "Masuk ke menu Input Nilai, dan pilih mata kuliah yang Anda ampu. Sistem akan otomatis menampilkan ketetapan Master Bobot dari Kaprodi.",
+                gambar: "gambar/Tutorial/gambar1.PNG"
+            },
+            { 
+                judul: "Perhatikan Terlebih Dahulu Master Dari Kaprodi ", 
+                desc: "Kenapa harus memerhatikan dahulu master datanya? Agar dapat menghindari kesalahan saat menginput. Perhatikan seperti cpl, cpmk, dsb sudah sesuai dengan yang diinginkan atau belum.",
+                gambar: "gambar/Tutorial/gambar2.PNG"
+            },
+            { 
+                judul: "Isi Penilaian Untuk Tiap Pertemuan", 
+                desc: "Setelah itu Isi bobot persen tiap komponen dari pertemuan 1 - 16. Acuan anda mengisi bobot itu adalah dari Anggaran Bobot Kaprodi, jadi tidak boleh melebihi persen yang sudah ditetapkan",
+                gambar: "gambar/Tutorial/gambar3.PNG"
+            },
+            { 
+                judul: "Download Template Excel di Hal. Upload Nilai Mahasiswa", 
+                desc: "Setelah mengisi komponen penilaian, anda bisa memasukkan nilai mahasiswa menggunakan excel. Download template terlebih dahulu dan jika sudah diisi silahkan upload file tersebut agar datanya dapat muncul dibawah",
+                gambar: "gambar/Tutorial/gambar4.PNG"
+            },
+            { 
+                judul: "Menginput Nilai Di Web Langsung", 
+                desc: "Jika ingin menginput nilai mahasiswa disini langsung tanpa harus menggunakan excel juga bisa. Dengan menekan tombol Input Nilai Langsung di Web.",
+                gambar: "gambar/Tutorial/gambar5.PNG"
+            },
+            { 
+                judul: "Menyusun RPS", 
+                desc: "Setelah anda selesai dengan bobot komponen penilaian dan penilaian mahasiswa, anda bisa menyusun RPS, mulai dari detail Mata Kuliah yang anda ampu sampai dengan sesi tiap pertemuan", 
+                gambar: "gambar/Tutorial/gambar6.PNG"
+            },
+            { 
+                judul: "Rencana Tugas & Rubrik", 
+                desc: "Setelah anda selesai dengan penyusunan RPS tersebut, anda bisa langsung mengisi rencana tugas dan rubrik. JIka sudah selesai mengisi rencana tugas dan rubrik tsb, bisa langsung saja di cetak rps nya", 
+                gambar: "gambar/Tutorial/gambar7.PNG"
+            },
+            { 
+                judul: "Laporan Capaian OBE", 
+                desc: "Laporan Capaian OBE menyajikan grafik target serta capaian CPL dari setiap kelas di Matakuliah yang dipilih dalam skala angka ", 
+                gambar: "gambar/Tutorial/gambar8.PNG"
+            },
+            { 
+                judul: "Laporan Capaian OBE (Evaluasi Kelas)", 
+                desc: "Evaluasi Kelas adalah data rata -rata capaian CPL di sebuah mata kuliah, dan akan ditandai dengan status tercapai bila rata-rata telah mencapai target dan dibawah target bila tidak memenuhi target", 
+                gambar: "gambar/Tutorial/gambar9.PNG"
+            },
+            { 
+                judul: "Laporan Capaian OBE (Detail Capaian Mahasiswa)", 
+                desc: "Tabel Detail Capaian Mahasiswa berisi rekap detail nilai CPL setiap mahasiswa yang mengikuti mata kuliah yang sudah dipilih", 
+                gambar: "gambar/Tutorial/gambar10.PNG"
+            },
+            { 
+                judul: "Mengajar (Mata Kuliah Yang Diampu)", 
+                desc: "Disini anda dapat melihat mata kuliah apa saja yang anda ampu dan juga detail mata kuliah tersebut seperti apa.", 
+                gambar: "gambar/Tutorial/gambar11.PNG"
+            },
         ];
 
         let currentStep = 0;
@@ -525,6 +576,17 @@
             document.getElementById("stepAngka").innerText = currentStep + 1;
             document.getElementById("stepJudul").innerText = tutorialSteps[currentStep].judul;
             document.getElementById("stepDeskripsi").innerText = tutorialSteps[currentStep].desc;
+            
+            // --- TAMBAHAN LOGIKA UNTUK GAMBAR ---
+            const elementGambar = document.getElementById("stepGambar");
+            const dataGambar = tutorialSteps[currentStep].gambar;
+            
+            if (dataGambar) {
+                elementGambar.src = dataGambar;
+                elementGambar.style.display = "block"; // Tampilkan gambar jika ada
+            } else {
+                elementGambar.style.display = "none"; // Sembunyikan jika tidak ada gambar
+            }
         }
 
         function bukaTutorial() {
