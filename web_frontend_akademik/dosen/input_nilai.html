@@ -1093,10 +1093,12 @@
                     let filteredCpmkTersedia = cpmkTersedia;
                     if (idx > 0 && row.cpl[0] !== "-") filteredCpmkTersedia = cpmkTersedia.filter(c => c.cpl === row.cpl[0]);
 
-                    let isCpmkEmpty = (!cpmkItem || cpmkItem === "-" || cpmkItem === "");
-                    let optCpmk = filteredCpmkTersedia.length > 0 ? `<option value="" disabled ${isCpmkEmpty ? 'selected' : ''}>-- Pilih CPMK --</option>` + filteredCpmkTersedia.map(c => `<option value="${c.cpmk}" data-cpl="${c.cpl}" ${c.cpmk === cpmkItem ? 'selected' : ''}>${c.cpl} - ${c.cpmk}</option>`).join('') : `<option disabled selected>Belum Ada Mapping</option>`;
+                    let isCpmkEmpty = (!cpmkItem || cpmkItem === "-" || cpmkItem === "" || cpmkItem === "null");
 
-                    let teksCpl = (row.cpl[idx] === "" || row.cpl[idx] === "-") ? "-" : row.cpl[idx];
+                    // FIX: Hapus atribut 'disabled' agar browser selalu memulai dari '-- Pilih CPMK --'
+                    let optCpmk = filteredCpmkTersedia.length > 0 ? `<option value="" ${isCpmkEmpty ? 'selected' : ''}>-- Pilih CPMK --</option>` + filteredCpmkTersedia.map(c => `<option value="${c.cpmk}" data-cpl="${c.cpl}" ${c.cpmk === cpmkItem ? 'selected' : ''}>${c.cpl} - ${c.cpmk}</option>`).join('') : `<option value="" selected>Belum Ada Mapping</option>`;
+
+                    let teksCpl = (!row.cpl[idx] || row.cpl[idx] === "" || row.cpl[idx] === "-" || row.cpl[idx] === "null") ? "-" : row.cpl[idx];
                     cplHtml += `<div style="margin-bottom: 8px; padding: 8px 0; font-size:0.9rem; min-height:35px; display:flex; align-items:center;">${teksCpl}</div>`;
 
                     cpmkHtml += `
@@ -1111,7 +1113,7 @@
                     let isKompEmpty = (kompAktif === "" || kompAktif.toLowerCase() === "tidak dinilai");
                     let allowedQ = trackingQuotas.filter(q => q.cpmk === cpmkItem);
 
-                    let optKomp = `<option value="" disabled ${kompAktif === '' ? 'selected' : ''}>-- Pilih Komponen --</option>`;
+                    let optKomp = `<option value="" ${kompAktif === '' ? 'selected' : ''}>-- Pilih Komponen --</option>`;
                     allowedQ.forEach(q => { optKomp += `<option value="${q.kategori}" ${kompAktif.toLowerCase() === q.kategori.toLowerCase() ? 'selected' : ''}>⭐ ${q.kategori}</option>`; });
                     optKomp += `<option value="Tidak Dinilai" ${isKompEmpty ? 'selected' : ''}>📘 Tidak Dinilai</option>`;
 
