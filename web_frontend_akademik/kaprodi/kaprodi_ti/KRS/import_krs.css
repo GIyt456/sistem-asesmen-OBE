@@ -42,6 +42,27 @@ body { animation: transitionIn 0.3s ease-in-out; }
 
     #sidebar-container.show-mobile { left: 0 !important; }
 
+    /* 1. Manfaatkan pseudo-element ::after pada body sebagai tirai gelap */
+    body::after {
+        content: "" !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(0, 0, 0, 0.56) !important; /* Tingkat kegelapan (50% hitam) */
+        z-index: 9998 !important; /* Berdiri tepat di bawah sidebar (910000 / 9999) */
+        opacity: 0 !important;
+        pointer-events: none !important; /* Saat transparan, tidak memblokir klik */
+        transition: opacity 0.3s ease-in-out !important; /* Efek animasi memudar halus */
+    }
+
+    /* 2. Saat sidebar memiliki class .show-mobile, aktifkan tirai gelapnya! */
+    body:has(#sidebar-container.show-mobile)::after {
+        opacity: 1 !important;
+        pointer-events: auto !important; /* Saat gelap, memblokir interaksi di belakang */
+    }
+    
     /* 3. Munculkan Navbar Melayang di Atas */
     #navbar-container {
         display: block !important;
