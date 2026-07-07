@@ -581,7 +581,8 @@
                         <th style="width: 20%;">Bentuk Pembelajaran</th>
                         <th style="width: 10%;">CPL</th>
                         <th style="width: 25%;">CPMK</th>
-                        <th style="width: 20%;">Komponen Penilaian <br><small style="font-weight:400; color:#cbd5e1;">(Dari Kaprodi)</small></th>
+                        <th style="width: 20%;">Komponen Penilaian <br><small
+                                style="font-weight:400; color:#cbd5e1;">(Dari Kaprodi)</small></th>
                         <th style="width: 15%;">Bobot (%)</th>
                     </tr>
                 </thead>
@@ -713,7 +714,7 @@
 
         const API_GET_BENTUK = `${API_BASE}/get-master-bentuk`;
         let daftarBentukMaster = [];
-        
+
         async function init() {
             // Tarik Master Bentuk dulu dari API baru
             try {
@@ -831,10 +832,19 @@
             tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Menarik Ketetapan Kaprodi...</td></tr>';
 
             try {
-                // Tarik data vertikal dari API
-                const res = await fetch(API_GET_MASTER_BOBOT);
+                // --- FIX: DETEKSI PRODI DINAMIS BERDASARKAN MATKUL YANG DIKLIK ---
+                // Karena dosen bisa mengajar lintas prodi (TI dan SI), kita melacak prodinya lewat dropdown
+                let prodiMatkul = "ti";
+                if (document.querySelector(`#pilihMK_SI option[value="${mkKode}"]`)) {
+                    prodiMatkul = "si";
+                }
+                const API_BOBOT_DINAMIS = `${API_BASE}/get-master-bobot?prodi=${prodiMatkul}`;
+                // -----------------------------------------------------------------
+
+                // Tarik data vertikal dari API menggunakan URL Dinamis
+                const res = await fetch(API_BOBOT_DINAMIS);
                 if (!res.ok) throw new Error(`Koneksi API Gagal. Status: ${res.status}`);
-                
+
                 const rawText = await res.text();
                 let allData = [];
                 if (rawText && rawText.trim() !== "") {
@@ -847,7 +857,7 @@
 
                 // Filter berdasarkan mata kuliah yang dipilih dosen
                 const dataMk = allData.filter(d => d.kode_mk === mkKode);
-                
+
                 if (dataMk.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 20px; color: #ef4444; font-weight: bold;"><i class="fas fa-exclamation-circle"></i> Kaprodi belum mengatur Master Bobot untuk Mata Kuliah ini.</td></tr>';
                     gTotal.innerText = "0%"; gTotal.className = "status-err";
@@ -860,7 +870,7 @@
                 let listKomponenUnik = [];
                 dataMk.forEach(row => {
                     let nm = row.nama_komponen;
-                    if(nm && !setKomponen.has(nm)) {
+                    if (nm && !setKomponen.has(nm)) {
                         setKomponen.add(nm);
                         listKomponenUnik.push({ id: row.id_komponen, nama: nm });
                     }
@@ -880,7 +890,7 @@
                 // 3. Konversi Data Vertikal menjadi Horizontal (Grup per CPMK)
                 let groupedData = {};
                 let urutanCpmk = [];
-                
+
                 dataMk.forEach(row => {
                     if (!groupedData[row.cpmk]) {
                         groupedData[row.cpmk] = { cpl: row.cpl, cpmk: row.cpmk, bobot: {} };
@@ -890,26 +900,26 @@
                 });
 
                 // 4. Render Body Tabel & Siapkan Data untuk Validasi Kuota (kaprodiQuotas)
-                let htmlBody = ''; 
+                let htmlBody = '';
                 let grandTotal = 0;
                 kaprodiQuotas = []; // Kosongkan kaprodiQuotas lama
 
                 urutanCpmk.forEach(cpmkKey => {
                     let baris = groupedData[cpmkKey];
                     let totalBaris = 0;
-                    
+
                     let trHtml = `<tr>
                         <td style="border: 1px solid #e5e7eb; padding: 15px; font-weight: 800; color: var(--primary-red);">${baris.cpl}</td>
                         <td style="border: 1px solid #e5e7eb; padding: 15px; font-weight: 600; color: #334155;">${baris.cpmk}</td>`;
-                    
+
                     // Cetak kolom bobot sesuai urutan header
                     listKomponenUnik.forEach(k => {
                         let nilai = baris.bobot[k.nama] || 0;
                         totalBaris += nilai;
                         trHtml += `<td style="border: 1px solid #e5e7eb; padding: 15px;">${nilai}%</td>`;
-                        
+
                         // JIKA NILAI > 0, SIMPAN KE TRACKING QUOTA
-                        if(nilai > 0) {
+                        if (nilai > 0) {
                             kaprodiQuotas.push({ cpl: baris.cpl, cpmk: baris.cpmk, id_komponen: k.id, nama_komponen: k.nama, bobot: nilai });
                         }
                     });
@@ -920,10 +930,10 @@
                 });
 
                 tbody.innerHTML = htmlBody;
-                
+
                 // 5. Update Footer Kolom Span agar sejajar dengan dinamis header
                 const tfootRow = document.querySelector("#masterBobotTable tfoot tr td:first-child");
-                if(tfootRow) tfootRow.colSpan = listKomponenUnik.length + 2;
+                if (tfootRow) tfootRow.colSpan = listKomponenUnik.length + 2;
 
                 gTotal.innerText = grandTotal + "%";
                 gTotal.style.color = grandTotal === 100 ? "#16a34a" : "#dc2626";
@@ -1201,7 +1211,7 @@
                 configData = [];
                 for (let i = 1; i <= 16; i++) {
                     let barisDb = arrDraft.find(d => parseInt(d.pertemuan) === i);
-                    
+
                     if (barisDb) {
                         let b = barisDb.bentuk_penilaian || "";
                         let k = barisDb.komponen_penilaian || "";
@@ -1209,7 +1219,7 @@
                         // Otomatis Pindahkan jika Tugas/UTS masih tersasar di kolom bentuk
                         let bLower = b.toLowerCase();
                         if (bLower === 'uts' || bLower === 'uas' || bLower === 'tugas' || bLower === 'attitude' || bLower === 'kehadiran') {
-                            k = b; b = ""; 
+                            k = b; b = "";
                         }
 
                         configData.push({
@@ -1242,10 +1252,10 @@
                 if (mhsDB.length > 0) {
                     mhsDB.forEach(mhs => {
                         let barisMhs = [mhs.nim, mhs.nama_mahasiswa];
-                        
+
                         // Parse JSON di dalam database (Karena sistem lama menyimpannya dalam format text JSON)
                         let detailData = [];
-                        try { detailData = JSON.parse(mhs.detail_json || "[]"); } catch (e) {}
+                        try { detailData = JSON.parse(mhs.detail_json || "[]"); } catch (e) { }
 
                         // Tata nilai berdasarkan kolom konfigurasi (Sesuai pertemuan & indeks bobot)
                         configData.forEach(cfg => {
@@ -1268,7 +1278,7 @@
                     const resKrs = await fetch(`${API_GET_STUDENTS}?mk=${mkKode}`);
                     let dKrs = await resKrs.json();
                     let listKrs = Array.isArray(dKrs) ? dKrs : (dKrs.data || []);
-                    
+
                     listKrs = listKrs.filter(m => !daftarNimMBKM.includes(String(m.nim || m.NIM || "").trim()));
                     listKrs.sort((a, b) => String(a.nim || a.NIM).localeCompare(String(b.nim || b.NIM), undefined, { numeric: true }));
 
@@ -1277,7 +1287,7 @@
                         configData.forEach(cfg => { cfg.bobot.forEach(() => barisMhs.push(0)); });
                         mhsRekonstruksi.push(barisMhs);
                     });
-                } catch(e) {}
+                } catch (e) { }
             }
 
             // TAMPILKAN KE TABEL MAHASISWA
@@ -1296,7 +1306,7 @@
                 configData.push({
                     pertemuan: i,
                     cpl: ["-"],
-                    cpmk: [""], 
+                    cpmk: [""],
                     komponen: [""],
                     bentuk: "",
                     bobot: [0]
@@ -1316,7 +1326,7 @@
             configData.forEach((row, i) => {
                 // --- SAFEGUARD ---
                 if (!row.komponen) row.komponen = row.cpmk.map(() => "");
-                
+
                 let totalBobotPertemuan = row.bobot.reduce((a, b) => a + b, 0);
                 totalBobot += totalBobotPertemuan;
 
@@ -1329,7 +1339,7 @@
                 // 1. RENDER DROPDOWN BENTUK PEMBELAJARAN
                 let optBentukHTML = `<option value="" disabled ${(!row.bentuk || row.bentuk.trim() === "") ? 'selected' : ''}>-- Pilih Kegiatan --</option>`;
                 let listKomp = daftarBentukMaster.length > 0 ? daftarBentukMaster : [{ nama_bentuk: "Kuliah (Tatap Muka)" }, { nama_bentuk: "Praktikum" }, { nama_bentuk: "Responsi / Tutorial" }, { nama_bentuk: "Seminar" }];
-                
+
                 listKomp.forEach(b => {
                     let isSelected = (row.bentuk === b.nama_bentuk) ? 'selected' : '';
                     optBentukHTML += `<option value="${b.nama_bentuk}" ${isSelected}>${b.nama_bentuk}</option>`;
@@ -1367,14 +1377,14 @@
                     let komponenAktif = row.komponen[idx] || "";
                     let isKomponenEmpty = (komponenAktif === "" || komponenAktif === "Tidak Dinilai");
                     let allowedQuotas = trackingQuotas.filter(q => q.cpmk === cpmkItem);
-                    
+
                     let optKompHTML = `<option value="" disabled ${komponenAktif === "" ? 'selected' : ''}>-- Pilih Komponen --</option>`;
-                    
+
                     allowedQuotas.forEach(q => {
                         let isSelected = (komponenAktif === q.kategori) ? 'selected' : '';
                         optKompHTML += `<option value="${q.kategori}" ${isSelected}>⭐ ${q.kategori}</option>`;
                     });
-                    
+
                     // Default Fallback: Jika kosong, otomatis arahkan ke "Tidak Dinilai" secara visual
                     let isNone = isKomponenEmpty ? 'selected' : '';
                     optKompHTML += `<option value="Tidak Dinilai" ${isNone}>📘 Tidak Dinilai</option>`;
@@ -1385,7 +1395,7 @@
                     // Kunci input jika bentuknya "Tidak Dinilai" atau kosong
                     let lockAttr = isKomponenEmpty ? 'readonly style="background:#f1f5f9; cursor:not-allowed;" title="Pilih komponen terlebih dahulu"' : '';
                     let valBobot = isKomponenEmpty ? 0 : row.bobot[idx];
-                    
+
                     bobotHtml += `<div style="margin-bottom: 8px; display: flex; gap: 5px;"><input type="number" value="${valBobot}" ${lockAttr} style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" oninput="updateRowOnlyBobot(${i}, ${idx}, this.value)"></div>`;
                 });
 
@@ -1404,7 +1414,7 @@
             const gt = document.getElementById("grandTotal");
             gt.innerText = totalBobot + "%"; gt.style.color = totalBobot === 100 ? "#16a34a" : "#dc2626";
         }
-        
+
         function hitungDanValidasiKuota() {
             // Reset perhitungan
             trackingQuotas.forEach(q => q.current = 0);
@@ -1414,7 +1424,7 @@
                 cfg.cpmk.forEach((cItem, idx) => {
                     let bobotItem = parseFloat(cfg.bobot[idx]) || 0;
                     let komponenPilihan = (cfg.komponen[idx] || "").toLowerCase(); // BACA DARI KOMPONEN, BUKAN BENTUK
-                    
+
                     // Cocokkan CPMK dan Komponen Penilaian (Tugas, UTS, dll)
                     let matched = trackingQuotas.find(q => q.cpmk === cItem && komponenPilihan.includes(q.kategori.toLowerCase()));
                     if (matched) {
@@ -1478,7 +1488,7 @@
             configData[i].cpl.push("-");
             configData[i].cpmk.push("");
             configData[i].komponen.push(""); // <--- BARIS INI DITAMBAHKAN
-            configData[i].bobot.push(0); 
+            configData[i].bobot.push(0);
             renderTableAsesmen();
             hitungDanValidasiKuota();
         }
@@ -1519,16 +1529,16 @@
             if (field === 'bentuk') renderTableAsesmen();
             hitungDanValidasiKuota();
         }
-        function updateRowOnlyKomponen(i, idx, val) { 
-            configData[i].komponen[idx] = val; 
-            
+        function updateRowOnlyKomponen(i, idx, val) {
+            configData[i].komponen[idx] = val;
+
             // Logika Kunci: Jika dosen memilih "Tidak Dinilai", set bobot jadi 0
-            if(val === "Tidak Dinilai") {
+            if (val === "Tidak Dinilai") {
                 configData[i].bobot[idx] = 0;
             }
-            
-            renderTableAsesmen(); 
-            hitungDanValidasiKuota(); 
+
+            renderTableAsesmen();
+            hitungDanValidasiKuota();
         }
 
         function updateRowOnlyBobot(i, idx, val) {
@@ -1674,7 +1684,7 @@
                 c.bobot.forEach((b, idx) => {
                     let bNum = parseFloat(b) || 0;
                     // BACA DARI KOMPONEN BUKAN BENTUK
-                    let namaKomp = c.komponen[idx] && c.komponen[idx] !== "Tidak Dinilai" ? c.komponen[idx] : c.bentuk; 
+                    let namaKomp = c.komponen[idx] && c.komponen[idx] !== "Tidak Dinilai" ? c.komponen[idx] : c.bentuk;
                     headerRow += `<th style="padding: 12px; text-align: center; min-width: 110px;">P${c.pertemuan} <small>(${idx + 1})</small><br><small style="color:#0ea5e9;">${namaKomp}</small><br><span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-size:0.7rem;">${bNum}%</span></th>`;
                 });
             });
@@ -1698,13 +1708,13 @@
                 let labelMBKM = isMBKM ? '<span style="background: #eab308; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 8px; vertical-align: middle;">MBKM</span>' : '';
 
                 let htmlNilaiInputs = "";
-                let flatColIndex = 0; 
+                let flatColIndex = 0;
 
                 configData.forEach((config) => {
                     config.bobot.forEach((bobotItem, idx) => {
                         let nilaiMentah = parseFloat(m[flatColIndex + 2]) || 0;
                         let lockInput = '';
-                        
+
                         // KUNCI BILA KOMPONEN NYA KOSONG ATAU "Tidak Dinilai"
                         let kompAktif = config.komponen[idx] || "";
                         let isBebas = (kompAktif === "Tidak Dinilai" || kompAktif === "");
