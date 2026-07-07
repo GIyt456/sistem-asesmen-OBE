@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Bobot - Sistem OBE</title>
     
-    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin_si.css">
     
@@ -52,7 +51,7 @@
         .total-ok { color: #059669 !important; background: #ecfdf5 !important; } 
         .total-warn { color: #dc2626 !important; background: #fef2f2 !important; box-shadow: inset 0 0 0 2px #f87171;} 
 
-        /* Kelas Penolong */
+        /* Kelas Penolong (Desktop) */
         .show-mobile { display: none; }
         .mobile-total-panel { display: none; }
 
@@ -148,7 +147,7 @@
                     <div class="header-subtitle" style="margin-bottom: 5px;">MEKANISME ASESMEN</div>
                     <h1 class="header-title" style="font-size: 2rem;">MASTER <span>BOBOT</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
             <div style="border-bottom: 1px solid var(--border-color); margin: 0 50px 20px 50px;" class="header-bobot-mhs"></div>
         </div>
@@ -195,7 +194,6 @@
         </div>
     </div>
 
-    <!-- PANEL STICKY TOTAL BOBOT KHUSUS MOBILE -->
     <div id="mobileTotalPanel" class="mobile-total-panel">
         <div>
             <div class="mobile-total-label">TOTAL BOBOT MK</div>
@@ -212,6 +210,7 @@
             document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
             document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
         } else {
+            // PAKSA BIRU NAVY UNTUK SISTEM INFORMASI
             document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
             document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
         }
@@ -323,7 +322,7 @@
                 let cplKey = row.kode_mk + '_' + row.cpl;
                 let tr = `<tr data-rowid="${index}" data-mk="${row.kode_mk}" data-cpmk="${row.cpmk || row.kode_cpmk}">`;
 
-                // ELEMEN DESKTOP (Di-hide di Mobile)
+                // ELEMEN DESKTOP (Sembunyikan kelas 'hide-mobile' saat diakses di HP)
                 if (!renderedCpl[cplKey]) {
                     tr += `<td class="col-cpl hide-mobile" rowspan="${cplCount[cplKey]}">${row.cpl}</td>`;
                     renderedCpl[cplKey] = true;

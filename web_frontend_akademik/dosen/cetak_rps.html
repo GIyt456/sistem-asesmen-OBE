@@ -434,19 +434,20 @@
                             <thead class="text-center font-bold bg-light">
                                 <tr>
                                     <th width="4%">MG</th>
+                                    <th width="8%">CPL</th>
                                     <th width="10%">ID CPMK</th>
                                     <th width="15%">DESKRIPSI CPMK</th>
-                                    <th width="14%">INDIKATOR</th>
-                                    <th width="10%">BENTUK ASSESSMEN</th>
-                                    <th width="15%">MATERI POKOK</th>
-                                    <th width="10%">METODE</th>
-                                    <th width="11%">LURING</th>
-                                    <th width="11%">DARING</th>
+                                    <th width="13%">INDIKATOR</th>
+                                    <th width="12%">KOMPONEN PENILAIAN</th>
+                                    <th width="12%">MATERI POKOK</th>
+                                    <th width="9%">METODE</th>
+                                    <th width="9%">LURING</th>
+                                    <th width="8%">DARING</th>
                                 </tr>
                             </thead>
                             <tbody id="bodyTabelSesi">
                                 <tr>
-                                    <td colspan="9" style="text-align: center; padding: 20px;">Memuat data RPS... <i
+                                    <td colspan="10" style="text-align: center; padding: 20px;">Memuat data RPS... <i
                                             class="fas fa-spinner fa-spin"></i></td>
                                 </tr>
                             </tbody>
@@ -469,7 +470,7 @@
         const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
         const API_GET_TUGAS = `${API_BASE}/get-rubrik-by-matkul`;
         const API_GET_RUMPUN = `${API_BASE}/get-rumpun-bk`;
-        const API_GET_BOBOT = `${API_BASE}/get-bobot-penilaian`;
+        const API_GET_BOBOT = `${API_BASE}/get-master-bobot-dinamis`;
 
         let globalCplMap = new Map();
         let globalCpmkMap = new Map();
@@ -745,34 +746,69 @@
         async function loadDataRPSTable(kodeMK) {
             const tbody = document.getElementById("bodyTabelSesi");
             try {
+                // 1. Tarik Data Sesi Pembelajaran (RPS Dosen)
                 const res = await fetch(`${API_GET_RPS}?kode=${kodeMK}`);
                 const rpsDataJSON = res.ok ? await res.json() : [];
                 const rpsData = safeExtractN8N(rpsDataJSON).filter(item => item.pertemuan);
 
+                // 2. Tarik Data Draft Bobot (CPL, CPMK, Komponen Penilaian)
+                let draftBobotData = [];
+                try {
+                    const resBobot = await fetch(`${API_BASE}/get-draft-bobot?mk=${kodeMK}`);
+                    if (resBobot.ok) {
+                        let bobotJson = await resBobot.json();
+                        let rawBobot = bobotJson.data || bobotJson;
+                        if (!Array.isArray(rawBobot)) rawBobot = [rawBobot];
+                        draftBobotData = rawBobot.map(item => item.json ? item.json : item);
+                    }
+                } catch (e) { console.warn("Gagal fetch draft bobot", e); }
+
                 tbody.innerHTML = "";
                 for (let i = 1; i <= 16; i++) {
                     const rowData = rpsData.find(item => parseInt(item.pertemuan) === i) || {};
-                    let bgRowClass = ''; let hint = '';
+                    let barisBobot = draftBobotData.filter(d => parseInt(d.pertemuan) === i);
 
-                    if (i === 8) { bgRowClass = 'bg-light'; hint = '<strong>[UTS]</strong><br>'; }
-                    else if (i === 16) { bgRowClass = 'bg-light'; hint = '<strong>[UAS]</strong><br>'; }
+                    // Pemetaan dinamis dari OBE_RENCANA_BOBOT
+                    let valCpl = barisBobot.map(b => b.kode_cpl || '').filter(Boolean).join('<br><br>');
+                    let valCpmk = barisBobot.map(b => b.kode_cpmk || '').filter(Boolean).join('<br><br>');
+                    let valKomponen = barisBobot.map(b => b.komponen_penilaian || '').filter(Boolean).join('<br><br>');
+
+                    // Fallback jika API bobot kosong
+                    if (barisBobot.length === 0) {
+                        valCpmk = rowData.id_cpmk || '';
+                        valKomponen = rowData.assessmen || rowData.bentuk_pembelajaran || '';
+                    }
+
+                    if (valCpmk === 'NONE' || valCpmk === 'null' || valCpmk === 'undefined') valCpmk = '';
+
+                    // --- FIX: Sinkronisasi Deskripsi CPMK menggunakan Map ---
+                    let valDeskripsi = barisBobot.map(b => globalCpmkMap.get(b.kode_cpmk) || '').filter(Boolean).join('<br><br>');
+                    if (!valDeskripsi) {
+                        valDeskripsi = rowData.deskripsi_cpmk || rowData.sub_cpmk || rowData.kemampuan_akhir || '';
+                    }
+
+                    // --- FIX: Menghilangkan hint [UTS] dan [UAS] ---
+                    let bgRowClass = '';
+                    if (i === 8) { bgRowClass = 'bg-light'; }
+                    else if (i === 16) { bgRowClass = 'bg-light'; }
 
                     tbody.innerHTML += `
                         <tr class="${bgRowClass}">
-                            <td class="text-center font-bold" style="${(i === 8 || i === 16) ? 'font-weight: bold;' : ''}">${i}</td>
-                            <td class="font-bold text-center">${(rowData.id_cpmk || '').replace(/\n/g, '<br>')}</td>
-                            <td style="text-align: justify;">${hint}${(rowData.deskripsi_cpmk || rowData.sub_cpmk || rowData.kemampuan_akhir || '').replace(/\n/g, '<br>')}</td>
-                            <td style="text-align: justify;">${(rowData.indikator || rowData.indikator_pencapaian || '').replace(/\n/g, '<br>')}</td>
-                            <td style="text-align: justify;">${(rowData.assessmen || rowData.bentuk_pembelajaran || '').replace(/\n/g, '<br>')}</td>
-                            <td style="text-align: justify;">${(rowData.materi || rowData.materi_pembelajaran || '').replace(/\n/g, '<br>')}</td>
-                            <td style="text-align: justify;">${(rowData.metode || rowData.metode_pembelajaran || '').replace(/\n/g, '<br>')}</td>
-                            <td style="text-align: justify;">${(rowData.tatap_muka || '').replace(/\n/g, '<br>')}</td>
-                            <td style="text-align: justify;">${(rowData.daring || '').replace(/\n/g, '<br>')}</td>
+                            <td class="text-center font-bold" style="${(i === 8 || i === 16) ? 'font-weight: bold; vertical-align: top;' : 'vertical-align: top;'}">${i}</td>
+                            <td class="font-bold text-center" style="vertical-align: top;">${valCpl || '-'}</td>
+                            <td class="font-bold text-center" style="vertical-align: top;">${valCpmk.replace(/\n/g, '<br>') || '-'}</td>
+                            <td style="text-align: justify; vertical-align: top;">${valDeskripsi.replace(/\n/g, '<br>') || '-'}</td>
+                            <td style="text-align: justify; vertical-align: top;">${(rowData.indikator || rowData.indikator_pencapaian || '').replace(/\n/g, '<br>')}</td>
+                            <td style="text-align: justify; vertical-align: top; font-weight: bold;">${valKomponen.replace(/\n/g, '<br>')}</td>
+                            <td style="text-align: justify; vertical-align: top;">${(rowData.materi || rowData.materi_pembelajaran || '').replace(/\n/g, '<br>')}</td>
+                            <td style="text-align: justify; vertical-align: top;">${(rowData.metode || rowData.metode_pembelajaran || '').replace(/\n/g, '<br>')}</td>
+                            <td style="text-align: justify; vertical-align: top;">${(rowData.tatap_muka || '').replace(/\n/g, '<br>')}</td>
+                            <td style="text-align: justify; vertical-align: top;">${(rowData.daring || '').replace(/\n/g, '<br>')}</td>
                         </tr>
                     `;
                 }
             } catch (e) {
-                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;">Gagal memuat tabel RPS dari n8n.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:red;">Gagal memuat tabel RPS dari database.</td></tr>`;
             }
         }
 
