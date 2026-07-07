@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Output Nilai - Universitas AKI</title>
     
+    <!-- PANGGIL FONT INTER & ICON -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- PANGGIL FILE CSS GLOBAL -->
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/index_mobile.css">
     
+    <!-- PANGGIL JQUERY & SELECT2 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -48,6 +51,9 @@
             height: auto !important;     
             min-height: 100vh !important;
         }
+
+        /* MEMBERIKAN RUANG DI ATAS AGAR KONTEN TIDAK TERTABRAK NAVBAR FIXED */
+        body { padding-top: 75px !important; }
         
         .container { max-width: 1250px; margin: 30px auto; padding: 0 20px; width: 100%; }
         .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 24px; border: 1px solid #e2e8f0; width: 100%; max-width: 100%;}
@@ -78,11 +84,13 @@
         .btn-page:disabled { opacity: 0.5; cursor: not-allowed; }
         #pageInfo { font-size: 0.95rem; font-weight: bold; color: var(--navy); background: #f1f5f9; padding: 6px 16px; border-radius: 6px; border: 1px solid #e2e8f0;}
 
-        /* NAVBAR DOSEN (STANDAR TOP NAVBAR) */
+        /* =========================================
+           NAVBAR FIXED (DIPAKU KE LAYAR ATAS)
+           ========================================= */
         .navbar-top {
             background-color: var(--navy) !important; padding: 15px 40px !important; 
             display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; color: white !important;
-            position: sticky !important; top: 0 !important; z-index: 100 !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important; width: 100% !important; height: auto !important;
+            position: fixed !important; top: 0 !important; left: 0 !important; z-index: 999 !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important; width: 100% !important; height: auto !important;
         }
         .nav-links { display: flex; gap: 30px; font-weight: 500; font-size: 0.95rem; align-items: center; }
         .nav-links a { color: white; text-decoration: none; transition: 0.3s; padding-bottom: 4px; opacity: 0.8; }
@@ -111,14 +119,14 @@
         }
         .sticky-nama { 
             position: sticky; left: 100px; z-index: 11; background: white; 
-            min-width: 250px; max-width: 250px; /* Diperlebar agar nama panjang muat */
+            min-width: 250px; max-width: 250px; 
             border-right: 2px solid #cbd5e1; 
-            white-space: normal !important; /* Paksa teks turun baris jika kepanjangan */
+            white-space: normal !important; 
             word-wrap: break-word; line-height: 1.4; text-align: left !important;
         }
         .sticky-bobot { 
             position: sticky; left: 0; z-index: 11; background: #f1f5f9; 
-            min-width: 350px; max-width: 350px; /* Gabungan NIM (100) + NAMA (250) */
+            min-width: 350px; max-width: 350px; 
             border-right: 2px solid #cbd5e1; 
         }
 
@@ -133,6 +141,7 @@
            📱 ERGONOMIC MOBILE VIEW (AKORDION)
            ========================================= */
         @media screen and (max-width: 768px) {
+            body { padding-top: 70px !important; } /* Ruang Navbar HP */
             .container { padding: 15px !important; margin: 10px 0 !important; width: 100% !important; box-sizing: border-box !important;}
             .grid-top { display: flex !important; flex-direction: column !important; gap: 15px !important; }
             .card { padding: 15px !important; margin-bottom: 15px !important; border-radius: 8px !important; width: 100% !important; box-sizing: border-box !important;}
@@ -143,10 +152,8 @@
             table, thead, tbody, tr, td, th { display: block !important; width: 100% !important; min-width: 0 !important;}
             thead { display: none !important; }
             
-            /* Sembunyikan baris "BOBOT" di HP karena mengganggu desain kartu */
             .row-bobot { display: none !important; }
             
-            /* Bebaskan kembali word-wrap tabel di HP agar tidak meluber */
             #tableDetail { white-space: normal !important; }
             
             tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 15px !important; padding: 0 !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;}
@@ -182,13 +189,9 @@
             #tableDetail td.summary-item::before { content: attr(data-label); font-weight: 800; color: #475569; text-align: left; flex: 1; }
             #tableDetail td.nilai-item::before { content: attr(data-label); font-weight: 700; color: #64748b; text-align: left; flex: 1; }
 
-            /* SEMBUNYIKAN RINCIAN NILAI SECARA DEFAULT (ERGONOMIS) */
             #tableDetail tr.mhs-row td.nilai-item { display: none !important; }
-            
-            /* JIKA TOMBOL DITEKAN, MUNCULKAN NILAINYA */
             #tableDetail tr.mhs-row.expanded td.nilai-item { display: flex !important; background: #f8fafc !important; }
             
-            /* Tombol Akordion Meluncur */
             .mobile-toggle-btn { 
                 display: flex !important; justify-content: center !important; 
                 background: #eff6ff !important; color: #1d4ed8 !important; 
@@ -261,6 +264,7 @@
     <main class="container">
         <div class="card">
             <h2 style="color: var(--navy); margin-top:0; margin-bottom:15px; font-weight: 800;"><i class="fas fa-university"></i> Laporan Capaian OBE</h2>
+            <!-- UBAH JADI SELECT2 COMPATIBLE -->
             <select id="pilihMK" style="width: 100%; max-width: 500px;"></select>
         </div>
 
@@ -285,6 +289,7 @@
                     </div>
                 </div>
 
+                <!-- KOTAK REKOMENDASI REMIDI OTOMATIS -->
                 <div class="card" id="cardRemidi" style="display: none; border-left: 5px solid #dc2626; background: #fff5f5;">
                     <h3 style="margin-top:0; color:#991b1b;"><i class="fas fa-exclamation-triangle"></i> Daftar Mahasiswa Remidi</h3>
                     <p style="font-size: 0.85rem; color: #7f1d1d; margin-bottom: 15px;">Sistem mendeteksi capaian CPL mahasiswa di bawah standar (75%). Berikut rincian pertemuan yang harus diperbaiki oleh masing-masing mahasiswa:</p>
@@ -305,6 +310,7 @@
                 </table>
             </div>
             
+            <!-- TOMBOL PAGINATION -->
             <div class="pagination-container" id="paginationControls" style="display: none;">
                 <button class="btn-page" id="btnPrev" onclick="gantiHalaman(-1)"><i class="fas fa-chevron-left"></i> Sebelumnya</button>
                 <span id="pageInfo">Halaman 1 / 1</span>
