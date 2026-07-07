@@ -1144,14 +1144,15 @@
                             <thead>
                                 <tr>
                                     <th width="4%">MG</th>
+                                    <th width="8%">CPL</th>
                                     <th width="10%">ID CPMK</th>
                                     <th width="15%">DESKRIPSI CPMK</th>
                                     <th width="13%">INDIKATOR</th>
-                                    <th width="10%">BENTUK ASSESSMEN</th>
+                                    <th width="12%">KOMPONEN PENILAIAN</th>
                                     <th width="12%">MATERI POKOK</th>
-                                    <th width="10%">METODE</th>
-                                    <th width="13%">LURING</th>
-                                    <th width="13%">DARING</th>
+                                    <th width="9%">METODE</th>
+                                    <th width="9%">LURING</th>
+                                    <th width="8%">DARING</th>
                                 </tr>
                             </thead>
                             <tbody id="bodyTabelSesi">
@@ -1188,7 +1189,7 @@
         const API_SIMPAN_RPS = `${API_BASE}/simpan-rps-sesi`;
         const API_GET_INFO_MK = `${API_BASE}/get-info-mk`;
         const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
-        const API_GET_BOBOT = `${API_BASE}/get-bobot-penilaian`;
+        const API_GET_BOBOT = `${API_BASE}/get-master-bobot-dinamis`;
         const API_CPMK_LIST = `${API_BASE}/get-cpmk-list`; // API Untuk Auto-fill CPMK
 
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
@@ -1814,24 +1815,30 @@
                 // Saring hanya data yang memiliki nomor pertemuan valid
                 const rpsData = extractedData.filter(item => item.pertemuan);
 
-                generateSemuaTabel(rpsData, kodeMK);
+                // --- TARIK DATA CPL, CPMK & KOMPONEN DARI OBE_RENCANA_BOBOT ---
+                let draftBobotData = [];
+                try {
+                    const resBobot = await fetch(`${API_BASE}/get-draft-bobot?mk=${kodeMK}`);
+                    if (resBobot.ok) {
+                        let bobotJson = await resBobot.json();
+                        let rawBobot = bobotJson.data || bobotJson;
+                        if (!Array.isArray(rawBobot)) rawBobot = [rawBobot];
+                        draftBobotData = rawBobot.map(item => item.json ? item.json : item);
+                    }
+                } catch (e) { console.log("Gagal fetch draft bobot"); }
+
+                generateSemuaTabel(rpsData, kodeMK, draftBobotData);
             } catch (e) {
                 console.error("Gagal load tabel:", e);
-                generateSemuaTabel([], kodeMK);
+                generateSemuaTabel([], kodeMK, []);
             }
         }
 
         let currentSesi = 1;
 
-        function generateSemuaTabel(existingData = [], kodeMK) {
+        function generateSemuaTabel(existingData = [], kodeMK, draftBobotData = []) {
             const tbodySesi = document.getElementById("bodyTabelSesi");
             let htmlSesi = "";
-
-            let configBobot = [];
-            try {
-                const draft = localStorage.getItem("draft_bobot_" + kodeMK);
-                if (draft) configBobot = JSON.parse(draft);
-            } catch (e) { console.log("Draft bobot tidak ditemukan"); }
 
             let optCpmk = '<option value="" disabled selected>+ Pilih CPMK...</option>';
             masterCPMK.forEach(c => {
@@ -1841,13 +1848,22 @@
 
             for (let i = 1; i <= 16; i++) {
                 const rowData = existingData.find(item => parseInt(item.pertemuan) === i) || {};
-                const rowBobot = configBobot.find(item => parseInt(item.pertemuan) === i) || {};
 
-                let valCpmk = rowData.id_cpmk || rowBobot.cpmk || '';
-                let valAssessmen = rowData.assessmen || rowData.bentuk_pembelajaran || rowBobot.bentuk || '';
+                // Ambil CPL, CPMK, dan Komponen Penilaian langsung dari Database OBE_RENCANA_BOBOT
+                let barisBobot = draftBobotData.filter(d => parseInt(d.pertemuan) === i);
+
+                // Gabungkan dengan koma jika ada lebih dari 1 CPMK di pertemuan yang sama
+                let valCpl = barisBobot.map(b => b.kode_cpl || '').filter(Boolean).join(', ');
+                let valCpmk = barisBobot.map(b => b.kode_cpmk || '').filter(Boolean).join(', ');
+                let valKomponen = barisBobot.map(b => b.komponen_penilaian || '').filter(Boolean).join(', ');
+
+                // Fallback jika API bobot sedang kosong (menggunakan memori rps lama)
+                if (barisBobot.length === 0) {
+                    valCpmk = rowData.id_cpmk || '';
+                    valKomponen = rowData.assessmen || rowData.bentuk_pembelajaran || '';
+                }
 
                 if (valCpmk === 'NONE' || valCpmk === 'null' || valCpmk === 'undefined') valCpmk = '';
-                if (valAssessmen.includes("(Tanpa Bobot)")) valAssessmen = valAssessmen.replace("(Tanpa Bobot)", "").trim();
 
                 let valDeskripsi = rowData.deskripsi_cpmk || rowData.sub_cpmk || rowData.kemampuan_akhir || '';
 
@@ -1877,16 +1893,14 @@
                 htmlSesi += `
                     <tr id="row_pertemuan_${i}" class="${bgRowClass} hidden-row">
                         <td style="text-align: center; font-weight: bold; padding-top: 15px; font-size:1.1rem; color: ${(i === 8 || i === 16) ? 'var(--primary-red)' : '#475569'};">${i}</td>
-                        <td style="vertical-align: top;">
-                            <div id="badge_container_${i}" style="display:flex; flex-direction:column; gap:5px; margin-bottom:5px;"></div>
-                            <select class="input-rps" id="select_cpmk_${i}" onchange="tambahCpmkKeSesi(${i})" style="background:${bgInput}; cursor:pointer; font-weight:600;">
-                                ${optCpmk}
-                            </select>
+                        <td style="vertical-align: top; font-weight: 700; color: #475569; padding-top: 15px; font-size: 0.85rem;">${valCpl || '-'}</td>
+                        <td style="vertical-align: top; font-weight: 700; color: #0369a1; padding-top: 15px; font-size: 0.85rem;">
+                            ${valCpmk || '-'}
                             <input type="hidden" id="id_cpmk_${i}" value="${valCpmk}">
                         </td>
                         <td><textarea class="input-rps sub_cpmk-input" id="sub_cpmk_${i}" placeholder="${hint}Deskripsi otomatis..." style="background:${bgInput}; cursor:not-allowed; font-size:0.8rem;" readonly>${valDeskripsi}</textarea></td>
                         <td><textarea class="input-rps indikator-input" id="indikator_${i}" placeholder="Indikator..." style="background:${bgInput};">${rowData.indikator || rowData.indikator_pencapaian || ''}</textarea></td>
-                        <td><textarea class="input-rps assessmen-input" id="assessmen_${i}" placeholder="Asesmen..." style="background:${bgInput};">${valAssessmen}</textarea></td>
+                        <td><textarea class="input-rps assessmen-input" id="assessmen_${i}" placeholder="Komponen Penilaian..." style="background:${bgInput};">${valKomponen}</textarea></td>
                         <td><textarea class="input-rps materi-input" id="materi_${i}" placeholder="Materi..." style="background:${bgInput};">${rowData.materi || rowData.materi_pembelajaran || ''}</textarea></td>
                         <td><textarea class="input-rps metode-input" id="metode_${i}" placeholder="Metode..." style="background:${bgInput};">${rowData.metode || rowData.metode_pembelajaran || ''}</textarea></td>
                         <td><textarea class="input-rps tatap_muka-input" id="tatap_muka_${i}" placeholder="Tatap Muka..." style="background:${bgInput};">${rowData.tatap_muka || ''}</textarea></td>
@@ -1896,7 +1910,7 @@
             }
 
             tbodySesi.innerHTML = htmlSesi;
-            for (let i = 1; i <= 16; i++) renderBadgeCpmk(i, false);
+            // Fitur auto-tambah CPMK dihapus, data hanya ditarik murni (read-only)
             const textareas = document.querySelectorAll('.input-rps');
             textareas.forEach(tx => {
                 tx.style.height = 'auto';

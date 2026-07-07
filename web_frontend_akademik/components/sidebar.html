@@ -178,18 +178,6 @@
             <div class="nav-item" data-path="/master_data/master_tugas_akhir.html"><i class="fas fa-book-reader"></i> Tugas Akhir</div>
         </div>
 
-        <div class="nav-item" onclick="toggleDropdown('menu-periksa', 'chevron-periksa')">
-            <i class="fas fa-shield-alt"></i> Periksa Data
-            <i id="chevron-periksa" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
-        </div>
-        <div id="menu-periksa" style="display: none; flex-direction: column; padding-left: 20px; margin-top: 4px;">
-            <!-- <div class="nav-item" data-path="/periksa_data/cek_live_data.html"><i class="fas fa-cloud-download-alt"></i> Cek Live Data</div> -->
-            <div class="nav-item" data-path="/periksa_data/rps_duplikat.html"><i class="fas fa-copy"></i> RPS Duplikat</div>
-            <div class="nav-item" data-path="/periksa_data/makul_duplikat.html"><i class="fas fa-clone"></i> Makul Duplikat</div>
-            <!-- <div class="nav-item" data-path="/periksa_data/mengajar_salah.html"><i class="fas fa-exclamation-triangle"></i> Mengajar Salah</div> -->
-            <div class="nav-item" data-path="/periksa_data/mengajar_duplikat.html"><i class="fas fa-users-slash"></i> Mengajar Duplikat</div>
-        </div>
-
         <div class="menu-category">EVALUASI & RPS</div>
 
         <div class="nav-item" data-path="/rps/rekap_nilai.html"><i class="fas fa-clipboard-list"></i> Rekap Nilai Dosen</div>
@@ -201,7 +189,7 @@
         </div>
         <div class="dropdown-container" style="display: none; flex-direction: column; padding-left: 35px; margin-top: 2px;">
             <a href="#" data-path="/cpl_cpmk/cpmk_kelas.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Nilai CPMK per Kelas</a>
-            <a href="#" data-path="/cpl_cpmk/cpl_angkatan.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Nilai CPL per Angkatan</a>
+            <!-- <a href="#" data-path="/cpl_cpmk/cpl_angkatan.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Nilai CPL per Angkatan</a> -->
             <a href="#" data-path="/cpl_cpmk/eval_cpmk.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Evaluasi CPMK Angkatan</a>
             <a href="#" data-path="/cpl_cpmk/eval_cpl.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Evaluasi CPL Angkatan</a>
             <a href="#" data-path="/cpl_cpmk/grafik_cpmk.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Grafik Rerata CPMK</a>
@@ -217,14 +205,14 @@
             <i class="fas fa-chevron-down arrow-icon" style="font-size: 0.8rem; margin-left: auto; opacity: 0.7;"></i>
         </div>
         <div class="dropdown-container" style="display: none; flex-direction: column; padding-left: 35px; margin-top: 2px;">
-            <a href="#" data-path="/rps/rps_bentuk.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Bentuk</a>
-            <a href="#" data-path="/rps/rps_metode.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Metode</a>
-            <a href="#" data-path="/rps/rps_kriteria.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Kriteria</a>
+            <a href="#" data-path="/rps/*" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Bentuk</a>
+            <!-- <a href="#" data-path="/rps/rps_metode.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Metode</a> -->
+            <!-- <a href="#" data-path="/rps/rps_kriteria.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Kriteria</a> -->
             <a href="#" data-path="/rps/rps_komponen.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Komponen</a>
             <a href="#" data-path="/rps/rps_kelola.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Kelola RPS</a>
             <a href="#" data-path="/rps/rps_pengecekan.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Pengecekan RPS</a>
-            <a href="#" data-path="/rps/rps_serap.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Serap RPS</a>
-            <a href="#" data-path="/rps/portofolio_admin.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Laporan CPL & CPMK</a>
+            <!-- <a href="#" data-path="/rps/rps_serap.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Serap RPS</a> -->
+            <!-- <a href="#" data-path="/rps/portofolio_admin.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Laporan CPL & CPMK</a> -->
         </div>
 
        
