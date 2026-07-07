@@ -1208,6 +1208,9 @@
                 if (arrDraft.data) arrDraft = arrDraft.data; // Unwrap dari N8N
                 if (!Array.isArray(arrDraft)) arrDraft = [arrDraft];
 
+                // FIX UTAMA: Bongkar bungkus json n8n agar data pertemuannya terbaca!
+                arrDraft = arrDraft.map(item => item.json ? item.json : item);
+
                 configData = [];
                 for (let i = 1; i <= 16; i++) {
                     let barisDb = arrDraft.find(d => parseInt(d.pertemuan) === i);
@@ -1216,18 +1219,18 @@
                         let b = barisDb.bentuk_penilaian || "";
                         let k = barisDb.komponen_penilaian || "";
 
-                        // Otomatis Pindahkan jika Tugas/UTS masih tersasar di kolom bentuk
                         let bLower = b.toLowerCase();
                         if (bLower === 'uts' || bLower === 'uas' || bLower === 'tugas' || bLower === 'attitude' || bLower === 'kehadiran') {
                             k = b; b = "";
                         }
 
+                        // Tambahkan fungsi .trim() untuk memotong spasi liar dari database
                         configData.push({
                             pertemuan: i,
-                            bentuk: b,
-                            cpl: String(barisDb.kode_cpl || "-").split(","),
-                            cpmk: String(barisDb.kode_cpmk || "").split(","),
-                            komponen: k === "" ? [""] : k.split(","),
+                            bentuk: b.trim(),
+                            cpl: String(barisDb.kode_cpl || "-").split(",").map(x => x.trim()),
+                            cpmk: String(barisDb.kode_cpmk || "").split(",").map(x => x.trim()),
+                            komponen: k === "" ? [""] : k.split(",").map(x => x.trim()),
                             bobot: String(barisDb.bobot_persen || "0").split(",").map(val => parseFloat(val) || 0)
                         });
                     } else {
@@ -1373,19 +1376,19 @@
                         </div>
                     `;
 
-                    // 3. RENDER DROPDOWN KOMPONEN PENILAIAN
-                    let komponenAktif = row.komponen[idx] || "";
-                    let isKomponenEmpty = (komponenAktif === "" || komponenAktif === "Tidak Dinilai");
+                    // 3. RENDER DROPDOWN KOMPONEN PENILAIAN (DENGAN FIX CASE-INSENSITIVE)
+                    let komponenAktif = (row.komponen[idx] || "").trim();
+                    let isKomponenEmpty = (komponenAktif === "" || komponenAktif.toLowerCase() === "tidak dinilai");
                     let allowedQuotas = trackingQuotas.filter(q => q.cpmk === cpmkItem);
 
                     let optKompHTML = `<option value="" disabled ${komponenAktif === "" ? 'selected' : ''}>-- Pilih Komponen --</option>`;
 
                     allowedQuotas.forEach(q => {
-                        let isSelected = (komponenAktif === q.kategori) ? 'selected' : '';
+                        // Paksa menjadi huruf kecil saat membandingkan agar selalu cocok (misal: "Tugas" == "TUGAS")
+                        let isSelected = (komponenAktif.toLowerCase() === q.kategori.toLowerCase()) ? 'selected' : '';
                         optKompHTML += `<option value="${q.kategori}" ${isSelected}>⭐ ${q.kategori}</option>`;
                     });
 
-                    // Default Fallback: Jika kosong, otomatis arahkan ke "Tidak Dinilai" secara visual
                     let isNone = isKomponenEmpty ? 'selected' : '';
                     optKompHTML += `<option value="Tidak Dinilai" ${isNone}>📘 Tidak Dinilai</option>`;
 
@@ -1854,9 +1857,10 @@
             // Menggabungkan kembali array menjadi teks (koma) agar API N8N tidak crash
             const configDataPayload = configData.map(c => ({
                 ...c,
-                cpl: c.cpl.join(","),
-                cpmk: c.cpmk.join(","),
-                komponen_penilaian: c.komponen.join(","),
+                bentuk_penilaian: c.bentuk || "", // Pastikan bentuk pembelajaran ikut terkirim
+                cpl: c.cpl.map(x => x.trim()).join(","),
+                cpmk: c.cpmk.map(x => x.trim()).join(","),
+                komponen_penilaian: c.komponen.map(x => x.trim()).join(","),
                 bobot: c.bobot.join(",")
             }));
 
