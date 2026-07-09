@@ -446,12 +446,17 @@
 
                     <div class="input-group">
                         <label>Program MBKM</label>
-                        <select id="jenis_mbkm">
+                        <select id="jenis_mbkm" onchange="toggleCustomProgram(this, 'jenis_mbkm_custom')">
+                            <option value="" disabled selected>-- Pilih Program MBKM --</option>
                             <option value="Magang Merdeka (MSIB)">Magang Merdeka (MSIB)</option>
                             <option value="Studi Independen (MSIB)">Studi Independen (MSIB)</option>
                             <option value="Kampus Mengajar">Kampus Mengajar</option>
                             <option value="Pertukaran Mahasiswa">Pertukaran Mahasiswa</option>
+                            <option value="Lainnya" style="font-weight: bold; color: #8b0000;">+ Ketik Program
+                                Lainnya...</option>
                         </select>
+                        <input type="text" id="jenis_mbkm_custom" placeholder="Ketik nama program MBKM baru..."
+                            style="display: none; margin-top: 8px;">
                     </div>
                     <div class="input-group">
                         <label>Mitra / Tempat Magang</label>
@@ -523,12 +528,17 @@
 
                 <div class="form-group">
                     <label>Program MBKM</label>
-                    <select id="editProgram" class="form-control">
+                    <select id="editProgram" class="form-control"
+                        onchange="toggleCustomProgram(this, 'editProgram_custom')">
                         <option value="Magang Merdeka (MSIB)">Magang Merdeka (MSIB)</option>
                         <option value="Studi Independen (MSIB)">Studi Independen (MSIB)</option>
                         <option value="Kampus Mengajar">Kampus Mengajar</option>
                         <option value="Pertukaran Mahasiswa">Pertukaran Mahasiswa</option>
+                        <option value="Lainnya" style="font-weight: bold; color: #8b0000;">+ Ketik Program Lainnya...
+                        </option>
                     </select>
+                    <input type="text" id="editProgram_custom" class="form-control"
+                        placeholder="Ketik nama program MBKM baru..." style="display: none; margin-top: 8px;">
                 </div>
 
                 <div class="form-group">
@@ -579,12 +589,37 @@
             reader.onerror = error => reject(error);
         });
 
+        function toggleCustomProgram(selectElement, customInputId) {
+            const customInput = document.getElementById(customInputId);
+            if (selectElement.value === "Lainnya") {
+                customInput.style.display = "block";
+                customInput.focus();
+            } else {
+                customInput.style.display = "none";
+                customInput.value = ""; // Bersihkan isinya jika kembali ke opsi standar
+            }
+        }
+
         // 1. LOAD DAFTAR MAHASISWA
         async function loadMahasiswa() {
             try {
                 const res = await fetch(API_GET_MHS);
                 const json = await res.json();
-                dataMahasiswa = json.data || json;
+                let allMhs = json.data || json;
+
+                // --- LOGIKA FILTER BERDASARKAN LOGIN KAPRODI ---
+                const prodiKaprodi = (localStorage.getItem("prodi_aktif") || "").toLowerCase();
+                window.semuaMahasiswaDB = allMhs; // Simpan semua ke memori global untuk referensi
+
+                if (prodiKaprodi.includes("ti")) {
+                    dataMahasiswa = allMhs.filter(m => (m.prodi || "").toLowerCase().includes("ti") || (m.prodi || "").toLowerCase().includes("informa"));
+                } else if (prodiKaprodi.includes("si")) {
+                    dataMahasiswa = allMhs.filter(m => (m.prodi || "").toLowerCase().includes("si") || (m.prodi || "").toLowerCase().includes("sistem"));
+                } else {
+                    dataMahasiswa = allMhs; // Munculkan semua jika admin level atas
+                }
+                // -----------------------------------------------
+
                 document.getElementById("nimSearch").disabled = false;
                 document.getElementById("nimSearch").placeholder = "Pilih / Ketik NIM Mahasiswa...";
                 document.getElementById("loadingDb").style.display = "none";
@@ -598,11 +633,30 @@
             try {
                 const res = await fetch(API_LOAD_MBKM);
                 const json = await res.json();
-                listPendaftarAktif = json.data || json;
+                let rawPendaftar = json.data || json;
 
+                const prodiKaprodi = (localStorage.getItem("prodi_aktif") || "").toLowerCase();
+                listPendaftarAktif = [];
                 tbody.innerHTML = "";
+
+                // --- FILTER TABEL PENDAFTAR SESUAI PRODI ---
+                rawPendaftar.forEach(item => {
+                    let mhsRef = (window.semuaMahasiswaDB || dataMahasiswa).find(m => String(m.nim) === String(item.nim));
+                    let prodiText = mhsRef ? (mhsRef.prodi || "").toLowerCase() : "";
+
+                    let isMyProdi = false;
+                    if (prodiKaprodi.includes('ti') && (prodiText === 'ti' || prodiText.includes('informa'))) isMyProdi = true;
+                    else if (prodiKaprodi.includes('si') && (prodiText === 'si' || prodiText.includes('sistem'))) isMyProdi = true;
+                    else if (!prodiKaprodi) isMyProdi = true; // Munculkan semua jika admin level atas
+
+                    if (isMyProdi) {
+                        listPendaftarAktif.push(item);
+                    }
+                });
+                // -------------------------------------------
+
                 if (listPendaftarAktif.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Belum ada pendaftar MBKM.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #6b7280;">Belum ada pendaftar MBKM dari prodi Anda.</td></tr>';
                     return;
                 }
 
@@ -610,7 +664,7 @@
                     const row = document.createElement("tr");
 
                     // --- LOGIKA STIKER PRODI DARI DATABASE ---
-                    let mhsRef = dataMahasiswa.find(m => String(m.nim) === String(item.nim));
+                    let mhsRef = (window.semuaMahasiswaDB || dataMahasiswa).find(m => String(m.nim) === String(item.nim));
                     let prodiText = mhsRef ? (mhsRef.prodi || "").toLowerCase() : "";
 
                     let badgeProdi = '';
@@ -661,10 +715,24 @@
             document.getElementById("editId").value = data.id;
             document.getElementById("editNim").value = data.nim;
             document.getElementById("editNama").value = data.nama;
-            document.getElementById("editProgram").value = data.program;
             document.getElementById("editMitra").value = data.mitra;
             document.getElementById("editDosen").value = data.dosen_pembimbing || "";
             document.getElementById("editBukti").value = "";
+
+            // Logika Dropdown Edit
+            const selectEl = document.getElementById("editProgram");
+            const customInput = document.getElementById("editProgram_custom");
+            let isStandard = Array.from(selectEl.options).some(opt => opt.value === data.program && opt.value !== "Lainnya");
+
+            if (isStandard) {
+                selectEl.value = data.program;
+                customInput.style.display = "none";
+                customInput.value = "";
+            } else {
+                selectEl.value = "Lainnya";
+                customInput.style.display = "block";
+                customInput.value = data.program;
+            }
 
             document.getElementById("modalEditMBKM").style.display = "flex";
         }
@@ -674,18 +742,23 @@
         }
 
         async function updateDataMBKM() {
+            let progVal = document.getElementById("editProgram").value;
+            if (progVal === "Lainnya") progVal = document.getElementById("editProgram_custom").value;
+
             const payload = {
                 id: document.getElementById("editId").value,
                 nim: document.getElementById("editNim").value,
                 nama: document.getElementById("editNama").value,
-                program: document.getElementById("editProgram").value,
+                program: progVal, // Ambil nilai yang benar
                 mitra: document.getElementById("editMitra").value,
                 dosen_pembimbing: document.getElementById("editDosen").value,
                 file_name: oldFileData.name,
                 file_base64: oldFileData.base64
             };
 
-            if (!payload.mitra) return alert("Mitra wajib diisi!");
+            // ... sisa kodenya tetap sama ...
+            if (!payload.mitra || !payload.program) return alert("Program dan Mitra wajib diisi!");
+            // ... dst
 
             const btn = document.getElementById("btnUpdateModal");
             btn.disabled = true;
@@ -744,16 +817,19 @@
         // 4. LOGIKA SIMPAN DATA BARU (FORM ATAS)
         // ==========================================
         async function simpanDataMBKM() {
+            let progVal = document.getElementById("jenis_mbkm").value;
+            if (progVal === "Lainnya") progVal = document.getElementById("jenis_mbkm_custom").value;
+
             const payload = {
                 nim: document.getElementById("nimSearch").value,
                 nama: document.getElementById("nama").value,
-                program: document.getElementById("jenis_mbkm").value,
+                program: progVal, // Ambil nilai yang benar
                 mitra: document.getElementById("mitra").value,
                 dosen_pembimbing: document.getElementById("dosen").value,
                 file_name: "", file_base64: ""
             };
 
-            if (!payload.nim || !payload.mitra) return alert("NIM dan Mitra wajib diisi!");
+            if (!payload.nim || !payload.mitra || !payload.program) return alert("NIM, Program, dan Mitra wajib diisi!");
 
             const btn = document.getElementById("btnSimpan");
             btn.disabled = true;

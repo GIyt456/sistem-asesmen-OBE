@@ -927,7 +927,6 @@
         async function initData() {
             const inputSearch = document.getElementById("mhsSearch");
             try {
-                // --- PERUBAHAN: Menambahkan tarikan data dari master_mahasiswa ---
                 const [resMhs, resMk, resMasterMhs] = await Promise.all([
                     fetch(API_MBKM_LIST).catch(() => null),
                     fetch(API_MK_MASTER).catch(() => null),
@@ -942,21 +941,49 @@
                 if (resMk && resMk.ok) jsonMk = await resMk.json();
                 if (resMasterMhs && resMasterMhs.ok) jsonMasterMhs = await resMasterMhs.json();
 
-                dataPendaftarMBKM = safeExtractArray(jsonMhs);
+                let rawPendaftarMBKM = safeExtractArray(jsonMhs);
                 allDataMK = safeExtractArray(jsonMk);
                 let dataMasterMhs = safeExtractArray(jsonMasterMhs);
 
-                // --- INJEKSI PRODI ASLI KE DATA MBKM ---
-                dataPendaftarMBKM.forEach(pendaftar => {
+                // --- INJEKSI PRODI ASLI KE DATA MBKM DENGAN FALLBACK NIM ---
+                rawPendaftarMBKM.forEach(pendaftar => {
                     let mhsRef = dataMasterMhs.find(m => String(m.nim) === String(pendaftar.nim));
                     if (mhsRef && (mhsRef.prodi || mhsRef.program_studi)) {
                         pendaftar.prodi = mhsRef.prodi || mhsRef.program_studi;
                     }
+
+                    // Fallback: Jika di database kosong, deteksi otomatis dari NIM
+                    let prodiText = (pendaftar.prodi || "").toLowerCase();
+                    if (!prodiText) {
+                        let nimStr = String(pendaftar.nim).toLowerCase();
+                        if (nimStr.includes('.11.') || nimStr.startsWith('222')) pendaftar.prodi = 'ti';
+                        else if (nimStr.includes('.12.') || nimStr.startsWith('223')) pendaftar.prodi = 'si';
+                    }
                 });
+
+                // --- FILTER BERDASARKAN KAPRODI LOGIN ---
+                const prodiKaprodi = (localStorage.getItem("prodi_aktif") || "").toLowerCase();
+
+                if (prodiKaprodi.includes("ti")) {
+                    dataPendaftarMBKM = rawPendaftarMBKM.filter(m => {
+                        let p = (m.prodi || "").toLowerCase();
+                        return p === 'ti' || p.includes("informa");
+                    });
+                } else if (prodiKaprodi.includes("si")) {
+                    dataPendaftarMBKM = rawPendaftarMBKM.filter(m => {
+                        let p = (m.prodi || "").toLowerCase();
+                        return p === 'si' || p.includes("sistem");
+                    });
+                } else {
+                    // Jika yang login Admin Pusat/Headadmin (Munculkan semua)
+                    dataPendaftarMBKM = rawPendaftarMBKM;
+                }
                 // ---------------------------------------
 
                 inputSearch.disabled = false;
                 inputSearch.placeholder = "Pilih / Ketik NIM atau Nama Peserta...";
+
+                // Render form dropdown dengan data yang sudah di-filter
                 renderDropdownMhs(dataPendaftarMBKM);
             } catch (e) {
                 console.error("Init Error:", e);
