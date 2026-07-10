@@ -12,7 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="/js/api_config.js"></script>
 
     <style>
@@ -455,10 +456,6 @@
                 <p style="color: var(--text-gray); font-size: 1rem;">Lakukan konfigurasi bobot dan unggah nilai asesmen
                     mahasiswa di sini.</p>
             </div>
-            <button class="btn-action" style="background: #e0f2fe; color: #0369a1; padding: 10px 20px;"
-                onclick="window.location.href='../kaprodi/laporan.html'">
-                <i class="fas fa-chart-line"></i> Dashboard Laporan
-            </button>
         </div>
 
         <div id="card-master-bobot"
@@ -1163,7 +1160,22 @@
             else { statusBox.innerHTML = '<span style="color: #ea580c;"><i class="fas fa-exclamation-triangle"></i> Kuota belum pas / Total belum 100%</span>'; }
 
             const btnSimpan = document.getElementById("btnSimpan");
-            if (btnSimpan) { btnSimpan.disabled = !(allValid && sumTotal === 100); btnSimpan.style.opacity = btnSimpan.disabled ? '0.5' : '1'; btnSimpan.innerText = btnSimpan.disabled ? "Penuhi Kuota & 100%" : "Simpan Final 100%"; }
+            if (btnSimpan) {
+                btnSimpan.disabled = !(allValid && sumTotal === 100);
+                btnSimpan.style.opacity = btnSimpan.disabled ? '0.5' : '1';
+
+                if (btnSimpan.disabled) {
+                    // Tampilan saat bobot belum 100% atau kuota belum terpenuhi (Hitam/Navy Gelap)
+                    btnSimpan.innerHTML = '<i class="fas fa-lock"></i> Penuhi Kuota & 100%';
+                    btnSimpan.style.background = '#0f172a';
+                    btnSimpan.style.color = 'white';
+                } else {
+                    // Tampilan menyala terang saat siap disave (Hijau)
+                    btnSimpan.innerHTML = '<i class="fas fa-check-circle"></i> Simpan Final 100%';
+                    btnSimpan.style.background = '#16a34a';
+                    btnSimpan.style.color = 'white';
+                }
+            }
         }
 
         async function simpanDraftBobotManual() {
@@ -1194,43 +1206,125 @@
             } catch (e) { }
             if (listMhs.length === 0) listMhs = [{ nim: "22320001", nama: "Fulan" }];
 
+            // 1. Inisialisasi Workbook ExcelJS
+            const workbook = new ExcelJS.Workbook();
+            const sheet = workbook.addWorksheet("Template Nilai");
+
             let rowCPL = ["", ""], rowCPMK = ["", ""], rowBentuk = ["NIM", "NAMA MAHASISWA"], rowBobot = ["", "BOBOT PENILAIAN (%)"];
             let flatColCount = 0;
 
+            // 2. Susun Struktur Header
             configData.forEach(c => {
                 c.bobot.forEach((b, idx) => {
-                    rowCPL.push(c.cpl[idx] || "-"); rowCPMK.push(c.cpmk[idx] || "-");
-                    rowBentuk.push(`P${c.pertemuan} - ${c.bentuk} (${idx + 1})`); rowBobot.push((parseFloat(b) || 0) + "%");
+                    rowCPL.push(c.cpl[idx] || "-");
+                    rowCPMK.push(c.cpmk[idx] || "-");
+
+                    // PERMINTAAN ANDA: Tambahkan nama komponen penilaian di bawah tulisan P1-P16
+                    let namaKomponen = (c.komponen[idx] && c.komponen[idx] !== "Tidak Dinilai") ? c.komponen[idx] : c.bentuk;
+                    rowBentuk.push(`P${c.pertemuan}\n(${namaKomponen})`);
+
+                    rowBobot.push((parseFloat(b) || 0) + "%");
                     flatColCount++;
                 });
             });
-            rowCPL.push("INFO", "INFO"); rowCPMK.push("INFO", "INFO"); rowBentuk.push("NILAI AKHIR", "GRADE"); rowBobot.push("100%", "-");
 
-            let finalData = [rowCPL, rowCPMK, rowBentuk, rowBobot]; let currRow = 5;
+            rowCPL.push("INFO", "INFO"); rowCPMK.push("INFO", "INFO");
+            rowBentuk.push("NILAI AKHIR", "GRADE"); rowBobot.push("100%", "-");
+
+            sheet.addRow(rowCPL); sheet.addRow(rowCPMK); sheet.addRow(rowBentuk); sheet.addRow(rowBobot);
+
+            // 3. Deteksi Kolom dengan Bobot Aktif (> 0%)
+            let hasBobotArray = [false, false]; // Index 0 (NIM) & Index 1 (NAMA) selalu putih
+            configData.forEach(c => {
+                c.bobot.forEach(b => {
+                    hasBobotArray.push((parseFloat(b) || 0) > 0);
+                });
+            });
+            hasBobotArray.push(false, false); // Index Akhir (NILAI AKHIR) & GRADE selalu putih
+
+            // 4. Modifikasi Style Header (Biru Muda jika ada bobot, Putih jika 0%)
+            for (let i = 1; i <= 4; i++) {
+                let row = sheet.getRow(i);
+                row.eachCell((cell, colNumber) => {
+                    let isKolomBobot = hasBobotArray[colNumber - 1]; // Array index mulai dari 0, colNumber dari 1
+
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        // Menggunakan biru muda pastel persis seperti gambar Excel (FFDDEBF7)
+                        fgColor: { argb: isKolomBobot ? 'FFDDEBF7' : 'FFFFFFFF' }
+                    };
+                    cell.font = { color: { argb: 'FF000000' }, bold: true, name: 'Arial', size: 10 };
+                    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                });
+            }
+            sheet.getRow(3).height = 40; // Tinggikan baris 3 agar teks komponen bisa turun ke bawah
+
+            // 5. Menggabungkan Cell (Merge) agar kolom NIM, NAMA, Akhir, dan Grade rapi
+            sheet.mergeCells('A1:A4'); sheet.mergeCells('B1:B4');
+            let endCol1 = sheet.getColumn(flatColCount + 3).letter;
+            let endCol2 = sheet.getColumn(flatColCount + 4).letter;
+            sheet.mergeCells(`${endCol1}1:${endCol1}4`); sheet.mergeCells(`${endCol2}1:${endCol2}4`);
+
+            sheet.getCell('A1').value = "NIM"; sheet.getCell('B1').value = "NAMA MAHASISWA";
+            sheet.getCell(`${endCol1}1`).value = "NILAI AKHIR"; sheet.getCell(`${endCol2}1`).value = "GRADE";
+
+            // 6. Masukkan Data Mahasiswa & Rumus Excel-nya
+            let currRow = 5;
+
             listMhs.forEach(mhs => {
                 let row = [mhs.nim || mhs.NIM || "", mhs.nama || mhs.nama_mahasiswa || ""];
-                for (let k = 0; k < flatColCount; k++) row.push("");
+                for (let k = 0; k < flatColCount; k++) row.push(""); // Slot kosong untuk diisi nanti
 
                 let fParts = []; let flatIdx = 0;
                 configData.forEach(c => {
                     c.bobot.forEach(b => {
-                        let col = String.fromCharCode(((flatIdx + 2) % 26) + 65);
+                        let col = sheet.getColumn(flatIdx + 3).letter;
                         fParts.push(`(${col}${currRow}*${((parseFloat(b) || 0) / 100)})`);
                         flatIdx++;
                     });
                 });
 
-                let tCol = String.fromCharCode(((flatColCount + 2) % 26) + 65);
-                row.push({ t: 'n', f: fParts.join('+') || "0" });
-                row.push({ t: 's', f: `IF(${tCol}${currRow}>=85,"A",IF(${tCol}${currRow}>=80,"A-",IF(${tCol}${currRow}>=75,"B+",IF(${tCol}${currRow}>=70,"B",IF(${tCol}${currRow}>=65,"B-",IF(${tCol}${currRow}>=60,"C+",IF(${tCol}${currRow}>=55,"C",IF(${tCol}${currRow}>=50,"D","E"))))))))` });
-                finalData.push(row); currRow++;
+                let tCol = sheet.getColumn(flatColCount + 3).letter;
+                row.push({ formula: fParts.join('+') || "0" });
+                row.push({ formula: `IF(${tCol}${currRow}>=85,"A",IF(${tCol}${currRow}>=80,"A-",IF(${tCol}${currRow}>=75,"B+",IF(${tCol}${currRow}>=70,"B",IF(${tCol}${currRow}>=65,"B-",IF(${tCol}${currRow}>=60,"C+",IF(${tCol}${currRow}>=55,"C",IF(${tCol}${currRow}>=50,"D","E"))))))))` });
+
+                let sheetRow = sheet.addRow(row);
+
+                // B. Styling Garis dan Penentuan Warna Kolom Aktif/Tidak Aktif untuk Data
+                sheetRow.eachCell((cell, colNumber) => {
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                    cell.alignment = { vertical: 'middle', horizontal: colNumber > 2 ? 'center' : 'left' };
+
+                    let isKolomBobot = hasBobotArray[colNumber - 1];
+
+                    if (isKolomBobot) {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDDEBF7' } }; // Biru Muda Pastel
+                    } else {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } }; // Putih bersih
+                        // Angka 0 telah dihapus. Sel tanpa bobot akan murni dibiarkan kosong
+                    }
+                });
+                currRow++;
             });
 
-            const ws = XLSX.utils.aoa_to_sheet(finalData);
-            let cw = [{ wch: 15 }, { wch: 30 }]; for (let k = 0; k < flatColCount; k++) cw.push({ wch: 15 }); cw.push({ wch: 15 }, { wch: 12 }); ws['!cols'] = cw;
-            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template Nilai");
-            XLSX.writeFile(wb, templateAktif);
-            document.getElementById("btnTemplate").innerHTML = '<i class="fas fa-download"></i> Download Template'; document.getElementById("btnTemplate").disabled = false;
+            // 6. Atur Lebar Kolom
+            sheet.getColumn(1).width = 15; sheet.getColumn(2).width = 35;
+            for (let k = 0; k < flatColCount; k++) sheet.getColumn(k + 3).width = 16;
+            sheet.getColumn(flatColCount + 3).width = 15; sheet.getColumn(flatColCount + 4).width = 12;
+
+            // 7. Eksekusi Download FileSaver
+            try {
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                saveAs(blob, templateAktif);
+            } catch (error) {
+                alert("Gagal mengunduh Excel. Pastikan internet stabil untuk meload library ExcelJS.");
+            }
+
+            document.getElementById("btnTemplate").innerHTML = '<i class="fas fa-download"></i> Download Template';
+            document.getElementById("btnTemplate").disabled = false;
         }
 
         function processStudentData(raw) {
