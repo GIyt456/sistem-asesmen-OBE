@@ -14,54 +14,7 @@
     
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
-    
-    <style>
-        /* =========================================
-           ✨ BEAUTIFY MATRIKS & FORM (ANTI-CACHE) ✨
-           ========================================= */
-        .btn-save-bobot { background: var(--primary-blue); color: white; border: none; padding: 14px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;}
-        .btn-save-bobot:hover { filter: brightness(0.85); transform: translateY(-2px); }
-        .btn-save-bobot:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
-
-        .control-panel { background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 25px; display: flex; gap: 20px; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .select-matkul { padding: 14px 20px; border: 2px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 1rem; flex: 1; cursor: pointer; background: #f8fafc; font-weight: 600; color: #334155; transition: 0.2s; }
-        .select-matkul:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1); }
-
-        .table-bobot-wrapper { overflow-x: auto; background: white; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
-        .tabel-bobot { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; } /* Memaksa scroll di HP agar layout isian angka tidak hancur */
-        
-        .tabel-bobot th { background: #1e293b !important; color: white !important; font-weight: 700; padding: 18px 10px !important; border-bottom: 2px solid #0f172a !important; border-right: 1px solid #334155 !important; text-align: center; vertical-align: middle; font-size: 0.85rem; }
-        .tabel-bobot th.bg-darker { background: #0f172a !important; letter-spacing: 1px;} 
-        .tabel-bobot th.bg-primary { background: var(--primary-blue) !important; font-size: 1rem; border-right: none !important;}
-
-        .tabel-bobot td { border-bottom: 1px solid #e5e7eb !important; border-right: 1px solid #e5e7eb !important; padding: 15px 10px !important; font-size: 0.9rem; text-align: center; vertical-align: middle; background: white; color: #1e293b;}
-        .tabel-bobot td:last-child { border-right: none !important; }
-        
-        .col-cpl { color: var(--primary-blue) !important; font-weight: 800 !important; background: #f8fafc !important; }
-        .col-mk { font-weight: 700 !important; }
-        .col-cpmk { background: #f1f5f9 !important; font-weight: 700 !important; color: #334155 !important;}
-
-        /* Gaya Kotak Input Angka Keren */
-        .input-bobot { width: 70px; padding: 10px 5px; border: 2px solid #cbd5e1; border-radius: 8px; text-align: center; font-size: 0.95rem; font-weight: 700; color: #1e293b; transition: all 0.2s; background: #f8fafc; outline: none;}
-        .input-bobot:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15); transform: translateY(-2px); }
-        
-        /* Gaya Kotak Total Responsif */
-        .col-total { font-size: 1.4rem !important; font-weight: 900 !important; transition: 0.3s; }
-        .total-ok { color: #059669 !important; background: #ecfdf5 !important; } 
-        .total-warn { color: #dc2626 !important; background: #fef2f2 !important; box-shadow: inset 0 0 0 2px #f87171;} 
-
-        /* =========================================
-           📱 PENYESUAIAN MOBILE ANTI-MEPET
-           ========================================= */
-        @media screen and (max-width: 768px) {
-            .header-bobot-mhs { margin: 20px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
-            .section-bobot-mhs { padding: 0 20px 40px 20px !important; }
-            
-            /* Panel kontrol menyusun ke bawah di HP */
-            .control-panel { flex-direction: column !important; align-items: stretch !important; padding: 20px !important; gap: 15px !important;}
-            .btn-save-bobot { width: 100% !important; justify-content: center !important; }
-        }
-    </style>
+    <link rel="stylesheet" href="master_bobot.css">
 </head>
 <body>
 
