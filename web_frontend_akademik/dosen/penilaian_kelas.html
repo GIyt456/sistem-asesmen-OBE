@@ -375,7 +375,8 @@
     <script>
         const API_GET_STUDENTS = `${API_BASE}/get-mahasiswa-mk`;
         const API_GET_REPORT = `${API_BASE}/get-report-obe`;
-        const API_SIMPAN = `${API_BASE}/simpan-konfigurasi`; // Menyamakan API dengan halaman sebelumnya
+        const API_SIMPAN = `${API_BASE}/simpan-konfigurasi-input-nilai`; // Gunakan webhook yang baru
+        const API_GET_DRAFT = `${API_BASE}/get-draft-bobot`; // Tambahkan endpoint ini
 
         // --- TAMBAHAN MBKM ---
         const API_GET_MBKM = `${API_BASE}/get-mbkm-data`;
@@ -388,7 +389,8 @@
         let dataMahasiswa = [];
         let activeAsesmenIndex = -1;
         let globalReportDB = [];
-        let globalConfigData = []; // Wadah untuk menyimpan konfigurasi 16 pertemuan
+        let globalConfigData = [];
+        let globalRawBobotPayload = []; // TAMBAHAN: Untuk menyimpan data mentah utuh
 
         document.getElementById("dosenName").innerText = localStorage.getItem("user_login") || "Dosen Pengampu";
 
@@ -456,46 +458,46 @@
                 }
             } catch (e) { console.warn("Gagal menarik data MBKM"); }
 
-            // 1. MEMBUAT KERANGKA 16 PERTEMUAN (IDENTIK DENGAN INPUT_NILAI.HTML)
+            // 1. MEMBUAT KERANGKA 16 PERTEMUAN (AMBIL DARI DRAFT ASLI)
             try {
-                // Coba tarik dari Database n8n
-                const resReport = await fetch(`${API_GET_REPORT}?mk=${currentKodeMk}`);
-                const textData = await resReport.text();
-                const dbData = JSON.parse(textData);
+                // Tarik draft bobot asli agar tidak hilang saat di-save ulang
+                const resDraft = await fetch(`${API_GET_DRAFT}?mk=${currentKodeMk}`);
+                const txtDraft = await resDraft.text();
+                let arrDraft = JSON.parse(txtDraft);
+                arrDraft = (arrDraft.data || arrDraft).map(item => item.json ? item.json : item);
 
-                // Jika di DB sudah pernah disave dan tidak error
-                if (Array.isArray(dbData) && dbData.length > 0 && dbData[0].nim !== undefined) {
-                    globalReportDB = dbData;
+                for (let i = 1; i <= 16; i++) {
+                    let barisDb = arrDraft.find(d => parseInt(d.pertemuan) === i);
+                    if (barisDb) {
+                        // Simpan data mentah agar komponen_penilaian TIDAK TERHAPUS
+                        globalRawBobotPayload.push({
+                            pertemuan: i,
+                            bentuk_penilaian: barisDb.bentuk_penilaian || "",
+                            cpl: barisDb.kode_cpl || "-",
+                            cpmk: barisDb.kode_cpmk || "",
+                            komponen_penilaian: barisDb.komponen_penilaian || "",
+                            bobot: barisDb.bobot_persen || "0"
+                        });
 
-                    for (let i = 1; i <= 16; i++) {
-                        let barisTerkait = dbData.find(d => d.pertemuan == i);
-                        let draftLokal = JSON.parse(localStorage.getItem("draft_bobot_" + currentKodeMk) || "[]");
-                        let bentukDraft = draftLokal.find(d => d.pertemuan == i)?.bentuk || "";
+                        // Totalkan bobot untuk keperluan UI jika ada multi-CPMK
+                        let sumBobot = String(barisDb.bobot_persen || "0").split(",").reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
 
-                        if (barisTerkait) {
-                            configData.push({
-                                pertemuan: i,
-                                cpl: barisTerkait.kode_cpl || "-",
-                                cpmk: barisTerkait.kode_cpmk || "",
-                                bentuk: bentukDraft,
-                                bobot: parseFloat(barisTerkait.bobot_maks_pertemuan) || 0
-                            });
-                        } else {
-                            configData.push({ pertemuan: i, cpl: "-", cpmk: "NONE", bentuk: "", bobot: 0 });
-                        }
+                        configData.push({
+                            pertemuan: i,
+                            cpl: barisDb.kode_cpl || "-",
+                            cpmk: barisDb.kode_cpmk || "",
+                            bentuk: barisDb.bentuk_penilaian || "",
+                            bobot: sumBobot
+                        });
+                    } else {
+                        configData.push({ pertemuan: i, cpl: "-", cpmk: "NONE", bentuk: "", bobot: 0 });
                     }
-                } else {
-                    throw new Error("DB Kosong"); // Paksa turun ke Catch jika DB belum pernah diisi nilai
                 }
             } catch (e) {
-                // JIKA DB KOSONG/GAGAL, GUNAKAN MURNI DRAF DARI HALAMAN INPUT_NILAI (1. Konfigurasi Bobot)
+                // Fallback jika gagal (murni dari UI)
                 const savedDraft = localStorage.getItem("draft_bobot_" + currentKodeMk);
-                if (savedDraft) {
-                    configData = JSON.parse(savedDraft);
-                } else {
-                    // Jika belum pernah dikonfigurasi sama sekali
-                    for (let i = 1; i <= 16; i++) configData.push({ pertemuan: i, cpl: "-", cpmk: "", bentuk: "", bobot: 0 });
-                }
+                if (savedDraft) { configData = JSON.parse(savedDraft); }
+                else { for (let i = 1; i <= 16; i++) configData.push({ pertemuan: i, cpl: "-", cpmk: "", bentuk: "", bobot: 0 }); }
             }
 
             // 2. MENGUBAH 16 PERTEMUAN MENJADI TAB DI MENU KIRI (Hanya yang memiliki Bobot)
@@ -521,6 +523,19 @@
 
             globalConfigData = configData; // Menyimpan bobot pertemuan agar sistem tahu cara menghitung nilai akhir
 
+            // --- AMBIL NILAI DARI DATABASE (DISAMAKAN DENGAN INPUT_NILAI) ---
+            try {
+                const resReport = await fetch(`${API_GET_REPORT}?mk=${currentKodeMk}`);
+                const txtReport = await resReport.text();
+                let arrReport = JSON.parse(txtReport);
+                // Ekstra proteksi jika N8N membungkus array di dalam object "data"
+                let rawData = Array.isArray(arrReport) ? arrReport : (arrReport.data || []);
+                globalReportDB = rawData.map(i => i.json ? i.json : i);
+            } catch (e) {
+                console.warn("Gagal menarik data nilai dari database", e);
+            }
+            // ----------------------------------------------------------------
+
             // 3. TARIK DATA MAHASISWA DAN INJEKSI NILAI LAMA
             try {
                 const resMhs = await fetch(`${API_GET_STUDENTS}?id_kelas=${currentIdKelas}&mk=${currentKodeMk}`);
@@ -531,20 +546,40 @@
 
                 dataMahasiswa = mhsArray.map(m => {
                     let objNilai = {};
-                    const nimMhs = m.nim || m.NIM || m.nim_mhs;
+                    const nimMhs = String(m.nim || m.NIM || m.nim_mhs).trim();
 
-                    // A. Injeksi dari Database N8N
+                    // A. Injeksi dari Database N8N (SUDAH TAHAN BANTING UNTUK MULTI-CPMK)
                     if (globalReportDB.length > 0) {
-                        globalReportDB.filter(d => (d.nim || d.NIM) === nimMhs).forEach(rowDB => {
-                            if (rowDB.pertemuan && parseFloat(rowDB.nilai_asli) > 0) {
-                                objNilai[`P${rowDB.pertemuan}`] = parseFloat(rowDB.nilai_asli);
+                        configData.forEach(cfg => {
+                            // 1. Kumpulkan SEMUA baris database untuk pertemuan ini (bisa ada >1 jika multi komponen)
+                            let matches = globalReportDB.filter(db =>
+                                String(db.nim || db.NIM).trim() === nimMhs &&
+                                parseInt(db.pertemuan) === parseInt(cfg.pertemuan)
+                            );
+
+                            if (matches.length > 0) {
+                                // 2. Ambil nilai TERTINGGI dari semua komponen di pertemuan ini
+                                let nilaiTertinggi = Math.max(...matches.map(m =>
+                                    parseFloat(m.nilai_asli || m.nilai_mentah || m.nilai || 0)
+                                ));
+
+                                if (nilaiTertinggi > 0) {
+                                    objNilai[`P${parseInt(cfg.pertemuan)}`] = nilaiTertinggi;
+                                }
                             }
                         });
                     }
 
-                    // B. Injeksi dari Draft Lokal Browser (Jika ada ketikan yang belum disave)
+                    // B. Injeksi dari Draft Lokal Browser (DIPERBAIKI)
                     if (draftNilaiRaw[nimMhs]) {
-                        objNilai = { ...objNilai, ...draftNilaiRaw[nimMhs] };
+                        for (let pKey in draftNilaiRaw[nimMhs]) {
+                            let draftVal = parseFloat(draftNilaiRaw[nimMhs][pKey]) || 0;
+                            // 3. Hanya gunakan draft lokal JIKA nilainya lebih besar dari 0 
+                            // atau jika database benar-benar kosong, agar tidak menimpa data asli dengan angka 0
+                            if (draftVal > 0 || !objNilai[pKey]) {
+                                objNilai[pKey] = draftVal;
+                            }
+                        }
                     }
 
                     return {
@@ -564,8 +599,7 @@
 
                 // --- TAMBAHAN BARU: URUTKAN BERDASARKAN NIM ---
                 dataMahasiswa.sort((a, b) => {
-                    // localeCompare dengan opsi numeric memastikan angka diurutkan secara logis 
-                    // (misal: 10 akan diletakkan setelah 2, bukan setelah 1)
+                    // localeCompare dengan opsi numeric memastikan angka diurutkan secara logis
                     return String(a.nim).localeCompare(String(b.nim), undefined, { numeric: true, sensitivity: 'base' });
                 });
 
@@ -723,6 +757,7 @@
 
                     detailNilai.push({
                         pertemuan: cfg.pertemuan,
+                        bobot_index: 0,
                         cpmk: cfg.cpmk,
                         nilai: nilaiInput
                     });
@@ -758,9 +793,9 @@
                     nidn: userNidn,
                     kode_mk: currentKodeMk,
                     tanggal: new Date().toISOString(),
-                    status: 'final' // Langsung tersimpan sebagai final
+                    status: 'final'
                 },
-                data_bobot: globalConfigData,
+                data_bobot: globalRawBobotPayload.length > 0 ? globalRawBobotPayload : globalConfigData,
                 data_nilai: formattedStudentData
             };
 

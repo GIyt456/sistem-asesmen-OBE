@@ -470,7 +470,7 @@
         const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
         const API_GET_TUGAS = `${API_BASE}/get-rubrik-by-matkul`;
         const API_GET_RUMPUN = `${API_BASE}/get-rumpun-bk`;
-        const API_GET_BOBOT = `${API_BASE}/get-master-bobot-dinamis`;
+        const API_GET_BOBOT = `${API_BASE}/get-master-bobot`;
 
         let globalCplMap = new Map();
         let globalCpmkMap = new Map();
@@ -664,42 +664,97 @@
         }
 
         // ==========================================
-        // MATRIKS PENILAIAN NESTED TABLE
+        // MATRIKS PENILAIAN NESTED TABLE (DINAMIS SESUAI KAPRODI)
         // ==========================================
         async function loadBobotPenilaian(kodeMK) {
             try {
-                const res = await fetch(`${API_GET_BOBOT}?kode_mk=${kodeMK}`);
+                // 1. Deteksi otomatis Prodi dari UI yang sudah dirender (TI atau SI)
+                let prodiMatkul = 'ti';
+                if (document.getElementById('printProdiTitle').innerText.includes('SISTEM INFORMASI')) {
+                    prodiMatkul = 'si';
+                }
+
+                // 2. Tarik Master Bobot berdasarkan Prodi persis seperti RPS Dosen
+                const res = await fetch(`${API_GET_BOBOT}?prodi=${prodiMatkul}`);
                 if (res.ok) {
                     const jsonBobot = await res.json();
-                    const data = safeExtractN8N(jsonBobot);
-                    const validData = data.filter(b => b.kode_cpmk && globalCpmkMap.has(b.kode_cpmk));
+                    let allData = safeExtractN8N(jsonBobot);
 
+                    // Filter murni untuk kode MK ini
+                    const dataMk = allData.filter(d => d.kode_mk === kodeMK);
                     const tabelDinamis = document.getElementById('tabelPenilaianDinamis');
 
-                    if (validData.length > 0) {
-                        let sumTgs = 0, sumUts = 0, sumUas = 0, sumAtt = 0, sumKhd = 0, grandTotal = 0;
-                        let barisDataHtml = '';
-
-                        validData.forEach(b => {
-                            const tgs = Number(b.tugas) || 0; const uts = Number(b.uts) || 0; const uas = Number(b.uas) || 0;
-                            const att = Number(b.attitude) || 0; const khd = Number(b.kehadiran) || 0;
-                            const total = tgs + uts + uas + att + khd;
-
-                            sumTgs += tgs; sumUts += uts; sumUas += uas; sumAtt += att; sumKhd += khd; grandTotal += total;
-
-                            barisDataHtml += `
-                                <tr class="text-center">
-                                    <td class="font-bold" style="border-left: none;">${b.kode_cpmk}</td>
-                                    <td>${tgs === 0 ? '' : tgs + '%'}</td>
-                                    <td>${uts === 0 ? '' : uts + '%'}</td>
-                                    <td>${uas === 0 ? '' : uas + '%'}</td>
-                                    <td>${att === 0 ? '' : att + '%'}</td>
-                                    <td>${khd === 0 ? '' : khd + '%'}</td>
-                                    <td class="font-bold" style="font-size:11pt; border-right: none;">${total}%</td>
-                                </tr>
-                            `;
+                    if (dataMk.length > 0) {
+                        // 3. Ambil daftar komponen unik dari Kaprodi secara dinamis
+                        let setKomp = new Set();
+                        let listKomp = [];
+                        dataMk.forEach(r => {
+                            if (r.nama_komponen && !setKomp.has(r.nama_komponen)) {
+                                setKomp.add(r.nama_komponen);
+                                listKomp.push(r.nama_komponen);
+                            }
                         });
 
+                        // 4. Siapkan Header Tabel (Bagi rata persentase lebar kertas)
+                        let wKomp = 65 / (listKomp.length || 1);
+                        let headerKolomHtml = '';
+                        listKomp.forEach(k => {
+                            headerKolomHtml += `<td style="width: ${wKomp}%;">${k.toUpperCase()}</td>`;
+                        });
+
+                        // 5. Grouping Data berdasarkan CPMK yang Valid
+                        let grouped = {};
+                        let urutanCpmk = [];
+                        dataMk.forEach(r => {
+                            let kodeCpmk = r.cpmk || r.kode_cpmk; // Proteksi perbedaan kolom
+                            // Cek jika CPMK-nya benar-benar ada di relasi CPL
+                            if (kodeCpmk && globalCpmkMap.has(kodeCpmk)) {
+                                if (!grouped[kodeCpmk]) {
+                                    grouped[kodeCpmk] = { cpmk: kodeCpmk, bobot: {} };
+                                    urutanCpmk.push(kodeCpmk);
+                                }
+                                grouped[kodeCpmk].bobot[r.nama_komponen] = parseFloat(r.bobot) || 0;
+                            }
+                        });
+
+                        // 6. Cetak Body Tabel (Menghitung Total ke Samping dan ke Bawah)
+                        let grandTotal = 0;
+                        let sumKomp = {};
+                        listKomp.forEach(k => sumKomp[k] = 0); // Inisialisasi sum = 0
+
+                        let barisDataHtml = '';
+
+                        urutanCpmk.forEach(cKey => {
+                            let b = grouped[cKey];
+                            let tb = 0;
+                            let rowHtml = `
+                                <tr class="text-center">
+                                    <td class="font-bold" style="border-left: none;">${b.cpmk}</td>
+                            `;
+
+                            listKomp.forEach(k => {
+                                let nil = b.bobot[k] || 0;
+                                tb += nil;
+                                sumKomp[k] += nil;
+                                rowHtml += `<td>${nil === 0 ? '' : nil + '%'}</td>`;
+                            });
+
+                            grandTotal += tb;
+                            rowHtml += `<td class="font-bold" style="font-size:11pt; border-right: none;">${tb}%</td></tr>`;
+                            barisDataHtml += rowHtml;
+                        });
+
+                        // 7. Cetak Baris Total Paling Bawah
+                        let barisTotalHtml = `
+                            <tr class="text-center font-bold bg-light">
+                                <td style="text-align:left; border-bottom: none; border-left: none;">Total per penilaian</td>
+                        `;
+                        listKomp.forEach(k => {
+                            barisTotalHtml += `<td style="border-bottom: none;">${sumKomp[k]}%</td>`;
+                        });
+                        barisTotalHtml += `<td style="font-size:12pt; background-color: white !important; border-bottom: none; border-right: none;">${grandTotal}%</td></tr>`;
+
+                        // 8. Rangkai Semua Komponen HTML dan Injeksi ke Dokumen Cetak
                         tabelDinamis.innerHTML = `
                             <tr>
                                 <td class="font-bold bg-light" style="vertical-align:top; width: 15%;">Penilaian</td>
@@ -707,36 +762,25 @@
                                     <table style="width: 100%; border-collapse: collapse; margin: 0; border-style: hidden;">
                                         <tr class="text-center font-bold bg-light">
                                             <td rowspan="2" style="vertical-align:middle; width: 20%; border-top: none; border-left: none;">Id CPMK</td>
-                                            <td colspan="5" style="border-top: none;">Bobot per Bentuk Penilaian</td>
+                                            <td colspan="${listKomp.length}" style="border-top: none;">Bobot per Bentuk Penilaian</td>
                                             <td rowspan="2" style="vertical-align:middle; width: 15%; border-top: none; border-right: none;">TOTAL<br>BOBOT PER CPMK</td>
                                         </tr>
                                         <tr class="text-center font-bold bg-light">
-                                            <td style="width: 13%;">TUGAS</td>
-                                            <td style="width: 13%;">UTS</td>
-                                            <td style="width: 13%;">UAS</td>
-                                            <td style="width: 13%;">ATTITUDE</td>
-                                            <td style="width: 13%;">KEHADIRAN</td>
+                                            ${headerKolomHtml}
                                         </tr>
                                         ${barisDataHtml}
-                                        <tr class="text-center font-bold bg-light">
-                                            <td style="text-align:left; border-bottom: none; border-left: none;">Total per penilaian</td>
-                                            <td style="border-bottom: none;">${sumTgs}%</td>
-                                            <td style="border-bottom: none;">${sumUts}%</td>
-                                            <td style="border-bottom: none;">${sumUas}%</td>
-                                            <td style="border-bottom: none;">${sumAtt}%</td>
-                                            <td style="border-bottom: none;">${sumKhd}%</td>
-                                            <td style="font-size:12pt; background-color: white !important; border-bottom: none; border-right: none;">${grandTotal}%</td>
-                                        </tr>
+                                        ${barisTotalHtml}
                                     </table>
                                 </td>
                             </tr>
                         `;
                     } else {
-                        document.getElementById('tabelPenilaianDinamis').innerHTML = `<tr><td class="font-bold bg-light" style="vertical-align:top; width: 15%;">Penilaian</td><td colspan="5" class="text-center" style="color:red; padding:15px;">Data bobot belum diatur.</td></tr>`;
+                        document.getElementById('tabelPenilaianDinamis').innerHTML = `<tr><td class="font-bold bg-light" style="vertical-align:top; width: 15%;">Penilaian</td><td colspan="5" class="text-center" style="color:red; padding:15px;">Data bobot belum diatur oleh Kaprodi di database.</td></tr>`;
                     }
                 }
             } catch (e) {
-                document.getElementById('tabelPenilaianDinamis').innerHTML = `<tr><td class="font-bold bg-light" style="vertical-align:top; width: 15%;">Penilaian</td><td colspan="5" class="text-center" style="padding:15px;">Gagal memuat bobot.</td></tr>`;
+                console.error(e);
+                document.getElementById('tabelPenilaianDinamis').innerHTML = `<tr><td class="font-bold bg-light" style="vertical-align:top; width: 15%;">Penilaian</td><td colspan="5" class="text-center" style="color:red; padding:15px;">Gagal memuat bobot dari webhook.</td></tr>`;
             }
         }
 
