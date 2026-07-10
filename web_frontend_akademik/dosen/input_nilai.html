@@ -3,19 +3,26 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sistem Input Nilai Dosen - OBE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="/js/api_config.js"></script>
 
     <style>
+        /* MANTRA ANTI-BOCOR & KUNCI FONT */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        body, input, select, button, textarea { font-family: 'Inter', sans-serif !important; }
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; }
+
         :root {
             --primary-navy: #0f172a;
             --primary-blue: #1e3a8a;
@@ -26,379 +33,220 @@
             --text-gray: #6b7280;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: #f8fafc;
-            color: var(--text-dark);
-        }
+        body { background-color: #f8fafc; color: var(--text-dark); }
 
         /* =========================================
-           2. NAVBAR (SOLID BACKGROUND)
+           2. NAVBAR FIXED
         ========================================= */
         .navbar {
-            position: sticky;
-            top: 0;
-            width: 100%;
-            background-color: var(--primary-navy);
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: fixed; top: 0; left: 0; width: 100%;
+            background-color: var(--primary-navy); padding: 15px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 999; color: white; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            font-weight: 500;
-            font-size: 0.95rem;
-            align-items: center;
-        }
+        body { padding-top: 70px; } 
 
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            transition: 0.3s;
-            padding-bottom: 4px;
-            opacity: 0.8;
-        }
+        .nav-links { display: flex; gap: 30px; font-weight: 500; font-size: 0.95rem; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; transition: 0.3s; padding-bottom: 4px; opacity: 0.8; }
+        .nav-links a:hover, .nav-links a.active { opacity: 1; font-weight: 800; border-bottom: 2px solid #ffc561; }
 
-        .nav-links a:hover {
-            opacity: 1;
-        }
+        .nav-user { display: flex; align-items: center; gap: 16px; font-weight: 600; }
+        .user-chip { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; color: #ffffff; }
+        .btn-logout { background: var(--primary-red); color: white; padding: 8px 24px; border-radius: 50px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s;}
+        .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
 
-        .nav-links a.active {
-            opacity: 1;
-            font-weight: 800;
-            border-bottom: 2px solid #ffc561;
-        }
-
-        .nav-user {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-weight: 600;
-        }
-
-        .user-chip {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 16px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #ffffff;
-        }
-
-        .btn-logout {
-            background: var(--primary-red);
-            color: white;
-            padding: 8px 24px;
-            border-radius: 50px;
-            border: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-logout:hover {
-            background: #b91c1c;
-            transform: translateY(-2px);
-        }
+        .nav-menu-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 40px; flex: 1; }
 
         /* =========================================
            3. MAIN CONTENT & CARDS
         ========================================= */
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        .figma-card {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 30px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-        }
-
-        .card-title {
-            font-size: 1.4rem;
-            font-weight: 800;
-            margin-bottom: 6px;
-            color: var(--text-dark);
-        }
-
-        .card-subtitle {
-            color: var(--text-gray);
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-        }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .figma-card { background: #ffffff; border-radius: 16px; padding: 32px; margin-bottom: 30px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02); }
+        .card-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; color: var(--text-dark); }
+        .card-subtitle { color: var(--text-gray); font-size: 0.95rem; margin-bottom: 20px; }
 
         /* =========================================
            4. TABEL & INPUT
         ========================================= */
-        #configTable {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 15px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #e5e7eb;
-            background: white;
-        }
+        #configTable { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; background: white; }
+        #configTable th { background: #002878; color: white; padding: 16px 12px; text-align: center; border-right: 1px solid rgba(255, 255, 255, 0.15); font-size: 0.85rem; font-weight: 600; }
+        #configTable td { padding: 12px 8px; border-bottom: 1px solid #e5e7eb; border-right: 1px solid #e5e7eb; text-align: center; vertical-align: middle; font-size: 0.9rem; }
+        
+        input[type="number"] { width: 65px; padding: 8px; text-align: center; border: 1px solid #cbd5e1; border-radius: 50px; font-weight: 700; color: #111827; transition: 0.2s; }
+        input[type="number"]:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
 
-        #configTable th {
-            background: #002878;
-            color: white;
-            padding: 16px 12px;
-            text-align: center;
-            border-right: 1px solid rgba(255, 255, 255, 0.15);
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
+        .btn-action { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;}
+        .btn-action:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+        .btn-action:disabled { opacity: 0.8; cursor: not-allowed; }
 
-        #configTable td {
-            padding: 12px 8px;
-            border-bottom: 1px solid #e5e7eb;
-            border-right: 1px solid #e5e7eb;
-            text-align: center;
-            vertical-align: middle;
-            font-size: 0.9rem;
-        }
+        .grand-total { font-size: 1.1rem; font-weight: 900; }
+        .status-ok { color: #16a34a; }
+        .status-err { color: #dc2626; }
 
-        input[type="number"] {
-            width: 65px;
-            padding: 8px;
-            text-align: center;
-            border: 1px solid #cbd5e1;
-            border-radius: 50px;
-            font-weight: 700;
-            color: #111827;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.2s;
-        }
+        .select-mk { width: 320px; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; color: #334155; outline: none; background-color: white; cursor: pointer; }
+        .select-mk:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
 
-        input[type="number"]:focus {
-            border-color: #3b82f6;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .btn-action {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: 0.2s;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-action:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .btn-action:disabled {
-            opacity: 0.8;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .grand-total {
-            font-size: 1.1rem;
-            font-weight: 900;
-        }
-
-        .status-ok {
-            color: #16a34a;
-        }
-
-        .status-err {
-            color: #dc2626;
-        }
-
-        .select-mk {
-            width: 320px;
-            padding: 10px 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-family: 'Inter', sans-serif;
-            color: #334155;
-            outline: none;
-            background-color: white;
-            cursor: pointer;
-        }
-
-        .select-mk:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .empty-upload-box {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 80px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            margin-bottom: 24px;
-            margin-top: 20px;
-            border: 2px dashed #cbd5e1;
-        }
-
-        .empty-upload-box h1 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #cbd5e1;
-            margin-bottom: 10px;
-        }
-
-        .empty-upload-box p {
-            font-size: 1rem;
-            color: #64748b;
-            max-width: 500px;
-            line-height: 1.5;
-        }
+        .empty-upload-box { background: #f8fafc; border-radius: 16px; padding: 80px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; margin-bottom: 24px; margin-top: 20px; border: 2px dashed #cbd5e1; }
+        .empty-upload-box h1 { font-size: 2.5rem; font-weight: 900; color: #cbd5e1; margin-bottom: 10px; }
+        .empty-upload-box p { font-size: 1rem; color: #64748b; max-width: 500px; line-height: 1.5; }
 
         /* GAYA DASHBOARD KUOTA */
-        .quota-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .quota-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .quota-box.valid {
-            background: #f0fdf4;
-            border-color: #86efac;
-        }
-
-        .quota-box.invalid {
-            background: #fef2f2;
-            border-color: #fca5a5;
-        }
-
-        .quota-lbl {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #64748b;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .quota-val {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: #0f172a;
-        }
-
-        .quota-box.valid .quota-val {
-            color: #16a34a;
-        }
-
-        .quota-box.invalid .quota-val {
-            color: #dc2626;
-        }
+        .quota-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 15px; text-align: center; transition: 0.3s; }
+        .quota-lbl { font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 5px; }
 
         /* =========================================
            5. FOOTER
         ========================================= */
-        .footer {
-            background: var(--primary-navy);
-            color: #9ca3af;
-            padding: 60px 60px 30px 60px;
-            margin-top: 50px;
-        }
+        .footer { background: var(--primary-navy); color: #9ca3af; padding: 60px 60px 30px 60px; margin-top: 50px; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .footer h4 { color: white; font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links a { color: #9ca3af; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .footer-links a:hover { color: white; }
 
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-            padding-bottom: 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        .hamburger-btn, .close-menu-btn, .mobile-overlay, .sidebar-header-mobile { display: none; }
 
-        .footer h4 {
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-
-        .footer-links a {
-            color: #9ca3af;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: white;
-        }
+        /* Penolong CSS Mobile Pagination */
+        .mobile-pagination { display: none; }
 
         /* =========================================
-           6. RESPONSIVE NAVBAR (SIDEBAR BIRU DI HP)
+           📱 ERGONOMIC MOBILE VIEW
         ========================================= */
-        .hamburger-btn,
-        .close-menu-btn,
-        .mobile-overlay,
-        .sidebar-header-mobile {
-            display: none;
-        }
+        @media screen and (max-width: 768px) {
+            .container { padding: 15px !important; margin: 10px 0 !important; }
+            .figma-card { padding: 20px 15px !important; width: 100% !important; box-sizing: border-box !important;}
+            .card-title { font-size: 1.2rem !important; }
+            
+            /* -- NAVIGASI HP -- */
+            .navbar { padding: 15px 20px; justify-content: flex-start !important; gap: 15px; }
+            .nav-links { display: none !important; }
+            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+            
+            .nav-menu-wrapper { position: fixed; top: 0; left: -320px; width: 280px; height: 100vh; background: #0f172a; flex-direction: column; align-items: flex-start; padding: 0; box-shadow: 10px 0 25px rgba(0,0,0,0.5); transition: left 0.3s ease; z-index: 1000; overflow-y: auto; display: flex !important; }
+            .nav-menu-wrapper.active { left: 0; }
+            .sidebar-header-mobile { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .sidebar-brand { font-size: 1.3rem; font-weight: 900; color: white; margin: 0;}
+            .sidebar-brand span { color: #ffc561; }
+            .close-menu-btn { display: block; background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; }
+            
+            /* PERBAIKAN MENU LINKS AGAR MUNCUL SAAT SIDEBAR AKTIF */
+            .nav-menu-wrapper.active .nav-links { flex-direction: column; gap: 10px; width: 100%; padding: 20px; display: flex !important; align-items: flex-start; }
+            .nav-menu-wrapper.active .nav-links a { display: block; width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.05); border-radius: 8px; border: none; margin-bottom: 5px; }
+            .nav-menu-wrapper.active .nav-links a.active { background: rgba(255, 255, 255, 0.1); border-left: 4px solid #ffc561; border-radius: 0 8px 8px 0; }
+            
+            .nav-user { padding: 20px; width: 100%; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); flex-direction: column; justify-content: center; gap: 12px; }
+            .user-chip { width: 100%; justify-content: flex-start; }
+            .btn-logout { width: 100%; }
 
-        /* PENGATURAN DESKTOP AGAR TIDAK MEPET */
-        .nav-menu-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            /* Mendorong menu ke kanan */
-            gap: 40px;
-            /* Memberi jarak lega antara menu dan tombol profil */
-            flex: 1;
+            .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
+            .mobile-overlay.active { display: block; }
+
+            /* --- HEADER UTAMA --- */
+            .container > div:first-child { flex-direction: column !important; align-items: flex-start !important; gap: 15px; }
+            .container > div:first-child h1 { font-size: 1.8rem !important; }
+            .container > div:first-child button { width: 100%; justify-content: center; }
+
+            /* --- MASTER BOBOT KAPRODI --- */
+            #card-master-bobot > div:first-child { flex-direction: column !important; align-items: flex-start !important; gap: 10px; }
+            #masterBobotTable, #masterBobotTable thead, #masterBobotTable tbody, #masterBobotTable th, #masterBobotTable td, #masterBobotTable tr, #masterBobotTable tfoot { display: block !important; width: 100% !important; }
+            #masterBobotTable thead { display: none !important; }
+            #masterBobotTable tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;}
+            #masterBobotTable td { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 12px 15px !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+            #masterBobotTable td:last-child { border-bottom: none !important; }
+            
+            #masterBobotTable td::before { font-weight: 800; color: #475569; font-size: 0.8rem; flex-basis: 40%; text-align: left;}
+            #masterBobotTable tbody td:nth-child(1) { background: #1e293b !important; color: white !important; font-weight: 900 !important;}
+            #masterBobotTable tbody td:nth-child(2) { font-weight: 800; color: var(--primary-blue); }
+            #masterBobotTable tbody td:nth-child(3)::before { content: "ATTITUDE"; }
+            #masterBobotTable tbody td:nth-child(4)::before { content: "KEHADIRAN"; }
+            #masterBobotTable tbody td:nth-child(5)::before { content: "TUGAS"; }
+            #masterBobotTable tbody td:nth-child(6)::before { content: "UTS"; }
+            #masterBobotTable tbody td:nth-child(7)::before { content: "UAS"; }
+            #masterBobotTable tbody td:nth-child(8) { background: #e0f2fe !important; font-weight: 900 !important; color: #0369a1 !important;}
+            #masterBobotTable tbody td:nth-child(8)::before { content: "TOTAL BOBOT"; }
+
+            /* --- PILIH MATA KULIAH --- */
+            .mk-grid-responsive { grid-template-columns: 1fr !important; padding: 15px !important; }
+            .select-mk { width: 100% !important; }
+
+            /* --- TABEL KONFIGURASI BOBOT (PAGINATION SULAP) --- */
+            #configTable, #configTable thead, #configTable tbody, #configTable th, #configTable td, #configTable tr, #configTable tfoot { display: block !important; width: 100% !important; }
+            #configTable thead { display: none !important; }
+            
+            /* Sembunyikan semua baris konfigurasi, HANYA tampilkan yang aktif (untuk efek pagination) */
+            #configTable tbody tr.config-row { display: none !important; }
+            #configTable tbody tr.config-row.active { 
+                display: block !important; background: white !important; 
+                border: 1px solid #cbd5e1 !important; border-radius: 12px !important; 
+                margin-bottom: 20px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; 
+            }
+            
+            #configTable td { display: flex !important; flex-direction: column !important; align-items: stretch !important; padding: 15px !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; text-align: left !important;}
+            #configTable td:last-child { border-bottom: none !important; }
+            
+            #configTable td::before { font-weight: 800; color: #64748b; font-size: 0.85rem; margin-bottom: 8px;}
+            #configTable tbody td:nth-child(1) { background: #1e293b !important; color: white !important; font-weight: 900 !important; font-size: 1.2rem !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important;}
+            #configTable tbody td:nth-child(1)::before { content: "PERTEMUAN"; display: inline-block; margin-bottom: 0; color: #94a3b8; font-size: 0.8rem;}
+            #configTable tbody td:nth-child(2)::before { content: "BENTUK PEMBELAJARAN"; }
+            #configTable tbody td:nth-child(3)::before { content: "CPL"; display: none;} 
+            #configTable tbody td:nth-child(4)::before { content: "CPMK"; display: none;}
+            #configTable tbody td:nth-child(5)::before { content: "KOMPONEN PENILAIAN"; display: none;}
+            #configTable tbody td:nth-child(6)::before { content: "BOBOT (%)"; display: none;}
+
+            #configTable input[type="number"], #configTable select { width: 100% !important; max-width: 100% !important; text-align: left !important; padding: 12px !important;}
+            
+            /* Tfoot Total Bobot di HP */
+            #configTable tfoot tr { background: #e0f2fe !important; border: 1px solid #bae6fd !important; border-radius: 12px !important; }
+            #configTable tfoot td { flex-direction: row !important; justify-content: space-between !important; align-items: center !important; border: none !important;}
+            #configTable tfoot td:nth-child(1) { display: none !important; } 
+            #configTable tfoot td:nth-child(2)::before { content: "TOTAL KESELURUHAN:"; margin: 0; font-size: 0.9rem;}
+
+            /* Munculkan Tombol Pagination HP */
+            .mobile-pagination { display: flex !important; justify-content: space-between !important; align-items: center !important; margin: 15px 0 25px 0 !important; width: 100% !important; gap: 10px;}
+            .mobile-pagination button { flex: 1 !important; padding: 12px !important; font-size: 0.95rem !important; justify-content: center !important;}
+
+            /* --- UPLOAD & SIMPAN --- */
+            #card-upload > div:first-child { flex-direction: column !important; align-items: flex-start !important; gap: 20px; }
+            #card-upload > div:first-child > div { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+            #card-upload .btn-action, #labelUpload { width: 100% !important; justify-content: center !important; margin: 0 !important; }
+            
+            #area-simpan { flex-direction: column !important; gap: 15px; align-items: stretch !important;}
+            #area-simpan > div { display: flex; flex-direction: column; gap: 10px; width: 100%;}
+            #area-simpan button { width: 100%; justify-content: center; }
+
+            /* =========================================
+               🚀 PREVIEW EXCEL (KEMBALI KE HORIZONTAL SCROLL)
+            ========================================= */
+            #previewArea table { display: table !important; width: 100% !important; white-space: nowrap !important;}
+            #previewArea thead { display: table-header-group !important; }
+            #previewArea tbody { display: table-row-group !important; }
+            
+            #previewArea tr { display: table-row !important; background: transparent !important; border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+            
+            #previewArea th, #previewArea td { display: table-cell !important; border: none !important; border-bottom: 1px solid #e5e7eb !important; border-right: 1px solid #e5e7eb !important; text-align: center !important; vertical-align: middle !important; padding: 12px 8px !important; flex-direction: row !important;}
+            
+            #previewArea td::before { display: none !important; }
+            
+            /* Sticky Header & Kolom */
+            #studentHead th { position: sticky !important; top: 0 !important; background: #f8fafc !important; z-index: 10 !important; }
+            
+            #studentHead th:first-child, #studentBody td:first-child { position: static !important; box-shadow: none !important; }
+            
+            #studentHead th:nth-child(2), #studentBody td:nth-child(2) { 
+                position: sticky !important; left: 0 !important; background: white !important; z-index: 11 !important; 
+                min-width: 120px !important; max-width: 120px !important; overflow: hidden !important; 
+                text-overflow: ellipsis !important; white-space: nowrap !important;
+                border-right: 2px solid #cbd5e1 !important; text-align: left !important;
+            }
+            #studentHead th:nth-child(2) { background: #f8fafc !important; z-index: 12 !important; }
+
+            /* --- FOOTER --- */
+            .footer { padding: 40px 20px 20px 20px !important; }
+            .footer-grid { grid-template-columns: 1fr !important; gap: 30px !important; }
         }
     </style>
-    <link rel="stylesheet" href="css_dosen/index_mobile.css?v=99">
 </head>
 
 <body>
@@ -425,7 +273,6 @@
                 <a href="input_nilai.html" class="active">Input Asesmen</a>
                 <a href="rps_dosen.html">Penyusunan RPS</a>
                 <a href="../dosen/laporan.html">Output nilai</a>
-                <!-- <a href="portofolio.html">Portofolio</a> -->
             </div>
 
             <div class="nav-user" id="navRightContainer">
@@ -455,10 +302,6 @@
                 <p style="color: var(--text-gray); font-size: 1rem;">Lakukan konfigurasi bobot dan unggah nilai asesmen
                     mahasiswa di sini.</p>
             </div>
-            <button class="btn-action" style="background: #e0f2fe; color: #0369a1; padding: 10px 20px;"
-                onclick="window.location.href='../kaprodi/laporan.html'">
-                <i class="fas fa-chart-line"></i> Dashboard Laporan
-            </button>
         </div>
 
         <div id="card-master-bobot"
@@ -480,40 +323,21 @@
                 <table style="width: 100%; border-collapse: collapse; text-align: center;" id="masterBobotTable">
                     <thead style="background: #f8fafc; color: var(--text-dark); border-bottom: 2px solid #e5e7eb;">
                         <tr>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                CPL</th>
-                            <!-- Kolom Mata Kuliah Dihapus karena mubazir -->
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                CPMK</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                ATTITUDE</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                KEHADIRAN</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                TUGAS</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                UTS</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                UAS</th>
-                            <th
-                                style="padding: 15px; font-size: 0.85rem; font-weight: 800; background: #e0f2fe; color: #0369a1;">
-                                TOTAL</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">CPL</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">CPMK</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">ATTITUDE</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">KEHADIRAN</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">TUGAS</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">UTS</th>
+                            <th style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">UAS</th>
+                            <th style="padding: 15px; font-size: 0.85rem; font-weight: 800; background: #e0f2fe; color: #0369a1;">TOTAL</th>
                         </tr>
                     </thead>
                     <tbody id="bodyMasterBobot" style="font-size: 0.95rem;">
                     </tbody>
                     <tfoot>
                         <tr style="background: #f1f5f9; font-weight: 800; border-top: 2px solid #e5e7eb;">
-                            <td colspan="7"
-                                style="text-align: right; padding: 15px; border-right: 1px solid #e5e7eb; color: #334155;">
-                                TOTAL KESELURUHAN:</td>
+                            <td colspan="7" style="text-align: right; padding: 15px; border-right: 1px solid #e5e7eb; color: #334155;">TOTAL KESELURUHAN:</td>
                             <td id="grandTotalMaster" style="padding: 15px; font-size: 1.1rem;">0%</td>
                         </tr>
                     </tfoot>
@@ -521,24 +345,19 @@
             </div>
         </div>
 
-        <div id="warningMK"
-            style="display: none; background: #fee2e2; border-left: 5px solid #ef4444; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
-            <h4 style="margin: 0 0 5px 0; color: #991b1b;"><i class="fas fa-lock"></i> Akses Ditutup: Mata Kuliah Sudah
-                Dihitung!</h4>
-            <p style="margin: 0; color: #7f1d1d; font-size: 0.95rem;">Nilai untuk mata kuliah ini sudah direkam di dalam
-                sistem. Anda tidak bisa mengunggah nilai baru untuk mencegah duplikasi data.</p>
+        <div id="warningMK" style="display: none; background: #fee2e2; border-left: 5px solid #ef4444; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+            <h4 style="margin: 0 0 5px 0; color: #991b1b;"><i class="fas fa-lock"></i> Akses Ditutup: Mata Kuliah Sudah Dihitung!</h4>
+            <p style="margin: 0; color: #7f1d1d; font-size: 0.95rem;">Nilai untuk mata kuliah ini sudah direkam di dalam sistem. Anda tidak bisa mengunggah nilai baru untuk mencegah duplikasi data.</p>
         </div>
 
         <div class="figma-card" id="card-bobot">
             <h3 class="card-title">1. Konfigurasi Bobot Penilaian</h3>
             <p class="card-subtitle" style="margin-bottom: 20px;">Pilih Mata Kuliah untuk memulai.</p>
 
-            <div class="mk-grid-responsive"
-                style="display: grid; gap: 20px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0;">
+            <div class="mk-grid-responsive" style="display: grid; gap: 20px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0;">
 
                 <div>
-                    <label
-                        style="font-weight: 700; font-size: 0.85rem; color: #1e3a8a; display: block; margin-bottom: 8px;">
+                    <label style="font-weight: 700; font-size: 0.85rem; color: #1e3a8a; display: block; margin-bottom: 8px;">
                         <i class="fas fa-laptop-code" style="color: #0284c7;"></i> Teknik Informatika (TI)
                     </label>
                     <select id="pilihMK_TI" class="select-mk" style="width: 100%;">
@@ -547,8 +366,7 @@
                 </div>
 
                 <div>
-                    <label
-                        style="font-weight: 700; font-size: 0.85rem; color: #16a34a; display: block; margin-bottom: 8px;">
+                    <label style="font-weight: 700; font-size: 0.85rem; color: #16a34a; display: block; margin-bottom: 8px;">
                         <i class="fas fa-network-wired" style="color: #16a34a;"></i> Sistem Informasi (SI)
                     </label>
                     <select id="pilihMK_SI" class="select-mk" style="width: 100%;">
@@ -559,19 +377,21 @@
                 <input type="hidden" id="pilihMK" value="">
             </div>
 
-            <div id="card-quota"
-                style="display: none; margin-bottom: 20px; padding: 12px 15px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-                <div
-                    style="font-weight: 800; font-size: 0.8rem; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+            <div id="card-quota" style="display: none; margin-bottom: 20px; padding: 12px 15px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <div style="font-weight: 800; font-size: 0.8rem; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
                     <i class="fas fa-chart-bar" style="color: #0284c7;"></i> Visualisasi Target Kaprodi
                 </div>
 
-                <div id="sparklineContainer" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 10px;">
-                </div>
+                <div id="sparklineContainer" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 10px;"></div>
 
-                <div id="statusTextContainer"
-                    style="font-size: 0.8rem; font-weight: 700; padding-top: 8px; border-top: 1px dashed #e2e8f0;">
-                </div>
+                <div id="statusTextContainer" style="font-size: 0.8rem; font-weight: 700; padding-top: 8px; border-top: 1px dashed #e2e8f0;"></div>
+            </div>
+
+            <!-- TOMBOL PAGINATION MOBILE (MUNCUL DI ATAS TABEL) -->
+            <div class="mobile-pagination" id="mobilePaginationTop">
+                <button class="btn-action" style="background: #f1f5f9; color: #475569;" onclick="gantiHalamanMobile(-1)" id="btnPrevMobileTop"><i class="fas fa-chevron-left"></i> Sesi Seb.</button>
+                <div style="font-weight: 800; color: var(--primary-blue); font-size: 1rem;" id="pageInfoMobileTop">P1</div>
+                <button class="btn-action" style="background: #f1f5f9; color: #475569;" onclick="gantiHalamanMobile(1)" id="btnNextMobileTop">Sesi Sel. <i class="fas fa-chevron-right"></i></button>
             </div>
 
             <table id="configTable">
@@ -581,29 +401,32 @@
                         <th style="width: 20%;">Bentuk Pembelajaran</th>
                         <th style="width: 10%;">CPL</th>
                         <th style="width: 25%;">CPMK</th>
-                        <th style="width: 20%;">Komponen Penilaian <br><small
-                                style="font-weight:400; color:#cbd5e1;">(Dari Kaprodi)</small></th>
+                        <th style="width: 20%;">Komponen Penilaian</th>
                         <th style="width: 15%;">Bobot (%)</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
                     <tr>
-                        <td colspan="6" style="padding:30px; color:#94a3b8; font-style:italic; text-align: center;">
-                            Belum ada data. Silakan klik Mata Kuliah di atas.</td>
+                        <td colspan="6" style="padding:30px; color:#94a3b8; font-style:italic; text-align: center;">Belum ada data. Silakan klik Mata Kuliah di atas.</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr style="background:#e0f2fe; color: #0369a1;">
-                        <td colspan="5" style="text-align:right; font-weight:800; padding-right:15px;">Total Bobot
-                            Keseluruhan:</td>
+                        <td colspan="5" style="text-align:right; font-weight:800; padding-right:15px;">Total Bobot Keseluruhan:</td>
                         <td id="grandTotal" class="grand-total status-err">0%</td>
                     </tr>
                 </tfoot>
             </table>
 
-            <div style="display: flex; justify-content: flex-end; margin-top: 20px; padding: 0 10px;">
-                <button onclick="simpanDraftBobotManual()" class="btn-action"
-                    style="background: #0f172a; color: white;">
+            <!-- TOMBOL PAGINATION MOBILE (MUNCUL DI BAWAH TABEL) -->
+            <div class="mobile-pagination" id="mobilePaginationBot">
+                <button class="btn-action" style="background: #f1f5f9; color: #475569;" onclick="gantiHalamanMobile(-1)" id="btnPrevMobileBot"><i class="fas fa-chevron-left"></i> Sesi Seb.</button>
+                <div style="font-weight: 800; color: var(--primary-blue); font-size: 1rem;" id="pageInfoMobileBot">P1</div>
+                <button class="btn-action" style="background: #f1f5f9; color: #475569;" onclick="gantiHalamanMobile(1)" id="btnNextMobileBot">Sesi Sel. <i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                <button onclick="simpanDraftBobotManual()" class="btn-action" style="background: #0f172a; color: white; width: 100%; justify-content: center; padding: 15px; font-size: 1.05rem;">
                     <i class="fas fa-save"></i> Terapkan & Simpan Bobot
                 </button>
             </div>
@@ -613,20 +436,16 @@
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <h3 class="card-title" style="margin: 0;">2. Upload Nilai Mahasiswa</h3>
-                    <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 5px;">Unduh template Excel, isi
-                        nilai, lalu unggah kembali.</p>
+                    <p style="color: var(--text-gray); font-size: 0.9rem; margin-top: 5px;">Unduh template Excel, isi nilai, lalu unggah kembali.</p>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button id="btnTemplate" type="button" class="btn-action" style="background: #10b981; color: white;"
-                        onclick="downloadTemplateExcel()">
+                    <button id="btnTemplate" type="button" class="btn-action" style="background: #10b981; color: white;" onclick="downloadTemplateExcel()">
                         <i class="fas fa-download"></i> Download Template
                     </button>
-                    <button onclick="inputManual()" id="btnManual" class="btn-action"
-                        style="background: var(--primary-blue); color:white;">
+                    <button onclick="inputManual()" id="btnManual" class="btn-action" style="background: var(--primary-blue); color:white;">
                         <i class="fas fa-keyboard"></i> Input Manual Web
                     </button>
-                    <label id="labelUpload" class="btn-action"
-                        style="background: #16a34a; color: white; margin: 0; cursor: pointer;">
+                    <label id="labelUpload" class="btn-action" style="background: #16a34a; color: white; margin: 0; cursor: pointer;">
                         <i class="fas fa-upload"></i> Upload Excel
                         <input type="file" id="fileExcel" hidden accept=".xlsx, .xls" onchange="handleFileUpload()">
                     </label>
@@ -636,39 +455,29 @@
             <div class="empty-upload-box" id="emptyUploadBox">
                 <i class="fas fa-file-excel" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 10px;"></i>
                 <h2 style="color: #94a3b8; font-size: 1.2rem;">Data Kosong</h2>
-                <p>Upload file excel yang telah diisi untuk melihat *preview* nilai mahasiswa di sini.</p>
+                <p>Upload file excel yang telah diisi untuk melihat preview nilai mahasiswa di sini.</p>
             </div>
 
             <div id="previewArea" style="margin-top:20px; display:none;">
-                <p style="margin-bottom:10px; color:#4b5563;"><strong>Preview Data:</strong> <span id="studentCount"
-                        style="color:#1e3a8a; font-weight:800;">0</span> Mahasiswa ditemukan.</p>
-                <div
-                    style="max-height:400px; overflow:auto; border:1px solid #e5e7eb; border-radius:12px; background: white;">
-                    <table
-                        style="margin-top:0; border: none; width: 100%; border-collapse: collapse; white-space: nowrap;">
-                        <thead id="studentHead" style="position:sticky; top:0; z-index:20; background: #f8fafc;">
-                        </thead>
+                <p style="margin-bottom:10px; color:#4b5563;"><strong>Preview Data:</strong> <span id="studentCount" style="color:#1e3a8a; font-weight:800;">0</span> Mahasiswa ditemukan.</p>
+                <div style="max-height:400px; overflow:auto; border:1px solid #e5e7eb; border-radius:12px; background: white;">
+                    <table style="margin-top:0; border: none; width: 100%; border-collapse: collapse; white-space: nowrap;">
+                        <thead id="studentHead" style="position:sticky; top:0; z-index:20; background: #f8fafc;"></thead>
                         <tbody id="studentBody"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="area-simpan"
-                style="display: flex; justify-content: space-between; align-items: center; margin-top:30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
-                <button class="btn-action" style="background: #1e3a8a; color: white; padding: 12px 24px;"
-                    onclick="lanjutKeRPS()">
+            <div id="area-simpan" style="display: flex; justify-content: space-between; align-items: center; margin-top:30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                <button class="btn-action" style="background: #1e3a8a; color: white; padding: 12px 24px;" onclick="lanjutKeRPS()">
                     <i class="fas fa-book-open"></i> Lanjut Susun RPS
                 </button>
 
                 <div style="display: flex; gap: 10px;">
-                    <button id="btnSimpanDraf" class="btn-action"
-                        style="background: #f59e0b; color: white; padding: 12px 24px; font-size: 1.05rem;"
-                        onclick="simpanKeDatabase('draft')">
+                    <button id="btnSimpanDraf" class="btn-action" style="background: #f59e0b; color: white; padding: 12px 24px; font-size: 1.05rem;" onclick="simpanKeDatabase('draft')">
                         <i class="fas fa-save"></i> Simpan Draf
                     </button>
-                    <button id="btnSimpan" class="btn-action"
-                        style="background: #0f172a; padding: 12px 24px; font-size: 1.05rem;"
-                        onclick="simpanKeDatabase('final')" disabled>
+                    <button id="btnSimpan" class="btn-action" style="background: #0f172a; color: white; padding: 12px 24px; font-size: 1.05rem;" onclick="simpanKeDatabase('final')" disabled>
                         <i class="fas fa-check-circle"></i> Simpan Final 100%
                     </button>
                 </div>
@@ -681,8 +490,7 @@
         <div class="footer-grid">
             <div>
                 <h4>Sistem OBE</h4>
-                <p>Platform otomatis terpadu untuk mengelola, memantau, dan mengevaluasi Capaian Pembelajaran Lulusan
-                    (CPL) secara real-time.</p>
+                <p>Platform otomatis terpadu untuk mengelola, memantau, dan mengevaluasi Capaian Pembelajaran Lulusan (CPL) secara real-time.</p>
             </div>
             <div>
                 <h4>Menu Cepat</h4>
@@ -716,6 +524,9 @@
         const API_GET_BENTUK = `${API_BASE}/get-master-bentuk`;
         let daftarBentukMaster = [];
 
+        // --- VARIABEL UNTUK PAGINATION MOBILE ---
+        let currentMobilePage = 1;
+
         async function init() {
             try {
                 const resBentuk = await fetch(API_GET_BENTUK);
@@ -729,7 +540,6 @@
 
         const API_GET_MBKM = `${API_BASE}/get-mbkm-data`;
         let daftarNimMBKM = [];
-        const API_GET_KOMPONEN = `${API_BASE}/get-master-komponen`;
 
         const userLogin = localStorage.getItem("user_login");
         const userNidn = localStorage.getItem("user_nidn");
@@ -747,7 +557,6 @@
         let cpmkTersedia = [];
         let kaprodiQuotas = [];
         let trackingQuotas = [];
-        let daftarKomponenMaster = [];
 
         if (!userLogin || !userNidn) {
             alert("🔒 Akses Ditolak! Sesi Anda telah habis atau Anda belum login.");
@@ -976,7 +785,6 @@
             trackingQuotas = kaprodiQuotas.map(row => ({ cpmk: row.cpmk, kategori: row.kategori, target: parseFloat(row.bobot) || 0, current: 0 }));
             document.getElementById("card-quota").style.display = trackingQuotas.length > 0 ? "block" : "none";
 
-            // 1. TARIK DATA DRAF / CONFIG (DIUBAH MENJADI ARRAY UNTUK MULTI CPMK)
             try {
                 const resDraft = await fetch(`${API_GET_DRAFT}?mk=${mkKode}`);
                 const txtDraft = await resDraft.text();
@@ -1007,7 +815,6 @@
 
             renderTableAsesmen(); hitungDanValidasiKuota();
 
-            // 2. TARIK NILAI MAHASISWA (MENGGUNAKAN LOGIKA ASLI ANDA)
             let mhsRekonstruksi = [];
             let globalReportDB = [];
 
@@ -1029,7 +836,6 @@
                     let barisMhs = [nimMhs, m.nama_mahasiswa || m.nama];
                     configData.forEach(cfg => {
                         cfg.bobot.forEach((_, bIndex) => {
-                            // Menyesuaikan logika pencarian report Anda untuk membaca tiap-tiap bobot
                             let match = globalReportDB.find(db => (db.nim || db.NIM) === nimMhs && parseInt(db.pertemuan) === cfg.pertemuan && (db.bobot_index == bIndex || db.bobot_index == null));
                             barisMhs.push(match && match.nilai_asli ? parseFloat(match.nilai_asli) : 0);
                         });
@@ -1047,7 +853,6 @@
             }
         }
 
-        // FUNGSI BARU UNTUK MULTI-CPMK (TOMBOL PLUS DAN SILANG)
         function tambahCPMK(i) {
             configData[i].cpl.push("-");
             configData[i].cpmk.push("");
@@ -1064,6 +869,52 @@
             renderTableAsesmen(); hitungDanValidasiKuota();
         }
 
+        // ==========================================
+        // SULAP PAGINATION MOBILE
+        // ==========================================
+        function updatePaginationButtons() {
+            const btnPrevTop = document.getElementById("btnPrevMobileTop");
+            const btnNextTop = document.getElementById("btnNextMobileTop");
+            const pageInfoTop = document.getElementById("pageInfoMobileTop");
+
+            const btnPrevBot = document.getElementById("btnPrevMobileBot");
+            const btnNextBot = document.getElementById("btnNextMobileBot");
+            const pageInfoBot = document.getElementById("pageInfoMobileBot");
+
+            if(btnPrevTop) btnPrevTop.disabled = currentMobilePage === 1;
+            if(btnNextTop) btnNextTop.disabled = currentMobilePage === 16;
+            if(pageInfoTop) pageInfoTop.innerText = `Sesi P${currentMobilePage}`;
+
+            if(btnPrevBot) btnPrevBot.disabled = currentMobilePage === 1;
+            if(btnNextBot) btnNextBot.disabled = currentMobilePage === 16;
+            if(pageInfoBot) pageInfoBot.innerText = `Sesi P${currentMobilePage}`;
+
+            const rows = document.querySelectorAll("#configTable tbody tr.config-row");
+            rows.forEach((row, index) => {
+                if(window.innerWidth <= 768) {
+                    if ((index + 1) === currentMobilePage) {
+                        row.classList.add("active");
+                    } else {
+                        row.classList.remove("active");
+                    }
+                } else {
+                    row.classList.add("active");
+                }
+            });
+        }
+
+        function gantiHalamanMobile(step) {
+            currentMobilePage += step;
+            if (currentMobilePage < 1) currentMobilePage = 1;
+            if (currentMobilePage > 16) currentMobilePage = 16;
+            updatePaginationButtons();
+        }
+
+        window.addEventListener('resize', function() {
+            updatePaginationButtons();
+        });
+
+
         function renderTableAsesmen() {
             const tbody = document.getElementById("tableBody");
             tbody.innerHTML = ""; let totalBobot = 0;
@@ -1074,7 +925,6 @@
             }
 
             configData.forEach((row, i) => {
-                // Konversi aman agar tidak error jika dari database lama masih string
                 if (!Array.isArray(row.cpl)) row.cpl = [row.cpl];
                 if (!Array.isArray(row.cpmk)) row.cpmk = [row.cpmk];
                 if (!Array.isArray(row.komponen)) row.komponen = [row.komponen];
@@ -1095,7 +945,6 @@
 
                     let isCpmkEmpty = (!cpmkItem || cpmkItem === "-" || cpmkItem === "" || cpmkItem === "null");
 
-                    // FIX: Hapus atribut 'disabled' agar browser selalu memulai dari '-- Pilih CPMK --'
                     let optCpmk = filteredCpmkTersedia.length > 0 ? `<option value="" ${isCpmkEmpty ? 'selected' : ''}>-- Pilih CPMK --</option>` + filteredCpmkTersedia.map(c => `<option value="${c.cpmk}" data-cpl="${c.cpl}" ${c.cpmk === cpmkItem ? 'selected' : ''}>${c.cpl} - ${c.cpmk}</option>`).join('') : `<option value="" selected>Belum Ada Mapping</option>`;
 
                     let teksCpl = (!row.cpl[idx] || row.cpl[idx] === "" || row.cpl[idx] === "-" || row.cpl[idx] === "null") ? "-" : row.cpl[idx];
@@ -1125,7 +974,7 @@
                 });
 
                 tbody.innerHTML += `
-                    <tr>
+                    <tr class="config-row">
                         <td style="font-weight: 800; font-size: 1.1rem; color: var(--primary-navy); vertical-align: top;">P.${row.pertemuan}</td>
                         <td style="vertical-align: top;"><select style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1;" onchange="updateRow(${i}, 'bentuk', this.value)">${optBentukHTML}</select></td>
                         <td style="font-weight:700; color:#475569; vertical-align: top;">${cplHtml}</td>
@@ -1137,6 +986,8 @@
             });
             document.getElementById("grandTotal").innerText = totalBobot + "%";
             document.getElementById("grandTotal").style.color = totalBobot === 100 ? "#16a34a" : "#dc2626";
+
+            updatePaginationButtons();
         }
 
         function hitungDanValidasiKuota() {
@@ -1163,7 +1014,22 @@
             else { statusBox.innerHTML = '<span style="color: #ea580c;"><i class="fas fa-exclamation-triangle"></i> Kuota belum pas / Total belum 100%</span>'; }
 
             const btnSimpan = document.getElementById("btnSimpan");
-            if (btnSimpan) { btnSimpan.disabled = !(allValid && sumTotal === 100); btnSimpan.style.opacity = btnSimpan.disabled ? '0.5' : '1'; btnSimpan.innerText = btnSimpan.disabled ? "Penuhi Kuota & 100%" : "Simpan Final 100%"; }
+            if (btnSimpan) {
+                btnSimpan.disabled = !(allValid && sumTotal === 100);
+                btnSimpan.style.opacity = btnSimpan.disabled ? '0.5' : '1';
+
+                if (btnSimpan.disabled) {
+                    // Tampilan saat bobot belum 100% atau kuota belum terpenuhi (Hitam/Navy Gelap)
+                    btnSimpan.innerHTML = '<i class="fas fa-lock"></i> Penuhi Kuota & 100%';
+                    btnSimpan.style.background = '#0f172a';
+                    btnSimpan.style.color = 'white';
+                } else {
+                    // Tampilan menyala terang saat siap disave (Hijau)
+                    btnSimpan.innerHTML = '<i class="fas fa-check-circle"></i> Simpan Final 100%';
+                    btnSimpan.style.background = '#16a34a';
+                    btnSimpan.style.color = 'white';
+                }
+            }
         }
 
         async function simpanDraftBobotManual() {
@@ -1194,43 +1060,125 @@
             } catch (e) { }
             if (listMhs.length === 0) listMhs = [{ nim: "22320001", nama: "Fulan" }];
 
+            // 1. Inisialisasi Workbook ExcelJS
+            const workbook = new ExcelJS.Workbook();
+            const sheet = workbook.addWorksheet("Template Nilai");
+
             let rowCPL = ["", ""], rowCPMK = ["", ""], rowBentuk = ["NIM", "NAMA MAHASISWA"], rowBobot = ["", "BOBOT PENILAIAN (%)"];
             let flatColCount = 0;
 
+            // 2. Susun Struktur Header
             configData.forEach(c => {
                 c.bobot.forEach((b, idx) => {
-                    rowCPL.push(c.cpl[idx] || "-"); rowCPMK.push(c.cpmk[idx] || "-");
-                    rowBentuk.push(`P${c.pertemuan} - ${c.bentuk} (${idx + 1})`); rowBobot.push((parseFloat(b) || 0) + "%");
+                    rowCPL.push(c.cpl[idx] || "-");
+                    rowCPMK.push(c.cpmk[idx] || "-");
+
+                    // PERMINTAAN ANDA: Tambahkan nama komponen penilaian di bawah tulisan P1-P16
+                    let namaKomponen = (c.komponen[idx] && c.komponen[idx] !== "Tidak Dinilai") ? c.komponen[idx] : c.bentuk;
+                    rowBentuk.push(`P${c.pertemuan}\n(${namaKomponen})`);
+
+                    rowBobot.push((parseFloat(b) || 0) + "%");
                     flatColCount++;
                 });
             });
-            rowCPL.push("INFO", "INFO"); rowCPMK.push("INFO", "INFO"); rowBentuk.push("NILAI AKHIR", "GRADE"); rowBobot.push("100%", "-");
 
-            let finalData = [rowCPL, rowCPMK, rowBentuk, rowBobot]; let currRow = 5;
+            rowCPL.push("INFO", "INFO"); rowCPMK.push("INFO", "INFO");
+            rowBentuk.push("NILAI AKHIR", "GRADE"); rowBobot.push("100%", "-");
+
+            sheet.addRow(rowCPL); sheet.addRow(rowCPMK); sheet.addRow(rowBentuk); sheet.addRow(rowBobot);
+
+            // 3. Deteksi Kolom dengan Bobot Aktif (> 0%)
+            let hasBobotArray = [false, false]; // Index 0 (NIM) & Index 1 (NAMA) selalu putih
+            configData.forEach(c => {
+                c.bobot.forEach(b => {
+                    hasBobotArray.push((parseFloat(b) || 0) > 0);
+                });
+            });
+            hasBobotArray.push(false, false); // Index Akhir (NILAI AKHIR) & GRADE selalu putih
+
+            // 4. Modifikasi Style Header (Biru Muda jika ada bobot, Putih jika 0%)
+            for (let i = 1; i <= 4; i++) {
+                let row = sheet.getRow(i);
+                row.eachCell((cell, colNumber) => {
+                    let isKolomBobot = hasBobotArray[colNumber - 1]; // Array index mulai dari 0, colNumber dari 1
+
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        // Menggunakan biru muda pastel persis seperti gambar Excel (FFDDEBF7)
+                        fgColor: { argb: isKolomBobot ? 'FFDDEBF7' : 'FFFFFFFF' }
+                    };
+                    cell.font = { color: { argb: 'FF000000' }, bold: true, name: 'Arial', size: 10 };
+                    cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                });
+            }
+            sheet.getRow(3).height = 40; // Tinggikan baris 3 agar teks komponen bisa turun ke bawah
+
+            // 5. Menggabungkan Cell (Merge) agar kolom NIM, NAMA, Akhir, dan Grade rapi
+            sheet.mergeCells('A1:A4'); sheet.mergeCells('B1:B4');
+            let endCol1 = sheet.getColumn(flatColCount + 3).letter;
+            let endCol2 = sheet.getColumn(flatColCount + 4).letter;
+            sheet.mergeCells(`${endCol1}1:${endCol1}4`); sheet.mergeCells(`${endCol2}1:${endCol2}4`);
+
+            sheet.getCell('A1').value = "NIM"; sheet.getCell('B1').value = "NAMA MAHASISWA";
+            sheet.getCell(`${endCol1}1`).value = "NILAI AKHIR"; sheet.getCell(`${endCol2}1`).value = "GRADE";
+
+            // 6. Masukkan Data Mahasiswa & Rumus Excel-nya
+            let currRow = 5;
+
             listMhs.forEach(mhs => {
                 let row = [mhs.nim || mhs.NIM || "", mhs.nama || mhs.nama_mahasiswa || ""];
-                for (let k = 0; k < flatColCount; k++) row.push("");
+                for (let k = 0; k < flatColCount; k++) row.push(""); // Slot kosong untuk diisi nanti
 
                 let fParts = []; let flatIdx = 0;
                 configData.forEach(c => {
                     c.bobot.forEach(b => {
-                        let col = String.fromCharCode(((flatIdx + 2) % 26) + 65);
+                        let col = sheet.getColumn(flatIdx + 3).letter;
                         fParts.push(`(${col}${currRow}*${((parseFloat(b) || 0) / 100)})`);
                         flatIdx++;
                     });
                 });
 
-                let tCol = String.fromCharCode(((flatColCount + 2) % 26) + 65);
-                row.push({ t: 'n', f: fParts.join('+') || "0" });
-                row.push({ t: 's', f: `IF(${tCol}${currRow}>=85,"A",IF(${tCol}${currRow}>=80,"A-",IF(${tCol}${currRow}>=75,"B+",IF(${tCol}${currRow}>=70,"B",IF(${tCol}${currRow}>=65,"B-",IF(${tCol}${currRow}>=60,"C+",IF(${tCol}${currRow}>=55,"C",IF(${tCol}${currRow}>=50,"D","E"))))))))` });
-                finalData.push(row); currRow++;
+                let tCol = sheet.getColumn(flatColCount + 3).letter;
+                row.push({ formula: fParts.join('+') || "0" });
+                row.push({ formula: `IF(${tCol}${currRow}>=85,"A",IF(${tCol}${currRow}>=80,"A-",IF(${tCol}${currRow}>=75,"B+",IF(${tCol}${currRow}>=70,"B",IF(${tCol}${currRow}>=65,"B-",IF(${tCol}${currRow}>=60,"C+",IF(${tCol}${currRow}>=55,"C",IF(${tCol}${currRow}>=50,"D","E"))))))))` });
+
+                let sheetRow = sheet.addRow(row);
+
+                // B. Styling Garis dan Penentuan Warna Kolom Aktif/Tidak Aktif untuk Data
+                sheetRow.eachCell((cell, colNumber) => {
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                    cell.alignment = { vertical: 'middle', horizontal: colNumber > 2 ? 'center' : 'left' };
+
+                    let isKolomBobot = hasBobotArray[colNumber - 1];
+
+                    if (isKolomBobot) {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDDEBF7' } }; // Biru Muda Pastel
+                    } else {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } }; // Putih bersih
+                        // Angka 0 telah dihapus. Sel tanpa bobot akan murni dibiarkan kosong
+                    }
+                });
+                currRow++;
             });
 
-            const ws = XLSX.utils.aoa_to_sheet(finalData);
-            let cw = [{ wch: 15 }, { wch: 30 }]; for (let k = 0; k < flatColCount; k++) cw.push({ wch: 15 }); cw.push({ wch: 15 }, { wch: 12 }); ws['!cols'] = cw;
-            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template Nilai");
-            XLSX.writeFile(wb, templateAktif);
-            document.getElementById("btnTemplate").innerHTML = '<i class="fas fa-download"></i> Download Template'; document.getElementById("btnTemplate").disabled = false;
+            // 6. Atur Lebar Kolom
+            sheet.getColumn(1).width = 15; sheet.getColumn(2).width = 35;
+            for (let k = 0; k < flatColCount; k++) sheet.getColumn(k + 3).width = 16;
+            sheet.getColumn(flatColCount + 3).width = 15; sheet.getColumn(flatColCount + 4).width = 12;
+
+            // 7. Eksekusi Download FileSaver
+            try {
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                saveAs(blob, templateAktif);
+            } catch (error) {
+                alert("Gagal mengunduh Excel. Pastikan internet stabil untuk meload library ExcelJS.");
+            }
+
+            document.getElementById("btnTemplate").innerHTML = '<i class="fas fa-download"></i> Download Template';
+            document.getElementById("btnTemplate").disabled = false;
         }
 
         function processStudentData(raw) {
