@@ -173,7 +173,7 @@
     });
 
     const API_METADATA = `${API_BASE}/get-metadata?prodi=${PRODI}`;
-    const API_MATRIKS = `${API_BASE}/matriks-kurikulum?prodi=${PRODI}`; 
+    const API_MATRIKS = `${API_BASE}/get-matkul-cpl?prodi=${PRODI}`; 
     
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace("/login/login.html");
@@ -234,7 +234,7 @@
 
             html += `<th title="${cpl.label || cpl.nama || ''}">${labelSingkat}</th>`;
         });
-        html += `</tr></thead><tbody>`;
+        html += `</tr></thead><tbody id="bodyMatriksMk">`;
 
         if (dataMatriks.length === 0) {
             html += `<tr><td colspan="${4 + daftarCPL.length}" style="padding: 30px; text-align: center; color: #64748b;">Belum ada relasi Matriks Kurikulum yang terbentuk.</td></tr>`;
@@ -250,20 +250,76 @@
                         <td>${row.sks}</td>
                 `;
                 
+                // Menampilkan Checkbox yang bisa di-klik
                 daftarCPL.forEach(cpl => {
-                    if (cplTerkait.includes(cpl.kode)) {
-                        html += `<td><span class="check-mark"><i class="fas fa-check"></i></span></td>`;
-                    } else {
-                        html += `<td></td>`;
-                    }
+                    const isChecked = cplTerkait.includes(cpl.kode);
+                    const chk = isChecked ? 'checked' : '';
+                    html += `<td style="text-align: center;">
+                                <input type="checkbox" class="chk-matrix-mk" data-mk="${row.kode_mk}" data-cpl="${cpl.kode}" ${chk} style="cursor: pointer; transform: scale(1.2);">
+                             </td>`;
                 });
                 
                 html += `</tr>`;
             });
         }
 
+        // Menutup tag tabel
         html += `</tbody></table>`;
+        
+        // Memunculkan tombol Simpan tepat di bawah tabel
+        html += `
+            <div style="margin-top: 20px; text-align: right;">
+                <button id="btnSaveMatriks" class="btn-primary-si" onclick="simpanMatriks()">
+                    <i class="fas fa-save"></i> Simpan Matriks CPL - MK
+                </button>
+            </div>
+        `;
+        
         container.innerHTML = html;
+    }
+
+    // Fungsi Baru untuk Mengirim Data ke n8n
+    async function simpanMatriks() {
+        const btnSave = document.getElementById('btnSaveMatriks');
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btnSave.disabled = true;
+
+        // Kumpulkan semua checkbox yang dicentang
+        const checkedBoxes = document.querySelectorAll('.chk-matrix-mk:checked');
+        const mappingData = [];
+        
+        checkedBoxes.forEach(cb => {
+            mappingData.push({
+                kode_mk: cb.getAttribute('data-mk'),
+                kode_cpl: cb.getAttribute('data-cpl')
+            });
+        });
+
+        const payload = {
+            prodi: PRODI,
+            mapping: mappingData
+        };
+
+        try {
+            // Pastikan URL API ini sesuai dengan webhook n8n untuk simpan
+            const response = await fetch(`${API_BASE}/admin-map-cpl-mk`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            if (response.ok) {
+                alert("✅ Matriks Relasi CPL - MK berhasil disimpan!");
+            } else {
+                throw new Error("Respon server tidak ok");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("❌ Gagal menyimpan data ke server. Cek koneksi atau n8n.");
+        } finally {
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks CPL - MK';
+            btnSave.disabled = false;
+        }
     }
 </script>
 </body>

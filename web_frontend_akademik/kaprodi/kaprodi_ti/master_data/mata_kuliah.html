@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <link rel="stylesheet" href="susunan_mk.css">
+    <link rel="stylesheet" href="mata_kuliah.css">
 </head>
 <body>
 
@@ -139,7 +139,6 @@
                             <th width="15%">Kode MK</th>
                             <th>Nama Mata Kuliah</th>
                             <th width="15%" style="text-align: center;">SKS</th>
-                            <th width="12%" style="text-align: center;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>`;
@@ -150,25 +149,12 @@
                 <tr>
                     <td data-label="KODE MK" style="font-weight: 800; color: var(--primary-blue);">${mk.kode_mk}</td>
                     
-                    <td data-label="MATA KULIAH">
-                        <input type="text" id="in-${mk.kode_mk}" value="${mk.nama_mk}" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; font-size: 0.95rem;">
+                    <td data-label="MATA KULIAH" style="padding: 10px; font-size: 0.95rem; color: #1e293b;">
+                        ${mk.nama_mk}
                     </td>
                     
-                    <td data-label="SKS" style="text-align: center;">
-                        <input type="number" id="sks-${mk.kode_mk}" value="${mk.sks}" style="width:70px; padding:10px; border:1px solid #cbd5e1; border-radius:6px; text-align:center; font-weight: 600;" min="1" max="6">
-                    </td>
-                    
-                    <td data-label="AKSI" style="text-align:center;">
-                        <div class="action-buttons-wrapper">
-                            <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                                <button class="btn-action btn-dark" style="padding: 8px 12px;" onclick="simpanEdit('matkul', '${mk.kode_mk}')" title="Simpan">
-                                    <i class="fas fa-save"></i>
-                                </button>
-                                <button class="btn-action btn-danger" style="padding: 8px 12px;" onclick="hapusMK('${mk.kode_mk}')" title="Hapus">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
+                    <td data-label="SKS" style="text-align: center; padding: 10px; font-weight: 600; color: #1e293b;">
+                        ${mk.sks}
                     </td>
                 </tr>`;
         });
