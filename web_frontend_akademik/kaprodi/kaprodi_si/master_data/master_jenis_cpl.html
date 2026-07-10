@@ -2,154 +2,265 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Jenis CPL SI - Sistem OBE</title>
-    <link rel="stylesheet" href="../../../css/style.css">
-    <script src="../../../js/template.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Master Jenis CPL - Sistem OBE</title>
+    
+    <!-- PANGGIL FONT INTER & IKON -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-     <script src="../../../js/api_config.js"></script>
+    
+    <!-- CSS RELATIF SESUAI FOLDER LOKAL -->
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/admin_si.css">
+    <link rel="stylesheet" href="../../../css/index_mobile.css">
+    
+    <script src="../../../js/api_config.js"></script>
+    <script src="../../../js/template.js"></script>
     
     <style>
-        /* --- VARIABEL WARNA KHUSUS SI --- */
-        :root { 
-            /* Background sidebar dihapus agar mengikuti theme-si dari style.css global */
-            --primary-teal: #01626d; 
-            --primary-teal-dark: #006064; 
-            --bg-main: #ffffff; 
-            --text-dark: #111827;
-            --border-dark: #161923;
-        }
+        /* =========================================
+           🛡️ MANTRA ANTI-BOCOR & ANTI-MEROSOT
+           ========================================= */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;}
+        body, input, select, button, textarea { font-family: 'Inter', sans-serif !important; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark); }
-        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
+        /* MEMBUNUH PADDING BAWAAN CSS GLOBAL */
+        .fixed-header { padding-top: 15px !important; }
+        .main-content { padding-top: 0 !important; }
 
-        /* HEADER */
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
-        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
-        .header-title span { color: var(--primary-teal); }
+        /* KONTROL TABEL DESKTOP */
+        .table-action-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;}
+        .table-action-header > div { flex: 1; min-width: 250px;}
         
-        .badge-prodi { 
-            background: var(--primary-teal-dark); 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 30px; 
-            font-size: 0.9rem; 
-            font-weight: 600; 
-            box-shadow: 0 4px 6px rgba(0, 96, 100, 0.2); 
-        }
+        .btn-primary-dynamic { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center;}
+        .btn-primary-dynamic:hover:not(:disabled) { filter: brightness(0.85); transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-dark { background: #1e293b; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center;}
+        .btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
 
-        /* BUTTONS */
-        .btn-primary-si { 
-            background: linear-gradient(to right, var(--primary-teal), var(--primary-teal-dark)); 
-            color: white; 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 8px; 
-            font-weight: 600; 
-            font-size: 0.95rem; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            transition: 0.2s; 
-            box-shadow: 0 4px 6px rgba(0, 96, 100, 0.2);
-        }
-        .btn-primary-si:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 12px rgba(0, 96, 100, 0.3);
-        }
-
-        .btn-refresh { background: #1f2937; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s; margin-left: 8px; display: flex; align-items: center; gap: 10px; }
-        .btn-refresh:hover { background: #111827; transform: translateY(-2px); }
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 20px; width: 100%; }
+        .tabel-jenis { width: 100%; min-width: 600px; border-collapse: collapse; text-align: left; }
+        .tabel-jenis th { background: #1e293b; color: white; padding: 15px 20px; text-align: left; border-bottom: 2px solid #0f172a; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; position: sticky; top: 0; z-index: 5;}
+        .tabel-jenis td { padding: 15px 20px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; vertical-align: middle; }
+        .tabel-jenis tbody tr:hover td { background-color: #f8fafc; }
         
-        .btn-edit { background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; }
-        .btn-edit:hover { background: #d97706; }
-        .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: 0.2s; margin-left: 5px; }
-        .btn-delete:hover { background: #b91c1c; }
+        .btn-edit, .btn-delete { padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin: 0 3px; border: 1px solid transparent;}
+        .btn-edit { background: #fffbeb; color: #d97706; border-color: #fcd34d; }
+        .btn-edit:hover { background: #fef3c7; color: #b45309; }
+        .btn-delete { background: #fef2f2; color: #ef4444; border-color: #fca5a5; }
+        .btn-delete:hover { background: #fee2e2; color: #b91c1c; }
 
-        /* TABLE */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
-        th { background: #f3f4f6; color: #374151; padding: 14px 20px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
-        td { padding: 14px 20px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; color: #111827; font-weight: 500; }
-        tbody tr:hover { background-color: #f9fafb; }
+        /* --- MODAL POP-UP STYLES --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-box { background: white; padding: 32px; border-radius: 12px; width: 500px; max-width: 90%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto;}
+        .modal-title { margin-top: 0; color: #1e293b; font-size: 1.4rem; font-weight: 800; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px;}
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+        .form-control { width: 100%; padding: 12px 16px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; outline: none; transition: 0.2s; background: #f8fafc; color: #334155; font-weight: 500;}
+        .form-control:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1);}
 
-        /* MODAL */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-box { background: white; border-radius: 12px; width: 500px; padding: 25px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .modal-title { margin: 0 0 20px 0; font-size: 1.2rem; font-weight: 800; color: var(--text-dark); border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
-        .form-group { margin-bottom: 15px; }
-        .form-label { display: block; font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 8px; }
-        .form-control { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; }
-        .form-control:focus { border-color: var(--primary-teal); }
-        .btn-save-modal { background: var(--primary-teal); color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;}
+        /* =========================================
+           📱 CSS KHUSUS HP (SULAP TABEL JADI KARTU)
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
+            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
+            
+            .header-master { margin: 15px 0 10px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-master { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
+            
+            .table-action-header { flex-direction: column !important; align-items: stretch !important; gap: 15px;}
+            .table-action-header > div:last-child { display: flex; flex-direction: column; gap: 10px; width: 100%;}
+            .btn-primary-dynamic, .btn-dark { width: 100% !important; justify-content: center !important;}
+
+            /* SULAP TABEL MENJADI KARTU */
+            .table-container { border: none !important; box-shadow: none !important; background: transparent !important; padding: 0 !important; overflow-x: hidden !important; margin: 0;}
+            .table-container table, .table-container thead, .table-container tbody, .table-container th, .table-container td, .table-container tr { display: block !important; width: 100% !important; min-width: 0 !important; box-sizing: border-box !important;}
+            
+            .table-container thead { display: none !important;}
+            
+            .table-container tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; padding: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;}
+            
+            .table-container td { display: flex !important; flex-direction: column !important; align-items: stretch !important; text-align: left !important; padding: 10px 0 !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+            .table-container td:last-child { border-bottom: none !important; padding-bottom: 0 !important; flex-direction: row !important; gap: 10px; margin-top: 10px;}
+            
+            .table-container td::before { font-weight: 800; color: #64748b; font-size: 0.8rem; margin-bottom: 6px; text-transform: uppercase;}
+            
+            /* Mapping Label untuk Kartu Jenis CPL */
+            .tabel-jenis td:nth-child(1) { display: none !important;} /* Sembunyikan Nomor */
+            .tabel-jenis td:nth-child(2)::before { content: "KATEGORI / JENIS CPL"; color: var(--primary-blue);}
+            .tabel-jenis td:nth-child(3)::before { display: none; }
+            
+            /* Penyesuaian Visual Konten HP */
+            .tabel-jenis td:nth-child(2) { font-size: 1.2rem !important; font-weight: 900 !important; color: #0f172a !important; border-bottom: 3px solid var(--primary-blue) !important; padding-bottom: 15px !important; margin-bottom: 5px !important;}
+            .tabel-jenis td:nth-child(3) { border-top: 1px dashed #e2e8f0; padding-top: 15px !important; }
+            .tabel-jenis td:nth-child(3) .btn-edit, .tabel-jenis td:nth-child(3) .btn-delete { flex: 1; justify-content: center; padding: 12px; font-size: 1rem;}
+
+            /* Modal Mobile */
+            .modal-box { width: 100% !important; height: 100% !important; max-height: 100vh !important; border-radius: 0 !important; padding: 20px !important;}
+            .modal-box > div:last-child { flex-direction: column !important; }
+            .modal-box > div:last-child button { width: 100%; }
+        }
     </style>
 </head>
 <body>
 
+    <!-- NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi"></div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        
-        <div class="header-container">
-            <div class="header-title-area">
-                <div class="header-subtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title">JENIS <span>CPL</span></h1>
+        <div id="navbar-container"></div>
+
+        <div class="fixed-header">
+            <div class="header-container header-master" style="margin: 0 0 15px 0; border-bottom: none; padding-bottom: 0;">
+                <div class="header-title-area">
+                    <div class="header-subtitle">KELOLA KURIKULUM</div>
+                    <h1 class="header-title">JENIS <span>CPL</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
             </div>
-            <div class="badge-prodi">Sistem Informasi</div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;" class="header-master"></div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div>
-                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800;">Jenis CPL SN DIKTI</h3>
-                <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 0.9rem;">Kelola kategori Capaian Pembelajaran Lulusan.</p>
+        <div class="scrollable-content section-master" style="padding-top: 0; padding-bottom: 40px;">
+            
+            <div class="table-action-header">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: #1e293b;">Jenis CPL SN DIKTI</h3>
+                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.9rem;">Kelola kategori Capaian Pembelajaran Lulusan (Sikap, Keterampilan, dll).</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-dark" onclick="loadJenisCPL()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    <button class="btn-primary-dynamic" onclick="bukaModal()"><i class="fas fa-plus"></i> Tambah Data</button>
+                </div>
             </div>
-            <div style="display: flex;">
-                <button class="btn-primary-si" onclick="bukaModal()"><i class="fas fa-plus"></i> Tambah</button>
-                <button class="btn-refresh" onclick="loadJenisCPL()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            
+            <div class="table-container">
+                <table class="tabel-jenis">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%; text-align: center;">NO</th>
+                            <th style="width: 70%;">KATEGORI JENIS CPL</th>
+                            <th style="width: 25%; text-align: center;">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelJenisCPL">
+                        <tr>
+                            <td colspan="3" style="text-align: center; padding: 40px; color: #64748b;">
+                                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); margin-bottom: 10px; display: block;"></i>
+                                Menghubungkan ke database Jenis CPL...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 5%; text-align: center;">#</th>
-                    <th style="width: 70%;">JENIS</th>
-                    <th style="width: 25%; text-align: center;">OPSI</th>
-                </tr>
-            </thead>
-            <tbody id="tabelJenisCPL">
-                <tr>
-                    <td colspan="3" style="text-align: center; padding: 30px; color: #6b7280;">
-                        <i class="fas fa-spinner fa-spin"></i> Memuat data...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
     </div>
 
+    <!-- MODAL POP UP -->
     <div id="modalJenisCPL" class="modal-overlay">
         <div class="modal-box">
-            <h3 class="modal-title" id="modalTitle">Tambah Jenis CPL</h3>
+            <h3 class="modal-title" id="modalTitle"><i class="fas fa-plus-circle" style="color: var(--primary-blue); margin-right: 8px;"></i> Tambah Jenis CPL</h3>
+            
             <input type="hidden" id="idJenis">
+            
             <div class="form-group">
                 <label class="form-label">Nama Jenis CPL</label>
-                <input type="text" id="inputNamaJenis" class="form-control" placeholder="Contoh: SIKAP (S)">
+                <input type="text" id="inputNamaJenis" class="form-control" placeholder="Contoh: SIKAP (S)" autocomplete="off">
             </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-save-modal" style="background: #6b7280;" onclick="tutupModal()">Batal</button>
-                <button class="btn-save-modal" id="btnSimpan" onclick="simpanJenisCPL()"><i class="fas fa-save"></i> Simpan</button>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 10px;">
+                <button onclick="tutupModal()" class="btn-dark" style="background: #f1f5f9; color: #475569;">Batal</button>
+                <button onclick="simpanJenisCPL()" class="btn-primary-dynamic" id="btnSimpan"><i class="fas fa-save"></i> Simpan Data</button>
             </div>
         </div>
     </div>
 
 <script>
+    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
+    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        if(PRODI === "ti") {
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+        } else {
+            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+        }
+
+        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+        const avatarMobile = document.getElementById("mobileNavbarAvatar");
+        if(avatarMobile) {
+            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+        }
+    });
+
+    // --- FUNGSI SIDEBAR MOBILE ---
+    function toggleSidebar() {
+        document.getElementById('sidebar-container').classList.toggle('active');
+        document.getElementById('mobileOverlay').classList.toggle('active');
+    }
+
+    // ==========================================================
+    // 🔮 SIHIR ANTI-MACET DROPDOWN (GLOBAL EVENT DELEGATION)
+    // ==========================================================
+    document.addEventListener('click', function(e) {
+        const dropdownBtn = e.target.closest('.dropdown-btn') || e.target.closest('[data-toggle="dropdown"]');
+        if (dropdownBtn) {
+            e.preventDefault(); 
+            const dropdownContent = dropdownBtn.nextElementSibling;
+            const icon = dropdownBtn.querySelector('.fa-chevron-down') || dropdownBtn.querySelector('i:last-child');
+            
+            if (dropdownContent && (dropdownContent.classList.contains('dropdown-container') || dropdownContent.tagName === 'DIV' || dropdownContent.tagName === 'UL')) {
+                const isHidden = window.getComputedStyle(dropdownContent).display === 'none';
+                
+                if (isHidden) {
+                    dropdownContent.style.display = 'block';
+                    dropdownBtn.classList.add('active');
+                    if (icon) icon.style.transform = 'rotate(180deg)';
+                } else {
+                    dropdownContent.style.display = 'none';
+                    dropdownBtn.classList.remove('active');
+                    if (icon) icon.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
+    });
+
+    function setMenuAktif() {
+        const navDashboard = document.getElementById('nav-home');
+        let navJenisCpl = document.querySelector('[data-path="/master_data/master_jenis_cpl_si.html"]') || document.querySelector('[data-path="/master_data/master_jenis_cpl.html"]');
+        
+        if (navDashboard) navDashboard.classList.remove('active');
+        if (navJenisCpl) navJenisCpl.classList.add('active');
+
+        const menuMaster = document.getElementById('menu-master') || (navJenisCpl ? navJenisCpl.closest('.dropdown-container') : null);
+        
+        if (menuMaster) {
+            menuMaster.style.display = 'block';
+            const parentBtn = menuMaster.previousElementSibling;
+            if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                parentBtn.classList.add('active');
+                const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
+                if(icon) icon.style.transform = 'rotate(180deg)';
+            }
+        }
+    }
+
+    // --- AMANKAN AKSES HALAMAN ---
     const userLogin = localStorage.getItem("user_login");
-
-
     if (!userLogin) window.location.replace('/login/login.html');
 
     // ==========================================
@@ -157,21 +268,22 @@
     // ==========================================
     async function loadJenisCPL() {
         const tbody = document.getElementById('tabelJenisCPL');
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding: 40px;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); margin-bottom: 10px; display: block;"></i>Menarik data terbaru...</td></tr>`;
 
         try {
-            const response = await fetch(`${API_BASE}/get-jenis-cpl?prodi=si`);
+            // Kita pakai param prodi fleksibel (atau hardcode jika disepakati prodi tertentu saja)
+            const response = await fetch(`${API_BASE}/get-jenis-cpl?prodi=${PRODI}`);
             const textData = await response.text();
 
             if (!textData || textData.includes('<!DOCTYPE html>')) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:red;">Gagal terhubung ke Database.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#ef4444; font-weight: bold; padding: 30px;">❌ Gagal terhubung ke Database N8N.</td></tr>';
                 return;
             }
 
             const data = JSON.parse(textData);
 
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Belum ada data Jenis CPL.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; font-weight: 600; color: #64748b; padding: 30px;">Belum ada data Jenis CPL.</td></tr>';
                 return;
             }
 
@@ -179,9 +291,9 @@
             data.forEach((item, index) => {
                 tbody.innerHTML += `
                     <tr>
-                        <td style="text-align: center;">${index + 1}</td>
-                        <td>${item.nama_jenis}</td>
-                        <td style="text-align: center;">
+                        <td style="text-align: center; font-weight: 700; color: #64748b;">${index + 1}</td>
+                        <td style="font-weight: 800; color: var(--primary-blue); font-size: 1.05rem;">${item.nama_jenis}</td>
+                        <td style="text-align: center; white-space: nowrap;">
                             <button class="btn-edit" onclick="bukaModalEdit('${item.id}', '${item.nama_jenis}')"><i class="fas fa-edit"></i> Ubah</button>
                             <button class="btn-delete" onclick="hapusJenisCPL('${item.id}')"><i class="fas fa-trash"></i> Hapus</button>
                         </td>
@@ -189,19 +301,19 @@
                 `;
             });
         } catch (error) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red;">Error: ${error.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#ef4444; font-weight: bold; padding: 30px;"><i class="fas fa-exclamation-triangle"></i> Terjadi kesalahan jaringan.</td></tr>`;
         }
     }
 
     function bukaModal() {
-        document.getElementById('modalTitle').innerText = "Tambah Jenis CPL";
+        document.getElementById('modalTitle').innerHTML = `<i class="fas fa-plus-circle" style="color: var(--primary-blue); margin-right: 8px;"></i> Tambah Jenis CPL`;
         document.getElementById('idJenis').value = '';
         document.getElementById('inputNamaJenis').value = '';
         document.getElementById('modalJenisCPL').style.display = 'flex';
     }
 
     function bukaModalEdit(id, nama) {
-        document.getElementById('modalTitle').innerText = "Ubah Jenis CPL";
+        document.getElementById('modalTitle').innerHTML = `<i class="fas fa-edit" style="color: var(--primary-blue); margin-right: 8px;"></i> Ubah Jenis CPL`;
         document.getElementById('idJenis').value = id;
         document.getElementById('inputNamaJenis').value = nama;
         document.getElementById('modalJenisCPL').style.display = 'flex';
@@ -218,10 +330,11 @@
 
         if (!nama) return alert("⚠️ Nama jenis CPL wajib diisi!");
 
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i> Menyimpan...';
         btn.disabled = true;
 
-        const payload = { id: id, nama_jenis: nama, prodi: 'si' };
+        const payload = { id: id, nama_jenis: nama, prodi: PRODI };
 
         try {
             const response = await fetch(`${API_BASE}/simpan-jenis-cpl`, {
@@ -234,18 +347,18 @@
                 tutupModal();
                 loadJenisCPL();
             } else {
-                alert("❌ Gagal menyimpan data.");
+                alert("❌ Gagal menyimpan data ke N8N.");
             }
         } catch (error) {
             alert("❌ Terjadi kesalahan koneksi.");
         } finally {
-            btn.innerHTML = '<i class="fas fa-save"></i> Simpan';
+            btn.innerHTML = originalText;
             btn.disabled = false;
         }
     }
 
     async function hapusJenisCPL(id) {
-        if(!confirm("Yakin ingin menghapus jenis CPL ini?")) return;
+        if(!confirm("⚠️ Peringatan!\n\nYakin ingin menghapus jenis CPL ini? Data yang terhapus tidak dapat dikembalikan.")) return;
         
         try {
             const response = await fetch(`${API_BASE}/hapus-jenis-cpl`, {
@@ -257,7 +370,7 @@
             if (response.ok) {
                 loadJenisCPL();
             } else {
-                alert("❌ Gagal menghapus data.");
+                alert("❌ Gagal menghapus data dari N8N.");
             }
         } catch (error) {
             alert("❌ Terjadi kesalahan koneksi.");
@@ -270,21 +383,21 @@
     window.onload = () => {
         loadJenisCPL();
 
-        // Memberikan jeda agar template.js selesai melakukan perakitan DOM sidebar
         setTimeout(() => {
-            const navDashboard = document.getElementById('nav-home');
-            const navJenisCpl = document.querySelector('[data-path="/master_data/master_jenis_cpl.html"]');
-            const menuMaster = document.getElementById('menu-master');
-            const chevronMaster = document.getElementById('chevron-master');
-
-            if(navDashboard) navDashboard.classList.remove('active');
-            if(navJenisCpl) navJenisCpl.classList.add('active'); 
-            
-            if(menuMaster && chevronMaster) {
-                menuMaster.style.display = 'flex';
-                chevronMaster.style.transform = 'rotate(180deg)';
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                    .then(res => res.text())
+                    .then(html => {
+                        sidebar.innerHTML = html;
+                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                        setMenuAktif();
+                    })
+                    .catch(e => console.log('Gagal memuat sidebar otomatis'));
+            } else {
+                setMenuAktif();
             }
-        }, 300);
+        }, 400);
     };
 </script>
 </body>

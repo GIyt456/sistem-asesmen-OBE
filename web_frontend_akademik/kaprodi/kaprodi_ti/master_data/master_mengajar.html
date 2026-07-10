@@ -2,445 +2,344 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Mengajar TI - Sistem OBE</title>
-    <link rel="stylesheet" href="../../../css/style.css">
-    <script src="../../../js/template.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Data Mengajar Dosen - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    <link rel="stylesheet" href="/css/index_mobile.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="../../../js/api_config.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script>
     
     <style>
-        :root { 
-            --primary-red: #8b0000; 
-            --primary-red-dark: #5c0000; 
-            --bg-main: #ffffff; 
-            --text-dark: #111827;
-            --border-light: #e5e7eb;
-            --border-dark: #161923;
+        /* =========================================
+           🛡️ MANTRA ANTI-BOCOR & ANTI-MEROSOT
+           ========================================= */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;}
+        body, input, select, button, textarea { font-family: 'Inter', sans-serif !important; }
+
+        /* MEMBUNUH PADDING BAWAAN CSS GLOBAL */
+        .fixed-header { padding-top: 15px !important; }
+        .main-content { padding-top: 0 !important; }
+
+        /* KONTROL TABEL DESKTOP */
+        .table-action-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;}
+        .table-controls { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .search-box { position: relative; }
+        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+        .search-box input { padding: 10px 15px 10px 35px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; width: 250px; font-weight: 500; transition: 0.2s;}
+        .search-box input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(30,58,138, 0.1); }
+        .select-entries { padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 600; color: #334155; outline: none; cursor: pointer;}
+
+        .tabel-mengajar th { background: #1e293b !important; color: white !important; font-weight: 700; padding: 15px !important; position: sticky; top: 0; z-index: 5;}
+        .tabel-mengajar td { padding: 15px !important; vertical-align: middle; border-bottom: 1px solid #e5e7eb;}
+        .tabel-mengajar tbody tr:hover td { background-color: #f8fafc; }
+
+        .btn-action-small { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s;}
+        .btn-danger { background: #fee2e2; color: #dc2626; }
+        .btn-danger:hover { background: #fca5a5; }
+
+        /* =========================================
+           📱 CSS KHUSUS HP (SULAP TABEL JADI KARTU)
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
+            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
+            
+            .header-master { margin: 15px 0 10px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-master { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
+            
+            .table-action-header { flex-direction: column !important; align-items: stretch !important; gap: 15px;}
+            .table-controls { flex-direction: column !important; align-items: stretch !important; width: 100%;}
+            .search-box { width: 100%; }
+            .search-box input { width: 100%; }
+            .select-entries { width: 100%; }
+            .btn-primary-si { width: 100% !important; justify-content: center !important;}
+
+            /* SULAP TABEL MENJADI KARTU */
+            .table-container { border: none !important; box-shadow: none !important; background: transparent !important; padding: 0 !important; overflow-x: hidden !important; margin: 0;}
+            .table-container table, .table-container thead, .table-container tbody, .table-container th, .table-container td, .table-container tr { display: block !important; width: 100% !important; min-width: 0 !important; box-sizing: border-box !important;}
+            
+            .table-container thead { display: none !important;}
+            
+            .table-container tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; padding: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;}
+            
+            .table-container td { display: flex !important; flex-direction: column !important; align-items: stretch !important; text-align: left !important; padding: 10px 0 !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+            .table-container td:last-child { border-bottom: none !important; padding-bottom: 0 !important; flex-direction: row !important; gap: 10px; margin-top: 10px;}
+            
+            .table-container td::before { font-weight: 800; color: #64748b; font-size: 0.8rem; margin-bottom: 6px; text-transform: uppercase;}
+            
+            /* Mapping Label untuk Kartu Data Mengajar */
+            .tabel-mengajar td:nth-child(1) { display: none !important;} /* Sembunyikan Nomor */
+            .tabel-mengajar td:nth-child(2)::before { content: "TAHUN AJARAN"; }
+            .tabel-mengajar td:nth-child(3)::before { content: "SEMESTER"; }
+            .tabel-mengajar td:nth-child(4)::before { content: "MATA KULIAH"; color: var(--primary-blue);}
+            .tabel-mengajar td:nth-child(5)::before { content: "DOSEN PENGAMPU"; }
+            .tabel-mengajar td:nth-child(6)::before { content: "KELOMPOK KELAS"; }
+            .tabel-mengajar td:nth-child(7)::before { display: none; }
+            
+            /* Penyesuaian Visual Konten HP */
+            .tabel-mengajar td:nth-child(4) { font-size: 1.15rem !important; font-weight: 900 !important; border-bottom: 3px solid var(--primary-blue) !important; padding-bottom: 15px !important; margin-bottom: 5px !important;}
+            .tabel-mengajar td:nth-child(5) { font-size: 1rem !important; font-weight: 700 !important; color: #1e293b !important;}
+            .tabel-mengajar td:nth-child(6) span { font-size: 0.9rem !important; padding: 6px 12px !important; display: inline-block; width: fit-content;}
+            .tabel-mengajar td:nth-child(7) .btn-action-small { flex: 1; justify-content: center; padding: 12px; font-size: 1rem;}
+            
+            #pagination-container { flex-direction: column; width: 100%; gap: 10px;}
+            #pagination-container button, #pagination-container span { width: 100%; text-align: center; justify-content: center;}
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        
-        body { 
-            display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark);
-            animation: transitionIn 0.3s ease-in-out; 
-        }
-        
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
-
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
-        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px;}
-        .header-title span { color: var(--primary-red); }
-        
-        .badge-prodi { background: var(--primary-red-dark); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2); }
-
-        .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        
-        .btn-primary-ti { background: linear-gradient(to right, var(--primary-red), var(--primary-red-dark)); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 6px rgba(139, 0, 0, 0.2); }
-        .btn-primary-ti:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(139, 0, 0, 0.3); }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; border: 1.5px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white; }
-        th { background: #f3f4f6; color: var(--text-dark); padding: 14px 16px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
-        td { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; }
-        tbody tr:hover { background-color: #f9fafb; }
-        
-        .form-control { width: 100%; padding: 12px 16px; border: 1.5px solid #d1d5db; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
-        .form-control:focus { border-color: var(--border-dark); }
-        
-        .btn-action { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; color: white; transition: 0.2s; }
-        .btn-delete { background: #ef4444; }
-        .btn-delete:hover { background: #dc2626; }
-
-        /* --- MODAL POP-UP STYLES --- */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; animation: fadeIn 0.2s ease; }
-        .modal-box { background: white; padding: 32px; border-radius: 16px; width: 500px; max-width: 90%; border: 2.5px solid var(--border-dark); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 0.9rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
     </style>
 </head>
 <body>
 
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi"></div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        
-        <div class="header-container">
-            <div class="header-title-area">
-                <div class="header-subtitle">KELOLA KURIKULUM</div>
-                <h1 class="header-title">DATA <span>MENGAJAR</span></h1>
-            </div>
-            <div class="badge-prodi"><i class="fas fa-chalkboard"></i> Teknik Informatika</div>
-        </div>
+        <div id="navbar-container"></div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <div>
-                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Data Mengajar (TI)</h3>
-                <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola plotting dosen mengajar per mata kuliah dan kelas Teknik Informatika.</p>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                
-                <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display:none;" onchange="prosesUploadExcel(event)">
-                
-                <button class="btn-dark" onclick="loadData()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            </div>
-        </div>
-
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <div style="display: flex; align-items: center; gap: 8px; color: #4b5563; font-size: 0.9rem;">
-                Show 
-                <select id="showEntries" style="padding: 6px 10px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; cursor: pointer;">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="25">25</option>
-                </select> entries
-            </div>
-            
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <label style="font-size: 0.9rem; font-weight: 600; color: #4b5563;">Search:</label>
-                <input type="text" id="searchBox" placeholder="Ketik pencarian..." style="padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 6px; outline: none; font-size: 0.9rem;">
-            </div>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th width="3%" style="text-align: center;">#</th>
-                    <th width="18%">Mata Kuliah</th>
-                    <th width="10%" style="text-align: center;">Tahun</th>
-                    <th width="8%" style="text-align: center;">Semester</th>
-                    <th width="20%">Dosen Koordinator</th>
-                    <th width="15%">Kelas</th>
-                </tr>
-            </thead>
-            <tbody id="bodyMengajar">
-                </tbody>
-        </table>
-
-        <div id="pagination-mengajar" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.85rem; color: #6b7280;">
-            <div>Loading entries...</div>
-        </div>
-    </div>
-
-    <div id="modalMengajar" class="modal-overlay">
-        <div class="modal-box">
-            <h3 id="modalTitle" style="margin-top: 0; margin-bottom: 20px; color: var(--text-dark); font-size: 1.4rem; font-weight: 800;">Form Data Mengajar</h3>
-            
-            <input type="hidden" id="inputIdMengajar">
-            
-            <div class="form-group">
-                <label>Kode Mata Kuliah</label>
-                <input type="text" id="inputKodeMk" class="form-control" placeholder="Contoh: 2523W031">
-            </div>
-            <div class="form-group">
-                <label>Nama Mata Kuliah</label>
-                <input type="text" id="inputNamaMk" class="form-control" placeholder="Contoh: Pemrograman Web">
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="form-group">
-                    <label>Tahun Ajaran</label>
-                    <input type="text" id="inputTahun" class="form-control" placeholder="Contoh: 2025/2026">
+        <div class="fixed-header">
+            <div class="header-container header-master" style="margin: 0 0 15px 0; border-bottom: none; padding-bottom: 0;">
+                <div class="header-title-area">
+                    <div class="header-subtitle">DATA AKADEMIK</div>
+                    <h1 class="header-title">DATA <span>MENGAJAR DOSEN</span></h1>
                 </div>
-                <div class="form-group">
-                    <label>Semester</label>
-                    <select id="inputSemester" class="form-control" style="cursor: pointer;">
-                        <option value="Ganjil">Ganjil</option>
-                        <option value="Genap">Genap</option>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
+            </div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;" class="header-master"></div>
+        </div>
+
+        <div class="scrollable-content section-master" style="padding-top: 0; padding-bottom: 40px;">
+            
+            <div class="table-action-header">
+                <div class="table-controls">
+                    <select id="showEntries" class="select-entries">
+                        <option value="10">10 Entri per halaman</option>
+                        <option value="25">25 Entri per halaman</option>
+                        <option value="50">50 Entri per halaman</option>
                     </select>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchBox" placeholder="Cari dosen, mata kuliah, kelompok...">
+                    </div>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label>Kelas</label>
-                <input type="text" id="inputKelas" class="form-control" placeholder="Contoh: TI-A / Gabungan">
-            </div>
-
-            <div class="form-group" style="margin-bottom: 30px;">
-                <label>Nama Dosen Pengampu</label>
-                <input type="text" id="inputNamaDosen" class="form-control" placeholder="Nama Dosen beserta Gelar">
+                <button class="btn-primary-si" onclick="alert('Fungsi Tambah Jadwal diarahkan ke Form n8n')">
+                    <i class="fas fa-plus" style="margin-right: 8px;"></i> Tambah Jadwal
+                </button>
             </div>
             
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button onclick="tutupModalMengajar()" style="padding: 12px 18px; border: none; border-radius: 8px; background: #f3f4f6; cursor: pointer; font-weight: 600; color: #4b5563;">Batal</button>
-                <button onclick="simpanMengajar()" class="btn-primary-ti"><i class="fas fa-save"></i> Simpan Data</button>
+            <div class="table-container">
+                <table class="tabel-mengajar">
+                    <thead>
+                        <tr>
+                            <th width="5%" style="text-align: center;">NO</th>
+                            <th width="12%">TAHUN AJARAN</th>
+                            <th width="10%">SEMESTER</th>
+                            <th width="30%">MATA KULIAH</th>
+                            <th width="23%">DOSEN PENGAMPU</th>
+                            <th width="10%">KELOMPOK</th>
+                            <th width="10%" style="text-align: center;">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyMengajar">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px; color: #64748b;">
+                                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); margin-bottom: 10px; display: block;"></i>
+                                Menghubungkan ke database Data Mengajar...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+
+            <div id="pagination-container"></div>
+
         </div>
     </div>
 
 <script>
-    const PRODI = 'ti'; 
-    const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`; 
+    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
+    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        if(PRODI === "ti") {
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+        } else {
+            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+        }
 
-    const userLogin = localStorage.getItem("user_login");
-    const userRole = localStorage.getItem("user_role");
-    const userProdi = localStorage.getItem("prodi_aktif");
+        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+        const avatarMobile = document.getElementById("mobileNavbarAvatar");
+        if(avatarMobile) {
+            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+        }
+    });
 
-    if (!userLogin) window.location.replace('/login/login.html');
-    if (userRole !== 'head_admin') {
-        if (userRole === 'dosen') window.location.replace(userProdi === 'si' ? "input_nilai_si.html" : "../../dosen/input_nilai.html");
-        else if (userRole === 'admin' && userProdi === 'si') window.location.replace("../kaprodi_si/admin_config_si.html");
+    // --- FUNGSI SIDEBAR MOBILE ---
+    function toggleSidebar() {
+        document.getElementById('sidebar-container').classList.toggle('active');
+        document.getElementById('mobileOverlay').classList.toggle('active');
     }
+    
+    // --- AMANKAN AKSES HALAMAN ---
+    const userLogin = localStorage.getItem("user_login");
+    if (!userLogin) window.location.replace('/login/login.html');
 
-    let allDataMengajar = []; 
+    // --- VARIABEL & PENGATURAN API ---
+    const API_URL = `${API_BASE}/get-metadata?prodi=${PRODI}`;
+    let allDataMengajar = [];
     let currentPage = 1;
     let rowsPerPage = 10;
-    let searchQuery = "";
+    let searchQuery = '';
 
+    // --- TARIK DATA DARI N8N ---
     async function loadData() {
-        const tbody = document.getElementById("bodyMengajar");
-        tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding: 20px;'><i class='fas fa-spinner fa-spin'></i> Sedang memuat data dari database...</td></tr>";
-
+        const tbody = document.getElementById('tableBodyMengajar');
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); margin-bottom: 10px; display: block;"></i>Menarik data terbaru...</td></tr>`;
+        
         try {
-            const res = await fetch(API_URL);
-            const fullData = await res.json();
+            const response = await fetch(API_URL);
+            const textData = await response.text();
             
-            allDataMengajar = fullData.filter(i => i.tipe === 'mengajar');
-            currentPage = 1;
-            renderTablePaginated(); 
+            let parsed = JSON.parse(textData);
+            let rawData = Array.isArray(parsed) ? parsed : (parsed.data || []);
+            rawData = rawData.map(i => i.json ? i.json : i);
             
+            // Saring hanya tipe = 'mengajar'
+            allDataMengajar = rawData.filter(i => i.tipe === 'mengajar');
+            
+            renderTablePaginated();
+
         } catch (error) {
-            console.error("Gagal menarik data:", error);
-            tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; color:red; padding: 20px;'>❌ Gagal memuat data dari server n8n. Pastikan webhook aktif.</td></tr>";
+            console.error("Gagal memuat data Mengajar:", error);
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color: #ef4444; font-weight: bold;"><i class="fas fa-exclamation-triangle" style="margin-right: 5px;"></i> Gagal terhubung ke server n8n.</td></tr>`;
         }
     }
 
+    // --- FUNGSI RENDER TABEL & PAGINATION ---
     function renderTablePaginated() {
-        const tbody = document.getElementById("bodyMengajar");
-        tbody.innerHTML = ""; 
-
-        const filteredData = allDataMengajar.filter(item => {
-            const labelContent = item.label ? item.label.toLowerCase() : "";
-            return labelContent.includes(searchQuery);
+        const tbody = document.getElementById("tableBodyMengajar");
+        
+        // 1. Filter Pencarian
+        let filtered = allDataMengajar.filter(item => {
+            const lbl = item.label || "";
+            return lbl.toLowerCase().includes(searchQuery);
         });
 
-        if(filteredData.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='7' style='text-align:center; padding: 20px;'>Data tidak ditemukan.</td></tr>";
-            document.getElementById('pagination-mengajar').innerHTML = `<div>Showing 0 entries</div>`;
+        // 2. Kalkulasi Pagination
+        const totalPages = Math.ceil(filtered.length / rowsPerPage);
+        if (currentPage > totalPages) currentPage = totalPages || 1;
+        const start = (currentPage - 1) * rowsPerPage;
+        const currentData = filtered.slice(start, start + rowsPerPage);
+
+        tbody.innerHTML = '';
+
+        if (currentData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; font-weight: 600; color: #64748b;">Tidak ada data yang ditemukan.</td></tr>';
+            renderPaginationControls(0);
             return;
         }
 
-        const startIndex = (currentPage - 1) * rowsPerPage;
-        const endIndex = startIndex + rowsPerPage;
-        const dataToShow = filteredData.slice(startIndex, endIndex);
-
-        dataToShow.forEach((item, index) => {
-            const noUrut = startIndex + index + 1;
-            const parts = item.label ? item.label.split('||') : ['-','-','-','-','-','-'];
-            const kodeMk = parts[0] || '-'; 
-            const namaMk = parts[1] || '-'; 
-            const tahun = parts[2] || '-';
-            const semester = parts[3] || '-'; 
-            const namaDosen = parts[4] || '-'; 
-            const namaKelas = parts[5] || '-';
-            const idData = item.kode || '';
-
-            // Menghindari karakter kutip yang merusak parameter fungsi
-            const safeNamaMk = namaMk.replace(/'/g, "\\'");
-            const safeNamaDosen = namaDosen.replace(/'/g, "\\'");
-
+        // 3. Cetak Baris
+        currentData.forEach((item, index) => {
+            // Pecah data berdasarkan delimiter "||" dari query SQL n8n terbaru
+            const parts = item.label ? item.label.split('||') : [];
+            const kodeMK = parts[0] ? parts[0].trim() : "-";
+            const namaMK = parts[1] ? parts[1].trim() : "-";
+            const tahun = parts[2] ? parts[2].trim() : "-";
+            const semester = parts[3] ? parts[3].trim() : "-";
+            const dosen = parts[4] ? parts[4].trim() : "-";
+            const kelompok = parts[5] ? parts[5].trim() : "-";
+            
             tbody.innerHTML += `
-            <tr>
-                <td style="text-align: center; vertical-align: top; padding-top: 18px;">${noUrut}</td>
-                <td style="vertical-align: top; padding-top: 18px;">
-                    <span style="display:block; color:#6b7280; font-size:0.8rem; margin-bottom: 4px;">${kodeMk}</span>
-                    <strong style="color: var(--text-dark); font-size: 0.9rem;">${namaMk}</strong>
-                </td>
-                <td style="text-align:center; vertical-align: top; padding-top: 18px; font-weight:600;">${tahun}</td>
-                <td style="text-align:center; vertical-align: top; padding-top: 18px;">${semester}</td>
-                <td style="vertical-align: top; font-size: 0.85rem; color: #4338ca; padding-top: 18px; line-height: 1.6; font-weight: 600;">
-                    ${namaDosen !== '-' ? namaDosen : '<a href="#" style="color: #ef4444; font-weight: 600; text-decoration: none;">Belum Diplot</a>'}
-                </td>
-                <td style="vertical-align: top; font-size: 0.8rem; color: #6b7280; padding-top: 18px;">${namaKelas}</td>
-                </td>
-            </tr>`;
+                <tr>
+                    <td style="text-align: center; font-weight: 600;">${start + index + 1}</td>
+                    <td style="font-weight: 600; color: #475569;">${tahun}</td>
+                    <td style="font-weight: 600; color: #475569;">${semester}</td>
+                    <td>
+                        <div style="font-weight: 800; color: var(--primary-blue); margin-bottom: 4px;">${kodeMK}</div>
+                        <div style="font-size: 0.85rem; color: #64748b; font-weight: 500;">${namaMK}</div>
+                    </td>
+                    <td style="font-weight: 700; color: #1e293b;">${dosen}</td>
+                    <td>
+                        <span style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; white-space: nowrap;">
+                            ${kelompok}
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-action-small btn-danger" onclick="alert('Fitur hapus diarahkan ke API n8n untuk MK: ${kodeMK}')">
+                            <i class="fas fa-trash-alt"></i> Hapus
+                        </button>
+                    </td>
+                </tr>
+            `;
         });
-
-        renderPaginationUI(filteredData.length, startIndex, endIndex);
-    }
-
-    function renderPaginationUI(totalFilteredData, startIndex, endIndex) {
-        const totalPages = Math.ceil(totalFilteredData / rowsPerPage);
-        const actualEndIndex = Math.min(endIndex, totalFilteredData);
-        const paginationContainer = document.getElementById('pagination-mengajar');
         
-        let html = `<div>Showing ${startIndex + 1} to ${actualEndIndex} of ${totalFilteredData} entries</div>`;
-        html += `<div style="display: flex; gap: 5px;">`;
-        const prevDisabled = currentPage === 1;
-        html += `<button class="btn" style="background: ${prevDisabled ? '#e5e7eb' : 'var(--border-dark)'}; color: ${prevDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; cursor: ${prevDisabled ? 'not-allowed' : 'pointer'}; border:none; border-radius:8px;" ${prevDisabled ? 'disabled' : `onclick="changePage(-1)"`}><i class="fas fa-chevron-left"></i> Prev</button>`;
-        const nextDisabled = currentPage === totalPages || totalPages === 0;
-        html += `<button class="btn" style="background: ${nextDisabled ? '#e5e7eb' : 'var(--border-dark)'}; color: ${nextDisabled ? '#9ca3af' : 'white'}; padding: 8px 12px; cursor: ${nextDisabled ? 'not-allowed' : 'pointer'}; border:none; border-radius:8px;" ${nextDisabled ? 'disabled' : `onclick="changePage(1)"`}>Next <i class="fas fa-chevron-right"></i></button>`;
-        html += `</div>`;
-        paginationContainer.innerHTML = html;
+        renderPaginationControls(totalPages);
     }
 
-    function changePage(direction) { currentPage += direction; renderTablePaginated(); }
+    function renderPaginationControls(totalPages) {
+        const container = document.getElementById("pagination-container");
+        container.innerHTML = '';
+        if (totalPages <= 1 && allDataMengajar.length <= rowsPerPage) return;
 
-    // ==========================================
-    // FUNGSI MODAL MANUAL (TAMBAH / UBAH)
-    // ==========================================
-    function bukaModalMengajar(id = '', kode = '', namaMk = '', tahun = '', semester = 'Ganjil', kelas = '', dosen = '') {
-        document.getElementById('inputIdMengajar').value = id;
-        document.getElementById('inputKodeMk').value = kode;
-        document.getElementById('inputNamaMk').value = namaMk;
-        document.getElementById('inputTahun').value = tahun;
-        document.getElementById('inputSemester').value = semester;
-        document.getElementById('inputKelas').value = kelas;
-        document.getElementById('inputNamaDosen').value = dosen === '-' ? '' : dosen;
+        let btnPrev = `<button ${currentPage === 1 ? 'disabled' : ''} onclick="currentPage--; renderTablePaginated()"><i class="fas fa-chevron-left"></i></button>`;
+        let btnNext = `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="currentPage++; renderTablePaginated()"><i class="fas fa-chevron-right"></i></button>`;
+        let info = `<span style="padding: 8px 15px; background: #f1f5f9; border-radius: 6px; font-weight: 700; color: #475569;">Halaman ${currentPage} dari ${totalPages}</span>`;
 
-        // Kunci Kode MK jika mode Edit
-        if(id) {
-            document.getElementById('inputKodeMk').readOnly = true;
-            document.getElementById('inputKodeMk').style.backgroundColor = "#f3f4f6";
-            document.getElementById('modalTitle').innerText = "Ubah Data Mengajar";
-        } else {
-            document.getElementById('inputKodeMk').readOnly = false;
-            document.getElementById('inputKodeMk').style.backgroundColor = "#ffffff";
-            document.getElementById('modalTitle').innerText = "Tambah Plotting Baru";
-        }
-
-        document.getElementById('modalMengajar').style.display = "flex";
+        container.innerHTML = `${btnPrev} ${info} ${btnNext}`;
     }
 
-    function tutupModalMengajar() { document.getElementById('modalMengajar').style.display = "none"; }
+    // --- EVENT LISTENER SAAT HALAMAN DIBUKA ---
+    window.onload = function() {
+        loadData();
 
-    async function simpanMengajar() {
-        const id = document.getElementById('inputIdMengajar').value;
-        const kodeMk = document.getElementById('inputKodeMk').value.trim();
-        const namaMk = document.getElementById('inputNamaMk').value.trim();
-        const tahun = document.getElementById('inputTahun').value.trim();
-        const semester = document.getElementById('inputSemester').value;
-        const kelas = document.getElementById('inputKelas').value.trim();
-        const dosen = document.getElementById('inputNamaDosen').value.trim();
-
-        if(!kodeMk || !namaMk || !kelas || !dosen) { alert("⚠️ Harap isi Kode MK, Nama MK, Kelas, dan Dosen!"); return; }
-
-        const actionType = id ? "UBAH" : "TAMBAH";
-        const btnSimpan = document.querySelector("#modalMengajar .btn-primary-ti");
-        const originalText = btnSimpan.innerHTML;
-        btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-        btnSimpan.disabled = true;
-
-        try {
-            const response = await fetch(`${API_BASE}/post-data-mengajar`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    aksi: actionType, 
-                    id_mengajar: id, // Berguna untuk klausa WHERE saat update
-                    kode_mk: kodeMk, nama_mk: namaMk, tahun: tahun, 
-                    semester: semester, kelas: kelas, dosen: dosen, prodi: PRODI 
-                })
-            });
-
-            if(response.ok) {
-                alert(`✅ Plotting mengajar berhasil di${actionType.toLowerCase()}!`);
-                tutupModalMengajar(); loadData();
-            } else { alert("❌ Gagal menyimpan data ke server n8n."); }
-        } catch(e) { console.error(e); alert("❌ Terjadi kesalahan jaringan.");
-        } finally { btnSimpan.innerHTML = originalText; btnSimpan.disabled = false; }
-    }
-
-    async function konfirmasiHapusMengajar(id, kodeMk, kelas) {
-        if(confirm(`⚠️ Peringatan!\n\nAnda akan MENGHAPUS plotting kelas:\nKode MK: ${kodeMk}\nKelas: ${kelas}\n\nLanjutkan?`)) {
-            try {
-                const response = await fetch(`${API_BASE}/post-data-mengajar`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ aksi: "HAPUS", id_mengajar: id, prodi: PRODI })
-                });
-
-                if(response.ok) { alert("✅ Data plotting berhasil dihapus!"); loadData(); } 
-                else { alert("❌ Gagal menghapus data di server n8n."); }
-            } catch(e) { alert("❌ Terjadi kesalahan jaringan."); }
-        }
-    }
-
-    // ==========================================
-    // FUNGSI UPLOAD EXCEL DATA MENGAJAR
-    // ==========================================
-    async function prosesUploadExcel(event) {
-        const file = event.target.files[0];
-        if(!file) return;
-
-        const btnUpload = document.getElementById('btnUploadExcel');
-        const originalText = btnUpload.innerHTML;
-        btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membaca File...';
-        btnUpload.disabled = true;
-
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const excelData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-
-                if(excelData.length === 0) { alert("⚠️ Excel kosong!"); resetButton(); return; }
-
-                const arraySiapKirim = excelData.map(row => {
-                    return { 
-                        kode_mk: String(row['Kode MK'] || row['kode_mk'] || '').trim(),
-                        nama_mk: String(row['Nama MK'] || row['nama_mk'] || '').trim(),
-                        tahun: String(row['Tahun'] || row['Tahun Ajaran'] || '').trim(),
-                        semester: String(row['Semester'] || '').trim(),
-                        kelas: String(row['Kelas'] || '').trim(),
-                        dosen: String(row['Dosen'] || row['Nama Dosen'] || '').trim()
-                    };
-                }).filter(item => item.kode_mk !== '' && item.kelas !== ''); 
-
-                if(arraySiapKirim.length === 0) {
-                    alert("⚠️ Format salah! Pastikan ada kolom 'Kode MK', 'Nama MK', 'Tahun', 'Semester', 'Kelas', dan 'Dosen'.");
-                    resetButton(); return;
-                }
-
-                btnUpload.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyimpan ${arraySiapKirim.length} Data...`;
-
-                const response = await fetch(`${API_BASE}/post-excel-mengajar`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: arraySiapKirim, prodi: PRODI })
-                });
-
-                if(response.ok) { alert(`✅ ${arraySiapKirim.length} plotting berhasil diimport.`); loadData(); } 
-                else { alert("❌ Gagal mengirim ke server n8n."); }
-            } catch (err) { alert("❌ Gagal membaca file Excel.");
-            } finally { resetButton(); }
-        };
-        reader.readAsArrayBuffer(file);
-
-        function resetButton() {
-            btnUpload.innerHTML = originalText; btnUpload.disabled = false;
-            document.getElementById('fileExcel').value = ""; 
-        }
-    }
-
-    // ==========================================
-    // INIT
-    // ==========================================
-    window.onload = () => { 
-        loadData(); 
+        // Event Listener Pencarian & Entri
         const selectBox = document.getElementById('showEntries');
         if(selectBox) { selectBox.onchange = (e) => { rowsPerPage = parseInt(e.target.value); currentPage = 1; renderTablePaginated(); } }
 
         const searchBox = document.getElementById('searchBox');
         if(searchBox) { searchBox.oninput = (e) => { searchQuery = e.target.value.toLowerCase(); currentPage = 1; renderTablePaginated(); } }
 
+        // Sidebar Active Indicator
         setTimeout(() => {
-            const navDashboard = document.getElementById('nav-home');
-            const navMengajar = document.querySelector('[data-path="/master_data/master_mengajar.html"]'); 
-            const menuMaster = document.getElementById('menu-master');
-            const chevronMaster = document.getElementById('chevron-master');
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                    .then(res => res.text())
+                    .then(html => {
+                        sidebar.innerHTML = html;
+                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                        
+                        setTimeout(() => {
+                            const navDashboard = document.getElementById('nav-home');
+                            let navMengajar = document.querySelector('[data-path="/master_data/master_mengajar_si.html"]'); 
+                            if (!navMengajar) navMengajar = document.querySelector('[data-path="/master_data/master_mengajar.html"]');
+                            const menuMaster = document.getElementById('menu-master');
+                            const chevronMaster = document.getElementById('chevron-master');
 
-            if(navDashboard) navDashboard.classList.remove('active');
-            if(navMengajar) navMengajar.classList.add('active'); 
-            if(menuMaster && chevronMaster) { menuMaster.style.display = 'flex'; chevronMaster.style.transform = 'rotate(180deg)'; }
-        }, 300);
+                            if(navDashboard) navDashboard.classList.remove('active');
+                            if(navMengajar) navMengajar.classList.add('active'); 
+                            if(menuMaster && chevronMaster) { menuMaster.style.display = 'flex'; chevronMaster.style.transform = 'rotate(180deg)'; }
+                        }, 100);
+                    })
+                    .catch(e => console.log('Gagal memuat sidebar darurat'));
+            }
+        }, 400); 
     };
 </script>
 </body>
