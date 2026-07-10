@@ -2,151 +2,227 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Rumpun MK SI - Sistem OBE</title>
-    <link rel="stylesheet" href="../../../css/style.css">
-    <script src="../../../js/template.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Master Rumpun MK - Sistem OBE</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    <link rel="stylesheet" href="/css/index_mobile.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-     <script src="../../../js/api_config.js"></script>
+    
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script>
     
     <style>
-        /* --- CSS STYLING UTAMA --- */
-        :root { 
-            /* Background sidebar dihapus agar mengikuti theme-si dari style.css global */
-            --primary-teal: #01626d; 
-            --primary-teal-dark: #006064; 
-            --bg-main: #ffffff; 
-            --text-dark: #111827;
-            --border-dark: #161923;
-        }
+        /* =========================================
+           🛡️ MANTRA ANTI-BOCOR & ANTI-MEROSOT
+           ========================================= */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        body, input, select, button, textarea { font-family: 'Inter', sans-serif !important; }
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        /* MEMBUNUH PADDING BAWAAN CSS GLOBAL */
+        .fixed-header { padding-top: 15px !important; }
+        .main-content { padding-top: 0 !important; }
+
+        /* HEADER TABEL KUSTOM */
+        .table-action-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .table-action-header h3 { margin: 0; font-size: 1.4rem; font-weight: 800; color: var(--text-dark);}
+        .table-action-header p { margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500; }
+
+        /* DESAIN TABEL DESKTOP */
+        .table-container { background: white; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 20px; width: 100%; }
+        .table-container table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
+        .table-container th { background: #1e293b; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; color: white; border-bottom: 2px solid #0f172a; text-transform: uppercase; position: sticky; top: 0; z-index: 5;}
+        .table-container td { padding: 15px 20px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; color: #1e293b; vertical-align: middle; }
         
-        /* --- ✨ EFEK SMOOTH TRANSITION ✨ --- */
-        body { 
-            display: flex; background: var(--bg-main); height: 100vh; overflow: hidden; color: var(--text-dark);
-            animation: transitionIn 0.3s ease-in-out; 
+        .tabel-rumpun tbody tr:hover td { background-color: #f8fafc; }
+
+        /* =========================================
+           📱 CSS KHUSUS HP (SULAP TABEL JADI KARTU)
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
+            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
+            
+            .header-master { margin: 15px 0 10px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-master { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
+            
+            /* Penyesuaian Header Tabel di HP */
+            .table-action-header { flex-direction: column !important; align-items: flex-start !important; gap: 15px;}
+            .table-action-header button { width: 100% !important; justify-content: center !important; padding: 12px !important; font-size: 1.05rem !important;}
+
+            /* SULAP TABEL MENJADI KARTU (TANPA AKSI) */
+            .table-container { border: none !important; box-shadow: none !important; background: transparent !important; padding: 0 !important; overflow-x: hidden !important; margin: 0;}
+            .table-container table, .table-container thead, .table-container tbody, .table-container th, .table-container td, .table-container tr { display: block !important; width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; }
+            
+            /* Sembunyikan Header Tabel */
+            .table-container thead { display: none !important;}
+            
+            /* TR Menjadi Kotak Kartu Utama */
+            .table-container tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; padding: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;}
+            
+            /* TD menyusun ke bawah dan menambahkan label */
+            .table-container td { display: flex !important; flex-direction: column !important; align-items: stretch !important; text-align: left !important; padding: 10px 0 !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+            .table-container td:last-child { border-bottom: none !important; padding-bottom: 0 !important; }
+            
+            /* Label buatan menggunakan CSS content() */
+            .table-container td::before { font-weight: 800; color: #64748b; font-size: 0.8rem; margin-bottom: 8px; text-transform: uppercase;}
+            
+            /* Mapping Label untuk Kartu Rumpun MK (BK) */
+            .tabel-rumpun td:nth-child(1)::before { content: "KODE RUMPUN (BK)"; color: var(--primary-blue); }
+            .tabel-rumpun td:nth-child(2)::before { content: "NAMA RUMPUN BAHAN KAJIAN"; }
+            .tabel-rumpun td:nth-child(3)::before { content: "DESKRIPSI"; }
+            .tabel-rumpun td:nth-child(4)::before { display: none;} /* Label prodi dihilangkan agar badge natural */
+            
+            /* Penyesuaian visual konten di HP */
+            .tabel-rumpun td:nth-child(1) { font-size: 1.2rem !important; color: #0f172a !important; font-weight: 900 !important; border-bottom: 3px solid var(--primary-blue) !important; padding-bottom: 15px !important; margin-bottom: 5px !important;}
+            .tabel-rumpun td:nth-child(2) { font-size: 1.1rem !important; font-weight: 700 !important; color: var(--text-dark) !important;}
+            .tabel-rumpun td:nth-child(3) { color: #475569 !important; line-height: 1.5; padding-top: 5px !important; white-space: pre-wrap !important;}
+            .tabel-rumpun td:nth-child(4) { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; margin-top: 5px !important;}
         }
-        
-        @keyframes transitionIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* GAYA MAIN CONTENT & TABEL */
-        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; background-color: var(--bg-main); }
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
-        .header-title-area { display: flex; flex-direction: column; }
-        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
-        .header-title span { color: var(--primary-teal); }
-        
-        /* --- UPDATE GAYA BADGE KHUSUS SI --- */
-        .badge-prodi { 
-            background: var(--primary-teal-dark); 
-            color: white; 
-            padding: 10px 20px; 
-            border-radius: 30px; 
-            font-size: 0.9rem; 
-            font-weight: 600; 
-            box-shadow: 0 4px 6px rgba(0, 96, 100, 0.2);
-        }
-        
-        .btn-dark { background: var(--border-dark); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .btn-dark:hover { background: #000000; transform: translateY(-2px); }
-        
-        .table-card { background: white; border-radius: 12px; overflow: hidden; border: 1.5px solid #e5e7eb; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #f8fafc; color: var(--text-dark); padding: 16px 20px; text-align: left; border-bottom: 2px solid #e5e7eb; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
-        td { padding: 16px 20px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; }
-        tbody tr:hover { background-color: #f9fafb; }
     </style>
 </head>
 <body>
 
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
+                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
+                 onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()">
+            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
+        </div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
 
     <div class="main-content">
-        <div class="header-container">
-            <div class="header-title-area">
-                <div class="header-subtitle">MASTER DATA</div>
-                <h1 class="header-title">RUMPUN <span>MATA KULIAH</span></h1>
+        <div id="navbar-container"></div>
+
+        <div class="fixed-header">
+            <div class="header-container header-master" style="margin: 0 0 15px 0; border-bottom: none; padding-bottom: 0;">
+                <div class="header-title-area">
+                    <div class="header-subtitle">MASTER DATA</div>
+                    <h1 class="header-title">RUMPUN <span>MATA KULIAH</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
             </div>
-            <div class="badge-prodi"><i class="fas fa-layer-group"></i> Sistem Informasi</div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;" class="header-master"></div>
         </div>
 
-        <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div class="scrollable-content section-master" style="padding-top: 0; padding-bottom: 40px;">
+            
+            <div class="table-action-header">
                 <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Rumpun MK (Bahan Kajian)</h3>
-                    <p style="margin: 4px 0 0 0; color: #9ca3af; font-size: 0.95rem; font-weight: 500;">Kelola data rumpun mata kuliah prodi Sistem Informasi.</p>
+                    <h3>Daftar Rumpun MK (Bahan Kajian)</h3>
+                    <p>Melihat daftar data rumpun mata kuliah yang terintegrasi pada sistem.</p>
                 </div>
-                <button class="btn-dark" onclick="fetchDataRumpunBK()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+                <button class="btn-navy" style="padding: 10px 18px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer;" onclick="fetchDataRumpunBK()">
+                    <i class="fas fa-sync-alt" style="margin-right: 6px;"></i> Refresh Data
+                </button>
             </div>
             
-            <div class="table-card">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="15%">Kode BK</th>
-                        <th width="30%">Nama Bahan Kajian</th>
-                        <th width="45%">Deskripsi (Rumpun Mata Kuliah)</th>
-                        <th width="10%">Prodi</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBodyRumpun">
-                    <tr>
-                        <td colspan="4" style="text-align: center; padding: 40px; color: #64748b;">
-                            <i class="fas fa-spinner fa-spin"></i> Menghubungkan ke database Bahan Kajian...
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-            
-            <div id="pagination-rumpun" style="display: flex; justify-content: center; align-items: center; margin-top: 24px; gap: 15px;"></div>
+            <div class="table-container">
+                <table class="tabel-rumpun">
+                    <thead>
+                        <tr>
+                            <th width="15%">Kode BK</th>
+                            <th width="35%">Nama Bahan Kajian</th>
+                            <th width="40%">Deskripsi (Rumpun Mata Kuliah)</th>
+                            <th width="10%">Prodi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyRumpun">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 40px; color: #64748b;">
+                                <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); margin-bottom: 15px; display: block;"></i>
+                                Menghubungkan ke database Bahan Kajian...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 
 <script>
-    // 1. SISTEM KEAMANAN & PENGATURAN AWAL
+    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
+    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        if(PRODI === "ti") {
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+        } else {
+            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+        }
+
+        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+        const avatarMobile = document.getElementById("mobileNavbarAvatar");
+        if(avatarMobile) {
+            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+        }
+    });
+
+    // --- FUNGSI SIDEBAR MOBILE ---
+    function toggleSidebar() {
+        document.getElementById('sidebar-container').classList.toggle('active');
+        document.getElementById('mobileOverlay').classList.toggle('active');
+    }
+    
+    // --- AMANKAN AKSES HALAMAN ---
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace('/login/login.html');
 
-    // 2. PENGATURAN API N8N 
+    // --- PENGATURAN API N8N ---
     async function fetchDataRumpunBK() {
         const tableBody = document.getElementById('tableBodyRumpun');
-        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin"></i> Menarik data...</td></tr>';
+        tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); margin-bottom: 15px; display: block;"></i>Menarik data terbaru...</td></tr>`;
         
         try {
-            const API_URL = `${API_BASE}/get-master-bk?prodi=si`;
+            const API_URL = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
             
             const response = await fetch(API_URL);
             const textData = await response.text();
 
             if (!textData || textData.includes('<!DOCTYPE html>')) {
-                 tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#ef4444;">Gagal terhubung ke Database. Periksa URL n8n.</td></tr>';
+                 tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#ef4444; font-weight: bold;">❌ Gagal terhubung ke Database. Periksa URL n8n.</td></tr>';
                  return;
             }
 
             const data = JSON.parse(textData);
 
             if (!data || data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">Data Bahan Kajian belum tersedia untuk prodi SI.</td></tr>';
+                tableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:30px; font-weight: bold; color: #64748b;">Data Bahan Kajian belum tersedia untuk prodi ${PRODI.toUpperCase()}.</td></tr>`;
                 return;
             }
 
             tableBody.innerHTML = ''; 
             
+            // Konfigurasi Badge Warna Sesuai Prodi
+            const badgeBg = PRODI === 'si' ? '#e0f2fe' : '#fef2f2';
+            const badgeText = PRODI === 'si' ? '#0369a1' : '#991b1b';
+            const badgeBorder = PRODI === 'si' ? '#bae6fd' : '#fecaca';
+
             data.forEach(item => {
                 tableBody.innerHTML += `
                     <tr>
-                        <td style="font-weight: 800; color: var(--primary-teal);">${item.kode_bk}</td>
-                        <td style="font-weight: 600;">${item.nama_bk}</td>
-                        <td style="font-size: 13.5px; color: #4b5563; line-height: 1.6;">${item.deskripsi || 'Tidak ada deskripsi rumpun.'}</td>
+                        <td style="font-weight: 800; color: var(--primary-blue); font-size: 1.05rem;">${item.kode_bk}</td>
+                        <td style="font-weight: 700; color: var(--text-dark);">${item.nama_bk}</td>
+                        <td style="font-size: 0.9rem; color: #475569; line-height: 1.6;">${item.deskripsi || 'Tidak ada deskripsi.'}</td>
                         <td>
-                            <span style="background: #e0f2f1; color: #006064; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+                            <span style="background: ${badgeBg}; color: ${badgeText}; border: 1px solid ${badgeBorder}; padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase;">
                                 ${item.prodi}
                             </span>
                         </td>
@@ -158,33 +234,46 @@
             console.error("Gagal memuat data BK:", error);
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="4" style="text-align:center; padding:20px; color: #ef4444;">
-                        <i class="fas fa-exclamation-triangle"></i> Gagal terhubung ke database. Pastikan URL n8n & Tunnel aktif.
+                    <td colspan="4" style="text-align:center; padding:30px; color: #ef4444; font-weight: bold;">
+                        <i class="fas fa-exclamation-triangle" style="margin-right: 5px;"></i> Gagal terhubung ke server. Pastikan n8n & Tunnel aktif.
                     </td>
                 </tr>
             `;
         }
     }
 
-    // 3. JALANKAN FUNGSI SAAT HALAMAN DIBUKA
+    // --- JALANKAN SAAT HALAMAN DIBUKA ---
     window.onload = function() {
         fetchDataRumpunBK();
 
-        // Jeda agar template.js selesai menyusun sidebar sebelum kita ubah menu aktifnya
         setTimeout(() => {
-            const navDashboard = document.getElementById('nav-home');
-            const navRumpun = document.querySelector('[data-path="/master_data/master_rumpun.html"]');
-            const menuMaster = document.getElementById('menu-master');
-            const chevronMaster = document.getElementById('chevron-master');
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                    .then(res => res.text())
+                    .then(html => {
+                        sidebar.innerHTML = html;
+                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                        
+                        // Aktifkan Indikator Menu Sidebar
+                        setTimeout(() => {
+                            const navDashboard = document.getElementById('nav-home');
+                            const navRumpun = document.querySelector('[data-path="/master_data/master_rumpun.html"]');
+                            const menuMaster = document.getElementById('menu-master');
+                            const chevronMaster = document.getElementById('chevron-master');
 
-            if(navDashboard) navDashboard.classList.remove('active');
-            if(navRumpun) navRumpun.classList.add('active'); 
-            
-            if(menuMaster && chevronMaster) {
-                menuMaster.style.display = 'flex';
-                chevronMaster.style.transform = 'rotate(180deg)';
+                            if(navDashboard) navDashboard.classList.remove('active');
+                            if(navRumpun) navRumpun.classList.add('active'); 
+                            
+                            if(menuMaster && chevronMaster) {
+                                menuMaster.style.display = 'flex';
+                                chevronMaster.style.transform = 'rotate(180deg)';
+                            }
+                        }, 100);
+                    })
+                    .catch(e => console.log('Gagal memuat sidebar darurat'));
             }
-        }, 300);
+        }, 400); 
     };
 </script>
 </body>
