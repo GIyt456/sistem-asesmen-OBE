@@ -2,80 +2,179 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portofolio Angkatan - Sistem OBE</title>
-    
-    <!-- PANGGIL CSS GLOBAL SECARA ABSOLUT -->
-    <link rel="stylesheet" href="/css/style.css">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS RELATIF SESUAI FOLDER LOKAL -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    <link rel="stylesheet" href="/css/index_mobile.css">
+    
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
+    
     <style>
-        .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
+        /* =========================================
+           🛡️ MANTRA ANTI-BOCOR & ANTI-MEROSOT
+           ========================================= */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; }
+        body, input, select, button, textarea { font-family: 'Inter', sans-serif !important; }
+
+        .fixed-header { padding-top: 15px !important; }
+        .main-content { padding-top: 0 !important; }
         
-        .report-page { background: white; padding: 50px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; max-width: 1000px; margin-left: auto; margin-right: auto; }
-        .report-header { text-align: center; border-bottom: 4px solid var(--primary-red); padding-bottom: 20px; margin-bottom: 30px; }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;}
+        .header-title { font-size: 2.2rem; font-weight: 800; color: #111827; margin: 0;}
+        .header-subtitle { font-size: 0.85rem; font-weight: 700; color: #64748b; letter-spacing: 1px; margin-bottom: 5px;}
+
+        /* FILTER & KONTROL */
+        .filter-container { background: white; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; flex-wrap: wrap;}
+        .filter-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; flex: 1;}
+        .filter-item { display: flex; align-items: center; gap: 10px; }
+        .filter-item label { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
+        .filter-item input { padding: 12px 15px; border-radius: 8px; border: 2px solid #cbd5e1; font-weight: 700; font-size: 0.95rem; outline: none; transition: 0.2s; background: #f8fafc; color: #1e293b;}
+        .filter-item input:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1);}
+        
+        .btn-primary-dynamic { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center;}
+        .btn-primary-dynamic:hover:not(:disabled) { filter: brightness(0.85); transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-dark { background: #1e293b; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center;}
+        .btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
+
+        /* GAYA HALAMAN LAPORAN (KERTAS A4) */
+        .report-page { background: white; padding: 50px 60px; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); margin-top: 20px; max-width: 1000px; margin-left: auto; margin-right: auto; }
+        .report-header { text-align: center; border-bottom: 4px solid var(--primary-blue); padding-bottom: 20px; margin-bottom: 30px; }
         .report-header h1 { margin: 0; color: #0f172a; text-transform: uppercase; font-size: 1.8rem; letter-spacing: 1px; font-weight: 800; }
         .report-header p { margin: 5px 0 0 0; color: #475569; font-weight: 600; font-size: 1.1rem; }
         
-        .section-title { background: #f8fafc; padding: 12px 15px; border-left: 6px solid var(--primary-red); font-weight: 800; margin: 30px 0 15px 0; color: #1e293b; text-transform: uppercase; font-size: 1.1rem; }
+        .section-title { background: #f8fafc; padding: 12px 15px; border-left: 6px solid var(--primary-blue); font-weight: 800; margin: 30px 0 15px 0; color: #1e293b; text-transform: uppercase; font-size: 1.1rem; }
         
         .info-grid { display: grid; grid-template-columns: 200px 1fr; gap: 12px; margin-bottom: 25px; font-size: 1.05rem; }
         .info-label { font-weight: 700; color: #475569; }
-        .info-value { font-weight: 600; color: #0f172a; }
+        .info-value { font-weight: 700; color: #0f172a; }
         
         table.laporan { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
-        table.laporan th, table.laporan td { border: 1px solid #cbd5e1; padding: 12px; text-align: center; vertical-align: middle; }
+        table.laporan th, table.laporan td { border: 1px solid #cbd5e1; padding: 12px 15px; text-align: center; vertical-align: middle; }
         table.laporan th { background: #f1f5f9; font-weight: 800; color: #1e293b; text-transform: uppercase; font-size: 0.9rem; }
-        table.laporan td { color: #334155; font-weight: 500; font-size: 0.95rem; }
-        
-        body { animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        table.laporan td { color: #1e293b; font-weight: 600; font-size: 0.95rem; }
+        table.laporan tbody tr:hover td { background-color: #f8fafc; }
 
         /* PENGATURAN CETAK (PRINT) YANG RAPI */
         @media print {
-            .no-print, #sidebar-container, #navbar-container, .header-container { display: none !important; }
+            .no-print, #sidebar-container, #navbar-container, .navbar-mobile, .mobile-overlay, .header-container, .filter-container { display: none !important; }
             .main-content { padding: 0 !important; margin: 0 !important; background: white; }
-            .report-page { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
+            .scrollable-content { padding: 0 !important; }
+            .report-page { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; margin: 0;}
             body { background: white; }
-            table.laporan th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; }
-            .section-title { background-color: #f8fafc !important; -webkit-print-color-adjust: exact; }
+            table.laporan th { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; color-adjust: exact;}
+            .section-title { background-color: #f8fafc !important; -webkit-print-color-adjust: exact; color-adjust: exact;}
+            .report-header { border-bottom-color: #1e3a8a !important; -webkit-print-color-adjust: exact; color-adjust: exact;}
+            /* Memaksa elemen tidak terpotong ke halaman berikutnya */
+            .section-title, table.laporan tr, .info-grid { page-break-inside: avoid; }
+        }
+
+        /* =========================================
+           📱 CSS KHUSUS HP
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
+            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
+            
+            .header-master { margin: 15px 0 10px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-master { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
+            
+            /* FILTER MOBILE */
+            .filter-container { flex-direction: column !important; align-items: stretch !important; padding: 20px 15px !important; gap: 20px !important;}
+            .filter-group { flex-direction: column !important; align-items: stretch !important; gap: 15px !important; }
+            .filter-item { flex-direction: column; align-items: flex-start; gap: 8px;}
+            .filter-item input { width: 100% !important; }
+            .btn-primary-dynamic, .btn-dark { width: 100% !important; justify-content: center !important;}
+
+            /* KERTAS LAPORAN MOBILE */
+            .report-page { padding: 20px 15px !important; border-radius: 12px !important; margin-top: 10px !important;}
+            .report-header img { height: 50px !important; }
+            .report-header h1 { font-size: 1.4rem !important; }
+            .report-header p { font-size: 0.95rem !important; }
+
+            .info-grid { grid-template-columns: 1fr !important; gap: 8px !important; margin-bottom: 20px !important;}
+            .info-label { font-size: 0.85rem !important; color: var(--primary-blue) !important; margin-top: 10px;}
+            .info-label:first-child { margin-top: 0; }
+            .info-value { font-size: 1.1rem !important; border-bottom: 1px dashed #cbd5e1; padding-bottom: 8px;}
+
+            /* SULAP TABEL LAPORAN MENJADI KARTU */
+            table.laporan, table.laporan thead, table.laporan tbody, table.laporan th, table.laporan td, table.laporan tr { display: block !important; width: 100% !important; min-width: 0 !important; box-sizing: border-box !important;}
+            
+            table.laporan thead { display: none !important;}
+            
+            table.laporan tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; padding: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.02) !important;}
+            
+            table.laporan td { display: flex !important; flex-direction: column !important; align-items: flex-start !important; text-align: left !important; padding: 10px 0 !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+            table.laporan td:last-child { border-bottom: none !important; padding-bottom: 0 !important; }
+            
+            table.laporan td::before { font-weight: 800; color: #64748b; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase;}
+            
+            /* Mapping Label untuk Kartu CPMK */
+            #resCPMK td:nth-child(1)::before { content: "KODE CPMK"; color: var(--primary-blue);}
+            #resCPMK td:nth-child(2)::before { content: "TARGET LUARAN"; }
+            #resCPMK td:nth-child(3)::before { content: "RATA-RATA NILAI"; }
+            #resCPMK td:nth-child(4)::before { content: "KETERCAPAIAN (%)"; }
+
+            /* Mapping Label untuk Kartu CPL */
+            #resCPL td:nth-child(1)::before { content: "KODE CPL"; color: var(--primary-blue);}
+            #resCPL td:nth-child(2)::before { content: "TARGET LUARAN"; }
+            #resCPL td:nth-child(3)::before { content: "RERATA NILAI"; }
+            #resCPL td:nth-child(4)::before { content: "STATUS EVALUASI"; }
+
+            table.laporan td:nth-child(1) { font-size: 1.25rem !important; font-weight: 900 !important; color: #0f172a !important; border-bottom: 3px solid var(--primary-blue) !important; padding-bottom: 10px !important; margin-bottom: 5px !important;}
         }
     </style>
 </head>
 <body>
 
-    <!-- WADAH SMART SIDEBAR -->
+    <!-- NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi"></div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
     
     <div class="main-content">
-        <!-- WADAH SMART NAVBAR -->
         <div id="navbar-container"></div>
 
-        <div class="content-wrapper">
-            <!-- HEADER HALAMAN -->
-            <div class="header-container no-print" style="margin-bottom: 20px;">
+        <div class="fixed-header no-print">
+            <div class="header-container header-master" style="margin: 0 0 15px 0; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
                     <div class="header-subtitle">EVALUASI & RPS</div>
                     <h1 class="header-title">PORTOFOLIO <span>ANGKATAN</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content; background: var(--primary-blue); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">PRODI</div>
             </div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;" class="header-master"></div>
+        </div>
 
-            <!-- KOTAK FILTER -->
+        <div class="scrollable-content section-master" style="padding-top: 0; padding-bottom: 40px;">
+
             <div class="filter-container no-print">
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-users"></i> Cari Angkatan:</label>
-                    <input type="number" id="inputAngkatan" placeholder="Contoh: 2025" value="2025" style="padding: 10px 15px; border-radius: 6px; border: 1px solid #cbd5e1; width: 140px; font-weight: bold; outline: none;">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label><i class="fas fa-users" style="color: var(--primary-blue); margin-right: 5px;"></i> Cari Angkatan:</label>
+                        <input type="number" id="inputAngkatan" placeholder="Contoh: 2025" value="2025" style="width: 140px;">
+                    </div>
                     
-                    <button style="background: #1e293b; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; font-weight: 600;" onclick="loadPortofolio()">
-                        <i class="fas fa-sync-alt"></i> Bangun Laporan
+                    <button class="btn-dark" onclick="loadPortofolio()" style="align-self: flex-end; height: 46px;">
+                        <i class="fas fa-file-contract"></i> Bangun Laporan
                     </button>
                 </div>
 
-                <button class="btn-action" style="background: #10b981; color: white; padding: 10px 20px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer;" onclick="window.print()">
+                <button class="btn-primary-dynamic" onclick="window.print()" style="background: #10b981; align-self: flex-end; height: 46px;">
                     <i class="fas fa-print"></i> Cetak Dokumen
                 </button>
             </div>
@@ -84,8 +183,8 @@
             <div id="printArea" class="report-page">
                 <div class="report-header" id="docHeader">
                     <img src="/gambar/LogoUnaki.png" style="height: 70px; margin-bottom: 15px;" alt="Logo UNAKI">
-                    <h1 style="font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 5px;">PORTOFOLIO EVALUASI ANGKATAN (OBE)</h1>
-                    <p id="labelProdiPrint" style="margin: 0; font-size: 1.1rem; color: #475569; font-weight: 600;">Program Studi Teknik Informatika - Universitas AKI</p>
+                    <h1 style="font-size: 1.8rem; font-weight: 900; color: #0f172a; margin-bottom: 5px;">PORTOFOLIO EVALUASI ANGKATAN</h1>
+                    <p id="labelProdiPrint" style="margin: 0; font-size: 1.1rem; color: #475569; font-weight: 700;">Program Studi Teknik Informatika - Universitas AKI</p>
                 </div>
 
                 <!-- I. IDENTITAS -->
@@ -113,7 +212,7 @@
                         </tr>
                     </thead>
                     <tbody id="resCPMK">
-                        <tr><td colspan="4" style="color: #64748b; padding: 20px;">Silakan pilih angkatan dan klik "Generate Portofolio".</td></tr>
+                        <tr><td colspan="4" style="color: #64748b; padding: 20px; font-weight: 600;"><i class="fas fa-info-circle"></i> Silakan ketik tahun angkatan dan klik "Bangun Laporan".</td></tr>
                     </tbody>
                 </table>
 
@@ -129,22 +228,22 @@
                         </tr>
                     </thead>
                     <tbody id="resCPL">
-                        <tr><td colspan="4" style="color: #64748b; padding: 20px;">-</td></tr>
+                        <tr><td colspan="4" style="color: #64748b; padding: 20px; font-weight: 600;">-</td></tr>
                     </tbody>
                 </table>
 
                 <!-- IV. KESIMPULAN & TINDAK LANJUT -->
                 <div class="section-title" id="secTitle4">IV. Kesimpulan & Analisis</div>
-                <div id="resDistribusi" style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px dashed #cbd5e1; color: #334155; line-height: 1.6; font-size: 1rem; text-align: justify;">
-                    Menunggu proses ekstraksi data...
+                <div id="resDistribusi" style="background: #f8fafc; padding: 25px; border-radius: 8px; border: 2px dashed #cbd5e1; color: #1e293b; line-height: 1.8; font-size: 1.05rem; text-align: justify; font-weight: 500;">
+                    Menunggu proses ekstraksi data analisis...
                 </div>
 
                 <!-- TANDA TANGAN -->
                 <div style="margin-top: 60px; display: flex; justify-content: flex-end;">
                     <div style="text-align: center; width: 300px;">
-                        <p style="margin: 0 0 5px 0;">Semarang, <span id="resTanggal" style="font-weight: 600;"></span></p>
-                        <p style="margin: 0 0 80px 0; font-weight: 600;">Ketua Program Studi,</p>
-                        <p style="margin: 0;"><b>( _________________________ )</b></p>
+                        <p style="margin: 0 0 5px 0;">Semarang, <span id="resTanggal" style="font-weight: 700;"></span></p>
+                        <p style="margin: 0 0 80px 0; font-weight: 700;">Ketua Program Studi,</p>
+                        <p style="margin: 0; font-weight: 800;">( _________________________ )</p>
                     </div>
                 </div>
             </div>
@@ -152,33 +251,102 @@
     </div>
 
     <script>
-        // 1. TANGKAP IDENTITAS LOGIN SECARA DINAMIS
-        const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
+        // 1. TANGKAP IDENTITAS LOGIN SECARA DINAMIS (SIHIR BUNGLON)
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
         const API_PORTOFOLIO = `${API_BASE}/get-portofolio-angkatan`;
 
+        document.addEventListener("DOMContentLoaded", () => {
+            const userLogin = localStorage.getItem("user_login");
+            if (!userLogin) window.location.replace("/login/login.html");
+
+            const badge = document.getElementById("prodiBadge");
+            const labelPrint = document.getElementById("labelProdiPrint");
+            
+            if(PRODI === "ti") {
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+                badge.innerText = "Teknik Informatika";
+                labelPrint.innerText = "Program Studi Teknik Informatika - Universitas AKI";
+            } else {
+                document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+                badge.innerText = "Sistem Informasi";
+                labelPrint.innerText = "Program Studi Sistem Informasi - Universitas AKI";
+            }
+
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if(avatarMobile) {
+                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+            }
+        });
+
+        // --- FUNGSI SIDEBAR MOBILE ---
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+
+        // ==========================================================
+        // 🔮 SIHIR ANTI-MACET DROPDOWN (GLOBAL EVENT DELEGATION)
+        // ==========================================================
+        document.addEventListener('click', function(e) {
+            const dropdownBtn = e.target.closest('.dropdown-btn') || e.target.closest('[data-toggle="dropdown"]');
+            if (dropdownBtn) {
+                e.preventDefault(); 
+                const dropdownContent = dropdownBtn.nextElementSibling;
+                const icon = dropdownBtn.querySelector('.fa-chevron-down') || dropdownBtn.querySelector('i:last-child');
+                
+                if (dropdownContent && (dropdownContent.classList.contains('dropdown-container') || dropdownContent.tagName === 'DIV' || dropdownContent.tagName === 'UL')) {
+                    const isHidden = window.getComputedStyle(dropdownContent).display === 'none';
+                    
+                    if (isHidden) {
+                        dropdownContent.style.display = 'block';
+                        dropdownBtn.classList.add('active');
+                        if (icon) icon.style.transform = 'rotate(180deg)';
+                    } else {
+                        dropdownContent.style.display = 'none';
+                        dropdownBtn.classList.remove('active');
+                        if (icon) icon.style.transform = 'rotate(0deg)';
+                    }
+                }
+            }
+        });
+
+        function setMenuAktif() {
+            const navDashboard = document.getElementById('nav-home');
+            let navPorto = document.querySelector('[data-path="/evaluasi/portofolio_angkatan_si.html"]') || document.querySelector('[data-path="/evaluasi/portofolio_angkatan.html"]');
+            
+            if (navDashboard) navDashboard.classList.remove('active');
+            if (navPorto) navPorto.classList.add('active');
+
+            const menuMaster = document.getElementById('menu-evaluasi') || (navPorto ? navPorto.closest('.dropdown-container') : null);
+            
+            if (menuMaster) {
+                menuMaster.style.display = 'block';
+                const parentBtn = menuMaster.previousElementSibling;
+                if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                    parentBtn.classList.add('active');
+                    const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
+                    if(icon) icon.style.transform = 'rotate(180deg)';
+                }
+            }
+        }
+
         async function loadPortofolio() {
-            // Ambil Input Tahun dari Search Box
             const inputThn = document.getElementById("inputAngkatan").value;
             const angkatan = inputThn ? inputThn.trim() : "2025"; 
             
-            // Nama Prodi Dinamis
             const namaProdiLengkap = PRODI === 'si' ? 'SISTEM INFORMASI' : 'TEKNIK INFORMATIKA';
 
-            // PERBAIKAN: Menggunakan ID yang benar sesuai dengan HTML Anda
             document.getElementById("resKodeMK").innerText = `Angkatan ${angkatan}`;
             document.getElementById("resTahunAjaran").innerText = `${angkatan}/${parseInt(angkatan)+1}`;
             document.getElementById("resNamaMK").innerText = `Akumulasi Seluruh Mata Kuliah - ${namaProdiLengkap}`;
             
-            // Set Tanggal Cetak Hari Ini
             document.getElementById("resTanggal").innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-            const btn = document.querySelector(".filter-container button");
-            btn.disabled = true;
-            
-            // Tampilkan Efek Loading Langsung di Dalam Tabel
-            document.getElementById("resCPMK").innerHTML = `<tr><td colspan="4"><i class="fas fa-spinner fa-spin"></i> Mengekstrak data agregat angkatan...</td></tr>`;
-            document.getElementById("resCPL").innerHTML = `<tr><td colspan="4"><i class="fas fa-spinner fa-spin"></i> Mengekstrak data agregat angkatan...</td></tr>`;
-            document.getElementById("resDistribusi").innerText = "Sedang menganalisis hasil luaran mahasiswa...";
+            document.getElementById("resCPMK").innerHTML = `<tr><td colspan="4" style="padding: 30px;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); display: block; margin-bottom: 10px;"></i> Mengekstrak data agregat angkatan...</td></tr>`;
+            document.getElementById("resCPL").innerHTML = `<tr><td colspan="4" style="padding: 30px;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); display: block; margin-bottom: 10px;"></i> Mengekstrak data agregat angkatan...</td></tr>`;
+            document.getElementById("resDistribusi").innerHTML = `<i class="fas fa-spinner fa-spin" style="color: var(--primary-blue); margin-right: 8px;"></i> Sedang menganalisis hasil luaran mahasiswa...`;
 
             try {
                 // Minta data ke N8N dengan mengirimkan Angkatan DAN Prodi
@@ -186,22 +354,21 @@
                 if(!res.ok) throw new Error("Gagal mengambil data dari API.");
 
                 const rawText = await res.text();
-                btn.disabled = false;
 
                 // Cek Keamanan Jika Database Kosong
                 if (!rawText || rawText.trim() === "" || rawText.includes("empty_database")) {
-                    document.getElementById("resCPMK").innerHTML = `<tr><td colspan="4" style="color:red;">Data nilai belum tersedia untuk Angkatan ${angkatan} di prodi ini!</td></tr>`;
-                    document.getElementById("resCPL").innerHTML = `<tr><td colspan="4">-</td></tr>`;
-                    document.getElementById("resDistribusi").innerText = "Tidak ada data yang bisa dianalisis.";
+                    document.getElementById("resCPMK").innerHTML = `<tr><td colspan="4" style="color:#ef4444; font-weight: 700; padding: 20px;"><i class="fas fa-exclamation-circle"></i> Data nilai belum tersedia untuk Angkatan ${angkatan} di prodi ini.</td></tr>`;
+                    document.getElementById("resCPL").innerHTML = `<tr><td colspan="4" style="color:#ef4444; font-weight: 700; padding: 20px;"><i class="fas fa-exclamation-circle"></i> Data nilai belum tersedia.</td></tr>`;
+                    document.getElementById("resDistribusi").innerHTML = `<span style="color: #ef4444; font-weight: 700;"><i class="fas fa-exclamation-circle"></i> Tidak ada data yang bisa dianalisis.</span>`;
                     return;
                 }
 
                 const data = JSON.parse(rawText);
 
                 if (data.length === 0 || !data[0].nim) {
-                    document.getElementById("resCPMK").innerHTML = `<tr><td colspan="4" style="color:red;">Data nilai belum tersedia untuk Angkatan ${angkatan} di prodi ini!</td></tr>`;
-                    document.getElementById("resCPL").innerHTML = `<tr><td colspan="4">-</td></tr>`;
-                    document.getElementById("resDistribusi").innerText = "Tidak ada data yang bisa dianalisis.";
+                    document.getElementById("resCPMK").innerHTML = `<tr><td colspan="4" style="color:#ef4444; font-weight: 700; padding: 20px;"><i class="fas fa-exclamation-circle"></i> Data nilai belum tersedia untuk Angkatan ${angkatan} di prodi ini.</td></tr>`;
+                    document.getElementById("resCPL").innerHTML = `<tr><td colspan="4" style="color:#ef4444; font-weight: 700; padding: 20px;"><i class="fas fa-exclamation-circle"></i> Data nilai belum tersedia.</td></tr>`;
+                    document.getElementById("resDistribusi").innerHTML = `<span style="color: #ef4444; font-weight: 700;"><i class="fas fa-exclamation-circle"></i> Tidak ada data yang bisa dianalisis.</span>`;
                     return;
                 }
 
@@ -234,11 +401,11 @@
                 let cpmkHtml = "";
                 Object.keys(agregatCPMK).sort().forEach(cpmk => {
                     let avg = (agregatCPMK[cpmk].sumSkor / agregatCPMK[cpmk].count).toFixed(2);
-                    let status = avg >= 70 ? `<span style="color: #166534; font-weight: bold;"><i class="fas fa-check-circle"></i> TERCAPAI</span>` : `<span style="color: #991b1b; font-weight: bold;"><i class="fas fa-times-circle"></i> DIEVALUASI</span>`;
+                    let status = avg >= 70 ? `<span style="color: #166534; font-weight: 800; background: #dcfce7; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;"><i class="fas fa-check-circle"></i> TERCAPAI</span>` : `<span style="color: #991b1b; font-weight: 800; background: #fee2e2; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;"><i class="fas fa-times-circle"></i> DIEVALUASI</span>`;
                     cpmkHtml += `<tr>
-                                    <td style="font-weight: 700; color: #1e293b;">${cpmk}</td>
+                                    <td style="font-weight: 900; color: var(--primary-blue); font-size: 1.1rem;">${cpmk}</td>
                                     <td>Pencapaian spesifik keterampilan ${cpmk}</td>
-                                    <td style="font-size: 1.1rem; font-weight: bold; color: ${avg >= 70 ? '#166534' : '#991b1b'};">${avg}</td>
+                                    <td style="font-size: 1.25rem; font-weight: 900; color: ${avg >= 70 ? '#166534' : '#991b1b'};">${avg}</td>
                                     <td>${status}</td>
                                 </tr>`;
                 });
@@ -256,23 +423,23 @@
                     if(val > cplTertinggi.skor) { cplTertinggi = { nama: cpl, skor: val }; }
                     if(val < cplTerendah.skor) { cplTerendah = { nama: cpl, skor: val }; }
 
-                    let status = val >= 75 ? `<span style="color: #166534; font-weight: bold;"><i class="fas fa-check-circle"></i> TERCAPAI</span>` : `<span style="color: #991b1b; font-weight: bold;"><i class="fas fa-times-circle"></i> TINJAU ULANG</span>`;
+                    let status = val >= 75 ? `<span style="color: #166534; font-weight: 800; background: #dcfce7; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;"><i class="fas fa-check-circle"></i> TERCAPAI</span>` : `<span style="color: #991b1b; font-weight: 800; background: #fee2e2; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;"><i class="fas fa-times-circle"></i> TINJAU ULANG</span>`;
                     cplHtml += `<tr>
-                                    <td style="font-weight: 700; color: #1e293b;">${cpl}</td>
+                                    <td style="font-weight: 900; color: var(--primary-blue); font-size: 1.1rem;">${cpl}</td>
                                     <td>Capaian profil lulusan standar ${cpl}</td>
-                                    <td style="font-size: 1.1rem; font-weight: bold; color: ${val >= 75 ? '#166534' : '#991b1b'};">${avg}</td>
+                                    <td style="font-size: 1.25rem; font-weight: 900; color: ${val >= 75 ? '#166534' : '#991b1b'};">${avg}</td>
                                     <td>${status}</td>
                                 </tr>`;
                 });
                 document.getElementById("resCPL").innerHTML = cplHtml || `<tr><td colspan="4">Data CPL kosong.</td></tr>`;
 
                 // 5. KESIMPULAN CERDAS (Dinamis Warna Prodi)
-                let colorTema = PRODI === 'si' ? '#0097a7' : '#8b0000';
+                let colorTema = PRODI === 'si' ? '#1e3a8a' : '#8b0000';
                 
-                let kesimpulanTeks = `Berdasarkan hasil evaluasi agregat terhadap <b>${totalMahasiswa.size} mahasiswa</b> dari Angkatan ${angkatan}, capaian kompetensi menunjukkan penguasaan yang paling optimal pada profil <b style="color:${colorTema};">${cplTertinggi.nama}</b> dengan rerata skor ketercapaian <b>${cplTertinggi.skor}</b>. `;
+                let kesimpulanTeks = `Berdasarkan hasil evaluasi agregat terhadap <b style="color: ${colorTema}; font-size: 1.1rem;">${totalMahasiswa.size} mahasiswa</b> dari Angkatan ${angkatan}, capaian kompetensi menunjukkan penguasaan yang paling optimal pada profil <b style="color:${colorTema}; font-size: 1.1rem;">${cplTertinggi.nama}</b> dengan rerata skor ketercapaian <b style="color:${colorTema}; font-size: 1.1rem;">${cplTertinggi.skor}</b>. <br><br>`;
 
                 if(cplTerendah.skor < 75) {
-                    kesimpulanTeks += `Namun demikian, diperlukan tinjauan manajerial dan penyesuaian kurikulum pada aspek yang berkaitan dengan <b style="color:${colorTema};">${cplTerendah.nama}</b>, dikarenakan rerata angkatan (${cplTerendah.skor}) masih berada di bawah target mutu minimal (75.00) yang ditetapkan oleh Program Studi ${namaProdiLengkap}.`;
+                    kesimpulanTeks += `Namun demikian, diperlukan tinjauan manajerial dan penyesuaian kurikulum pada aspek yang berkaitan dengan <b style="color:#ef4444; font-size: 1.1rem;">${cplTerendah.nama}</b>, dikarenakan rerata angkatan (<b style="color:#ef4444; font-size: 1.1rem;">${cplTerendah.skor}</b>) masih berada di bawah target mutu minimal (75.00) yang ditetapkan oleh Program Studi ${namaProdiLengkap}.`;
                 } else {
                     kesimpulanTeks += `Secara kumulatif, seluruh indikator Capaian Pembelajaran Lulusan (CPL) telah memenuhi standar mutu akademik (≥ 75.00), mengonfirmasi efektivitas strategi pembelajaran yang diterapkan oleh program studi ${namaProdiLengkap}.`;
                 }
@@ -281,14 +448,28 @@
 
             } catch (e) {
                 console.error(e);
-                btn.disabled = false;
-                document.getElementById("resCPMK").innerHTML = `<tr><td colspan="4" style="color:red;">Terjadi kesalahan saat memuat data. Periksa koneksi ke N8N.</td></tr>`;
+                document.getElementById("resCPMK").innerHTML = `<tr><td colspan="4" style="color:red;"><i class="fas fa-wifi"></i> Terjadi kesalahan saat memuat data. Periksa koneksi ke N8N.</td></tr>`;
             }
         }
 
-        // Jalankan otomatis saat pertama halaman dimuat
         window.onload = () => {
             setTimeout(loadPortofolio, 400);
+
+            setTimeout(() => {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebar.innerHTML = html;
+                            if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                            setMenuAktif();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar otomatis'));
+                } else {
+                    setMenuAktif();
+                }
+            }, 500);
         };
     </script>
 </body>

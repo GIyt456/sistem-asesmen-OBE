@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin Panel SI - Sistem OBE</title>
     
     <!-- MEMANGGIL KEDUA FILE CSS -->
@@ -15,6 +15,67 @@
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* =========================================
+           PENYESUAIAN DESKTOP (Maks 768px)
+           ========================================= */
+        .header-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            /* Memberikan ruang lega di sisi kiri dan kanan pada layar desktop */
+            margin: 20px 40px 40px 40px; 
+            border-bottom: 1px solid #e5e7eb; 
+            padding-bottom: 20px; 
+        }
+
+        /* Penyesuaian khusus untuk card di mode desktop agar tidak mentok ke dinding */
+        .section {
+            padding: 0 40px 40px 40px;
+        }
+
+        /* =========================================
+           PENYESUAIAN MOBILE PANEL ADMIN (Maks 768px)
+           ========================================= */
+        @media (max-width: 768px) {
+            .header-container {
+                margin: 20px 15px 20px 15px !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }
+
+            .section {
+                padding: 0 15px 40px 15px !important;
+            }
+
+            /* Menyusun kotak statistik menjadi baris vertikal di HP */
+            .stat-cards {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+
+            /* Menyusun grafik menjadi baris vertikal di HP */
+            .dashboard-charts {
+                grid-template-columns: 1fr !important;
+                gap: 20px !important;
+            }
+
+            .dashboard-charts > div {
+                width: 100% !important;
+            }
+
+            /* Jarak aman di bawah Navbar mobile */
+            .main-content {
+                padding-top: 15px !important;
+            }
+            
+            #pageTitle {
+                font-size: 1.6rem !important;
+                line-height: 1.3;
+            }
+        }
+    </style>
 </head>
 <body>
     
@@ -107,7 +168,7 @@
             
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">Cari Nama Dosen / Username</label>
-                <input list="daftarDosenSI" id="targetUsername" placeholder="🔍 Ketik username atau nama..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
+                <input list="daftarDosenSI" id="targetUsername" placeholder="🔑 Ketik username atau nama..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem;">
                 <datalist id="daftarDosenSI"></datalist>
             </div>
             
@@ -154,7 +215,7 @@
 
                 const rawText = await res.text();
                 if (!rawText || rawText.trim() === "" || rawText.includes("empty_database")) {
-                    console.warn("⚠️ Data masih kosong.");
+                    console.warn("Data masih kosong.");
                     calculateSummary([], 0); 
                     return; 
                 }
@@ -263,15 +324,18 @@
                 contentSection.classList.add('active');
             }
 
+            // MENGGUNAKAN ELEMEN <span> AGAR OTOMATIS BERWARNA BIRU SI
             const titles = {
-                'dashboard': '📊 Dashboard Kaprodi Sistem Informasi',
-                'mapping-mk': '🔗 Mapping Mata Kuliah - CPMK (SI)',
-                'reset': '🔑 Manajemen Dosen (SI)',
+                'dashboard': '<i class="fas fa-chart-pie" style="color: var(--primary-blue); margin-right: 10px;"></i>Dashboard Kaprodi <span>Sistem Informasi</span>',
+                'mapping-mk': '<i class="fas fa-network-wired" style="color: var(--primary-blue); margin-right: 10px;"></i>Mapping Mata Kuliah - CPMK <span>(SI)</span>',
+                'reset': '<i class="fas fa-users-cog" style="color: var(--primary-blue); margin-right: 10px;"></i>Manajemen Dosen <span>(SI)</span>',
             };
-            document.getElementById('pageTitle').innerHTML = titles[type] || 'Panel Kaprodi SI';
+            document.getElementById('pageTitle').innerHTML = titles[type] || 'Panel Kaprodi <span>SI</span>';
 
             if(type === 'dashboard') loadDashboard();
-            if(type === 'mapping-mk') loadDropdownMK(); 
+            if(type === 'mapping-mk') {
+                if (typeof loadDropdownMK === "function") loadDropdownMK(); 
+            }
             
             if(window.innerWidth <= 768) {
                 document.getElementById('sidebar-container').classList.remove('active');

@@ -2,69 +2,133 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grafik Rerata CPL Angkatan - Sistem OBE</title>
-    
-    <link rel="stylesheet" href="/css/style.css">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS RELATIF SESUAI FOLDER LOKAL -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    <link rel="stylesheet" href="/css/index_mobile.css">
+    
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
-        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 40px; }
-        .chart-wrapper { position: relative; height: 550px; width: 100%; margin: 20px auto; display: flex; justify-content: center; }
-        #cplChart { max-width: 700px; }
+        /* =========================================
+           🛡️ MANTRA ANTI-BOCOR & ANTI-MEROSOT
+           ========================================= */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; }
+        body, input, select, button, textarea { font-family: 'Inter', sans-serif !important; }
+
+        .fixed-header { padding-top: 15px !important; }
+        .main-content { padding-top: 0 !important; }
         
-        body { animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;}
+        .header-title { font-size: 2.2rem; font-weight: 800; color: #111827; margin: 0;}
+        .header-subtitle { font-size: 0.85rem; font-weight: 700; color: #64748b; letter-spacing: 1px; margin-bottom: 5px;}
+
+        /* FILTER & KONTROL */
+        .filter-container { background: white; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; flex-wrap: wrap;}
+        .filter-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; flex: 1;}
+        .filter-item { display: flex; align-items: center; gap: 10px; }
+        .filter-item label { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
+        .filter-item input { padding: 12px 15px; border-radius: 8px; border: 2px solid #cbd5e1; font-weight: 700; font-size: 0.95rem; outline: none; transition: 0.2s; background: #f8fafc; color: #1e293b;}
+        .filter-item input:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1);}
+        
+        .btn-primary-dynamic { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center;}
+        .btn-primary-dynamic:hover:not(:disabled) { filter: brightness(0.85); transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-dark { background: #1e293b; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center;}
+        .btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
+
+        .card-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 40px; }
+        .chart-wrapper { position: relative; height: 500px; width: 100%; margin: 20px auto; display: flex; justify-content: center; }
+        #cplChart { max-width: 900px; }
 
         @media print {
-            #sidebar-container, #navbar-container, .filter-container, .header-container { display: none !important; }
-            .main-content { padding: 0 !important; }
+            #sidebar-container, #navbar-container, .navbar-mobile, .mobile-overlay, .filter-container { display: none !important; }
+            .main-content { padding: 0 !important; margin: 0 !important;}
             .card-container { box-shadow: none; border: none; padding: 0; }
+        }
+
+        /* =========================================
+           📱 CSS KHUSUS HP
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
+            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
+            
+            .header-master { margin: 15px 0 10px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-master { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
+            
+            /* FILTER MOBILE */
+            .filter-container { flex-direction: column !important; align-items: stretch !important; padding: 20px 15px !important; gap: 20px !important;}
+            .filter-group { flex-direction: column !important; align-items: stretch !important; gap: 15px !important; }
+            .filter-item { flex-direction: column; align-items: flex-start; gap: 8px;}
+            .filter-item input { width: 100% !important; }
+            .btn-primary-dynamic, .btn-dark { width: 100% !important; justify-content: center !important;}
+
+            .card-container { padding: 15px !important; border-radius: 12px !important;}
+            .chart-wrapper { height: 400px !important; margin: 10px 0 !important;}
         }
     </style>
 </head>
 <body>
 
+    <!-- NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi"></div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
     
     <div class="main-content">
         <div id="navbar-container"></div>
 
-        <div class="content-wrapper">
-            <div class="header-container" style="margin-bottom: 20px;">
+        <div class="fixed-header">
+            <div class="header-container header-master" style="margin: 0 0 15px 0; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
                     <div class="header-subtitle">EVALUASI & RPS</div>
                     <h1 class="header-title">GRAFIK RERATA <span>CPL ANGKATAN</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content; background: var(--primary-blue); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">PRODI</div>
             </div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;" class="header-master"></div>
+        </div>
 
-            <p style="margin: 0 0 20px 0; color: #64748b; font-size: 0.95rem;">Visualisasi Radar pencapaian profil lulusan berdasarkan data akumulasi satu angkatan secara keseluruhan.</p>
+        <div class="scrollable-content section-master" style="padding-top: 0; padding-bottom: 40px;">
+
+            <p style="margin: 0 0 25px 0; color: #475569; font-size: 0.95rem; line-height: 1.6;">Visualisasi performa pencapaian profil lulusan (Capaian Pembelajaran Lulusan) berdasarkan data akumulasi satu angkatan secara keseluruhan.</p>
 
             <div class="filter-container">
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-users"></i> Cari Angkatan:</label>
-                    <input type="number" id="inputAngkatan" placeholder="Contoh: 2025" value="2025" style="padding: 10px 15px; border-radius: 6px; border: 1px solid #cbd5e1; width: 140px; font-weight: bold; outline: none;">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label><i class="fas fa-users" style="color: var(--primary-blue); margin-right: 5px;"></i> Tahun Angkatan:</label>
+                        <input type="number" id="inputAngkatan" placeholder="Contoh: 2025" value="2025" style="width: 140px;">
+                    </div>
                     
-                    <button style="background: #1e293b; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; font-weight: 600;" onclick="loadGrafikCPL()">
-                        <i class="fas fa-sync-alt"></i> Bangun Grafik Radar
+                    <button class="btn-dark" onclick="loadGrafikCPL()" style="align-self: flex-end; height: 46px;">
+                        <i class="fas fa-chart-bar"></i> Bangun Grafik
                     </button>
                 </div>
 
-                <button class="btn-action" style="background: #10b981; color: white; padding: 10px 20px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer;" onclick="window.print()">
+                <button class="btn-primary-dynamic" onclick="window.print()" style="background: #10b981; align-self: flex-end; height: 46px;">
                     <i class="fas fa-print"></i> Cetak PDF
                 </button>
             </div>
 
             <div class="card-container">
                 <div id="loadingMsg" style="text-align: center; color: #64748b; padding: 40px; display: none;">
-                    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 15px;"></i><br>
+                    <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 15px; color: var(--primary-blue);"></i><br>
                     <span style="font-weight: 600;">Menghitung data CPL lintas mata kuliah dari database...</span>
                 </div>
                 <div id="errorMsg" style="text-align: center; color: #dc2626; padding: 40px; display: none; font-weight: 600;"></div>
@@ -77,11 +141,84 @@
     </div>
 
     <script>
-        // 1. TANGKAP IDENTITAS LOGIN SECARA DINAMIS
-        const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
+        // 1. TANGKAP IDENTITAS LOGIN SECARA DINAMIS (SIHIR BUNGLON)
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
         const API_GRAFIK_CPL = `${API_BASE}/get-grafik-cpl`;
-
         let chartInst = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const userLogin = localStorage.getItem("user_login");
+            if (!userLogin) window.location.replace("/login/login.html");
+
+            const badge = document.getElementById("prodiBadge");
+            
+            if(PRODI === "ti") {
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+                badge.innerText = "Teknik Informatika";
+            } else {
+                document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+                badge.innerText = "Sistem Informasi";
+            }
+
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if(avatarMobile) {
+                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+            }
+        });
+
+        // --- FUNGSI SIDEBAR MOBILE ---
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+
+        // ==========================================================
+        // 🔮 SIHIR ANTI-MACET DROPDOWN (GLOBAL EVENT DELEGATION)
+        // ==========================================================
+        document.addEventListener('click', function(e) {
+            const dropdownBtn = e.target.closest('.dropdown-btn') || e.target.closest('[data-toggle="dropdown"]');
+            if (dropdownBtn) {
+                e.preventDefault(); 
+                const dropdownContent = dropdownBtn.nextElementSibling;
+                const icon = dropdownBtn.querySelector('.fa-chevron-down') || dropdownBtn.querySelector('i:last-child');
+                
+                if (dropdownContent && (dropdownContent.classList.contains('dropdown-container') || dropdownContent.tagName === 'DIV' || dropdownContent.tagName === 'UL')) {
+                    const isHidden = window.getComputedStyle(dropdownContent).display === 'none';
+                    
+                    if (isHidden) {
+                        dropdownContent.style.display = 'block';
+                        dropdownBtn.classList.add('active');
+                        if (icon) icon.style.transform = 'rotate(180deg)';
+                    } else {
+                        dropdownContent.style.display = 'none';
+                        dropdownBtn.classList.remove('active');
+                        if (icon) icon.style.transform = 'rotate(0deg)';
+                    }
+                }
+            }
+        });
+
+        function setMenuAktif() {
+            const navDashboard = document.getElementById('nav-home');
+            let navGrafik = document.querySelector('[data-path="/evaluasi/grafik_cpl_si.html"]') || document.querySelector('[data-path="/evaluasi/grafik_cpl.html"]');
+            
+            if (navDashboard) navDashboard.classList.remove('active');
+            if (navGrafik) navGrafik.classList.add('active');
+
+            const menuMaster = document.getElementById('menu-evaluasi') || (navGrafik ? navGrafik.closest('.dropdown-container') : null);
+            
+            if (menuMaster) {
+                menuMaster.style.display = 'block';
+                const parentBtn = menuMaster.previousElementSibling;
+                if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                    parentBtn.classList.add('active');
+                    const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
+                    if(icon) icon.style.transform = 'rotate(180deg)';
+                }
+            }
+        }
 
         // 2. FUNGSI LOAD DATA
         async function loadGrafikCPL() {
@@ -92,10 +229,9 @@
             const errorMsg = document.getElementById("errorMsg");
             const canvas = document.getElementById("cplChart");
             
-            // Cek apakah elemen tersedia di HTML (untuk mencegah error)
             if (!loadingMsg || !errorMsg || !canvas) return;
 
-            loadingMsg.innerHTML = `<i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 15px;"></i><br><span style="font-weight: 600;">Menghitung data CPL Angkatan ${angkatan} dari database...</span>`;
+            loadingMsg.innerHTML = `<i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 15px; color: var(--primary-blue);"></i><br><span style="font-weight: 600;">Menghitung data CPL Angkatan ${angkatan} dari database...</span>`;
             loadingMsg.style.display = "block";
             errorMsg.style.display = "none";
             canvas.style.display = "none";
@@ -109,7 +245,7 @@
                 loadingMsg.style.display = "none";
 
                 if (!rawText || rawText.trim() === "" || rawText.includes("empty_database")) {
-                    errorMsg.innerHTML = `<i class="fas fa-exclamation-circle"></i> Tidak ada data nilai untuk Angkatan ${angkatan} di prodi ini.`;
+                    errorMsg.innerHTML = `<i class="fas fa-exclamation-circle fa-2x" style="display: block; margin-bottom: 10px;"></i> Tidak ada data nilai untuk Angkatan ${angkatan} di prodi ini.`;
                     errorMsg.style.display = "block";
                     return;
                 }
@@ -117,7 +253,7 @@
                 const data = JSON.parse(rawText);
 
                 if(!data || data.length === 0 || !data[0].kode_cpl) {
-                    errorMsg.innerHTML = `<i class="fas fa-exclamation-circle"></i> Tidak ada data nilai untuk Angkatan ${angkatan} di prodi ini.`;
+                    errorMsg.innerHTML = `<i class="fas fa-exclamation-circle fa-2x" style="display: block; margin-bottom: 10px;"></i> Tidak ada data nilai untuk Angkatan ${angkatan} di prodi ini.`;
                     errorMsg.style.display = "block";
                     return;
                 }
@@ -149,7 +285,7 @@
 
             } catch (e) {
                 loadingMsg.style.display = "none";
-                errorMsg.innerHTML = `<i class="fas fa-wifi"></i> Error: Gagal memuat data dari n8n. Periksa koneksi internet dan webhook.`;
+                errorMsg.innerHTML = `<i class="fas fa-wifi" style="margin-right: 8px;"></i> Error: Gagal memuat data dari N8N. Periksa koneksi internet.`;
                 errorMsg.style.display = "block";
             }
         }
@@ -158,20 +294,20 @@
         function renderBarChart(labels, averages) {
             const ctx = document.getElementById("cplChart").getContext("2d");
             
-            if (chartInst) chartInst.destroy(); // Hancurkan grafik lama jika melakukan pencarian ulang
+            if (chartInst) chartInst.destroy();
 
-            // Tentukan warna berdasarkan prodi yang login
-            let warnaBatang = PRODI === 'si' ? '#0097a7' : '#8b0000'; 
+            // Sihir Bunglon: Warna grafik menyesuaikan Prodi
+            let warnaBatang = PRODI === 'si' ? '#1e3a8a' : '#8b0000'; 
 
             chartInst = new Chart(ctx, {
-                type: 'bar', // Diubah menjadi Bar Chart
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: 'Rata-Rata Capaian CPL (%)',
                         data: averages,
                         backgroundColor: warnaBatang,
-                        borderRadius: 6, // Ujung batang dibuat agak melengkung (modern)
+                        borderRadius: 6,
                         borderWidth: 0
                     }]
                 },
@@ -181,27 +317,28 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 100, // Nilai maksimal tetap 100%
+                            max: 100, 
                             ticks: {
                                 stepSize: 20,
                                 font: { weight: 'bold' }
                             },
-                            grid: { borderDash: [5, 5] } // Garis putus-putus pada background
+                            grid: { borderDash: [5, 5] }
                         },
                         x: {
                             ticks: {
                                 font: { weight: 'bold', size: 12 },
                                 color: '#1e293b'
                             },
-                            grid: { display: false } // Hilangkan garis vertikal agar bersih
+                            grid: { display: false }
                         }
                     },
                     plugins: {
-                        legend: { display: false }, // Disembunyikan karena sudah jelas
+                        legend: { display: false },
                         tooltip: {
                             backgroundColor: '#1e293b',
                             titleFont: { size: 14 },
                             bodyFont: { size: 14, weight: 'bold' },
+                            padding: 12,
                             callbacks: {
                                 label: function(context) {
                                     return ` Capaian: ${context.raw}%`;
@@ -216,7 +353,23 @@
 
         // 4. EKSEKUSI SAAT AWAL
         window.onload = () => {
-            setTimeout(loadGrafikCPL, 400); 
+            setTimeout(loadGrafikCPL, 200); 
+            
+            setTimeout(() => {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebar.innerHTML = html;
+                            if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                            setMenuAktif();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar otomatis'));
+                } else {
+                    setMenuAktif();
+                }
+            }, 400);
         };
     </script>
 </body>

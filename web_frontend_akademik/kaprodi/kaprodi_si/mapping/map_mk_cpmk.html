@@ -2,26 +2,25 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mapping MK - CPMK - Sistem OBE</title>
-    
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/admin_si.css">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS RELATIF SESUAI FOLDER LOKAL -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    <link rel="stylesheet" href="/css/index_mobile.css">
     
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script>
     
     <style>
-        /* =========================================
-           🛡️ MANTRA ANTI-BOCOR & ANTI-MEROSOT
-           ========================================= */
+        /* MANTRA ANTI-BOCOR LAYAR */
         *, *::before, *::after { box-sizing: border-box !important; }
-        html, body { max-width: 100vw; overflow-x: hidden; }
-
-        /* MEMBUNUH PADDING 40PX BAWAAN DARI ADMIN_SI.CSS! */
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; }
+        
         .fixed-header { padding-top: 15px !important; }
         .main-content { padding-top: 0 !important; }
 
@@ -41,20 +40,17 @@
         .cpmk-code { font-weight: 900; font-size: 1.1rem; color: var(--primary-blue); margin-bottom: 6px;}
         .cpmk-desc { font-size: 0.85rem; color: #475569; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; font-weight: 500;}
 
+        .btn-primary-si { background: var(--primary-blue); color: white; border: none; padding: 15px 24px; border-radius: 8px; font-weight: 700; font-size: 1.05rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; white-space: nowrap; width: 100%; margin-top: 20px;}
+        .btn-primary-si:hover:not(:disabled) { filter: brightness(0.85); transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-primary-si:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
+
         /* =========================================
-           📱 CSS KHUSUS HP (ANTI MEPET & BOCOR)
+           📱 CSS KHUSUS HP
            ========================================= */
         @media screen and (max-width: 768px) {
-            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
-            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
-            
-            .header-mapping-mk-cpmk { margin: 15px 15px 10px 15px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
-            .section-mapping-mk-cpmk { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
-            .mapping-panel { padding: 25px 20px !important; width: 100% !important; box-sizing: border-box !important;}
-            
+            .mapping-panel { padding: 20px 15px !important; border: none !important; box-shadow: none !important; background: transparent !important; }
             .cpmk-grid { grid-template-columns: 1fr; gap: 15px; }
-            .cpmk-desc { -webkit-line-clamp: unset !important; overflow: visible !important;} 
-            .btn-primary-si { width: 100% !important; box-sizing: border-box !important;}
+            .cpmk-desc { -webkit-line-clamp: unset !important; overflow: visible !important;}
         }
     </style>
 </head>
@@ -62,16 +58,10 @@
 
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="hamburger-btn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
-                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
-                 onclick="window.location.href='/index.html'">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
         </div>
-        <div class="profile-btn-mobile" onclick="toggleSidebar()">
-            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
-        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi"></div>
     </nav>
 
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
@@ -81,17 +71,17 @@
         <div id="navbar-container"></div>
 
         <div class="fixed-header">
-            <div class="header-container header-mapping-mk-cpmk" style="margin: 0 50px 15px 50px; border-bottom: none; padding-bottom: 0;">
+            <div class="header-container header-master" style="margin: 0 50px 15px 50px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
-                    <div class="header-subtitle">PEMETAAN (MAPPING)</div>
-                    <h1 class="header-title">MAPPING <span>MK - CPMK</span></h1>
+                    <div class="header-subtitle" style="margin-bottom: 5px;">PEMETAAN (MAPPING)</div>
+                    <h1 class="header-title" style="font-size: 2rem;">MAPPING <span>MK - CPMK</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content; background: var(--primary-blue); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">PRODI</div>
             </div>
-            <div style="border-bottom: 1px solid var(--border-color); margin: 0 50px 20px 50px;" class="header-mapping-mk-cpmk"></div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 50px 20px 50px;" class="header-master"></div>
         </div>
 
-        <div class="scrollable-content section-mapping-mk-cpmk" style="padding: 0 50px 40px 50px;">
+        <div class="scrollable-content section-master" style="padding: 0 50px 40px 50px;">
             <div class="mapping-panel">
                 <div class="form-group">
                     <label for="selectMk">
@@ -118,7 +108,7 @@
                     </div>
                 </div>
 
-                <button id="btnSave" class="btn-primary-si" style="width: 100%; justify-content: center; padding: 15px; font-size: 1.1rem; margin-top: 40px;" onclick="saveMapping()" disabled>
+                <button id="btnSave" class="btn-primary-si" onclick="saveMapping()" disabled>
                     <i class="fas fa-save" style="font-size: 1.2rem;"></i> Simpan Relasi Pemetaan
                 </button>
             </div>
@@ -131,14 +121,15 @@
     
     document.addEventListener("DOMContentLoaded", () => {
         const dynamicIcons = document.querySelectorAll('.dynamic-icon');
+        const badge = document.getElementById("prodiBadge");
         
         if(PRODI === "ti") {
             document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
-            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+            badge.innerText = "TEKNIK INFORMATIKA";
             dynamicIcons.forEach(icon => icon.style.color = '#8b0000');
         } else {
             document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
-            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+            badge.innerText = "SISTEM INFORMASI";
             dynamicIcons.forEach(icon => icon.style.color = '#1e3a8a');
         }
 
@@ -165,11 +156,60 @@
                     .then(html => {
                         sidebar.innerHTML = html;
                         if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                        setMenuAktif();
                     })
-                    .catch(e => console.log('Gagal memuat sidebar darurat'));
+                    .catch(e => console.log('Gagal memuat sidebar otomatis'));
+            } else {
+                setMenuAktif();
             }
-        }, 600); 
+        }, 400); 
     });
+
+    // ==========================================================
+    // 🔮 SIHIR ANTI-MACET DROPDOWN (GLOBAL EVENT DELEGATION)
+    // ==========================================================
+    document.addEventListener('click', function(e) {
+        const dropdownBtn = e.target.closest('.dropdown-btn') || e.target.closest('[data-toggle="dropdown"]');
+        if (dropdownBtn) {
+            e.preventDefault(); 
+            const dropdownContent = dropdownBtn.nextElementSibling;
+            const icon = dropdownBtn.querySelector('.fa-chevron-down') || dropdownBtn.querySelector('i:last-child');
+            
+            if (dropdownContent && (dropdownContent.classList.contains('dropdown-container') || dropdownContent.tagName === 'DIV' || dropdownContent.tagName === 'UL')) {
+                const isHidden = window.getComputedStyle(dropdownContent).display === 'none';
+                
+                if (isHidden) {
+                    dropdownContent.style.display = 'block';
+                    dropdownBtn.classList.add('active');
+                    if (icon) icon.style.transform = 'rotate(180deg)';
+                } else {
+                    dropdownContent.style.display = 'none';
+                    dropdownBtn.classList.remove('active');
+                    if (icon) icon.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
+    });
+
+    function setMenuAktif() {
+        const navDashboard = document.getElementById('nav-home');
+        let navMapping = document.querySelector('[data-path="/mapping/map_mk_cpmk_si.html"]') || document.querySelector('[data-path="/mapping/map_mk_cpmk.html"]');
+        
+        if (navDashboard) navDashboard.classList.remove('active');
+        if (navMapping) navMapping.classList.add('active');
+
+        const menuMaster = document.getElementById('menu-mapping') || (navMapping ? navMapping.closest('.dropdown-container') : null);
+        
+        if (menuMaster) {
+            menuMaster.style.display = 'block';
+            const parentBtn = menuMaster.previousElementSibling;
+            if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                parentBtn.classList.add('active');
+                const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
+                if(icon) icon.style.transform = 'rotate(180deg)';
+            }
+        }
+    }
 
     // --- LOGIKA API ---
     const API_MATKUL = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`; 
@@ -177,14 +217,11 @@
     const API_MAPPING = `${API_BASE}/get-mapping-mk?prodi=${PRODI}`;
     const API_SAVE_MAPPING = `${API_BASE}/admin-map-mk-cpmk`;
 
-    let listCPMK = [];
-
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace("/login/login.html");
 
     window.onload = () => { setTimeout(initDropdownAndCheckboxes, 400); };
 
-    // --- INISIALISASI DATA ---
     async function initDropdownAndCheckboxes() {
         const selectMk = document.getElementById('selectMk');
         const cpmkContainer = document.getElementById('cpmkContainer');
@@ -195,9 +232,8 @@
             ]);
 
             const dataMk = await resMk.json();
-            listCPMK = await resCpmk.json();
+            const listCPMK = await resCpmk.json();
 
-            // Isi Dropdown Mata Kuliah
             if (selectMk) {
                 selectMk.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah --</option>';
                 if (dataMk.length > 0) {
@@ -209,7 +245,6 @@
                 }
             }
 
-            // Gambar Kotak Checkbox CPMK
             if (cpmkContainer) {
                 cpmkContainer.innerHTML = '';
                 if (listCPMK.length > 0) {
@@ -225,18 +260,14 @@
                         `;
                     });
                 } else {
-                    cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; padding: 20px; font-weight:bold; text-align:center;">Data CPMK Kosong. Harap isi data CPMK terlebih dahulu.</div>';
+                    cpmkContainer.innerHTML = '<div style="color: #ef4444; grid-column: 1 / -1; padding: 20px; font-weight:bold; text-align:center;">Data CPMK Kosong.</div>';
                 }
             }
-
         } catch (error) {
             console.error("Error Fetching Data:", error);
-            if (selectMk) selectMk.innerHTML = '<option value="">❌ Gagal terhubung ke API (Cek n8n!)</option>';
-            if (cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; padding:20px; text-align:center; font-weight:bold;">❌ Gagal menarik data dari server. Pastikan n8n menyala!</div>';
         }
     }
 
-    // --- CEK RELASI MK - CPMK ---
     async function fetchExistingMapping() {
         const selectMk = document.getElementById('selectMk');
         const kodeMk = selectMk ? selectMk.value : null;
@@ -245,83 +276,52 @@
 
         if (!kodeMk) return;
 
-        checkboxes.forEach(cb => {
-            cb.checked = false;
-            cb.disabled = false; 
-        });
-
-        if (btnSave) {
-            btnSave.disabled = true;
-            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px;"></i> Memeriksa Relasi...';
-        }
+        checkboxes.forEach(cb => { cb.checked = false; cb.disabled = false; });
+        btnSave.disabled = true;
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...';
 
         try {
             const res = await fetch(`${API_MAPPING}&mk=${kodeMk}`);
             const relations = await res.json();
+            let listRelasi = Array.isArray(relations) ? relations : [relations];
 
-            let listRelasi = [];
-            if (Array.isArray(relations)) {
-                listRelasi = relations;
-            } else if (relations && typeof relations === 'object') {
-                listRelasi = [relations];
-            }
-
-            // Cocokkan data secara programatik
             checkboxes.forEach(cb => {
                 const apakahCocok = listRelasi.some(rel => {
                     const dbKodeCpmk = rel.kode_cpmk || rel.KODE_CPMK || rel.kodeCpmk;
-                    if (!dbKodeCpmk) return false;
-                    return cb.value.trim().toLowerCase() === dbKodeCpmk.toString().trim().toLowerCase();
+                    return dbKodeCpmk && cb.value.trim().toLowerCase() === dbKodeCpmk.toString().trim().toLowerCase();
                 });
-                
                 if (apakahCocok) cb.checked = true;
             });
-
         } catch (error) {
             console.error("Gagal menarik relasi:", error);
         } finally {
-            if (btnSave) {
-                btnSave.disabled = false;
-                btnSave.innerHTML = '<i class="fas fa-save" style="font-size: 1.2rem;"></i> Simpan Relasi Pemetaan';
-            }
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Relasi Pemetaan';
         }
     }
 
-    // --- SIMPAN RELASI ---
     async function saveMapping() {
         const kodeMk = document.getElementById('selectMk').value;
         const btnSave = document.getElementById('btnSave');
-        
-        if (!kodeMk) { alert("Silakan pilih Mata Kuliah terlebih dahulu!"); return; }
-
         const checkedBoxes = Array.from(document.querySelectorAll('.cpmk-checkbox:checked')).map(cb => cb.value);
 
-        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px;"></i> Menyimpan Relasi...';
         btnSave.disabled = true;
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
         try {
-            const payload = {
-                kode_mk: kodeMk,
-                prodi: PRODI,
-                cpmk_list: checkedBoxes
-            };
-
             const res = await fetch(API_SAVE_MAPPING, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ kode_mk: kodeMk, prodi: PRODI, cpmk_list: checkedBoxes })
             });
 
-            if (res.ok) {
-                alert("✅ Relasi MK & CPMK berhasil disimpan!");
-            } else {
-                alert("❌ Gagal menyimpan data di server.");
-            }
+            if (res.ok) alert("✅ Berhasil disimpan!");
+            else alert("❌ Gagal menyimpan.");
         } catch (error) {
-            alert("❌ Terjadi kesalahan jaringan. Gagal menyimpan.");
+            alert("❌ Terjadi kesalahan.");
         } finally {
-            btnSave.innerHTML = '<i class="fas fa-save" style="font-size: 1.2rem;"></i> Simpan Relasi Pemetaan';
             btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Relasi Pemetaan';
         }
     }
 </script>

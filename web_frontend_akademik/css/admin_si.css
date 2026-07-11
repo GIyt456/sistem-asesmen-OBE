@@ -48,10 +48,11 @@ body {
 }
 
 /* =========================================================
-   PENGATUR JARAK KONTEN (YANG BIKIN TEKS NABRAK SIDEBAR)
+   PENGATUR JARAK KONTEN (AGAR LEBIH KE TENGAH & LEGA)
 ========================================================= */
 .fixed-header { 
-    padding: 40px 50px 20px 50px; 
+    /* Diubah dari 50px menjadi 70px agar lebih lega dan tidak mepet */
+    padding: 40px 70px 20px 70px; 
     flex-shrink: 0; 
     background: var(--bg-main); 
     z-index: 10; 
@@ -61,7 +62,8 @@ body {
 .scrollable-content { 
     flex: 1; 
     overflow-y: auto; 
-    padding: 30px 50px 40px 50px; 
+    /* Diubah dari 50px menjadi 70px */
+    padding: 30px 70px 40px 70px; 
     overflow-x: hidden; 
 }
 
@@ -70,7 +72,7 @@ body {
 ========================================================= */
 .header-container { 
     display: flex; justify-content: space-between; align-items: flex-start; 
-    margin-bottom: 40px; /* Memperbaiki jarak agar sejajar */
+    margin-bottom: 40px; 
     border-bottom: 1px solid var(--border-color); padding-bottom: 20px; 
 }
 .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
@@ -103,7 +105,8 @@ body {
 #pagination-container button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Bagian Admin Panel Config (Dashboard) */
-.section { display: none; animation: fadeIn 0.3s ease; padding: 0 50px 40px 50px; }
+/* Jarak (Padding) Kiri Kanan diperbesar untuk Card Halaman agar tidak pojok */
+.section { display: none; animation: fadeIn 0.3s ease; padding: 0 70px 40px 70px; }
 .section.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -134,13 +137,14 @@ body {
     #sidebar-container { position: fixed; top: 0; left: -320px; height: 100vh; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 25px rgba(0,0,0,0.5); }
     #sidebar-container.active { left: 0; }
     
-    /* Header Fix */
+    /* Header Fix (Dikembalikan ke 20px untuk layar HP) */
     .fixed-header { padding: 20px !important; }
     .scrollable-content { padding: 20px !important; overflow-x: hidden !important;}
     
     .header-container { margin: 0 0 20px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; width: auto !important;}
     .header-title { font-size: 1.6rem !important; }
     .fixed-header > div:nth-child(2) { flex-direction: column; align-items: flex-start !important; gap: 15px; padding: 0;}
+    /* Jarak diubah ke 20px (anti bocor) saat di Layar HP */
     .section { padding: 0 20px 40px 20px !important; width: 100% !important; box-sizing: border-box !important;}
     
     .action-buttons { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;}

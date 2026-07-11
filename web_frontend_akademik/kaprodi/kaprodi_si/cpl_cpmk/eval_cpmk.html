@@ -2,76 +2,172 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Evaluasi CPMK Angkatan - Sistem OBE</title>
     
-    <link rel="stylesheet" href="/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- CSS RELATIF SESUAI FOLDER LOKAL -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    <link rel="stylesheet" href="/css/index_mobile.css">
+    
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
+    
     <style>
-        .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
-        .table-responsive { overflow-x: auto; background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; margin-bottom: 40px;}
-        .table-eval { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        .table-eval th, .table-eval td { padding: 15px 12px; border-bottom: 1px solid #e5e7eb; text-align: center; vertical-align: middle; }
-        .table-eval th { background: #111827; color: white; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; position: sticky; top: 0; z-index: 2; }
+        /* =========================================
+           🛡️ MANTRA ANTI-BOCOR & ANTI-MEROSOT
+           ========================================= */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0; }
+        body, input, select, button, textarea { font-family: 'Inter', sans-serif !important; }
+
+        .fixed-header { padding-top: 15px !important; }
+        .main-content { padding-top: 0 !important; }
+        
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;}
+        .header-title { font-size: 2.2rem; font-weight: 800; color: #111827; margin: 0;}
+        .header-subtitle { font-size: 0.85rem; font-weight: 700; color: #64748b; letter-spacing: 1px; margin-bottom: 5px;}
+
+        /* FILTER & KONTROL */
+        .filter-container { background: white; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; flex-wrap: wrap;}
+        .filter-group { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; flex: 1;}
+        .filter-item { display: flex; align-items: center; gap: 10px; }
+        .filter-item label { font-weight: 700; color: #1e293b; font-size: 0.95rem; }
+        .filter-item input { padding: 12px 15px; border-radius: 8px; border: 2px solid #cbd5e1; font-weight: 700; font-size: 0.95rem; outline: none; transition: 0.2s; background: #f8fafc; color: #1e293b;}
+        .filter-item input:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1);}
+        
+        .btn-primary-dynamic { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center;}
+        .btn-primary-dynamic:hover:not(:disabled) { filter: brightness(0.85); transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-dark { background: #1e293b; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center;}
+        .btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
+
+        /* TABEL DESKTOP */
+        .table-responsive { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; width: 100%; margin-bottom: 40px;}
+        .table-eval { width: 100%; border-collapse: collapse; min-width: 900px; text-align: left; }
+        .table-eval th { background: #1e293b; color: white; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; border-bottom: 2px solid #0f172a; text-transform: uppercase; position: sticky; top: 0; z-index: 5; text-align: center;}
+        .table-eval td { padding: 15px 20px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; vertical-align: middle; text-align: center;}
+        .table-eval tbody tr:hover td { background-color: #f8fafc; }
         .text-left { text-align: left !important; }
         
         /* Styling Progress Bar & Badge */
-        .progress-bar-container { width: 100%; background-color: #e2e8f0; border-radius: 999px; height: 8px; margin-bottom: 6px; overflow: hidden; }
-        .progress-bar { height: 100%; border-radius: 999px; transition: width 0.5s ease; }
+        .progress-bar-container { width: 100%; background-color: #e2e8f0; border-radius: 999px; height: 10px; margin-bottom: 8px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);}
+        .progress-bar { height: 100%; border-radius: 999px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .bg-success { background-color: #10b981; }
         .bg-warning { background-color: #f59e0b; }
         .bg-danger { background-color: #ef4444; }
         
-        .badge-status { padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px; }
+        .badge-status { padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
         .badge-status.success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .badge-status.danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
-        
-        body { animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
         @media print {
-            #sidebar-container, #navbar-container, .filter-container, .header-container { display: none !important; }
-            .main-content { padding: 0 !important; }
-            .table-responsive { box-shadow: none; border: none; padding: 0; }
+            #sidebar-container, #navbar-container, .navbar-mobile, .mobile-overlay, .filter-container { display: none !important; }
+            .main-content { padding: 0 !important; margin: 0 !important;}
+            .table-responsive { box-shadow: none; border: none; padding: 0; overflow: visible;}
+            .table-eval { min-width: 100%; }
+        }
+
+        /* =========================================
+           📱 CSS KHUSUS HP (SULAP TABEL JADI KARTU)
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
+            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
+            
+            .header-master { margin: 15px 0 10px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-master { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
+            
+            /* FILTER MOBILE */
+            .filter-container { flex-direction: column !important; align-items: stretch !important; padding: 20px 15px !important; gap: 20px !important;}
+            .filter-group { flex-direction: column !important; align-items: stretch !important; gap: 15px !important; }
+            .filter-item { flex-direction: column; align-items: flex-start; gap: 8px;}
+            .filter-item input { width: 100% !important; }
+            .btn-primary-dynamic, .btn-dark { width: 100% !important; justify-content: center !important;}
+
+            /* SULAP TABEL MENJADI KARTU */
+            .table-responsive { border: none !important; box-shadow: none !important; background: transparent !important; padding: 0 !important; overflow-x: hidden !important; margin: 0;}
+            .table-eval, .table-eval thead, .table-eval tbody, .table-eval th, .table-eval td, .table-eval tr { display: block !important; width: 100% !important; min-width: 0 !important; box-sizing: border-box !important;}
+            
+            .table-eval thead { display: none !important;}
+            
+            .table-eval tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; padding: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;}
+            
+            .table-eval td { display: flex !important; flex-direction: column !important; align-items: flex-start !important; text-align: left !important; padding: 10px 0 !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+            .table-eval td:last-child { border-bottom: none !important; padding-bottom: 0 !important;}
+            
+            .table-eval td::before { font-weight: 800; color: #64748b; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase;}
+            
+            /* Mapping Label untuk Kartu Evaluasi CPMK */
+            .table-eval td:nth-child(1) { display: none !important;} /* Sembunyikan Nomor */
+            .table-eval td:nth-child(2)::before { content: "KODE MATA KULIAH"; }
+            .table-eval td:nth-child(3)::before { content: "KODE CPMK"; color: var(--primary-blue);}
+            .table-eval td:nth-child(4)::before { content: "JUMLAH MAHASISWA"; }
+            .table-eval td:nth-child(5)::before { content: "RATA-RATA KELAS"; }
+            .table-eval td:nth-child(6)::before { content: "DISTRIBUSI KELULUSAN"; }
+            .table-eval td:nth-child(7)::before { content: "STATUS CAPAIAN"; }
+            
+            /* Penyesuaian Visual Konten HP */
+            .table-eval td:nth-child(2) { font-size: 1.1rem !important; font-weight: 800 !important; color: #1e293b !important; }
+            .table-eval td:nth-child(3) { font-size: 1.3rem !important; font-weight: 900 !important; border-bottom: 3px solid var(--primary-blue) !important; padding-bottom: 15px !important; margin-bottom: 5px !important;}
+            .table-eval td:nth-child(5) { font-size: 1.5rem !important; font-weight: 900 !important;}
+            .table-eval td:nth-child(6) { width: 100% !important; align-items: stretch !important;}
+            .table-eval td:nth-child(7) { padding-top: 15px !important; }
         }
     </style>
 </head>
 <body>
 
+    <!-- NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi"></div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
     
     <div class="main-content">
         <div id="navbar-container"></div>
 
-        <div class="content-wrapper">
-            <div class="header-container" style="margin-bottom: 20px;">
+        <div class="fixed-header">
+            <div class="header-container header-master" style="margin: 0 0 15px 0; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
                     <div class="header-subtitle">EVALUASI & RPS</div>
                     <h1 class="header-title">EVALUASI <span>CPMK ANGKATAN</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content; background: var(--primary-blue); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">PRODI</div>
             </div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;" class="header-master"></div>
+        </div>
 
-            <p style="margin: 0 0 20px 0; color: #64748b; font-size: 0.95rem;">Analisis rata-rata nilai dan tingkat kelulusan tiap Capaian Pembelajaran Mata Kuliah (CPMK) berdasarkan akumulasi data satu angkatan penuh.</p>
+        <div class="scrollable-content section-master" style="padding-top: 0; padding-bottom: 40px;">
+
+            <p style="margin: 0 0 25px 0; color: #475569; font-size: 0.95rem; line-height: 1.6;">Analisis rata-rata nilai dan tingkat kelulusan tiap Capaian Pembelajaran Mata Kuliah (CPMK) berdasarkan akumulasi data satu angkatan penuh.</p>
 
             <div class="filter-container">
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-users"></i> Cari Angkatan:</label>
-                    <input type="number" id="inputAngkatan" placeholder="Contoh: 2025" value="2025" style="padding: 10px 15px; border-radius: 6px; border: 1px solid #cbd5e1; width: 140px; font-weight: bold; outline: none;">
+                <div class="filter-group">
+                    <div class="filter-item">
+                        <label><i class="fas fa-users" style="color: var(--primary-blue); margin-right: 5px;"></i> Tahun Angkatan:</label>
+                        <input type="number" id="inputAngkatan" placeholder="Contoh: 2025" value="2025" style="width: 140px;">
+                    </div>
                     
-                    <label style="font-weight: 700; margin-left: 10px; color: #1e293b;"><i class="fas fa-sliders-h"></i> Standar Lulus:</label>
-                    <input type="number" id="standarLulus" class="form-control" value="60" style="padding: 10px; width: 80px; text-align: center; font-weight: bold; border-radius: 6px; border: 1px solid #cbd5e1;">
+                    <div class="filter-item">
+                        <label><i class="fas fa-sliders-h" style="color: var(--primary-blue); margin-right: 5px;"></i> Standar Lulus (0-100):</label>
+                        <input type="number" id="standarLulus" value="60" style="width: 100px; text-align: center;">
+                    </div>
                     
-                    <button style="background: #1e293b; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; font-weight: 600;" onclick="loadEvalCPMK()">
+                    <button class="btn-dark" onclick="loadEvalCPMK()" style="align-self: flex-end; height: 46px;">
                         <i class="fas fa-search"></i> Analisis Data
                     </button>
                 </div>
 
-                <button style="background: #10b981; color: white; padding: 10px 20px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer;" onclick="window.print()">
+                <button class="btn-primary-dynamic" onclick="window.print()" style="background: #10b981; align-self: flex-end; height: 46px;">
                     <i class="fas fa-print"></i> Cetak Laporan
                 </button>
             </div>
@@ -90,7 +186,7 @@
                         </tr>
                     </thead>
                     <tbody id="bodyTable">
-                        <tr><td colspan="7" style="padding: 40px; color: #64748b; text-align: center;"><i class="fas fa-info-circle"></i> Silakan ketik tahun angkatan dan klik "Analisis Data".</td></tr>
+                        <tr><td colspan="7" style="padding: 40px; color: #64748b; text-align: center; font-weight: 600;"><i class="fas fa-info-circle" style="color: var(--primary-blue); font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Silakan ketik tahun angkatan dan klik "Analisis Data".</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -98,31 +194,37 @@
     </div>
 
     <script>
-        // 1. TANGKAP IDENTITAS LOGIN SECARA DINAMIS
-        const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
+        // 1. TANGKAP IDENTITAS LOGIN SECARA DINAMIS (SIHIR BUNGLON)
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
         const API_EVAL_CPMK = `${API_BASE}/get-eval-cpmk`;
-        let warnaTeksCpmk = '#8b0000'; // Default warna merah TI
 
-        // 2. RUBAH TEMA OTOMATIS BERDASARKAN PRODI
         document.addEventListener("DOMContentLoaded", () => {
             const userLogin = localStorage.getItem("user_login");
             if (!userLogin) window.location.replace("/login/login.html");
 
             const badge = document.getElementById("prodiBadge");
-            const titleSpan = document.querySelector('.header-title span');
             
-            if(PRODI === "si") {
-                badge.innerText = "Sistem Informasi";
-                badge.style.background = "#0097a7"; // Tema SI
-                titleSpan.style.color = "#0097a7";
-                warnaTeksCpmk = '#0097a7';
-            } else {
+            if(PRODI === "ti") {
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
                 badge.innerText = "Teknik Informatika";
-                badge.style.background = "#8b0000"; // Tema TI
-                titleSpan.style.color = "#8b0000";
-                warnaTeksCpmk = '#8b0000';
+            } else {
+                document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+                badge.innerText = "Sistem Informasi";
+            }
+
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if(avatarMobile) {
+                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
             }
         });
+
+        // --- FUNGSI SIDEBAR MOBILE ---
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
 
         // 3. FUNGSI ANALISIS DATA
         async function loadEvalCPMK() {
@@ -131,23 +233,23 @@
             const standar = parseFloat(document.getElementById("standarLulus").value) || 60;
             const bodyTbl = document.getElementById("bodyTable");
             
-            bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #64748b;"><i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; display: block; margin-bottom: 10px;"></i> Mengkalkulasi data CPMK Angkatan ${angkatan}...</td></tr>`;
+            bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: #64748b; font-weight: 600;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); display: block; margin-bottom: 15px;"></i> Mengkalkulasi data CPMK Angkatan ${angkatan}...</td></tr>`;
 
             try {
-                // Mengirim parameter pencarian & identitas prodi yang sedang login
+                // Mengirim parameter pencarian & identitas prodi yang sedang login ke N8N
                 const res = await fetch(`${API_EVAL_CPMK}?angkatan=${angkatan}&prodi=${PRODI}`);
                 if(!res.ok) throw new Error("Gagal mengambil data");
                 
                 const rawText = await res.text();
                 if (!rawText || rawText.trim() === "" || rawText.includes("empty_database")) {
-                    bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 30px;"><i class="fas fa-exclamation-circle"></i> Tidak ada data nilai untuk angkatan ${angkatan} di program studi ini.</td></tr>`;
+                    bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; font-weight: 700; padding: 40px;"><i class="fas fa-exclamation-circle fa-2x" style="display: block; margin-bottom: 10px;"></i> Tidak ada data nilai untuk angkatan ${angkatan} di program studi ini.</td></tr>`;
                     return;
                 }
 
                 const data = JSON.parse(rawText);
 
                 if (data.length === 0 || !data[0].kode_mk) {
-                    bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; padding: 30px;"><i class="fas fa-exclamation-circle"></i> Tidak ada rekap nilai untuk angkatan ${angkatan} di program studi ini.</td></tr>`;
+                    bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #dc2626; font-weight: 700; padding: 40px;"><i class="fas fa-exclamation-circle fa-2x" style="display: block; margin-bottom: 10px;"></i> Tidak ada rekap nilai untuk angkatan ${angkatan} di program studi ini.</td></tr>`;
                     return;
                 }
 
@@ -188,16 +290,16 @@
 
                     bodyTbl.innerHTML += `
                         <tr>
-                            <td style="font-weight: bold; color: #475569;">${no++}</td>
-                            <td class="text-left" style="font-weight: 700; color: #1e293b;">${row.kode_mk}</td>
-                            <td style="font-weight: 800; color: ${warnaTeksCpmk}; font-size: 1.05rem;">${row.kode_cpmk}</td>
-                            <td style="font-weight: 500; color: #4b5563;">${totalMhs} Mhs</td>
-                            <td style="font-size: 1.15rem; font-weight: 800; color: ${rataColor};">${rataRata}</td>
+                            <td style="font-weight: 700; color: #64748b;">${no++}</td>
+                            <td class="text-left" style="font-weight: 800; color: #1e293b;">${row.kode_mk}</td>
+                            <td style="font-weight: 900; color: var(--primary-blue); font-size: 1.1rem;">${row.kode_cpmk}</td>
+                            <td style="font-weight: 600; color: #475569;">${totalMhs} Mhs</td>
+                            <td style="font-size: 1.25rem; font-weight: 900; color: ${rataColor};">${rataRata}</td>
                             <td>
                                 <div class="progress-bar-container">
                                     <div class="progress-bar ${barColor}" style="width: ${persenLulus}%;"></div>
                                 </div>
-                                <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">${persenLulus}% Lulus (≥ ${standar})</span>
+                                <span style="font-size: 0.85rem; font-weight: 700; color: #475569;">${persenLulus}% Lulus (≥ ${standar})</span>
                             </td>
                             <td>${statusBadge}</td>
                         </tr>
@@ -205,12 +307,77 @@
                 });
 
             } catch (e) {
-                bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red; padding: 30px;">Error: Gagal terhubung ke N8N.</td></tr>`;
+                bodyTbl.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444; font-weight: bold; padding: 30px;"><i class="fas fa-wifi" style="margin-right: 8px;"></i> Error: Gagal terhubung ke N8N.</td></tr>`;
             }
         }
 
+        // ==========================================================
+        // 🔮 SIHIR ANTI-MACET DROPDOWN (GLOBAL EVENT DELEGATION)
+        // ==========================================================
+        document.addEventListener('click', function(e) {
+            const dropdownBtn = e.target.closest('.dropdown-btn') || e.target.closest('[data-toggle="dropdown"]');
+            if (dropdownBtn) {
+                e.preventDefault(); 
+                const dropdownContent = dropdownBtn.nextElementSibling;
+                const icon = dropdownBtn.querySelector('.fa-chevron-down') || dropdownBtn.querySelector('i:last-child');
+                
+                if (dropdownContent && (dropdownContent.classList.contains('dropdown-container') || dropdownContent.tagName === 'DIV' || dropdownContent.tagName === 'UL')) {
+                    const isHidden = window.getComputedStyle(dropdownContent).display === 'none';
+                    
+                    if (isHidden) {
+                        dropdownContent.style.display = 'block';
+                        dropdownBtn.classList.add('active');
+                        if (icon) icon.style.transform = 'rotate(180deg)';
+                    } else {
+                        dropdownContent.style.display = 'none';
+                        dropdownBtn.classList.remove('active');
+                        if (icon) icon.style.transform = 'rotate(0deg)';
+                    }
+                }
+            }
+        });
+
+        function setMenuAktif() {
+            const navDashboard = document.getElementById('nav-home');
+            let navEval = document.querySelector('[data-path="/evaluasi/eval_cpmk_si.html"]') || document.querySelector('[data-path="/evaluasi/eval_cpmk.html"]');
+            
+            if (navDashboard) navDashboard.classList.remove('active');
+            if (navEval) navEval.classList.add('active');
+
+            const menuMaster = document.getElementById('menu-evaluasi') || (navEval ? navEval.closest('.dropdown-container') : null);
+            
+            if (menuMaster) {
+                menuMaster.style.display = 'block';
+                const parentBtn = menuMaster.previousElementSibling;
+                if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                    parentBtn.classList.add('active');
+                    const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
+                    if(icon) icon.style.transform = 'rotate(180deg)';
+                }
+            }
+        }
+
+        // ==========================================
+        // JALANKAN SAAT HALAMAN DIBUKA
+        // ==========================================
         window.onload = () => {
-            setTimeout(loadEvalCPMK, 400); 
+            setTimeout(loadEvalCPMK, 200); 
+            
+            setTimeout(() => {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebar.innerHTML = html;
+                            if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                            setMenuAktif();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar otomatis'));
+                } else {
+                    setMenuAktif();
+                }
+            }, 400);
         };
     </script>
 </body>

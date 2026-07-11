@@ -19,11 +19,18 @@
     <style>
         /* MANTRA ANTI-BOCOR LAYAR */
         *, *::before, *::after { box-sizing: border-box !important; }
+        
+        .fixed-header { padding-top: 15px !important; }
+        .main-content { padding-top: 0 !important; }
+
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;}
+        .header-title { font-size: 2.2rem; font-weight: 800; color: #111827; margin: 0;}
+        .header-subtitle { font-size: 0.85rem; font-weight: 700; color: #64748b; letter-spacing: 1px; margin-bottom: 5px;}
 
         .btn-action-skpi { background: var(--primary-blue); color: white; padding: 12px 20px; font-weight: 700; border-radius: 8px; border: none; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;}
-        .btn-action-skpi:hover { filter: brightness(0.85); transform: translateY(-2px); }
+        .btn-action-skpi:hover { filter: brightness(0.85); transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn-cetak-skpi { background: #10b981; color: white; padding: 12px 20px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; white-space: nowrap;}
-        .btn-cetak-skpi:hover { background: #059669; transform: translateY(-2px); }
+        .btn-cetak-skpi:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
         .report-page { background: white; padding: 50px; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border-color); margin-top: 20px; max-width: 1100px; margin-left: auto; margin-right: auto; color: #1e293b; }
         
@@ -59,18 +66,19 @@
            ========================================= */
         @media screen and (max-width: 768px) {
             html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
-            .main-content { padding-top: 15px !important; overflow-x: hidden !important; width: 100% !important; max-width: 100% !important;}
-            .header-skpi-mhs { margin: 15px 15px 10px 15px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
-            .section-skpi-mhs { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
+            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
+            
+            .header-master { margin: 15px 0 10px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-master { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
             
             /* Kontrol Pencarian Menjadi Kolom ke Bawah */
-            .search-box-skpi { flex-direction: column !important; align-items: stretch !important; padding: 15px !important; gap: 15px !important;}
+            .search-box-skpi { flex-direction: column !important; align-items: stretch !important; padding: 20px 15px !important; gap: 15px !important;}
             .search-box-skpi input { width: 100% !important; max-width: none !important; box-sizing: border-box !important;}
             .search-box-skpi .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%;}
             .search-box-skpi button { width: 100% !important; justify-content: center !important;}
 
             /* Layout SKPI Menjadi Satu Kolom ke Bawah */
-            .report-page { padding: 20px !important; border-radius: 0 !important; border-left: none !important; border-right: none !important;}
+            .report-page { padding: 20px !important; border-radius: 12px !important; border-left: 1px solid var(--border-color) !important; border-right: 1px solid var(--border-color) !important;}
             .skpi-header-title { font-size: 1.3rem !important; }
             .identity-grid { grid-template-columns: 1fr !important; gap: 20px !important;}
             .ident-label { width: 120px !important; }
@@ -86,7 +94,7 @@
             
             html, body { background: white !important; padding: 0 !important; margin: 0 !important; width: 100% !important;}
             .main-content { padding: 0 !important; margin: 0 !important; overflow: visible !important;}
-            .section-skpi-mhs { padding: 0 !important; }
+            .scrollable-content { padding: 0 !important; }
             
             /* Matikan Shadow & Border di luar tabel */
             .report-page { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
@@ -130,23 +138,24 @@
     <div class="main-content">
         <div id="navbar-container"></div>
 
-        <div class="fixed-header">
-            <div class="header-container header-skpi-mhs" style="margin: 30px 50px 15px 50px; border-bottom: none; padding-bottom: 0;">
+        <!-- PERBAIKAN: Header distandardisasi menggunakan class header-master agar tidak mepet & aneh -->
+        <div class="fixed-header no-print">
+            <div class="header-container header-master" style="margin: 0 0 15px 0; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
-                    <div class="header-subtitle" style="margin-bottom: 5px;">PELAPORAN & CETAK</div>
-                    <h1 class="header-title" style="font-size: 2rem;">CETAK <span>SKPI MAHASISWA</span></h1>
+                    <div class="header-subtitle">PELAPORAN & CETAK</div>
+                    <h1 class="header-title">CETAK <span>SKPI MAHASISWA</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content; background: var(--primary-blue); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">PRODI</div>
             </div>
-            <div style="border-bottom: 1px solid var(--border-color); margin: 0 50px 20px 50px;" class="header-skpi-mhs"></div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;" class="header-master"></div>
         </div>
 
-        <div class="scrollable-content section-skpi-mhs" style="padding: 0 50px 40px 50px;">
+        <div class="scrollable-content section-master" style="padding-top: 0; padding-bottom: 40px;">
             
             <div class="search-box-skpi no-print" style="background: white; padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; gap: 20px; align-items: center;">
                 <div style="flex: 1;">
                     <label style="font-weight: 800; color: #475569; display: block; margin-bottom: 8px;"><i class="fas fa-id-card" style="color: var(--primary-blue); margin-right: 5px;"></i> Masukkan NIM Mahasiswa:</label>
-                    <input type="text" id="inputNIM" placeholder="Contoh: 22620191" style="padding: 14px 20px; border-radius: 8px; border: 2px solid #cbd5e1; font-weight: 700; width: 100%; max-width: 400px; outline: none; font-size: 1.05rem; color: var(--primary-blue);">
+                    <input type="text" id="inputNIM" placeholder="Contoh: 22620191" style="padding: 14px 20px; border-radius: 8px; border: 2px solid #cbd5e1; font-weight: 700; width: 100%; max-width: 400px; outline: none; font-size: 1.05rem; color: var(--primary-blue); background: #f8fafc; transition: 0.2s;" onfocus="this.style.borderColor='var(--primary-blue)'; this.style.background='white'; this.style.boxShadow='0 0 0 3px rgba(30,58,138, 0.1)';" onblur="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc'; this.style.boxShadow='none';">
                 </div>
                 
                 <div class="btn-group" style="display: flex; gap: 10px; margin-top: auto;">
@@ -243,6 +252,7 @@
     </div>
 
     <script>
+        // 1. TANGKAP IDENTITAS LOGIN SECARA DINAMIS (SIHIR BUNGLON)
         const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
         const API_SKPI = `${API_BASE}/get-skpi-data`;
         let radarChart = null;
@@ -251,13 +261,14 @@
             const userLogin = localStorage.getItem("user_login");
             if (!userLogin) window.location.replace("/login/login.html");
 
-            // KEKUATAN BUNGLON: Tentukan Tema Warna (Biru vs Merah)
+            const badge = document.getElementById("prodiBadge");
+            
             if(PRODI === "ti") {
                 document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
-                document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+                badge.innerText = "Teknik Informatika";
             } else {
                 document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
-                document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+                badge.innerText = "Sistem Informasi";
             }
 
             const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
@@ -268,9 +279,56 @@
             }
         });
 
+        // --- FUNGSI SIDEBAR MOBILE ---
         function toggleSidebar() {
             document.getElementById('sidebar-container').classList.toggle('active');
             document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+
+        // ==========================================================
+        // 🔮 SIHIR ANTI-MACET DROPDOWN (GLOBAL EVENT DELEGATION)
+        // ==========================================================
+        document.addEventListener('click', function(e) {
+            const dropdownBtn = e.target.closest('.dropdown-btn') || e.target.closest('[data-toggle="dropdown"]');
+            if (dropdownBtn) {
+                e.preventDefault(); 
+                const dropdownContent = dropdownBtn.nextElementSibling;
+                const icon = dropdownBtn.querySelector('.fa-chevron-down') || dropdownBtn.querySelector('i:last-child');
+                
+                if (dropdownContent && (dropdownContent.classList.contains('dropdown-container') || dropdownContent.tagName === 'DIV' || dropdownContent.tagName === 'UL')) {
+                    const isHidden = window.getComputedStyle(dropdownContent).display === 'none';
+                    
+                    if (isHidden) {
+                        dropdownContent.style.display = 'block';
+                        dropdownBtn.classList.add('active');
+                        if (icon) icon.style.transform = 'rotate(180deg)';
+                    } else {
+                        dropdownContent.style.display = 'none';
+                        dropdownBtn.classList.remove('active');
+                        if (icon) icon.style.transform = 'rotate(0deg)';
+                    }
+                }
+            }
+        });
+
+        function setMenuAktif() {
+            const navDashboard = document.getElementById('nav-home');
+            let navSKPI = document.querySelector('[data-path="/cetak/cetak_skpi_si.html"]') || document.querySelector('[data-path="/cetak/cetak_skpi.html"]');
+            
+            if (navDashboard) navDashboard.classList.remove('active');
+            if (navSKPI) navSKPI.classList.add('active');
+
+            const menuMaster = document.getElementById('menu-cetak') || (navSKPI ? navSKPI.closest('.dropdown-container') : null);
+            
+            if (menuMaster) {
+                menuMaster.style.display = 'block';
+                const parentBtn = menuMaster.previousElementSibling;
+                if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                    parentBtn.classList.add('active');
+                    const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
+                    if(icon) icon.style.transform = 'rotate(180deg)';
+                }
+            }
         }
         
         document.addEventListener("DOMContentLoaded", () => {
@@ -282,10 +340,13 @@
                         .then(html => {
                             sidebar.innerHTML = html;
                             if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                            setMenuAktif();
                         })
                         .catch(e => console.log('Gagal memuat sidebar darurat'));
+                } else {
+                    setMenuAktif();
                 }
-            }, 600); 
+            }, 400); 
         });
 
         async function loadSKPI() {
