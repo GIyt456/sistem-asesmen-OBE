@@ -765,25 +765,23 @@
                     <table>
                         <thead>
                             <tr>
-                                <th style="width: 18%; text-align: left;">Mata Kuliah Konversi</th>
+                                <th style="width: 20%; text-align: left;">Mata Kuliah Konversi</th>
                                 <th style="width: 5%; text-align: center;">SKS</th>
-                                <th style="width: 32%; text-align: left;">Kompetensi / Aktivitas MBKM</th>
+                                <th style="width: 45%; text-align: left;">Kompetensi / Aktivitas MBKM</th>
                                 <th style="width: 15%; text-align: center;">Status</th>
-                                <th style="width: 15%; text-align: center;">Nilai Akhir</th>
                                 <th style="width: 15%; text-align: center;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="mkTableBody">
                             <tr>
-                                <td colspan="6" style="text-align: center; color: #9ca3af; font-style: italic;">Belum
-                                    ada
-                                    mata kuliah konversi yang dipilih.</td>
+                                <td colspan="5" style="text-align: center; color: #9ca3af; font-style: italic;">Belum
+                                    ada mata kuliah konversi yang dipilih.</td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr class="total-row">
                                 <td colspan="2" style="text-align: right; padding: 15px;">Total SKS Diakui:</td>
-                                <td colspan="4" style="color: var(--primary-red); font-size: 1.1rem; padding: 15px;"
+                                <td colspan="3" style="color: var(--primary-red); font-size: 1.1rem; padding: 15px;"
                                     id="totalSksLabel">0</td>
                             </tr>
                         </tfoot>
@@ -886,7 +884,13 @@
         const API_MBKM_LIST = `${API_BASE}/get-mbkm-data`;
         const API_MK_MASTER = `${API_BASE}/get-master-matkul`;
         const API_CHECK_NILAI = `${API_BASE}/get-nilai-mhs`;
-        const API_SAVE_REKAP = `${API_BASE}/save-nilai-mbkm`;
+        const API_SAVE_REKAP = `${API_BASE}/save-nilai-mbkm`; // KEMBALIKAN API MBKM INI
+
+        // --- API BARU YANG DISAMAKAN DENGAN HALAMAN INPUT NILAI ---
+        const API_SIMPAN_OBE = `${API_BASE}/simpan-konfigurasi-input-nilai`;
+        const API_GET_DRAFT = `${API_BASE}/get-draft-bobot`;
+        const API_GET_REPORT = `${API_BASE}/get-report-obe`;
+        // -----------------------------------------------------------
 
         const API_GET_BOBOT = `${API_BASE}/get-bobot-mbkm`;
         const API_GET_NILAI_DETAIL = `${API_BASE}/get-nilai-mbkm-detail`;
@@ -1024,52 +1028,70 @@
             selectedBase64PDF = mhs.file_base64 || "";
             document.getElementById("btnPreviewBukti").style.display = selectedBase64PDF ? "inline-flex" : "none";
 
-            document.getElementById("mkTableBody").innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Menyelaraskan data nilai...</td></tr>';
+            document.getElementById("mkTableBody").innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Menyelaraskan data nilai...</td></tr>';
 
             try {
+                // 1. Tarik Matkul Konversi, Kompetensi, & Status dari DB MBKM (Tabel nilai_mbkm)
                 const res = await fetch(`${API_CHECK_NILAI}?nim=${mhs.nim}`);
                 const dataTersimpan = await res.json();
                 const dataArray = safeExtractArray(dataTersimpan);
 
-                let detailArray = [];
-                try {
-                    const resDetail = await fetch(`${API_GET_NILAI_DETAIL}?nim=${mhs.nim}`);
-                    if (resDetail.ok) {
-                        const jsonDet = await resDetail.json();
-                        detailArray = extractDBRows(jsonDet, 'minggu');
-                    }
-                } catch (errDetail) {
-                    console.warn("Belum ada data detail nilai 16 pertemuan.");
-                }
-
                 if (dataArray.length > 0) {
-                    selectedMKs = dataArray.map(m => {
+                    let tempMKs = [];
+
+                    // 2. Karena nilai sudah dipindah ke OBE DB, kita fetch nilainya dari API OBE secara real-time!
+                    for (const m of dataArray) {
                         const kodeValid = m.kode_mk || m.kode;
                         const objMaster = allDataMK.find(x => x.kode_mk === kodeValid);
 
-                        const detailMkIni = detailArray.filter(d => d.kode_mk === kodeValid).map(d => ({
-                            minggu: parseInt(d.minggu || d.pertemuan),
-                            bobot: parseFloat(d.bobot || 0),
-                            nilai: parseFloat(d.nilai || 0)
-                        }));
+                        let finalVal = 0;
+                        let gradeVal = '-';
+                        let detailPenilaian = [];
 
-                        return {
+                        try {
+                            // Menembak langsung ke tabel OBE untuk menarik nilai yang sesungguhnya
+                            const resReport = await fetch(`${API_GET_REPORT}?mk=${kodeValid}`);
+                            const txtReport = await resReport.text();
+                            let arrReport = JSON.parse(txtReport);
+                            let reportObe = (Array.isArray(arrReport) ? arrReport : []).map(i => i.json ? i.json : i);
+
+                            // Temukan nilai mahasiswa MBKM ini dari seluruh kumpulan data OBE
+                            let mhsObe = reportObe.filter(r => String(r.nim || r.NIM).trim() === String(mhs.nim).trim());
+
+                            if (mhsObe.length > 0) {
+                                // Ambil nilai akhir & grade dari baris pertama miliknya
+                                finalVal = parseFloat(mhsObe[0].nilai_akhir || mhsObe[0].nilai_angka || 0);
+                                gradeVal = mhsObe[0].grade || mhsObe[0].nilai_huruf || '-';
+
+                                // Rekonstruksi rincian per minggu untuk dimasukkan ke kalkulator
+                                detailPenilaian = mhsObe.map(r => ({
+                                    minggu: parseInt(r.pertemuan),
+                                    bobot: 0, // Akan dihitung ulang saat tombol Nilai ditekan
+                                    nilai: parseFloat(r.nilai_asli || r.nilai_mentah || 0)
+                                }));
+                            }
+                        } catch (e) {
+                            console.warn("Belum ada nilai OBE yang tersimpan untuk " + kodeValid);
+                        }
+
+                        tempMKs.push({
                             kode_mk: kodeValid,
                             nama_mk: m.nama_mk || m.nama || (objMaster ? objMaster.nama_mk : "-"),
                             sks: m.sks || (objMaster ? parseInt(objMaster.sks) : 0),
                             kompetensi: m.kompetensi || "",
                             status: m.status || "Diakui",
-                            penilaian: detailMkIni,
-                            nilai_akhir: m.nilai_akhir || m.nilai_angka || 0,
-                            grade: m.grade || m.nilai_huruf || '-'
-                        };
-                    });
+                            penilaian: detailPenilaian,
+                            nilai_akhir: finalVal,     // Disuntikkan dari Database OBE
+                            grade: gradeVal            // Disuntikkan dari Database OBE
+                        });
+                    }
+                    selectedMKs = tempMKs;
                 } else {
                     selectedMKs = [];
                 }
                 renderTabelMK();
             } catch (e) {
-                console.log("Belum ada data nilai tersimpan untuk mahasiswa ini.");
+                console.log("Belum ada data konversi tersimpan untuk mahasiswa ini.", e);
                 selectedMKs = [];
                 renderTabelMK();
             }
@@ -1186,7 +1208,7 @@
             let totSks = 0;
 
             if (selectedMKs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #9ca3af; font-style: italic; padding: 20px;">Belum ada mata kuliah konversi yang dipilih.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #9ca3af; font-style: italic; padding: 20px;">Belum ada mata kuliah konversi yang dipilih.</td></tr>`;
                 document.getElementById("totalSksLabel").innerText = 0;
                 return;
             }
@@ -1196,13 +1218,6 @@
                 const mkNama = mk.nama_mk || "-";
                 const mkSks = parseInt(mk.sks) || 0;
                 totSks += mkSks;
-
-                const gradeFinal = mk.grade || '-';
-                const nilaiFinal = parseFloat(mk.nilai_akhir) || 0;
-
-                const badgeGrade = gradeFinal !== '-'
-                    ? `<span class="grade-box">${nilaiFinal.toFixed(1)} (${gradeFinal})</span>`
-                    : '<span style="color:#9ca3af; font-size:0.85rem; font-weight:600;">Belum dinilai</span>';
 
                 const row = document.createElement('tr');
                 row.setAttribute('data-kode', mkKode);
@@ -1230,10 +1245,6 @@
                                 <div class="status-item" onclick="selectStatus(this, 'Ditolak', event)">Ditolak</div>
                             </div>
                         </div>
-                    </td>
-
-                    <td style="text-align: center; vertical-align: middle;">
-                        ${badgeGrade}
                     </td>
                     
                     <td style="text-align: center; vertical-align: top;">
@@ -1446,7 +1457,7 @@
         }
 
         // ==========================================
-        // 6. SIMPAN SELURUH DATA KE N8N
+        // 6. SIMPAN SELURUH DATA KE N8N (DUAL-SAVE / SIMPAN GANDA)
         // ==========================================
         async function simpanKeN8N(isAutoSave = false) {
             syncTableData(); // Pastikan memory sesuai tabel depan
@@ -1465,30 +1476,159 @@
 
             const btnSave = document.getElementById("btnSimpanRekap");
             btnSave.disabled = true;
-            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan ke Database...';
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyinkronkan & Menyimpan...';
 
             const nimMhs = document.getElementById("lblNim").innerText;
+            const namaMhs = document.getElementById("lblNama").innerText.replace(/MBKM/gi, '').trim();
+            const dosenName = localStorage.getItem("user_login") || "Kaprodi";
+            const nidn = localStorage.getItem("user_nidn") || "000000000";
 
-            const payload = {
-                nim: nimMhs,
-                data_nilai: selectedMKs
-            };
+            let errorCount = 0;
 
+            // =========================================================================
+            // TAHAP 1: SIMPAN KE DATABASE MBKM (Agar riwayat tabel tidak hilang saat direfresh)
+            // =========================================================================
             try {
-                const response = await fetch(API_SAVE_REKAP, {
+                const mbkmPayload = selectedMKs.map(mk => ({
+                    nim: nimMhs,
+                    nama_mahasiswa: namaMhs,
+                    kode_mk: mk.kode_mk,
+                    nama_mk: mk.nama_mk,
+                    sks: mk.sks,
+                    kompetensi: mk.kompetensi,
+                    status: mk.status,
+                    nilai_akhir: mk.nilai_akhir,
+                    grade: mk.grade,
+                    penilaian: mk.penilaian
+                }));
+
+                await fetch(API_SAVE_REKAP, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
+                    // Menggabungkan berbagai format agar webhook lama pasti bisa membaca
+                    body: JSON.stringify({
+                        nim: nimMhs,
+                        data: mbkmPayload,
+                        data_konversi: selectedMKs
+                    })
                 });
-                if (response.ok) {
-                    if (!isAutoSave) alert("✅ Hasil Konversi & Penilaian MBKM berhasil disimpan ke Database!");
-                } else {
-                    alert("❌ Gagal menyimpan ke n8n.");
+            } catch (e) {
+                console.warn("Peringatan: Gagal menyimpan riwayat ke DB MBKM lokal.", e);
+            }
+
+            // =========================================================================
+            // TAHAP 2: SIMPAN KE DATABASE OBE (Terintegrasi tanpa menghapus data mhs lain)
+            // =========================================================================
+            for (const mk of selectedMKs) {
+                const kodeMK = mk.kode_mk;
+                try {
+                    // --- A. TARIK BOBOT LAMA AGAR TIDAK HAPUS ---
+                    const resDraft = await fetch(`${API_GET_DRAFT}?mk=${kodeMK}`);
+                    const txtDraft = await resDraft.text();
+                    let arrDraft = JSON.parse(txtDraft);
+                    arrDraft = (arrDraft.data || arrDraft).map(item => item.json ? item.json : item);
+
+                    let dataBobotLama = [];
+                    for (let i = 1; i <= 16; i++) {
+                        let barisDb = arrDraft.find(d => parseInt(d.pertemuan) === i);
+                        if (barisDb) {
+                            dataBobotLama.push({
+                                pertemuan: i,
+                                bentuk_penilaian: barisDb.bentuk_penilaian || "",
+                                cpl: barisDb.kode_cpl || "-",
+                                cpmk: barisDb.kode_cpmk || "",
+                                komponen_penilaian: barisDb.komponen_penilaian || "",
+                                bobot: barisDb.bobot_persen || "0"
+                            });
+                        } else {
+                            dataBobotLama.push({ pertemuan: i, bentuk_penilaian: "", cpl: "-", cpmk: "", komponen_penilaian: "", bobot: "0" });
+                        }
+                    }
+
+                    // --- B. TARIK NILAI LAMA MAHASISWA REGULER ---
+                    const resReport = await fetch(`${API_GET_REPORT}?mk=${kodeMK}`);
+                    const txtReport = await resReport.text();
+                    let arrReport = JSON.parse(txtReport);
+                    let reportLama = (Array.isArray(arrReport) ? arrReport : []).map(i => i.json ? i.json : i);
+
+                    // Re-konstruksi format array nilai 
+                    let mhsMap = new Map();
+                    reportLama.forEach(r => {
+                        let nim = String(r.nim || r.NIM).trim();
+                        if (!mhsMap.has(nim)) {
+                            mhsMap.set(nim, {
+                                nim: nim,
+                                nama: r.nama_mahasiswa || r.nama,
+                                final: parseFloat(r.nilai_akhir || 0),
+                                grade: r.grade || r.nilai_huruf || 'E',
+                                detail: []
+                            });
+                        }
+                        mhsMap.get(nim).detail.push({
+                            pertemuan: parseInt(r.pertemuan),
+                            bobot_index: parseInt(r.bobot_index || 0),
+                            cpmk: r.cpmk || r.kode_cpmk || "-",
+                            nilai: parseFloat(r.nilai_asli || r.nilai_mentah || 0)
+                        });
+                    });
+
+                    // --- C. INJEKSI/TIMPA NILAI MBKM KE DALAM MAP ---
+                    let detailMBKM = [];
+                    if (mk.penilaian && mk.penilaian.length > 0) {
+                        mk.penilaian.forEach(p => {
+                            let cpmkTerkait = "-";
+                            let matchBobot = arrDraft.find(d => parseInt(d.pertemuan) === p.minggu);
+                            if (matchBobot) cpmkTerkait = matchBobot.kode_cpmk || "-";
+
+                            detailMBKM.push({
+                                pertemuan: p.minggu,
+                                bobot_index: 0,
+                                cpmk: cpmkTerkait,
+                                nilai: parseFloat(p.nilai)
+                            });
+                        });
+                    }
+
+                    mhsMap.set(nimMhs, {
+                        nim: nimMhs,
+                        nama: namaMhs + " (MBKM)",
+                        final: parseFloat(mk.nilai_akhir || 0),
+                        grade: mk.grade || "E",
+                        detail: detailMBKM
+                    });
+
+                    let dataNilaiGabungan = Array.from(mhsMap.values());
+
+                    // --- D. SUSUN PAYLOAD PERSIS INPUT NILAI & KIRIM ---
+                    const payload = {
+                        metadata: { dosen: dosenName, nidn: nidn, kode_mk: kodeMK, tanggal: new Date().toISOString(), status: 'final' },
+                        data_bobot: dataBobotLama,
+                        data_nilai: dataNilaiGabungan
+                    };
+
+                    const response = await fetch(API_SIMPAN_OBE, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) errorCount++;
+
+                } catch (e) {
+                    console.error("Error saving MK " + kodeMK, e);
+                    errorCount++;
                 }
-            } catch (e) { alert("❌ Error koneksi ke server n8n."); }
-            finally {
-                btnSave.disabled = false;
-                btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Hasil Konversi & Penilaian';
+            }
+
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Hasil Konversi & Penilaian';
+
+            if (!isAutoSave) {
+                if (errorCount === 0) {
+                    alert("✅ Hasil Konversi & Penilaian MBKM berhasil disimpan dan terintegrasi!\nData riwayat aman, data reguler lain tidak terhapus.");
+                } else {
+                    alert(`⚠️ Terdapat ${errorCount} Mata Kuliah yang gagal disimpan ke server OBE.`);
+                }
             }
         }
 
