@@ -28,6 +28,13 @@
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
 
+            <div style="margin-bottom: 20px;">
+                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                <select id="filterKurikulum" onchange="loadData()">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
+
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar CPL</h3>
@@ -71,48 +78,75 @@
 <script src="../../../js/template.js"></script>
 
 <script>
-    // --- 1. VARIABEL API & SESI ---
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
-    
-    const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_UPLOAD = `${API_BASE}/upload-master-cpl`;
-
     const userLogin = localStorage.getItem("user_login");
+
     if (!userLogin) window.location.replace("/login/login.html");
 
-    // --- SETUP TAMPILAN DINAMIS (WARNA & NAMA PRODI) ---
     const pAktif = localStorage.getItem("prodi_aktif") || "ti";
     const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
-    const warnaProdi = pAktif === 'si' ? '#1e3a8a' : '#8b0000'; // Biru SI, Merah TI
+    const warnaProdi = pAktif === 'si' ? '#1e3a8a' : '#8b0000'; 
     const warnaAvatar = pAktif === 'si' ? '1e3a8a' : '8b0000';
     
-    // Ubah warna text judul dan background badge
     document.getElementById("titleSpan").style.color = warnaProdi;
     const badge = document.getElementById("prodiBadge");
     badge.style.backgroundColor = warnaProdi;
     badge.innerText = pAktif === 'si' ? "SISTEM INFORMASI" : "TEKNIK INFORMATIKA";
 
-    // Setup Avatar Mobile
     const avatarMobile = document.getElementById("mobileNavbarAvatar");
     if(avatarMobile) {
         avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${warnaAvatar}&color=fff&bold=true`;
     }
 
-    // --- 2. FUNGSI AMBIL DATA TABEL ---
     let allData = [];
     let state = { page: 1, itemsPerPage: 10 };
 
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            const data = await response.json();
+            
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            
+            data.forEach(item => {
+                // PROTEKSI: Jangan biarkan kurikulum null/kosong masuk ke dropdown
+                if (item && item.kurikulum) {
+                    let opt = document.createElement('option');
+                    opt.value = item.kurikulum; 
+                    opt.text = "Kurikulum 20" + item.kurikulum; 
+                    selectKurikulum.appendChild(opt);
+                }
+            });
+
+            await loadData(); 
+
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+        }
+    }
+    
     async function loadData() { 
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding:40px;'><i class='fas fa-spinner fa-spin'></i> Memuat data...</td></tr>";
 
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "";
+        
+        let API_URL_DINAMIS = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
+        if (kurikulumTerpilih !== "") {
+            API_URL_DINAMIS += `&kurikulum=${kurikulumTerpilih}`;
+        }
+
         try {
-            const res = await fetch(API_CPL); 
+            const res = await fetch(API_URL_DINAMIS); 
             allData = await res.json(); 
             
             if (!allData || allData.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding:40px; color:#64748b;'>Belum ada data CPL. Silakan impor via Excel.</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding:40px; color:#64748b;'>Belum ada data CPL untuk kurikulum ini.</td></tr>";
                 document.getElementById('pagination-container').innerHTML = '';
                 return;
             }
@@ -124,7 +158,6 @@
         }
     }
 
-    // --- 3. RENDER TABEL & PAGINATION ---
     function renderTablePaginated() {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "";
@@ -182,7 +215,6 @@
         container.appendChild(btnNext);
     }
 
-    // --- 4. FUNGSI SIMPAN & EXCEL ---
     async function simpanEdit(tipe, kode) { 
         const value = document.getElementById(`in-${kode}`).value; 
         const btn = event.currentTarget;
@@ -209,6 +241,8 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
         btn.disabled = true;
 
+        let kurikulumTerpilih = document.getElementById('filterKurikulum').value;
+
         try {
             if (!allData || allData.length === 0) return alert("Tidak ada data untuk diekspor.");
 
@@ -221,7 +255,7 @@
             const worksheet = XLSX.utils.json_to_sheet(dataUntukExcel);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Master_CPL");
-            XLSX.writeFile(workbook, `Master_CPL_${PRODI}.xlsx`);
+            XLSX.writeFile(workbook, `Master_CPL_${PRODI}_Kurikulum_${kurikulumTerpilih}.xlsx`);
         } catch (e) { alert("Gagal mengekspor data."); } 
         finally { btn.innerHTML = oriText; btn.disabled = false; }
     }
@@ -242,36 +276,29 @@
 
         try {
             const res = await fetch(API_UPLOAD, { method: 'POST', body: formData });
-            if (res.ok) { alert("✅ Data Excel CPL berhasil diimpor!"); await loadData(); } 
+            if (res.ok) { alert("✅ Data Excel CPL berhasil diimpor!"); await loadDropdownKurikulum(); } 
             else { alert("❌ Gagal memproses file Excel."); }
         } catch (e) { alert("❌ Terjadi kesalahan koneksi."); } 
         finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
     }
 
-    // Fungsi untuk memunculkan dan menyembunyikan sidebar di mobile
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById("sidebar-container");
-            if (sidebar) {
-                // Tambahkan atau hapus class 'show-mobile' yang ada di CSS tadi
-                sidebar.classList.toggle("show-mobile");
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById("sidebar-container");
+        if (sidebar) sidebar.classList.toggle("show-mobile");
+    }
+
+    document.addEventListener('click', function(event) {
+        const sidebar = document.getElementById("sidebar-container");
+        const toggleBtn = document.getElementById("btnToggleSidebar");
+        if (sidebar && sidebar.classList.contains("show-mobile")) {
+            if (!sidebar.contains(event.target) && (!toggleBtn || !toggleBtn.contains(event.target))) {
+                sidebar.classList.remove("show-mobile");
             }
         }
-
-        // Opsional: Klik di sembarang tempat (luar sidebar) untuk menutupnya
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById("sidebar-container");
-            const toggleBtn = document.getElementById("btnToggleSidebar");
-            
-            // Jika sidebar sedang terbuka, dan user mengklik di luar sidebar & bukan di tombol garis tiga
-            if (sidebar && sidebar.classList.contains("show-mobile")) {
-                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
-                    sidebar.classList.remove("show-mobile");
-                }
-            }
-        });
+    });
         
-    window.onload = () => {
-        setTimeout(loadData, 400); 
+    window.onload = async () => {
+        await loadDropdownKurikulum(); 
     };
 </script>
 </body>

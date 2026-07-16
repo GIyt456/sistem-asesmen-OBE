@@ -26,9 +26,16 @@
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Bahan Kajian (BK) yang berelasi dengan Capaian Pembelajaran Lulusan (CPL).</p>
             </div>
+            
         </div>
 
         <div class="scrollable-content">
+            <div style="margin-bottom: 20px;">
+                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                <select id="filterKurikulum" onchange="loadData()">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
             <div style="overflow-x: auto; max-height: 550px; border: 1px solid var(--border-color); border-radius: 8px; background: white;">
                 <table id="matriksTable">
                     <thead>
@@ -52,52 +59,65 @@
 
 <script>
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
-        
-    const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
-    const API_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
-    const API_RELASI = `${API_BASE}/get-mapping-cpl-bk?prodi=${PRODI}`;
     const API_SAVE_MAPPING = `${API_BASE}/admin-map-cpl-bk`;
-
     const userLogin = localStorage.getItem("user_login");
-        if (!userLogin) window.location.replace("/login/login.html");
+    if (!userLogin) window.location.replace("/login/login.html");
 
     let listCPL = [];
     let listBK = [];
 
-    window.onload = () => {
-            setTimeout(loadData, 400); // Langsung eksekusi analisis saat web dibuka
-        };
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            const data = await response.json();
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            data.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.kurikulum; 
+                opt.text = "Kurikulum 20" + item.kurikulum; 
+                selectKurikulum.appendChild(opt);
+            });
+            await loadData(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+        }
+    }
 
-    // --- FUNGSI AMBIL DATA (KEBAL ERROR N8N) ---
     async function loadData() {
         const btnSave = document.getElementById("btnSave");
         const tbody = document.getElementById("bodyMatriks");
         if(btnSave) btnSave.disabled = true;
 
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulum = selectKurikulum ? selectKurikulum.value : "";
+        let URL_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
+        let URL_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
+        let URL_RELASI = `${API_BASE}/get-mapping-cpl-bk?prodi=${PRODI}`;
+
+        if(kurikulum) {
+            URL_CPL += `&kurikulum=${kurikulum}`;
+            URL_BK += `&kurikulum=${kurikulum}`;
+            URL_RELASI += `&kurikulum=${kurikulum}`;
+        }
+
         try {
             const [resCpl, resBk, resRelasi] = await Promise.all([
-                fetch(API_CPL),
-                fetch(API_BK),
-                fetch(API_RELASI)
+                fetch(URL_CPL), fetch(URL_BK), fetch(URL_RELASI)
             ]);
 
-            // Parse CPL dan BK
             listCPL = await resCpl.json();
             listBK = await resBk.json();
 
-            // PENGAMANAN: Jika Relasi kosong, cegah crash 'Unexpected end of JSON'
             let relasiExisting = [];
             try {
                 relasiExisting = await resRelasi.json();
                 if (!Array.isArray(relasiExisting)) relasiExisting = [];
-            } catch (e) {
-                console.warn("Info: Data relasi saat ini masih kosong di database.");
-                relasiExisting = [];
-            }
+            } catch (e) { relasiExisting = []; }
 
-            // Jika CPL atau BK kosong, beri tahu!
             if (!listCPL || listCPL.length === 0 || !listBK || listBK.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red; font-weight: bold;'>Data CPL atau BK masih KOSONG! Harap isi terlebih dahulu.</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red; font-weight: bold;'>Data CPL atau BK masih KOSONG untuk kurikulum ini.</td></tr>";
                 return;
             }
 
@@ -105,8 +125,7 @@
             if(btnSave) btnSave.disabled = false;
 
         } catch (error) {
-            console.error(error);
-            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red;'>Gagal terhubung ke API. Cek koneksi internet atau link Cloudflare!</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red;'>Gagal terhubung ke API.</td></tr>";
         }
     }
 
@@ -115,64 +134,59 @@
         const tbody = document.getElementById("bodyMatriks");
         if(!headerRow || !tbody) return;
 
-        // 1. MEMBUAT HEADER KOLOM ATAS (CPL)
-        // Menambahkan kolom statis untuk No, Kode BK, dan Bahan Kajian
         let headerHTML = `
             <th style="position: sticky; left: 0; background: #e2e8f0; z-index: 10; width: 40px; text-align: center;">No</th>
             <th style="position: sticky; left: 40px; background: #e2e8f0; z-index: 10; white-space: nowrap; text-align: left;">Kode BK</th>
             <th style="position: sticky; left: 120px; background: #e2e8f0; z-index: 10; min-width: 250px; text-align: left;">Bahan Kajian</th>
         `;
         
-        // Looping untuk memunculkan CPL1, CPL2, dst di kolom atas
         listCPL.forEach(cpl => {
             headerHTML += `<th title="${cpl.deskripsi || ''}" style="text-align: center;">${cpl.kode_cpl}</th>`;
         });
         headerRow.innerHTML = headerHTML;
 
-        // 2. MEMBUAT BARIS DATA (BK)
         tbody.innerHTML = "";
         listBK.forEach((bk, index) => {
-            // Membuat kolom statis untuk tiap baris BK
             let tr = `<tr class="bk-row">
                 <td style="position: sticky; left: 0; background: #f8fafc; z-index: 5; text-align: center;">${index + 1}</td>
                 <td style="position: sticky; left: 40px; background: #f8fafc; z-index: 5; font-weight: bold; white-space: nowrap;">${bk.kode_bk}</td>
                 <td style="position: sticky; left: 120px; background: #f8fafc; z-index: 5; text-align: left;" title="${bk.nama_bk}">${bk.nama_bk}</td>`;
             
-            // Looping untuk memunculkan Checkbox di bawah kolom CPL yang sesuai
             listCPL.forEach(cpl => {
                 const isChecked = relasiExisting.some(r => r.kode_cpl === cpl.kode_cpl && r.kode_bk === bk.kode_bk);
                 const chk = isChecked ? 'checked' : '';
                 tr += `<td style="text-align: center;"><input type="checkbox" class="chk-matrix" data-cpl="${cpl.kode_cpl}" data-bk="${bk.kode_bk}" ${chk}></td>`;
             });
-            
             tr += `</tr>`;
             tbody.innerHTML += tr;
         });
     }
 
-    // --- FUNGSI SIMPAN ---
     async function simpanMapping() {
         const btnSave = document.getElementById('btnSave');
         btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btnSave.disabled = true;
+
+        // 1. Tangkap Kurikulum yang sedang diedit Kaprodi
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25"; // default 25
         
         let fetchPromises = [];
 
         listCPL.forEach(cpl => {
-            // PERBAIKAN: Harus menggunakan cpl.kode_cpl, bukan cpl.kode!
             const checkedBoxes = document.querySelectorAll(`.chk-matrix[data-cpl="${cpl.kode_cpl}"]:checked`);
             const bkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-bk'));
-
-            const payload = {
-                kode_cpl: cpl.kode_cpl,
-                bk_list: bkList,
-                prodi: PRODI
+            
+            // 2. Tambahkan kurikulumTerpilih ke dalam payload
+            const payload = { 
+                kode_cpl: cpl.kode_cpl, 
+                bk_list: bkList, 
+                prodi: PRODI,
+                kurikulum: kurikulumTerpilih 
             };
 
             const request = fetch(API_SAVE_MAPPING, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
             fetchPromises.push(request);
         });
@@ -180,36 +194,16 @@
         try {
             await Promise.all(fetchPromises);
             alert("✅ Matriks Relasi CPL - BK berhasil disimpan!");
-        } catch (error) {
-            console.error(error);
-            alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi.");
-        } finally {
-            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks';
-            btnSave.disabled = false;
-        }
+        } catch (error) { alert("❌ Gagal menyimpan beberapa data ke server."); } 
+        finally { btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks'; btnSave.disabled = false; }
     }
 
-    // Fungsi untuk memunculkan dan menyembunyikan sidebar di mobile
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById("sidebar-container");
-            if (sidebar) {
-                // Tambahkan atau hapus class 'show-mobile' yang ada di CSS tadi
-                sidebar.classList.toggle("show-mobile");
-            }
-        }
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById("sidebar-container");
+        if (sidebar) sidebar.classList.toggle("show-mobile");
+    }
 
-        // Opsional: Klik di sembarang tempat (luar sidebar) untuk menutupnya
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById("sidebar-container");
-            const toggleBtn = document.getElementById("btnToggleSidebar");
-            
-            // Jika sidebar sedang terbuka, dan user mengklik di luar sidebar & bukan di tombol garis tiga
-            if (sidebar && sidebar.classList.contains("show-mobile")) {
-                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
-                    sidebar.classList.remove("show-mobile");
-                }
-            }
-        });
+    window.onload = async () => { await loadDropdownKurikulum(); };
 </script>
 </body>
 </html>

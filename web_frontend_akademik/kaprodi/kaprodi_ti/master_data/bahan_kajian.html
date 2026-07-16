@@ -67,6 +67,7 @@
                 <h1 class="header-title">Perumusan <span>Bahan Kajian</span></h1>
                 <p style="color: #64748b; margin-top: 5px;">Kelola detail rumusan atau Impor massal melalui Excel.</p>
             </div>
+            
             <div class="action-buttons">
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
                 <button class="btn-action btn-download" onclick="exportKeExcel()">
@@ -84,6 +85,12 @@
                 </button>
             </div>
         </div>
+        <div style="margin-bottom: 20px;">
+            <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                <select id="filterKurikulum" onchange="loadData()">
+                    <option value="">Memuat data...</option>
+                </select>
+        </div>   
 
         <div class="table-container">
             <table>
@@ -103,7 +110,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </div>   
 
     <div class="modal" id="inputModal">
         <div class="modal-content">
@@ -145,196 +152,175 @@
     <script src="/js/template.js"></script>
 
     <script>
-        const PRODI = localStorage.getItem("prodi_aktif") || "ti";
+    const PRODI = localStorage.getItem("prodi_aktif") || "ti";
+    const userLogin = localStorage.getItem("user_login");
+    if (!userLogin) window.location.replace("/login/login.html");
 
-        const userLogin = localStorage.getItem("user_login");
-        if (!userLogin) window.location.replace("/login/login.html");
-
-        window.onload = () => {
-            setTimeout(loadDataBK, 400); // Langsung eksekusi analisis saat web dibuka
-        };
-
-        // FUNGSI UPLOAD EXCEL KE N8N
-        async function uploadExcel() {
-            const fileInput = document.getElementById('fileExcel');
-            const file = fileInput.files[0];
-            
-            if (!file) return;
-
-            const formData = new FormData();
-            formData.append('data', file); // Nama field harus sama dengan di n8n ('data')
-            formData.append('prodi', PRODI);
-
-            // Ganti tombol upload jadi mode loading
-            const btnUpload = document.querySelector('.btn-upload');
-            const oriText = btnUpload.innerHTML;
-            btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
-            btnUpload.disabled = true;
-
-            try {
-                const res = await fetch(`${API_BASE}/upload-master-bk?prodi=${PRODI}`, {
-                    method: 'POST',
-                    body: formData // Jangan set Content-Type manual agar browser bisa set boundary otomatis
-                });
-
-                if (res.ok) {
-                    alert("✅ Data Excel berhasil diimpor!");
-                    await loadDataBK(); // Langsung perbarui tabel
-                } else {
-                    alert("❌ Gagal memproses file Excel.");
-                }
-            } catch (e) {
-                console.error(e);
-                alert("❌ Terjadi kesalahan koneksi.");
-            } finally {
-                btnUpload.innerHTML = oriText;
-                btnUpload.disabled = false;
-                fileInput.value = ''; // Reset input agar bisa upload file yang sama lagi
-            }
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            const data = await response.json();
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            data.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.kurikulum; 
+                opt.text = "Kurikulum 20" + item.kurikulum; 
+                selectKurikulum.appendChild(opt);
+            });
+            await loadData(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
         }
+    }
 
-        async function loadDataBK() {
-            const tbody = document.getElementById('tableBody');
-            try {
-                const res = await fetch(`${API_BASE}/get-master-bk?prodi=${PRODI}`);
-                const data = await res.json();
-                
-                tbody.innerHTML = '';
+    async function loadData() {
+        const tbody = document.getElementById('tableBody');
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "";
+        let API_BK_DINAMIS = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
+        if (kurikulumTerpilih !== "") API_BK_DINAMIS += `&kurikulum=${kurikulumTerpilih}`;
 
-                const aman = (str) => {
-                    if (!str) return '';
-                    return String(str).replace(/\\/g, '\\\\')
-                              .replace(/'/g, "\\'")
-                              .replace(/"/g, '&quot;')
-                              .replace(/\n/g, '\\n')
-                              .replace(/\r/g, '');
-                };
+        try {
+            const res = await fetch(API_BK_DINAMIS);
+            const data = await res.json();
+            tbody.innerHTML = '';
 
-                data.forEach(bk => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td style="font-weight: 800; color: var(--primary-red);">${bk.kode_bk}</td>
-                        <td style="font-weight: 700; color: #1e293b;">${bk.nama_bk}</td>
-                        <td style="color: #64748b; white-space: pre-wrap;">${bk.deskripsi || '-'}</td>
-                        <td style="color: #64748b; white-space: pre-wrap;">${bk.kompetensi || '-'}</td>
-                        <td style="font-weight: 600; color: #475569;">${bk.koordinator_bk || '-'}</td>
-                        <td style="font-size: 0.8rem; font-style: italic; color: #64748b; white-space: pre-wrap;">${bk.referensi || '-'}</td>
-                        <td>
-                            <button class="btn-edit" onclick="openModalEdit('${bk.kode_bk}', '${aman(bk.nama_bk)}', '${aman(bk.deskripsi)}', '${aman(bk.kompetensi)}', '${aman(bk.koordinator_bk)}', '${aman(bk.referensi)}')">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (e) { 
-                console.error(e);
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 40px;">Gagal memuat data.</td></tr>'; 
-            }
-        }
-
-        function openModalAdd() {
-            document.getElementById('modalTitle').innerText = "Tambah Bahan Kajian";
-            document.getElementById('modalMode').value = "add";
-            document.getElementById('inpKode').disabled = false;
-            resetForm();
-            document.getElementById('inputModal').style.display = 'flex';
-        }
-
-        function openModalEdit(kode, nama, desk, komp, koor, ref) {
-            document.getElementById('modalTitle').innerText = "Edit Perumusan BK";
-            document.getElementById('modalMode').value = "edit";
-            document.getElementById('inpKode').value = kode;
-            document.getElementById('inpKode').disabled = true; 
-            document.getElementById('inpNama').value = nama;
-            document.getElementById('inpDeskripsi').value = desk;
-            document.getElementById('inpKompetensi').value = komp;
-            document.getElementById('inpKoordinator').value = koor;
-            document.getElementById('inpReferensi').value = ref;
-            document.getElementById('inputModal').style.display = 'flex';
-        }
-
-        function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
-        
-        function resetForm() { 
-            document.getElementById('inpKode').value = ''; 
-            document.getElementById('inpNama').value = ''; 
-            document.getElementById('inpDeskripsi').value = ''; 
-            document.getElementById('inpKompetensi').value = ''; 
-            document.getElementById('inpKoordinator').value = ''; 
-            document.getElementById('inpReferensi').value = ''; 
-        }
-
-        async function saveData() {
-            const mode = document.getElementById('modalMode').value;
-            const endpoint = mode === 'add' ? 'add-master-bk' : 'update-master-bk';
-            
-            const payload = {
-                kode_bk: document.getElementById('inpKode').value,
-                nama_bk: document.getElementById('inpNama').value,
-                deskripsi: document.getElementById('inpDeskripsi').value,
-                kompetensi: document.getElementById('inpKompetensi').value,
-                koordinator_bk: document.getElementById('inpKoordinator').value,
-                referensi: document.getElementById('inpReferensi').value,
-                prodi: PRODI
+            const aman = (str) => {
+                if (!str) return '';
+                return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n').replace(/\r/g, '');
             };
 
-            if(!payload.kode_bk || !payload.nama_bk) return alert("Kode dan Nama BK wajib diisi!");
-
-            try {
-                const res = await fetch(`${API_BASE}/${endpoint}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (res.ok) { 
-                    alert("✅ Data berhasil disimpan!"); 
-                    closeModal(); 
-                    loadDataBK(); 
-                }
-            } catch (e) { alert("❌ Terjadi kesalahan koneksi."); }
-        }
-
-        async function exportKeExcel() {
-            const btn = document.querySelector('.btn-download');
-            const oriText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
-
-            try {
-                // 1. Ambil data terbaru dari Database via n8n
-                const res = await fetch(`${API_BASE}/get-master-bk?prodi=${PRODI}`);
-                const data = await res.json();
-
-                if (!data || data.length === 0) {
-                    alert("Belum ada data untuk di-export. Silakan tambah BK manual dulu satu kali.");
-                    return;
-                }
-
-                // 2. Rapikan format datanya agar sesuai dengan kolom Excel
-                const dataMapping = data.map(bk => ({
-                    'kode_bk': bk.kode_bk,
-                    'nama_bk': bk.nama_bk,
-                    'deskripsi': bk.deskripsi || '',
-                    'kompetensi': bk.kompetensi || '',
-                    'koordinator_bk': bk.koordinator_bk || '',
-                    'referensi': bk.referensi || ''
-                }));
-
-                // 3. Proses pembuatan File Excel oleh SheetJS
-                const worksheet = XLSX.utils.json_to_sheet(dataMapping);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Master_BK");
-
-                // 4. Download otomatis ke komputer Kaprodi
-                XLSX.writeFile(workbook, `Data_Master_BK_${PRODI}.xlsx`);
-
-            } catch (e) {
-                console.error(e);
-                alert("Gagal mengambil data untuk export.");
-            } finally {
-                btn.innerHTML = oriText;
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 40px;">Data BK Kosong untuk kurikulum ini.</td></tr>'; 
+                return;
             }
+
+            data.forEach(bk => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 800; color: var(--primary-red);">${bk.kode_bk}</td>
+                    <td style="font-weight: 700; color: #1e293b;">${bk.nama_bk}</td>
+                    <td style="color: #64748b; white-space: pre-wrap;">${bk.deskripsi || '-'}</td>
+                    <td style="color: #64748b; white-space: pre-wrap;">${bk.kompetensi || '-'}</td>
+                    <td style="font-weight: 600; color: #475569;">${bk.koordinator_bk || '-'}</td>
+                    <td style="font-size: 0.8rem; font-style: italic; color: #64748b; white-space: pre-wrap;">${bk.referensi || '-'}</td>
+                    <td>
+                        <button class="btn-edit" onclick="openModalEdit('${bk.kode_bk}', '${aman(bk.nama_bk)}', '${aman(bk.deskripsi)}', '${aman(bk.kompetensi)}', '${aman(bk.koordinator_bk)}', '${aman(bk.referensi)}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+        } catch (e) { 
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 40px;">Gagal memuat data.</td></tr>'; 
         }
-    </script>
+    }
+
+    async function uploadExcel() {
+        const fileInput = document.getElementById('fileExcel');
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('data', file); 
+        formData.append('prodi', PRODI);
+
+        const btnUpload = document.querySelector('.btn-upload');
+        const oriText = btnUpload.innerHTML;
+        btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
+        btnUpload.disabled = true;
+
+        try {
+            const res = await fetch(`${API_BASE}/upload-master-bk?prodi=${PRODI}`, { method: 'POST', body: formData });
+            if (res.ok) { alert("✅ Data Excel berhasil diimpor!"); await loadDropdownKurikulum(); } 
+            else { alert("❌ Gagal memproses file Excel."); }
+        } catch (e) { alert("❌ Terjadi kesalahan koneksi."); } 
+        finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
+    }
+
+    function openModalAdd() {
+        document.getElementById('modalTitle').innerText = "Tambah Bahan Kajian";
+        document.getElementById('modalMode').value = "add";
+        document.getElementById('inpKode').disabled = false;
+        resetForm();
+        document.getElementById('inputModal').style.display = 'flex';
+    }
+
+    function openModalEdit(kode, nama, desk, komp, koor, ref) {
+        document.getElementById('modalTitle').innerText = "Edit Perumusan BK";
+        document.getElementById('modalMode').value = "edit";
+        document.getElementById('inpKode').value = kode;
+        document.getElementById('inpKode').disabled = true; 
+        document.getElementById('inpNama').value = nama;
+        document.getElementById('inpDeskripsi').value = desk;
+        document.getElementById('inpKompetensi').value = komp;
+        document.getElementById('inpKoordinator').value = koor;
+        document.getElementById('inpReferensi').value = ref;
+        document.getElementById('inputModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
+    
+    function resetForm() { 
+        document.getElementById('inpKode').value = ''; 
+        document.getElementById('inpNama').value = ''; 
+        document.getElementById('inpDeskripsi').value = ''; 
+        document.getElementById('inpKompetensi').value = ''; 
+        document.getElementById('inpKoordinator').value = ''; 
+        document.getElementById('inpReferensi').value = ''; 
+    }
+
+    async function saveData() {
+        const mode = document.getElementById('modalMode').value;
+        const endpoint = mode === 'add' ? 'add-master-bk' : 'update-master-bk';
+        
+        const payload = {
+            kode_bk: document.getElementById('inpKode').value,
+            nama_bk: document.getElementById('inpNama').value,
+            deskripsi: document.getElementById('inpDeskripsi').value,
+            kompetensi: document.getElementById('inpKompetensi').value,
+            koordinator_bk: document.getElementById('inpKoordinator').value,
+            referensi: document.getElementById('inpReferensi').value,
+            prodi: PRODI
+        };
+
+        if(!payload.kode_bk || !payload.nama_bk) return alert("Kode dan Nama BK wajib diisi!");
+
+        try {
+            const res = await fetch(`${API_BASE}/${endpoint}`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+            });
+            if (res.ok) { alert("✅ Data berhasil disimpan!"); closeModal(); loadData(); }
+        } catch (e) { alert("❌ Terjadi kesalahan koneksi."); }
+    }
+
+    async function exportKeExcel() {
+        const btn = document.querySelector('.btn-download');
+        const oriText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
+        
+        let kurikulumTerpilih = document.getElementById('filterKurikulum').value;
+        let API_BK_DINAMIS = `${API_BASE}/get-master-bk?prodi=${PRODI}&kurikulum=${kurikulumTerpilih}`;
+
+        try {
+            const res = await fetch(API_BK_DINAMIS);
+            const data = await res.json();
+            if (!data || data.length === 0) { alert("Belum ada data untuk di-export."); return; }
+
+            const dataMapping = data.map(bk => ({
+                'kode_bk': bk.kode_bk, 'nama_bk': bk.nama_bk, 'deskripsi': bk.deskripsi || '', 'kompetensi': bk.kompetensi || '', 'koordinator_bk': bk.koordinator_bk || '', 'referensi': bk.referensi || ''
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(dataMapping);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Master_BK");
+            XLSX.writeFile(workbook, `Data_Master_BK_${PRODI}_Kurikulum_${kurikulumTerpilih}.xlsx`);
+        } catch (e) { alert("Gagal mengambil data untuk export."); } 
+        finally { btn.innerHTML = oriText; }
+    }
+
+    window.onload = async () => { await loadDropdownKurikulum(); };
+</script>
 </body>
 </html>

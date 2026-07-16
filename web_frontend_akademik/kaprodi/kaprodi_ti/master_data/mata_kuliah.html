@@ -53,6 +53,13 @@
                         </button>
                     </div>
                 </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                    <select id="filterKurikulum" onchange="loadData()">
+                        <option value="">Memuat data...</option>
+                    </select>
+                </div>
                 
                 <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; background: white; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                     <label for="filter-semester" style="font-weight: 700; color: var(--primary-blue);">Pilih Semester:</label>
@@ -69,65 +76,113 @@
 
 <script>
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
-    const API_MATKUL = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_UPLOAD = `${API_BASE}/upload-master-mk`;
     const API_DELETE = `${API_BASE}/delete-master-mk`;
     const userLogin = localStorage.getItem("user_login");
 
-    // 1. Buat variabel global untuk menyimpan data sementara agar tidak perlu loading API terus-menerus
     let dataMatkulGlobal = []; 
 
-    // 2. Fungsi untuk menarik data dari n8n (Hanya dipanggil sekali saat halaman dibuka)
+    // 1. Fungsi memuat Kurikulum
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            const data = await response.json();
+            
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            
+            data.forEach(item => {
+                // Cegah opsi kosong/null muncul di dropdown
+                if (item && item.kurikulum) {
+                    let opt = document.createElement('option');
+                    opt.value = item.kurikulum; 
+                    opt.text = "Kurikulum 20" + item.kurikulum; 
+                    selectKurikulum.appendChild(opt);
+                }
+            });
+
+            await loadData(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+        }
+    }
+
+    // 2. Fungsi memuat Data Tabel
     async function loadData() { 
         const container = document.getElementById('container-tabel-semester');
         const filterSelect = document.getElementById('filter-semester');
-        if (!container) return;
         
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "";
+        
+        let API_MATKUL_DINAMIS = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
+        if (kurikulumTerpilih !== "") {
+            API_MATKUL_DINAMIS += `&kurikulum=${kurikulumTerpilih}`;
+        }
+
+        if (!container) return;
         container.innerHTML = "<p style='text-align:center; padding:20px;'><i class='fas fa-spinner fa-spin'></i> Memuat data...</p>";
 
         try {
-            const res = await fetch(API_MATKUL); 
-            dataMatkulGlobal = await res.json(); // Simpan data ke dalam variabel global
+            const res = await fetch(API_MATKUL_DINAMIS); 
+            dataMatkulGlobal = await res.json(); 
             
             if (!dataMatkulGlobal || dataMatkulGlobal.length === 0) {
-                container.innerHTML = "<p style='text-align:center; padding:20px; color:#64748b;'>Belum ada data mata kuliah. Silakan impor via Excel.</p>";
+                container.innerHTML = "<p style='text-align:center; padding:20px; color:#64748b;'>Belum ada data mata kuliah untuk kurikulum ini.</p>";
+                filterSelect.innerHTML = '<option value="">-- Pilih Semester --</option>';
                 filterSelect.disabled = true;
                 return;
             }
 
-            // Ambil daftar semester unik dari data dan urutkan (contoh: 1, 2, 3...)
-            const semesters = [...new Set(dataMatkulGlobal.map(item => item.semester))].sort((a, b) => a - b);
+            filterSelect.disabled = false;
             
-            // Masukkan daftar semester ke dalam dropdown pilihan
+            // PROTEKSI EKSTREM FINAL: Buang tipe null/undefined, dan buang juga teks "undefined", "null", atau "0"
+            const cleanSemesters = dataMatkulGlobal
+                .filter(item => {
+                    if (!item || item.semester === null || item.semester === undefined) return false;
+                    
+                    const strSem = String(item.semester).trim().toLowerCase();
+                    if (strSem === "" || strSem === "undefined" || strSem === "null" || strSem === "0") return false;
+                    
+                    return true;
+                })
+                .map(item => String(item.semester).trim());
+            
+            // Pastikan pengurutan angka berjalan benar (membedakan '1' dan '10')
+            const semesters = [...new Set(cleanSemesters)].sort((a, b) => parseInt(a) - parseInt(b));
+            
             filterSelect.innerHTML = '<option value="">-- Pilih Semester --</option>';
             semesters.forEach(sem => {
                 filterSelect.innerHTML += `<option value="${sem}">Semester ${sem}</option>`;
             });
 
-            // Kosongkan area tabel dan minta user memilih semester
             container.innerHTML = "<p style='text-align:center; padding:30px; color:#64748b; font-weight:600;'><i class='fas fa-hand-point-up'></i> Silakan pilih semester di atas terlebih dahulu.</p>";
 
         } catch(e) { 
+            console.error(e);
             container.innerHTML = "<p style='color:red; text-align:center; padding: 20px;'>Gagal menarik data. Pastikan n8n menyala.</p>";
         }
     }
 
-    // 3. FUNGSI BARU: Ini akan dijalankan otomatis setiap kali Dropdown Semester dipilih
+    // 3. Render Tabel
     function renderTabelSemester() {
         const container = document.getElementById('container-tabel-semester');
-        const selectedSem = document.getElementById('filter-semester').value;
+        const filterSelect = document.getElementById('filter-semester');
+        const selectedSem = filterSelect ? filterSelect.value : "";
 
-        // Jika user kembali memilih "-- Pilih --", kosongkan tabel
         if (selectedSem === "") {
             container.innerHTML = "<p style='text-align:center; padding:30px; color:#64748b; font-weight:600;'><i class='fas fa-hand-point-up'></i> Silakan pilih semester di atas terlebih dahulu.</p>";
             return;
         }
 
-        // Saring data: Ambil hanya matkul yang semesternya cocok dengan yang dipilih
-        const dataSemesterIni = dataMatkulGlobal.filter(item => item.semester.toString() === selectedSem.toString());
+        // PROTEKSI EKSTREM: Pastikan perbandingan menggunakan String yang aman
+        const dataSemesterIni = dataMatkulGlobal.filter(item => {
+            if (!item || item.semester === null || item.semester === undefined) return false;
+            return String(item.semester).trim() === String(selectedSem).trim();
+        });
 
-        // Mulai bangun kerangka tabel untuk semester tersebut
         let tableHTML = `
             <h4 style="margin-bottom: 15px; margin-top: 10px; font-size: 1.1rem; color: var(--primary-blue); font-weight: 700;">
                 <i class="fas fa-graduation-cap"></i> SEMESTER ${selectedSem}
@@ -143,36 +198,40 @@
                     </thead>
                     <tbody>`;
 
-        // Masukkan data baris per baris lengkap dengan data-label mobile
-        dataSemesterIni.forEach(mk => {
-            tableHTML += `
-                <tr>
-                    <td data-label="KODE MK" style="font-weight: 800; color: var(--primary-blue);">${mk.kode_mk}</td>
-                    
-                    <td data-label="MATA KULIAH" style="padding: 10px; font-size: 0.95rem; color: #1e293b;">
-                        ${mk.nama_mk}
-                    </td>
-                    
-                    <td data-label="SKS" style="text-align: center; padding: 10px; font-weight: 600; color: #1e293b;">
-                        ${mk.sks}
-                    </td>
-                </tr>`;
-        });
+        if (dataSemesterIni.length === 0) {
+             tableHTML += `<tr><td colspan="3" style="text-align:center; padding:20px; color:#64748b;">Tidak ada mata kuliah di semester ini.</td></tr>`;
+        } else {
+            dataSemesterIni.forEach(mk => {
+                // Proteksi untuk nama_mk dan sks
+                const safeKode = mk.kode_mk || '-';
+                const safeNama = mk.nama_mk || '-';
+                const safeSks = mk.sks !== undefined && mk.sks !== null ? mk.sks : '0';
+
+                tableHTML += `
+                    <tr>
+                        <td data-label="KODE MK" style="font-weight: 800; color: var(--primary-blue);">${safeKode}</td>
+                        <td data-label="MATA KULIAH" style="padding: 10px; font-size: 0.95rem; color: #1e293b;">${safeNama}</td>
+                        <td data-label="SKS" style="text-align: center; padding: 10px; font-weight: 600; color: #1e293b;">${safeSks}</td>
+                    </tr>`;
+            });
+        }
 
         tableHTML += `</tbody></table></div>`;
-        
-        // Cetak tabelnya ke layar!
         container.innerHTML = tableHTML;
-    }      
+    }     
 
+    // 4. Fitur Lainnya
     async function exportKeExcel() {
         const btn = document.querySelector('.btn-download');
         const oriText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
         btn.disabled = true;
 
+        let kurikulumTerpilih = document.getElementById('filterKurikulum').value;
+        let URL_DOWNLOAD = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}&kurikulum=${kurikulumTerpilih}`;
+
         try {
-            const res = await fetch(API_MATKUL);
+            const res = await fetch(URL_DOWNLOAD);
             const data = await res.json();
             if (!data || data.length === 0) return alert("Tidak ada data.");
 
@@ -180,7 +239,7 @@
             const worksheet = XLSX.utils.json_to_sheet(dataUntukExcel);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Master_MK");
-            XLSX.writeFile(workbook, `Susunan_MK_${PRODI}.xlsx`);
+            XLSX.writeFile(workbook, `Susunan_MK_${PRODI}_Kurikulum_${kurikulumTerpilih}.xlsx`);
         } catch (e) { alert("Gagal mengekspor data."); } 
         finally { btn.innerHTML = oriText; btn.disabled = false; }
     }
@@ -201,63 +260,14 @@
 
         try {
             const res = await fetch(API_UPLOAD, { method: 'POST', body: formData });
-            if (res.ok) { alert("✅ Data Excel berhasil diimpor!"); await loadData(); } 
+            if (res.ok) { alert("✅ Data Excel berhasil diimpor!"); await loadDropdownKurikulum(); } 
             else { alert("❌ Gagal memproses file Excel."); }
         } catch (e) { alert("❌ Terjadi kesalahan koneksi."); } 
         finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
     }
 
-    async function hapusMK(kode) {
-        if(!confirm(`⚠️ PERINGATAN!\nApakah Anda yakin ingin menghapus Mata Kuliah ${kode}?\nData yang dihapus tidak dapat dikembalikan.`)) {
-            return;
-        }
-
-        const btn = event.currentTarget;
-        const oldHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        btn.disabled = true;
-
-        try {
-            const res = await fetch(API_DELETE, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ kode_mk: kode, prodi: PRODI })
-            });
-
-            if (res.ok) {
-                alert("✅ Mata Kuliah berhasil dihapus!");
-                loadData(); 
-            } else {
-                alert("❌ Gagal menghapus Mata Kuliah.");
-            }
-        } catch (error) {
-            alert("❌ Terjadi kesalahan jaringan.");
-        }
-    }
-
-    async function simpanEdit(tipe, kode) { 
-        const value = document.getElementById(`in-${kode}`).value; 
-        const sksBaru = document.getElementById(`sks-${kode}`).value;
-        const btn = event.currentTarget;
-        const oldHtml = btn.innerHTML;
-        
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-        btn.disabled = true;
-
-        try {
-            const res = await fetch(API_UPDATE, { 
-                method: "POST", headers: {"Content-Type":"application/json"}, 
-                body: JSON.stringify({ tipe: "matkul", kode: kode, value: value, sks: parseInt(sksBaru), prodi: PRODI }) 
-            }); 
-            if(res.ok) alert("✅ Data Mata Kuliah & SKS Berhasil Diperbarui!");
-            else alert("❌ Gagal menyimpan data.");
-        } catch (e) { alert("Terjadi kesalahan jaringan."); } 
-        finally { btn.innerHTML = oldHtml; btn.disabled = false; }
-    }
-
     function toggleMobileSidebar() {
         const sidebar = document.getElementById('sidebar-container');
-        // Toggle class 'active' untuk memunculkan sidebar
         sidebar.classList.toggle('active');
     }
 
@@ -265,8 +275,7 @@
         if (!userLogin) { window.location.replace("../login/login.html"); return; }
         document.getElementById("prodiBadge").innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
         
-        // Cukup panggil loadData, karena template.js sudah memuat sidebar dan navbar di background
-        await loadData();    
+        await loadDropdownKurikulum();    
     };
 </script>
 </body>

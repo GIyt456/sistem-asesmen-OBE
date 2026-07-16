@@ -132,6 +132,12 @@
         </div>
 
         <div class="scrollable-content">
+            <div style="margin-bottom: 20px;">
+                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                <select id="filterKurikulum" onchange="loadData()">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
             <div class="table-responsive-wrapper">
                 <table id="matriksTable">
                     <thead>
@@ -152,11 +158,9 @@
     </div>
 
 <script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
     const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
     
     document.addEventListener("DOMContentLoaded", () => {
-        // Jika TI, ganti warna aksentuasi Biru Gelap menjadi Merah Marun
         if(PRODI === "ti") {
             document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
             document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
@@ -172,13 +176,11 @@
         }
     });
 
-    // --- FUNGSI SIDEBAR MOBILE ---
     function toggleSidebar() {
         document.getElementById('sidebar-container').classList.toggle('active');
         document.getElementById('mobileOverlay').classList.toggle('active');
     }
     
-    // --- PENGAMAN SIDEBAR ---
     document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
             const sidebar = document.getElementById('sidebar-container');
@@ -189,26 +191,36 @@
                         sidebar.innerHTML = html;
                         if(typeof initSmartSidebar === 'function') initSmartSidebar();
                     })
-                    .catch(e => console.log('Gagal memuat sidebar darurat'));
+                    .catch(e => console.log('Gagal memuat sidebar'));
             }
         }, 600); 
     });
 
-    // --- VARIABEL API ---
-    const API_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
-    const API_MK = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
-    const API_RELASI = `${API_BASE}/get-mapping-bk-mk?prodi=${PRODI}`;
     const API_SAVE_MAPPING = `${API_BASE}/admin-map-bk-mk`;
-
     const userLoginCheck = localStorage.getItem("user_login");
     if (!userLoginCheck) window.location.replace("/login/login.html");
 
-    window.onload = () => {
-        setTimeout(loadData, 400); 
-    };
-
     let listBK = [];
     let listMK = [];
+
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            const data = await response.json();
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            data.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.kurikulum; 
+                opt.text = "Kurikulum 20" + item.kurikulum; 
+                selectKurikulum.appendChild(opt);
+            });
+            await loadData(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+        }
+    }
 
     async function loadData() {
         const btnSave = document.getElementById("btnSave");
@@ -216,11 +228,21 @@
         if(btnSave) btnSave.disabled = true;
         tbody.innerHTML = "<tr><td colspan='100%' style='text-align: center; padding: 30px !important;'><i class='fas fa-spinner fa-spin'></i> Memuat data matriks...</td></tr>";
 
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulum = selectKurikulum ? selectKurikulum.value : "";
+        let URL_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
+        let URL_MK = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
+        let URL_RELASI = `${API_BASE}/get-mapping-bk-mk?prodi=${PRODI}`;
+
+        if(kurikulum) {
+            URL_BK += `&kurikulum=${kurikulum}`;
+            URL_MK += `&kurikulum=${kurikulum}`;
+            URL_RELASI += `&kurikulum=${kurikulum}`;
+        }
+
         try {
             const [resBk, resMk, resRelasi] = await Promise.all([
-                fetch(API_BK),
-                fetch(API_MK),
-                fetch(API_RELASI)
+                fetch(URL_BK), fetch(URL_MK), fetch(URL_RELASI)
             ]);
 
             listBK = await resBk.json();
@@ -230,13 +252,10 @@
             try {
                 relasiExisting = await resRelasi.json();
                 if (!Array.isArray(relasiExisting)) relasiExisting = [];
-            } catch (e) {
-                console.warn("Info: Data relasi saat ini masih kosong di database.");
-                relasiExisting = [];
-            }
+            } catch (e) { relasiExisting = []; }
 
             if (!listBK || listBK.length === 0 || !listMK || listMK.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px !important; color: red; font-weight: bold;'>Data BK atau MK masih KOSONG! Harap isi terlebih dahulu.</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px !important; color: red; font-weight: bold;'>Data BK atau MK masih KOSONG untuk kurikulum ini!</td></tr>";
                 return;
             }
 
@@ -245,7 +264,7 @@
 
         } catch (error) {
             console.error(error);
-            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px !important; color: red;'>Gagal terhubung ke API. Cek koneksi internet atau link Cloudflare!</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px !important; color: red;'>Gagal terhubung ke API.</td></tr>";
         }
     }
 
@@ -255,22 +274,16 @@
         if(!headerRow || !tbody) return;
 
         headerRow.innerHTML = `<th style="min-width: 250px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">MATA KULIAH (MK) \\ BAHAN KAJIAN (BK)</th>`;
-        
-        listBK.forEach(bk => {
-            headerRow.innerHTML += `<th title="${bk.nama_bk || ''}">${bk.kode_bk}</th>`;
-        });
+        listBK.forEach(bk => { headerRow.innerHTML += `<th title="${bk.nama_bk || ''}">${bk.kode_bk}</th>`; });
 
         tbody.innerHTML = "";
         listMK.forEach(mk => {
-            
-            // Header Kartu di HP & Kolom Pertama di Desktop
             let tr = `<tr>
                 <td style="position: sticky; left: 0; background: #f8fafc; z-index: 5; font-weight: 600; color: var(--text-dark);" title="Kode: ${mk.kode_mk}">
                     <div class="mk-kode-badge" style="color: #64748b; font-size: 0.75rem; margin-bottom: 4px; font-weight: 800;">${mk.kode_mk}</div>
                     ${mk.nama_mk || mk.nama_mata_kuliah || mk.kode_mk}
                 </td>`;
             
-            // Loop checkbox untuk setiap BK
             listBK.forEach(bk => {
                 const isChecked = relasiExisting.some(r => r.kode_bk === bk.kode_bk && r.kode_mk === mk.kode_mk);
                 const chk = isChecked ? 'checked' : '';
@@ -283,7 +296,6 @@
                            </label>
                        </td>`;
             });
-            
             tr += `</tr>`;
             tbody.innerHTML += tr;
         });
@@ -293,23 +305,27 @@
         const btnSave = document.getElementById('btnSave');
         btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btnSave.disabled = true;
+
+        // 1. Tangkap Kurikulum yang sedang diedit Kaprodi
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25"; // default 25
         
         let fetchPromises = [];
 
         listBK.forEach(bk => {
             const checkedBoxes = document.querySelectorAll(`.chk-matrix[data-bk="${bk.kode_bk}"]:checked`);
             const mkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-mk'));
-
-            const payload = {
-                kode_bk: bk.kode_bk,
-                mk_list: mkList,
-                prodi: PRODI
+            
+            // 2. Tambahkan kurikulumTerpilih ke dalam payload
+            const payload = { 
+                kode_bk: bk.kode_bk, 
+                mk_list: mkList, 
+                prodi: PRODI,
+                kurikulum: kurikulumTerpilih
             };
 
             const request = fetch(API_SAVE_MAPPING, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
             fetchPromises.push(request);
         });
@@ -317,14 +333,11 @@
         try {
             await Promise.all(fetchPromises);
             alert("✅ Matriks Relasi BK - MK berhasil disimpan!");
-        } catch (error) {
-            console.error(error);
-            alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi.");
-        } finally {
-            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks';
-            btnSave.disabled = false;
-        }
+        } catch (error) { alert("❌ Gagal menyimpan beberapa data ke server."); } 
+        finally { btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks'; btnSave.disabled = false; }
     }
+
+    window.onload = async () => { await loadDropdownKurikulum(); };
 </script>
 </body>
 </html>

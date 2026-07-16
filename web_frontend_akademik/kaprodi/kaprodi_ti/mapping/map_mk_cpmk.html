@@ -60,6 +60,12 @@
         </div>
 
         <div class="mapping-panel">
+            <div style="margin-bottom: 20px;">
+                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                <select id="filterKurikulum" onchange="initDropdownAndCheckboxes()">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
             <!-- 1. PILIH MATA KULIAH -->
             <div class="form-group">
                 <label for="selectMk"><i class="fas fa-book" style="color: var(--primary-red); margin-right: 8px;"></i> Pilih Mata Kuliah</label>
@@ -88,93 +94,83 @@
     </div>
 
 <script>
-    // ========================================================================
-    // 1. DEKLARASI API (KTP) HARUS ADA DI BARIS PALING ATAS
-    // ========================================================================
     const PRODI = localStorage.getItem("prodi_aktif") || "ti";
-    const API_MATKUL = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`; 
-    const API_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
-    const API_MAPPING = `${API_BASE}/get-mapping-mk?prodi=${PRODI}`;
     const API_SAVE_MAPPING = `${API_BASE}/admin-map-mk-cpmk`;
-
     let listCPMK = [];
 
     const userLogin = localStorage.getItem("user_login");
-            if (!userLogin) window.location.replace("/login/login.html");
+    if (!userLogin) window.location.replace("/login/login.html");
 
-    window.onload = () => {
-        setTimeout(initDropdownAndCheckboxes, 400); 
-    };
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            const data = await response.json();
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            data.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.kurikulum; 
+                opt.text = "Kurikulum 20" + item.kurikulum; 
+                selectKurikulum.appendChild(opt);
+            });
+            await initDropdownAndCheckboxes(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+        }
+    }
 
-    // ========================================================================
-    // 3. TARIK MASTER MATA KULIAH & CPMK
-    // ========================================================================
-    // ========================================================================
-    // 3. TARIK MASTER MATA KULIAH & CPMK (VERSI RAPI & DIKELOMPOKKAN PER CPL)
-    // ========================================================================
     async function initDropdownAndCheckboxes() {
         const selectMk = document.getElementById('selectMk');
         const cpmkContainer = document.getElementById('cpmkContainer');
         const loadingIndicator = document.getElementById('loadingIndicator');
-        
-        // PENGAMAN: Cek dulu apakah HTML loading-nya ada
         if (loadingIndicator) loadingIndicator.style.display = 'block';
+
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulum = selectKurikulum ? selectKurikulum.value : "";
+        let URL_MK = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
+        let URL_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
+
+        if(kurikulum) {
+            URL_MK += `&kurikulum=${kurikulum}`;
+            URL_CPMK += `&kurikulum=${kurikulum}`;
+        }
 
         try {
             const [resMk, resCpmk] = await Promise.all([
-                fetch(API_MATKUL),
-                fetch(API_CPMK)
+                fetch(URL_MK), fetch(URL_CPMK)
             ]);
 
             const dataMk = await resMk.json();
             listCPMK = await resCpmk.json();
 
-            // Isi Dropdown Mata Kuliah
             if (selectMk) {
                 selectMk.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah --</option>';
                 if (dataMk.length > 0) {
                     dataMk.forEach(mk => {
                         selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
                     });
-                } else {
-                    selectMk.innerHTML = '<option value="">Data Mata Kuliah Kosong</option>';
-                }
+                } else { selectMk.innerHTML = '<option value="">Data Mata Kuliah Kosong</option>'; }
             }
 
-            // Gambar Kotak Checkbox CPMK (DIKELOMPOKKAN)
             if (cpmkContainer) {
                 cpmkContainer.innerHTML = '';
                 if (listCPMK.length > 0) {
-                    
-                    // 1. Proses Pengelompokan Data berdasarkan kode_cpl_ref
                     const groupedCPMK = {};
                     listCPMK.forEach(cpmk => {
-                        // Jika ada CPMK yang lupa diisi CPL-nya, masukkan ke grup 'Lainnya'
                         const cpl = cpmk.kode_cpl_ref || "Belum Terkoneksi CPL"; 
-                        if (!groupedCPMK[cpl]) {
-                            groupedCPMK[cpl] = [];
-                        }
+                        if (!groupedCPMK[cpl]) groupedCPMK[cpl] = [];
                         groupedCPMK[cpl].push(cpmk);
                     });
 
-                    // 2. Urutkan nama kelompok (Berdasarkan Angka CPL, bukan Abjad)
                     const sortedCPLs = Object.keys(groupedCPMK).sort((a, b) => {
-                        // Mengekstrak hanya angka dari teks (misal: "TI-CPL01" -> 1, "CPL12" -> 12)
                         const angkaA = parseInt(a.replace(/\D/g, ''), 10) || 0;
                         const angkaB = parseInt(b.replace(/\D/g, ''), 10) || 0;
-                        
-                        // Jika angkanya sama, baru urutkan berdasarkan abjad sebagai cadangan
-                        if (angkaA === angkaB) {
-                            return a.localeCompare(b);
-                        }
-                        
-                        // Urutkan dari angka terkecil ke terbesar
+                        if (angkaA === angkaB) return a.localeCompare(b);
                         return angkaA - angkaB;
                     });
 
-                    // 3. Render HTML Per Kelompok
                     sortedCPLs.forEach(cpl => {
-                        // Tambahkan Banner/Judul Pembatas CPL
                         cpmkContainer.innerHTML += `
                             <div style="grid-column: 1 / -1; margin-top: 25px; margin-bottom: 5px; padding: 12px 15px; background: #f1f5f9; border-left: 4px solid var(--primary-red); border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">
                                 <div style="font-weight: 700; color: #0f172a; font-size: 1.05rem;">
@@ -186,7 +182,6 @@
                             </div>
                         `;
 
-                        // Tambahkan Card CPMK di bawah judul CPL masing-masing
                         groupedCPMK[cpl].forEach(cpmk => {
                             cpmkContainer.innerHTML += `
                                 <label class="cpmk-card">
@@ -200,23 +195,18 @@
                         });
                     });
 
-                } else {
-                    cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1;">Master Data CPMK Kosong. Silakan isi terlebih dahulu.</div>';
-                }
+                } else { cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1;">Master Data CPMK Kosong.</div>'; }
             }
 
         } catch (error) {
             console.error("Error Fetching Data:", error);
             if (selectMk) selectMk.innerHTML = '<option value="">Gagal terhubung ke API</option>';
-            if (cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1;">Gagal menarik data Master dari N8N. Pastikan Link Benar!</div>';
+            if (cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1;">Gagal menarik data Master dari N8N.</div>';
         } finally {
             if (loadingIndicator) loadingIndicator.style.display = 'none';
         }
     }
 
-    // ========================================================================
-    // 4. CEK RELASI SAAT DROPDOWN DIPILIH
-    // ========================================================================
     async function fetchExistingMapping() {
         const selectMk = document.getElementById('selectMk');
         const kodeMk = selectMk ? selectMk.value : null;
@@ -226,45 +216,30 @@
 
         if (!kodeMk) return;
 
-        // Reset semua kotak menjadi kosong dan aktifkan agar bisa diklik kembali
-        checkboxes.forEach(cb => {
-            cb.checked = false;
-            cb.disabled = false; 
-        });
-
+        checkboxes.forEach(cb => { cb.checked = false; cb.disabled = false; });
         if (btnSave) btnSave.disabled = true;
         if (loadingIndicator) loadingIndicator.style.display = 'block';
 
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulum = selectKurikulum ? selectKurikulum.value : "";
+        let URL_MAPPING = `${API_BASE}/get-mapping-mk?prodi=${PRODI}&mk=${kodeMk}`;
+        if(kurikulum) URL_MAPPING += `&kurikulum=${kurikulum}`;
+
         try {
-            const res = await fetch(`${API_MAPPING}&mk=${kodeMk}`);
+            const res = await fetch(URL_MAPPING);
             const relations = await res.json();
             
-            // 👇 BAGUS UNTUK INTIP DATA: Tekan F12 di browser untuk melihat apa yang dikirim n8n
-            console.log("Data relasi dari n8n:", relations);
-
-            // Ambil array relasi secara aman (antisipasi kalau n8n mengirim single object)
             let listRelasi = [];
-            if (Array.isArray(relations)) {
-                listRelasi = relations;
-            } else if (relations && typeof relations === 'object') {
-                listRelasi = [relations];
-            }
+            if (Array.isArray(relations)) listRelasi = relations;
+            else if (relations && typeof relations === 'object') listRelasi = [relations];
 
-            // 🚀 JURUS KEBAL-BADAI: Cocokkan secara programatik (Anti-Spasi & Kebal Huruf Kapital)
             checkboxes.forEach(cb => {
                 const apakahCocok = listRelasi.some(rel => {
-                    // Cek semua kemungkinan nama kolom dari DB (huruf kecil, huruf besar, camelCase)
                     const dbKodeCpmk = rel.kode_cpmk || rel.KODE_CPMK || rel.kodeCpmk;
                     if (!dbKodeCpmk) return false;
-                    
-                    // Bandingkan setelah dibuang spasinya dan diubah ke huruf kecil semua
                     return cb.value.trim().toLowerCase() === dbKodeCpmk.toString().trim().toLowerCase();
                 });
-                
-                // Jika cocok dengan data di database, otomatis berikan centang!
-                if (apakahCocok) {
-                    cb.checked = true;
-                }
+                if (apakahCocok) cb.checked = true;
             });
 
             if (btnSave) btnSave.disabled = false; 
@@ -277,50 +252,41 @@
         }
     }
 
-    // ========================================================================
-    // 5. SIMPAN RELASI KE DATABASE
-    // ========================================================================
     async function saveMapping() {
         const kodeMk = document.getElementById('selectMk').value;
         const btnSave = document.getElementById('btnSave');
         
-        if (!kodeMk) {
-            alert("Silakan pilih Mata Kuliah terlebih dahulu!");
-            return;
-        }
+        if (!kodeMk) { alert("Silakan pilih Mata Kuliah terlebih dahulu!"); return; }
 
-        // Kumpulkan semua checkbox yang sedang dicentang
         const checkedBoxes = Array.from(document.querySelectorAll('.cpmk-checkbox:checked')).map(cb => cb.value);
 
         btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btnSave.disabled = true;
 
-        try {
-            const payload = {
-                kode_mk: kodeMk,
-                prodi: PRODI,
-                cpmk_list: checkedBoxes
-            };
+        // 1. Tangkap Kurikulum
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
 
+        try {
+            // 2. Sisipkan kurikulum ke payload
+            const payload = { 
+                kode_mk: kodeMk, 
+                prodi: PRODI, 
+                cpmk_list: checkedBoxes,
+                kurikulum: kurikulumTerpilih
+            };
+            
             const res = await fetch(API_SAVE_MAPPING, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
 
-            if (res.ok) {
-                alert("✅ Relasi MK & CPMK berhasil disimpan!");
-            } else {
-                alert("❌ Gagal menyimpan data di server.");
-            }
-        } catch (error) {
-            console.error("Error Saving:", error);
-            alert("Terjadi kesalahan jaringan.");
-        } finally {
-            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Pemetaan';
-            btnSave.disabled = false;
-        }
+            if (res.ok) alert("✅ Relasi MK & CPMK berhasil disimpan!");
+            else alert("❌ Gagal menyimpan data di server.");
+        } catch (error) { alert("Terjadi kesalahan jaringan."); } 
+        finally { btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Pemetaan'; btnSave.disabled = false; }
     }
+
+    window.onload = async () => { await loadDropdownKurikulum(); };
 </script>
 </body>
 </html>

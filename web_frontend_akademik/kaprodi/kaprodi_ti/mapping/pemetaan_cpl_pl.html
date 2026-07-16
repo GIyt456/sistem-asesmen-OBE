@@ -132,6 +132,13 @@
         </div>
 
         <div class="scrollable-content section-mapping-mhs" style="padding: 0 50px 40px 50px;">
+            </br>
+            <div style="margin-bottom: 20px;">
+                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                <select id="filterKurikulum" onchange="loadData()">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
             <div class="tabel-cpl-pl-wrapper">
                 <!-- SUNTIKKAN KELAS tabel-cpl-pl -->
                 <table id="matriksTable" class="tabel-cpl-pl">
@@ -149,7 +156,6 @@
     </div>
 
 <script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
     
     document.addEventListener("DOMContentLoaded", () => {
@@ -168,7 +174,6 @@
         }
     });
 
-    // --- FUNGSI SIDEBAR MOBILE ---
     function toggleSidebar() {
         document.getElementById('sidebar-container').classList.toggle('active');
         document.getElementById('mobileOverlay').classList.toggle('active');
@@ -189,28 +194,52 @@
         }, 600); 
     });
 
-    // --- LOGIKA DATA ---
-    const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
-    const API_PL = `${API_BASE}/get-master-pl?prodi=${PRODI}`;
-    const API_RELASI = `${API_BASE}/get-mapping-cpl-pl?prodi=${PRODI}`;
     const API_SAVE_MAPPING = `${API_BASE}/admin-map-cpl-pl`;
-
     let listCPL = [];
     let listPL = [];
 
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace("/login/login.html");
 
-    window.onload = () => { setTimeout(loadData, 400); };
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            const data = await response.json();
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            data.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.kurikulum; 
+                opt.text = "Kurikulum 20" + item.kurikulum; 
+                selectKurikulum.appendChild(opt);
+            });
+            await loadData(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+        }
+    }
 
     async function loadData() {
         const btnSaveTop = document.getElementById("btnSaveTop");
         const tbody = document.getElementById("bodyMatriks");
         if(btnSaveTop) btnSaveTop.disabled = true;
 
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulum = selectKurikulum ? selectKurikulum.value : "";
+        let URL_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
+        let URL_PL = `${API_BASE}/get-master-pl?prodi=${PRODI}`;
+        let URL_RELASI = `${API_BASE}/get-mapping-cpl-pl?prodi=${PRODI}`;
+
+        if(kurikulum) {
+            URL_CPL += `&kurikulum=${kurikulum}`;
+            URL_PL += `&kurikulum=${kurikulum}`;
+            URL_RELASI += `&kurikulum=${kurikulum}`;
+        }
+
         try {
             const [resCpl, resPl, resRelasi] = await Promise.all([
-                fetch(API_CPL), fetch(API_PL), fetch(API_RELASI)
+                fetch(URL_CPL), fetch(URL_PL), fetch(URL_RELASI)
             ]);
 
             listCPL = await resCpl.json();
@@ -223,7 +252,7 @@
             } catch (e) { relasiExisting = []; }
 
             if (!listCPL || listCPL.length === 0 || !listPL || listPL.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 50px !important; color: red; font-weight: bold;'>Data CPL atau PL masih KOSONG! Harap isi terlebih dahulu.</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 50px !important; color: red; font-weight: bold;'>Data CPL atau PL masih KOSONG untuk kurikulum ini!</td></tr>";
                 return;
             }
 
@@ -231,7 +260,6 @@
             if(btnSaveTop) btnSaveTop.disabled = false;
 
         } catch (error) {
-            console.error(error);
             tbody.innerHTML = "<tr><td colspan='100%' style='padding: 50px !important; color: red;'>Gagal terhubung ke API. Cek n8n!</td></tr>";
         }
     }
@@ -241,7 +269,6 @@
         const tbody = document.getElementById("bodyMatriks");
         if(!headerRow || !tbody) return;
 
-        // Render Judul Kolom yang Dipercantik
         headerRow.innerHTML = `<th style="min-width: 150px; position: sticky; left: 0;">CPL \\ PL</th>`;
         listPL.forEach(pl => {
             headerRow.innerHTML += `
@@ -263,7 +290,6 @@
                 const chk = isChecked ? 'checked' : '';
                 const namaPL = pl.nama_profil || '';
                 
-                // Sel yang responsif, menutupi seluruh kotak untuk diklik
                 tr += `<td>
                            <label class="cell-wrapper-cpl">
                                <span class="pl-label-mobile">${pl.kode_pl} - ${namaPL}</span>
@@ -271,7 +297,6 @@
                            </label>
                        </td>`;
             });
-            
             tr += `</tr>`;
             tbody.innerHTML += tr;
         });
@@ -283,15 +308,26 @@
         btnTop.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btnTop.disabled = true;
 
+        // 1. Tangkap Kurikulum
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
+
         let promises = [];
         listPL.forEach(pl => {
             const checked = document.querySelectorAll(`.chk-matrix[data-pl="${pl.kode_pl}"]:checked`);
             const cplList = Array.from(checked).map(c => c.getAttribute('data-cpl'));
 
+            // 2. Tambahkan kurikulum ke payload
+            const payload = { 
+                kode_pl: pl.kode_pl, 
+                cpl_list: cplList, 
+                prodi: PRODI,
+                kurikulum: kurikulumTerpilih
+            };
+
             promises.push(fetch(`${API_BASE}/admin-map-cpl-pl`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ kode_pl: pl.kode_pl, cpl_list: cplList, prodi: PRODI })
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             }));
         });
 
@@ -301,6 +337,8 @@
         } catch (e) { alert("❌ Gagal menyimpan."); }
         finally { btnTop.innerHTML = originalText; btnTop.disabled = false; }
     }
+
+    window.onload = async () => { await loadDropdownKurikulum(); };
 </script>
 </body>
 </html>

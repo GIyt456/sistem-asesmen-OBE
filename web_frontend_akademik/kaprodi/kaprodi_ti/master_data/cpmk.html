@@ -82,6 +82,12 @@
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
+            <div style="margin-bottom: 20px;">
+                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                <select id="filterKurikulum" onchange="loadData()">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
@@ -128,16 +134,13 @@
 <script src="../../../js/template.js"></script> 
 
 <script>
-    // --- 1. VARIABEL API & SESI ---
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
-    const API_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_UPLOAD = `${API_BASE}/upload-master-cpmk`;
-
     const userLogin = localStorage.getItem("user_login");
+
     if (!userLogin) window.location.replace("/login/login.html");
     
-    // --- SETUP TAMPILAN DINAMIS (WARNA & NAMA PRODI) ---
     const pAktif = localStorage.getItem("prodi_aktif") || "ti";
     const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
     const warnaProdi = pAktif === 'si' ? '#1e3a8a' : '#8b0000'; 
@@ -153,81 +156,84 @@
         avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${warnaAvatar}&color=fff&bold=true`;
     }
 
-    // --- 2. FUNGSI AMBIL DATA TABEL ---
     let allData = [];
     let state = { page: 1, itemsPerPage: 10 };
-    
-    // Objek Dictionary untuk melacak baris mana saja yang dimodifikasi oleh pengguna
     let dataBerubah = {};
+
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            const data = await response.json();
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            
+            data.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.kurikulum; 
+                opt.text = "Kurikulum 20" + item.kurikulum; 
+                selectKurikulum.appendChild(opt);
+            });
+            await loadData(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+        }
+    }
 
     async function loadData() { 
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "<tr><td colspan='2' style='text-align:center; padding:40px;'><i class='fas fa-spinner fa-spin'></i> Memuat data...</td></tr>";
-        dataBerubah = {}; // Reset tracking memory data setiap load ulang halaman
+        dataBerubah = {}; 
+
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "";
+        let API_CPMK_DINAMIS = `${API_BASE}/get-cpmk-list?prodi=${PRODI}`;
+        if (kurikulumTerpilih !== "") API_CPMK_DINAMIS += `&kurikulum=${kurikulumTerpilih}`;
 
         try {
-            const res = await fetch(API_CPMK); 
+            const res = await fetch(API_CPMK_DINAMIS); 
             allData = await res.json(); 
-            
             if (!allData || allData.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='2' style='text-align:center; padding:40px; color:#64748b;'>Belum ada data CPMK. Silakan impor via Excel.</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='2' style='text-align:center; padding:40px; color:#64748b;'>Belum ada data CPMK untuk kurikulum ini.</td></tr>";
                 document.getElementById('pagination-container').innerHTML = '';
                 return;
             }
-
             state.page = 1;
             renderTablePaginated();
         } catch(e) { 
-            tbody.innerHTML = "<tr><td colspan='2' style='color:red; text-align:center; padding:40px;'>Gagal menarik data. Pastikan n8n menyala.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='2' style='color:red; text-align:center; padding:40px;'>Gagal menarik data.</td></tr>";
         }
     }
 
-    // --- 3. MENCATAT KETIKAN KE MEMORI ---
     function catatPerubahan(kodeCpmk, nilaiBaru) {
         dataBerubah[kodeCpmk] = nilaiBaru;
-        
-        // Perbarui array utama allData agar saat pindah pagination teks ketikan tidak kembali ke setingan awal
         const index = allData.findIndex(item => item.kode_cpmk === kodeCpmk);
-        if(index !== -1) {
-            allData[index].deskripsi = nilaiBaru;
-        }
+        if(index !== -1) allData[index].deskripsi = nilaiBaru;
     }
 
-    // --- 4. FUNGSI RENDER TABEL & PAGINATION ---
     function renderTablePaginated() {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "";
-        
         const start = (state.page - 1) * state.itemsPerPage;
         const end = start + state.itemsPerPage;
         const paginatedItems = allData.slice(start, end);
         
         paginatedItems.forEach(cpmk => {
             const deskripsi = cpmk.deskripsi || cpmk.deskripsi_cpmk || ""; 
-            
             let tr = document.createElement('tr');
-            // Menghilangkan kolom aksi individual lama, menambahkan event oninput/onchange
             tr.innerHTML = `
                 <td style="font-weight: 800; color: ${warnaProdi}; vertical-align: middle;">${cpmk.kode_cpmk}</td>
                 <td>
-                    <textarea 
-                        id="in-${cpmk.kode_cpmk}" 
-                        rows="3" 
-                        style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; font-size: 0.95rem; resize: vertical; outline: none;"
-                        oninput="catatPerubahan('${cpmk.kode_cpmk}', this.value)"
-                    >${deskripsi}</textarea>
-                </td>
-            `;
+                    <textarea id="in-${cpmk.kode_cpmk}" rows="3" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:6px; font-size: 0.95rem; resize: vertical; outline: none;" oninput="catatPerubahan('${cpmk.kode_cpmk}', this.value)">${deskripsi}</textarea>
+                </td>`;
             tbody.appendChild(tr);
         });
-
         renderPaginationControls();
     }
 
     function renderPaginationControls() {
         const container = document.getElementById('pagination-container');
         container.innerHTML = "";
-        
         const totalPages = Math.ceil(allData.length / state.itemsPerPage);
         if (totalPages <= 1) return;
 
@@ -250,67 +256,42 @@
         container.appendChild(btnNext);
     }
 
-    // --- 5. LOGIKA SIMPAN MASSAL (BULK SAVE) ---
     async function simpanSemuaPerubahan() { 
         const keys = Object.keys(dataBerubah);
-        
-        if(keys.length === 0) {
-            alert("Belum ada perubahan deskripsi CPMK yang dilakukan.");
-            return;
-        }
+        if(keys.length === 0) { alert("Belum ada perubahan deskripsi."); return; }
 
         const btn = document.getElementById('btnSimpanBulk');
         const oldHtml = btn.innerHTML;
-        
-        btn.innerHTML = pAktif === 'si' || window.innerWidth > 768 
-            ? '<i class="fas fa-spinner fa-spin"></i> Menyimpan...' 
-            : '<i class="fas fa-spinner fa-spin"></i>';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btn.disabled = true;
 
         try {
-            // Melakukan looping HTTP POST request hanya untuk item data yang mengalami perubahan saja
             for(const kode of keys) {
                 await fetch(API_UPDATE, { 
-                    method: "POST", 
-                    headers: {"Content-Type":"application/json"}, 
-                    body: JSON.stringify({ 
-                        tipe: 'cpmk', 
-                        kode: kode, 
-                        value: dataBerubah[kode], 
-                        prodi: PRODI 
-                    }) 
+                    method: "POST", headers: {"Content-Type":"application/json"}, 
+                    body: JSON.stringify({ tipe: 'cpmk', kode: kode, value: dataBerubah[kode], prodi: PRODI }) 
                 }); 
             }
             alert(`✅ Berhasil memperbarui ${keys.length} deskripsi CPMK!`);
-            dataBerubah = {}; // Kosongkan state tracking memori setelah sukses menyimpan
-        } catch (e) { 
-            alert("❌ Terjadi kesalahan jaringan saat melakukan update ke server."); 
-        } finally { 
-            btn.innerHTML = oldHtml; 
-            btn.disabled = false; 
-        }
+            dataBerubah = {}; 
+        } catch (e) { alert("❌ Terjadi kesalahan jaringan."); } 
+        finally { btn.innerHTML = oldHtml; btn.disabled = false; }
     }
 
-    // --- 6. FUNGSI EXPORT / IMPORT EXCEL ---
     async function exportKeExcel() {
         const btn = document.querySelector('.btn-download');
         const oriText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
         btn.disabled = true;
 
+        let kurikulumTerpilih = document.getElementById('filterKurikulum').value;
         try {
             if (!allData || allData.length === 0) return alert("Tidak ada data untuk diekspor.");
-
-            const dataUntukExcel = allData.map(cpmk => ({ 
-                'kode_cpmk': cpmk.kode_cpmk, 
-                'deskripsi': cpmk.deskripsi || cpmk.deskripsi_cpmk || "", 
-                'prodi': PRODI 
-            }));
-            
+            const dataUntukExcel = allData.map(cpmk => ({ 'kode_cpmk': cpmk.kode_cpmk, 'deskripsi': cpmk.deskripsi || cpmk.deskripsi_cpmk || "", 'prodi': PRODI }));
             const worksheet = XLSX.utils.json_to_sheet(dataUntukExcel);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Master_CPMK");
-            XLSX.writeFile(workbook, `Master_CPMK_${PRODI}.xlsx`);
+            XLSX.writeFile(workbook, `Master_CPMK_${PRODI}_Kurikulum_${kurikulumTerpilih}.xlsx`);
         } catch (e) { alert("Gagal mengekspor data."); } 
         finally { btn.innerHTML = oriText; btn.disabled = false; }
     }
@@ -331,21 +312,18 @@
 
         try {
             const res = await fetch(API_UPLOAD, { method: 'POST', body: formData });
-            if (res.ok) { alert("✅ Data Excel CPMK berhasil diimpor!"); await loadData(); } 
+            if (res.ok) { alert("✅ Data Excel CPMK berhasil diimpor!"); await loadDropdownKurikulum(); } 
             else { alert("❌ Gagal memproses file Excel."); }
         } catch (e) { alert("❌ Terjadi kesalahan koneksi."); } 
         finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
     }
 
-    // --- 7. FUNGSI SIDEBAR MOBILE ---
     function toggleSidebar() {
         document.getElementById('sidebar-container').classList.toggle('active');
         document.getElementById('mobileOverlay').classList.toggle('active');
     }
 
-    window.onload = () => {
-        setTimeout(loadData, 400); 
-    };
+    window.onload = async () => { await loadDropdownKurikulum(); };
 </script>
 </body>
 </html>

@@ -79,6 +79,12 @@
 
         <div class="scrollable-content section-mapping-cpmk" style="padding: 0 50px 40px 50px;">
             <div class="mapping-panel">
+                <div style="margin-bottom: 20px;">
+                    <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                    <select id="filterKurikulum" onchange="initData()">
+                        <option value="">Memuat data...</option>
+                    </select>
+                </div>
                 <!-- 1. Pilih CPL -->
                 <div class="form-group">
                     <label for="selectCpl">
@@ -115,23 +121,23 @@
     </div>
 
 <script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
-    
+    const API_UPDATE = `${API_BASE}/admin-update-master`;
+    let listCPMK = [];
+
+    const userLogin = localStorage.getItem("user_login");
+    if (!userLogin) window.location.replace("/login/login.html");
+
     document.addEventListener("DOMContentLoaded", () => {
         const dynamicIcons = document.querySelectorAll('.dynamic-icon');
-        
         if(PRODI === "ti") {
             document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
             document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
-            // Ganti warna icon
             dynamicIcons.forEach(icon => icon.style.color = '#8b0000');
         } else {
             document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
-            // Ganti warna icon
             dynamicIcons.forEach(icon => icon.style.color = '#1e3a8a');
         }
-
         const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
         const avatarMobile = document.getElementById("mobileNavbarAvatar");
         if(avatarMobile) {
@@ -140,7 +146,6 @@
         }
     });
 
-    // --- FUNGSI SIDEBAR MOBILE ---
     function toggleSidebar() {
         document.getElementById('sidebar-container').classList.toggle('active');
         document.getElementById('mobileOverlay').classList.toggle('active');
@@ -151,35 +156,48 @@
             const sidebar = document.getElementById('sidebar-container');
             if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
                 fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
-                    .then(res => res.text())
-                    .then(html => {
-                        sidebar.innerHTML = html;
-                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
-                    })
-                    .catch(e => console.log('Gagal memuat sidebar darurat'));
+                    .then(res => res.text()).then(html => { sidebar.innerHTML = html; })
+                    .catch(e => console.log('Gagal memuat sidebar'));
             }
         }, 600); 
     });
 
-    // --- LOGIKA API ---
-    const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
-    const API_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
-    const API_UPDATE = `${API_BASE}/admin-update-master`;
-
-    let listCPMK = [];
-
-    const userLogin = localStorage.getItem("user_login");
-    if (!userLogin) window.location.replace("/login/login.html");
-
-    window.onload = () => { setTimeout(initData, 400); };
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            const data = await response.json();
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            data.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.kurikulum; 
+                opt.text = "Kurikulum 20" + item.kurikulum; 
+                selectKurikulum.appendChild(opt);
+            });
+            await initData(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+        }
+    }
 
     async function initData() {
         const selectCpl = document.getElementById('selectCpl');
         const cpmkContainer = document.getElementById('cpmkContainer');
 
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulum = selectKurikulum ? selectKurikulum.value : "";
+        let URL_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
+        let URL_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
+
+        if(kurikulum) {
+            URL_CPL += `&kurikulum=${kurikulum}`;
+            URL_CPMK += `&kurikulum=${kurikulum}`;
+        }
+
         try {
             const [resCpl, resCpmk] = await Promise.all([
-                fetch(API_CPL), fetch(API_CPMK)
+                fetch(URL_CPL), fetch(URL_CPMK)
             ]);
 
             const dataCpl = await resCpl.json();
@@ -189,13 +207,12 @@
                 selectCpl.innerHTML = '<option value="" disabled selected>-- Silakan Pilih CPL yang Tersedia --</option>';
                 if (dataCpl.length > 0) {
                     dataCpl.forEach(cpl => {
-                        // Memotong deskripsi CPL jika terlalu panjang di dropdown
                         const desc = cpl.deskripsi || '';
                         const shortDesc = desc.length > 60 ? desc.substring(0, 60) + '...' : desc;
                         selectCpl.innerHTML += `<option value="${cpl.kode_cpl}">${cpl.kode_cpl} - ${shortDesc}</option>`;
                     });
                 } else {
-                    selectCpl.innerHTML = '<option value="">Data CPL Kosong. Harap isi data CPL terlebih dahulu.</option>';
+                    selectCpl.innerHTML = '<option value="">Data CPL Kosong.</option>';
                 }
             }
 
@@ -204,7 +221,6 @@
                 if (listCPMK.length > 0) {
                     listCPMK.forEach(cpmk => {
                         const parentInfo = cpmk.kode_cpl_ref || cpmk.parent || cpmk.kode_cpl || '';
-                        
                         cpmkContainer.innerHTML += `
                             <label class="cpmk-card">
                                 <input type="checkbox" class="cpmk-checkbox" value="${cpmk.kode_cpmk}" data-parent="${parentInfo}" disabled>
@@ -216,13 +232,13 @@
                         `;
                     });
                 } else {
-                    cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; padding: 20px; font-weight:bold; text-align:center;">Data CPMK Kosong. Harap isi data CPMK terlebih dahulu.</div>';
+                    cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; padding: 20px; font-weight:bold; text-align:center;">Data CPMK Kosong.</div>';
                 }
             }
 
         } catch (error) {
-            if(selectCpl) selectCpl.innerHTML = '<option value="">❌ Gagal terhubung ke API (Cek n8n!)</option>';
-            if(cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; padding:20px; text-align:center; font-weight:bold;">❌ Gagal menarik data dari server. Pastikan n8n menyala!</div>';
+            if(selectCpl) selectCpl.innerHTML = '<option value="">❌ Gagal terhubung ke API</option>';
+            if(cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; padding:20px; text-align:center;">❌ Gagal menarik data dari server.</div>';
         } 
     }
 
@@ -236,7 +252,6 @@
         checkboxes.forEach(cb => {
             cb.checked = false;
             cb.disabled = false; 
-            
             const parentCpmk = cb.getAttribute('data-parent');
             if (parentCpmk && parentCpmk.trim().toLowerCase() === cplId.trim().toLowerCase()) {
                 cb.checked = true;
@@ -256,12 +271,25 @@
         btnSave.disabled = true;
         btnSave.innerHTML = '<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px;"></i> Sedang Menyimpan Relasi...';
 
+        // 1. Tangkap Kurikulum
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
+
         try {
             let fetchPromises = [];
             for (const cpmkId of selectedCpmk) {
+                // 2. Sisipkan kurikulum ke dalam Body Payload
+                const payload = { 
+                    tipe: 'mapping', 
+                    kode: cpmkId, 
+                    value: cplId, 
+                    prodi: PRODI,
+                    kurikulum: kurikulumTerpilih 
+                };
+                
                 const req = fetch(API_UPDATE, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tipe: 'mapping', kode: cpmkId, value: cplId, prodi: PRODI })
+                    body: JSON.stringify(payload)
                 });
                 fetchPromises.push(req);
             }
@@ -276,6 +304,8 @@
             btnSave.innerHTML = '<i class="fas fa-save" style="font-size: 1.2rem;"></i> Simpan Relasi Pemetaan';
         }
     }
+
+    window.onload = async () => { await loadDropdownKurikulum(); };
 </script>
 </body>
 </html>

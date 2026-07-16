@@ -122,6 +122,13 @@
         </div>
 
         <div class="scrollable-content section-matriks-mk" style="padding: 0 50px 20px 50px;">
+            </br>
+            <div style="margin-bottom: 20px;">
+                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                <select id="filterKurikulum" onchange="loadData()">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
             <div class="tabel-matriks-cpl-mk-wrapper" id="areaTabel">
                 <p style="padding: 50px; text-align: center; color: #6b7280; font-weight: 600;">
                     <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; color: var(--primary-blue);"></i><br>
@@ -135,7 +142,6 @@
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
     
     document.addEventListener("DOMContentLoaded", () => {
-        // PERBAIKAN BINGKAI WARNA: PAKSA BIRU JIKA SI
         if(PRODI === "ti") {
             document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
             document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
@@ -143,7 +149,6 @@
             document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
             document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
         }
-
         const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
         const avatarMobile = document.getElementById("mobileNavbarAvatar");
         if(avatarMobile) {
@@ -157,43 +162,50 @@
         document.getElementById('mobileOverlay').classList.toggle('active');
     }
     
-    document.addEventListener("DOMContentLoaded", () => {
-        setTimeout(() => {
-            const sidebar = document.getElementById('sidebar-container');
-            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
-                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
-                    .then(res => res.text())
-                    .then(html => {
-                        sidebar.innerHTML = html;
-                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
-                    })
-                    .catch(e => console.log('Gagal memuat sidebar darurat'));
-            }
-        }, 600); 
-    });
-
-    const API_METADATA = `${API_BASE}/get-metadata?prodi=${PRODI}`;
-    const API_MATRIKS = `${API_BASE}/get-matkul-cpl?prodi=${PRODI}`; 
-    
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace("/login/login.html");
 
-    window.onload = () => { setTimeout(loadDataMatriks, 400); };
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            const data = await response.json();
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            data.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.kurikulum; 
+                opt.text = "Kurikulum 20" + item.kurikulum; 
+                selectKurikulum.appendChild(opt);
+            });
+            await loadDataMatriks(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+        }
+    }
 
     async function loadDataMatriks() {
         const areaTabel = document.getElementById('areaTabel');
         areaTabel.innerHTML = `<p style="padding: 50px; text-align: center; color: #6b7280; font-weight: 600;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; color: var(--primary-blue);"></i><br>Memuat Matriks Kurikulum dari Database...</p>`;
 
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulum = selectKurikulum ? selectKurikulum.value : "";
+        let URL_META = `${API_BASE}/get-metadata?prodi=${PRODI}`;
+        let URL_MATRIKS = `${API_BASE}/get-matkul-cpl?prodi=${PRODI}`;
+
+        if(kurikulum) {
+            URL_META += `&kurikulum=${kurikulum}`;
+            URL_MATRIKS += `&kurikulum=${kurikulum}`;
+        }
+
         try {
             const [resMetadata, resMatriks] = await Promise.all([
-                fetch(API_METADATA), fetch(API_MATRIKS)
+                fetch(URL_META), fetch(URL_MATRIKS)
             ]);
 
             const dataMetadata = await resMetadata.json();
             let dataMatriks = [];
-            try {
-                dataMatriks = await resMatriks.json();
-            } catch (e) { dataMatriks = []; }
+            try { dataMatriks = await resMatriks.json(); } catch (e) { dataMatriks = []; }
 
             const daftarCPL = dataMetadata.filter(item => item.tipe === 'cpl').sort((a, b) => a.kode.localeCompare(b.kode));
 
@@ -227,21 +239,17 @@
         
         daftarCPL.forEach(cpl => {
             let labelSingkat = cpl.kode.replace('SI-CPL', '').replace('TI-CPL', '').replace('CPL', '');
-            if(labelSingkat.startsWith('-') || labelSingkat.startsWith('0')) {
-                labelSingkat = labelSingkat.substring(1); 
-            }
+            if(labelSingkat.startsWith('-') || labelSingkat.startsWith('0')) labelSingkat = labelSingkat.substring(1); 
             if(labelSingkat === '') labelSingkat = cpl.kode;
-
             html += `<th title="${cpl.label || cpl.nama || ''}">${labelSingkat}</th>`;
         });
         html += `</tr></thead><tbody id="bodyMatriksMk">`;
 
         if (dataMatriks.length === 0) {
-            html += `<tr><td colspan="${4 + daftarCPL.length}" style="padding: 30px; text-align: center; color: #64748b;">Belum ada relasi Matriks Kurikulum yang terbentuk.</td></tr>`;
+            html += `<tr><td colspan="${4 + daftarCPL.length}" style="padding: 30px; text-align: center; color: #64748b;">Belum ada relasi Matriks untuk kurikulum ini.</td></tr>`;
         } else {
             dataMatriks.forEach(row => {
                 const cplTerkait = row.cpl_terhubung ? row.cpl_terhubung.split(', ') : []; 
-                
                 html += `
                     <tr>
                         <td class="sticky-col-1">${row.semester || '-'}</td>
@@ -249,8 +257,6 @@
                         <td style="text-align: left; font-weight: 600;">${row.nama_mk}</td>
                         <td>${row.sks}</td>
                 `;
-                
-                // Menampilkan Checkbox yang bisa di-klik
                 daftarCPL.forEach(cpl => {
                     const isChecked = cplTerkait.includes(cpl.kode);
                     const chk = isChecked ? 'checked' : '';
@@ -258,60 +264,47 @@
                                 <input type="checkbox" class="chk-matrix-mk" data-mk="${row.kode_mk}" data-cpl="${cpl.kode}" ${chk} style="cursor: pointer; transform: scale(1.2);">
                              </td>`;
                 });
-                
                 html += `</tr>`;
             });
         }
-
-        // Menutup tag tabel
         html += `</tbody></table>`;
-        
         container.innerHTML = html;
     }
 
-    // Fungsi Baru untuk Mengirim Data ke n8n
     async function simpanMatriks() {
         const btnSave = document.getElementById('btnSaveMatriks');
         btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btnSave.disabled = true;
 
-        // Kumpulkan semua checkbox yang dicentang
         const checkedBoxes = document.querySelectorAll('.chk-matrix-mk:checked');
         const mappingData = [];
         
         checkedBoxes.forEach(cb => {
-            mappingData.push({
-                kode_mk: cb.getAttribute('data-mk'),
-                kode_cpl: cb.getAttribute('data-cpl')
-            });
+            mappingData.push({ kode_mk: cb.getAttribute('data-mk'), kode_cpl: cb.getAttribute('data-cpl') });
         });
 
-        const payload = {
-            prodi: PRODI,
-            mapping: mappingData
+        // 1. Tangkap Kurikulum
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
+
+        // 2. Sisipkan kurikulum ke payload
+        const payload = { 
+            prodi: PRODI, 
+            mapping: mappingData,
+            kurikulum: kurikulumTerpilih
         };
 
         try {
-            // Pastikan URL API ini sesuai dengan webhook n8n untuk simpan
             const response = await fetch(`${API_BASE}/admin-map-cpl-mk`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
-            
-            if (response.ok) {
-                alert("✅ Matriks Relasi CPL - MK berhasil disimpan!");
-            } else {
-                throw new Error("Respon server tidak ok");
-            }
-        } catch (error) {
-            console.error(error);
-            alert("❌ Gagal menyimpan data ke server. Cek koneksi atau n8n.");
-        } finally {
-            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks CPL - MK';
-            btnSave.disabled = false;
-        }
+            if (response.ok) alert("✅ Matriks Relasi CPL - MK berhasil disimpan!");
+            else throw new Error("Respon server tidak ok");
+        } catch (error) { alert("❌ Gagal menyimpan data ke server."); } 
+        finally { btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks CPL - MK'; btnSave.disabled = false; }
     }
+
+    window.onload = async () => { await loadDropdownKurikulum(); };
 </script>
 </body>
 </html>
