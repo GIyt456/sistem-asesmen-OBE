@@ -1,0 +1,82 @@
+/* ========================================================================
+   FILE SPESIFIK: KELOLA BAHAN KAJIAN (bahan_kajian.css)
+   (Catatan: Desain Tabel belum disentuh/diubah sesuai permintaan)
+   ======================================================================== */
+
+/* TOMBOL TAMBAH KHUSUS BK */
+.btn-add { background: var(--primary-blue); }
+.btn-add:hover { background: #172554; transform: translateY(-2px); }
+
+/* --- TABEL STYLING (DIKEMBALIKAN PERSIS SEPERTI ASLINYA) --- */
+.table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-y: auto; max-height: 70vh; }
+table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: left; }
+th { background: #f8fafc; padding: 15px 12px; font-size: 0.75rem; font-weight: 800; color: #475569; border-bottom: 2px solid var(--border-color); position: sticky; top: 0; z-index: 10; text-transform: uppercase; }
+
+th:nth-child(1) { width: 7%; } th:nth-child(2) { width: 15%; } th:nth-child(3) { width: 24%; } 
+th:nth-child(4) { width: 22%; } th:nth-child(5) { width: 12%; } th:nth-child(6) { width: 10%; } 
+th:nth-child(7) { width: 10%; text-align: center; }
+
+td { padding: 15px 12px; border-bottom: 1px solid var(--border-color); font-size: 0.85rem; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+
+.btn-edit { background: #f1f5f9; color: var(--primary-blue); border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem; width: 100%; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
+.btn-edit:hover { background: var(--primary-blue); color: white; border-color: var(--primary-blue); }
+
+/* --- MODAL (POP-UP) STYLING (GLOBAL) --- */
+/* Z-index diubah jadi 10005 agar pasti berada di atas navbar dan tirai gelap */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 10005; }
+.modal-content { background: white; padding: 30px; border-radius: 16px; width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+.modal-header { font-weight: 800; font-size: 1.4rem; margin-bottom: 20px; color: var(--text-dark); border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; font-size: 0.75rem; font-weight: 800; margin-bottom: 5px; color: #64748b; text-transform: uppercase; }
+.form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; }
+.form-group input:disabled { background: #f8fafc; color: #94a3b8; }
+
+
+/* --- RESPONSIVE MOBILE KHUSUS BK --- */
+@media (max-width: 768px) {
+    /* 1. Merubah Tombol Tambah menjadi Bola */
+    .action-buttons .btn-add { width: 45px !important; height: 45px !important; border-radius: 50% !important; padding: 0 !important; justify-content: center !important; font-size: 0 !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important; flex: none !important;}
+    .action-buttons .btn-add i { font-size: 1.1rem !important; margin: 0 !important; color: white !important; }
+    
+    /* 2. SULAP POP-UP MODAL AGAR MUNGIL DAN RAPI DI HP */
+    .modal {
+        padding: 15px; /* Memberi jarak aman dari tepi layar HP */
+    }
+    .modal-content { 
+        width: 100%; 
+        max-height: 75vh; /* Membatasi tinggi agar tidak menabrak navbar atas */
+        padding: 20px 15px; /* Kurangi jarak dalam agar lebih padat */
+        border-radius: 12px;
+        margin-top: 40px; /* Dorong sedikit ke bawah menjauhi navbar */
+    }
+    .modal-header {
+        font-size: 1.15rem; /* Perkecil ukuran judul */
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+    }
+    .form-group {
+        margin-bottom: 12px; /* Rapatkan jarak antar input */
+    }
+    .form-group label {
+        font-size: 0.7rem;
+        margin-bottom: 4px;
+    }
+    .form-group input, .form-group textarea {
+        padding: 10px; /* Kurangi ketebalan input */
+        font-size: 0.85rem;
+        border-radius: 6px;
+    }
+    
+    /* Pangkas paksa tinggi textarea agar tidak memanjang penuhi layar */
+    .form-group textarea {
+        height: 65px !important;
+        min-height: 65px !important;
+    }
+
+    /* Perkecil tombol aksi Batal dan Simpan di dalam pop-up */
+    .modal-content div[style*="justify-content: flex-end"] button {
+        padding: 10px 16px !important;
+        font-size: 0.85rem !important;
+        border-radius: 6px !important;
+    }
+}
