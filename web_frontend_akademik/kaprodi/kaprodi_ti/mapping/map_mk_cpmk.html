@@ -4,94 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapping MK - CPL - CPMK - Sistem OBE</title>
-    <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- MEMANGGIL FILE CSS STANDAR -->
+    <link rel="stylesheet" href="../../../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="/js/api_config.js"></script>
-    <script src="/js/template.js"></script>
-    <style>
-        :root { 
-            --sidebar-bg: #161923; --sidebar-text: #7b8395; --sidebar-hover: #262936; --sidebar-active-text: #ffffff;
-            --primary-red: #8b0000; --bg-main: #ffffff; --text-dark: #111827; --border-dark: #161923;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { display: flex; background: #f9fafb; height: 100vh; overflow: hidden; color: var(--text-dark); animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .main-content { flex: 1; overflow-y: auto; padding: 40px 60px; }
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid #e5e7eb; padding-bottom: 20px; }
-        .header-subtitle { color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-        .header-title { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); letter-spacing: -0.5px; }
-        .header-title span { color: var(--primary-red); }
-
-        /* GAYA PANEL MAPPING */
-        .mapping-panel { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        
-        .form-group { margin-bottom: 25px; }
-        .form-group label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 1.05rem; }
-        .select-mk { width: 100%; padding: 14px 16px; border-radius: 8px; border: 1px solid #d1d5db; font-size: 1rem; font-weight: 500; outline: none; background: #f9fafb; cursor: pointer; }
-        .select-mk:focus { border-color: var(--primary-red); box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1); }
-
-        .cpmk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
-        .cpmk-card { border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px; display: flex; align-items: flex-start; gap: 12px; cursor: pointer; transition: 0.2s; background: white; }
-        .cpmk-card:hover { border-color: var(--primary-red); background: #fff5f5; }
-        .cpmk-card input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; margin-top: 2px; accent-color: var(--primary-red); }
-        .cpmk-info { display: flex; flex-direction: column; }
-        .cpmk-code { font-weight: 700; font-size: 0.95rem; color: var(--text-dark); }
-        .cpmk-desc { font-size: 0.8rem; color: #6b7280; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-
-        .btn-save { background: var(--primary-red); color: white; border: none; padding: 14px 24px; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; width: 100%; justify-content: center; margin-top: 30px; }
-        .btn-save:hover { background: #6b0000; transform: translateY(-2px); }
-        .btn-save:disabled { background: #d1d5db; cursor: not-allowed; transform: none; }
-    </style>
+    
+    <script src="../../../js/api_config.js"></script>
+    
+    <!-- Panggil CSS -->
+    <link rel="stylesheet" href="mk_cpmk.css">
+    <link rel="stylesheet" href="../../../css/global_ti.css">
 </head>
 <body>
 
-    <!-- TEMPAT SIDEBAR OTOMATIS MUNCUL -->
     <div id="sidebar-container"></div>
+    <div id="navbar-container"></div>
 
     <div class="main-content">
-        <div class="header-container">
-            <div>
-                <div class="header-subtitle">PEMETAAN (MAPPING)</div>
-                <h1 class="header-title">MAPPING <span>MK - CPL - CPMK</span></h1>
-            </div>
-        </div>
+        <!-- SATUKAN SEMUA KE DALAM CONTENT-WRAPPER -->
+        <div class="content-wrapper">
 
-        <div class="mapping-panel">
-            <div style="margin-bottom: 20px;">
-                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
-                <select id="filterKurikulum" onchange="initDropdownAndCheckboxes()">
+            <!-- TEMPLATE: Header -->
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="header-title-area">
+                        <div class="header-subtitle">PEMETAAN (MAPPING)</div>
+                        <h1 class="header-title">MAPPING <span>MK - CPMK</span></h1>
+                    </div>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
+            <!-- TEMPLATE: Filter Section -->
+            <div class="filter-section">
+                <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
+                <select id="filterKurikulum" onchange="initDropdownAndCheckboxes()" class="filter-select">
                     <option value="">Memuat data...</option>
                 </select>
             </div>
-            <!-- 1. PILIH MATA KULIAH -->
-            <div class="form-group">
-                <label for="selectMk"><i class="fas fa-book" style="color: var(--primary-red); margin-right: 8px;"></i> Pilih Mata Kuliah</label>
-                <select id="selectMk" class="select-mk" onchange="fetchExistingMapping()">
-                    <option value="">-- Memuat daftar Mata Kuliah... --</option>
-                </select>
-            </div>
 
-            <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-
-            <!-- 2. DAFTAR CHECKBOX CPMK -->
-            <div class="form-group">
-                <label><i class="fas fa-tasks" style="color: var(--primary-red); margin-right: 8px;"></i> Centang CPMK yang Relevan</label>
-                <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 15px;">Pilih mata kuliah di atas terlebih dahulu untuk melihat CPMK yang terhubung.</p>
-                
-                <div id="cpmkContainer" class="cpmk-grid">
-                    <p style="grid-column: 1 / -1; color: #9ca3af; font-style: italic;">Memuat daftar CPMK dari database...</p>
+            <!-- TEMPLATE: Section Header -->
+            <div class="section-header">
+                <div class="section-title-area">
+                    <h3 class="section-title">Relasi Pemetaan</h3>
+                    <p class="section-subtitle">Pilih Mata Kuliah, lalu centang CPMK relevan yang dipelajari.</p>
                 </div>
             </div>
 
-            <!-- 3. TOMBOL SIMPAN -->
-            <button id="btnSave" class="btn-save" onclick="saveMapping()" disabled>
-                <i class="fas fa-save"></i> Simpan Pemetaan
-            </button>
+            <!-- PANEL MAPPING KONTEN -->
+            <div class="mapping-panel">
+                <!-- 1. PILIH MATA KULIAH -->
+                <div class="form-group">
+                    <label for="selectMk"><i class="fas fa-book dynamic-icon" style="margin-right: 8px;"></i> Pilih Mata Kuliah</label>
+                    <select id="selectMk" class="select-custom" onchange="fetchExistingMapping()">
+                        <option value="">-- Memuat daftar Mata Kuliah... --</option>
+                    </select>
+                </div>
+
+                <hr style="border: 0; border-top: 2px dashed #cbd5e1; margin: 40px 0;">
+
+                <!-- 2. DAFTAR CHECKBOX CPMK -->
+                <div class="form-group">
+                    <label><i class="fas fa-tasks dynamic-icon" style="margin-right: 8px;"></i> Centang CPMK yang Relevan</label>
+                    <p style="font-size: 0.9rem; color: #64748b; font-weight: 500; margin-bottom: 20px; line-height: 1.5;">Pilih mata kuliah di atas terlebih dahulu untuk melihat dan menghubungkan CPMK.</p>
+                    
+                    <div id="cpmkContainer" class="cpmk-grid">
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #9ca3af; font-weight: 600; border: 2px dashed #e2e8f0; border-radius: 12px; background: white;">
+                            <i class="fas fa-spinner fa-spin fa-2x" style="margin-bottom: 15px; color: var(--primary-blue);"></i><br>
+                            Memuat daftar CPMK...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. TOMBOL SIMPAN -->
+                <button id="btnSave" class="btn-save-mapping" onclick="saveMapping()" disabled>
+                    <i class="fas fa-save" style="font-size: 1.2rem;"></i> Simpan Pemetaan
+                </button>
+            </div>
+
         </div>
     </div>
+
+<script src="../../../js/template.js"></script>
 
 <script>
     const PRODI = localStorage.getItem("prodi_aktif") || "ti";
@@ -101,6 +96,21 @@
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace("/login/login.html");
 
+    // SET TEMA WARNA SESUAI PRODI
+    document.addEventListener("DOMContentLoaded", () => {
+        const dynamicIcons = document.querySelectorAll('.dynamic-icon');
+        if(PRODI === "ti") {
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+            dynamicIcons.forEach(icon => icon.style.color = '#8b0000');
+        } else {
+            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+            dynamicIcons.forEach(icon => icon.style.color = '#1e3a8a');
+        }
+    });
+
+    // --- FUNGSI LOAD KURIKULUM ---
     async function loadDropdownKurikulum() {
         try {
             const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
@@ -108,28 +118,34 @@
             const selectKurikulum = document.getElementById('filterKurikulum');
             selectKurikulum.innerHTML = ''; 
             data.forEach(item => {
-                let opt = document.createElement('option');
-                opt.value = item.kurikulum; 
-                opt.text = "Kurikulum 20" + item.kurikulum; 
-                selectKurikulum.appendChild(opt);
+                if (item && item.kurikulum) {
+                    let opt = document.createElement('option');
+                    opt.value = item.kurikulum; 
+                    opt.text = "Kurikulum 20" + item.kurikulum; 
+                    selectKurikulum.appendChild(opt);
+                }
             });
             await initDropdownAndCheckboxes(); 
         } catch (error) {
-            console.error("Gagal memuat list kurikulum:", error);
             document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
         }
     }
 
+    // --- LOGIKA MAPPING API ---
     async function initDropdownAndCheckboxes() {
         const selectMk = document.getElementById('selectMk');
         const cpmkContainer = document.getElementById('cpmkContainer');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        if (loadingIndicator) loadingIndicator.style.display = 'block';
+        const btnSave = document.getElementById('btnSave');
+        
+        if (btnSave) btnSave.disabled = true;
 
         const selectKurikulum = document.getElementById('filterKurikulum');
         let kurikulum = selectKurikulum ? selectKurikulum.value : "";
-        let URL_MK = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
-        let URL_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}`;
+        
+        // Anti-Cache
+        const timeStamp = new Date().getTime();
+        let URL_MK = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}&_t=${timeStamp}`;
+        let URL_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}&_t=${timeStamp}`;
 
         if(kurikulum) {
             URL_MK += `&kurikulum=${kurikulum}`;
@@ -138,7 +154,7 @@
 
         try {
             const [resMk, resCpmk] = await Promise.all([
-                fetch(URL_MK), fetch(URL_CPMK)
+                fetch(URL_MK, { cache: "no-store" }), fetch(URL_CPMK, { cache: "no-store" })
             ]);
 
             const dataMk = await resMk.json();
@@ -171,40 +187,46 @@
                     });
 
                     sortedCPLs.forEach(cpl => {
+                        // Kategori CPL Header
                         cpmkContainer.innerHTML += `
-                            <div style="grid-column: 1 / -1; margin-top: 25px; margin-bottom: 5px; padding: 12px 15px; background: #f1f5f9; border-left: 4px solid var(--primary-red); border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">
-                                <div style="font-weight: 700; color: #0f172a; font-size: 1.05rem;">
-                                    <i class="fas fa-link" style="color: var(--primary-red); margin-right: 8px;"></i> CPL Induk: ${cpl}
+                            <div class="cpl-divider">
+                                <div class="cpl-divider-title">
+                                    <i class="fas fa-link dynamic-icon"></i> CPL Induk: ${cpl}
                                 </div>
-                                <div style="font-size: 0.85rem; color: #64748b; font-weight: 500;">
+                                <div class="cpl-divider-count">
                                     ${groupedCPMK[cpl].length} CPMK Terkait
                                 </div>
                             </div>
                         `;
 
+                        // Daftar Kartu CPMK
                         groupedCPMK[cpl].forEach(cpmk => {
                             cpmkContainer.innerHTML += `
                                 <label class="cpmk-card">
                                     <input type="checkbox" class="cpmk-checkbox" value="${cpmk.kode_cpmk}" disabled>
-                                    <div>
-                                        <div style="font-weight: 700; color: #1e293b;">${cpmk.kode_cpmk}</div>
-                                        <div style="font-size: 0.85rem; color: #64748b; margin-top: 4px; line-height: 1.4;">${cpmk.deskripsi || '-'}</div>
+                                    <div class="cpmk-info">
+                                        <div class="cpmk-code">${cpmk.kode_cpmk}</div>
+                                        <div class="cpmk-desc">${cpmk.deskripsi || '-'}</div>
                                     </div>
                                 </label>
                             `;
                         });
                     });
+                    
+                    // Trigger pewarnaan ikon divider
+                    const dynamicIcons = document.querySelectorAll('.dynamic-icon');
+                    const color = PRODI === 'si' ? '#1e3a8a' : '#8b0000';
+                    dynamicIcons.forEach(icon => icon.style.color = color);
 
-                } else { cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1;">Master Data CPMK Kosong.</div>'; }
+                } else { 
+                    cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; text-align:center; padding:20px; font-weight:bold;">Master Data CPMK Kosong.</div>'; 
+                }
             }
 
         } catch (error) {
-            console.error("Error Fetching Data:", error);
             if (selectMk) selectMk.innerHTML = '<option value="">Gagal terhubung ke API</option>';
-            if (cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1;">Gagal menarik data Master dari N8N.</div>';
-        } finally {
-            if (loadingIndicator) loadingIndicator.style.display = 'none';
-        }
+            if (cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; text-align:center; padding:20px; font-weight:bold;">Gagal menarik data Master dari Server.</div>';
+        } 
     }
 
     async function fetchExistingMapping() {
@@ -212,13 +234,12 @@
         const kodeMk = selectMk ? selectMk.value : null;
         const btnSave = document.getElementById('btnSave');
         const checkboxes = document.querySelectorAll('.cpmk-checkbox');
-        const loadingIndicator = document.getElementById('loadingIndicator');
 
         if (!kodeMk) return;
 
         checkboxes.forEach(cb => { cb.checked = false; cb.disabled = false; });
         if (btnSave) btnSave.disabled = true;
-        if (loadingIndicator) loadingIndicator.style.display = 'block';
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat relasi...';
 
         const selectKurikulum = document.getElementById('filterKurikulum');
         let kurikulum = selectKurikulum ? selectKurikulum.value : "";
@@ -226,7 +247,7 @@
         if(kurikulum) URL_MAPPING += `&kurikulum=${kurikulum}`;
 
         try {
-            const res = await fetch(URL_MAPPING);
+            const res = await fetch(URL_MAPPING, { cache: "no-store" });
             const relations = await res.json();
             
             let listRelasi = [];
@@ -242,19 +263,20 @@
                 if (apakahCocok) cb.checked = true;
             });
 
-            if (btnSave) btnSave.disabled = false; 
-
         } catch (error) {
-            console.error("Gagal menarik relasi:", error);
             alert("Gagal memuat pemetaan yang sudah ada untuk MK ini.");
         } finally {
-            if (loadingIndicator) loadingIndicator.style.display = 'none';
+            if (btnSave) {
+                btnSave.disabled = false; 
+                btnSave.innerHTML = '<i class="fas fa-save" style="font-size: 1.2rem;"></i> Simpan Pemetaan';
+            }
         }
     }
 
     async function saveMapping() {
         const kodeMk = document.getElementById('selectMk').value;
         const btnSave = document.getElementById('btnSave');
+        const textAwal = btnSave.innerHTML;
         
         if (!kodeMk) { alert("Silakan pilih Mata Kuliah terlebih dahulu!"); return; }
 
@@ -263,12 +285,10 @@
         btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
         btnSave.disabled = true;
 
-        // 1. Tangkap Kurikulum
         const selectKurikulum = document.getElementById('filterKurikulum');
         let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
 
         try {
-            // 2. Sisipkan kurikulum ke payload
             const payload = { 
                 kode_mk: kodeMk, 
                 prodi: PRODI, 
@@ -280,11 +300,42 @@
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
             });
 
-            if (res.ok) alert("✅ Relasi MK & CPMK berhasil disimpan!");
-            else alert("❌ Gagal menyimpan data di server.");
-        } catch (error) { alert("Terjadi kesalahan jaringan."); } 
-        finally { btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Pemetaan'; btnSave.disabled = false; }
+            if (res.ok) {
+                alert("✅ Relasi MK & CPMK berhasil disimpan!");
+            } else {
+                alert("❌ Gagal menyimpan data di server.");
+            }
+        } catch (error) { 
+            alert("Terjadi kesalahan jaringan."); 
+        } finally { 
+            btnSave.innerHTML = textAwal; 
+            btnSave.disabled = false; 
+        }
     }
+
+    // 1. Fungsi Buka/Tutup dari Navbar 
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('sidebar-container');
+        if (sidebar) sidebar.classList.toggle('active');
+    }
+
+    // 2. Fungsi Buka/Tutup dari dalam Sidebar 
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar-container');
+        if (sidebar) sidebar.classList.toggle('active');
+    }
+
+    // 3. SENSOR PENUTUP (Deteksi klik di layar gelap)
+    document.addEventListener('click', function(event) {
+        const sidebar = document.getElementById("sidebar-container");
+        const hamburgerBtn = document.querySelector('.hamburger-btn') || document.querySelector('.mobile-menu-btn'); 
+        
+        if (sidebar && sidebar.classList.contains("active")) {
+            if (!sidebar.contains(event.target) && (!hamburgerBtn || !hamburgerBtn.contains(event.target))) {
+                sidebar.classList.remove("active"); 
+            }
+        }
+    });
 
     window.onload = async () => { await loadDropdownKurikulum(); };
 </script>

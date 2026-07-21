@@ -69,7 +69,9 @@
 <script src="/js/template.js"></script>
 
 <script>
-    const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
+    // 1. KUNCI PRODI KE 'ti' SESUAI PERMINTAAN
+    const PRODI = "ti"; 
+    
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_UPLOAD = `${API_BASE}/upload-master-mk`;
     const API_DELETE = `${API_BASE}/delete-master-mk`;
@@ -77,23 +79,38 @@
 
     let dataMatkulGlobal = []; 
 
-    // 1. Fungsi memuat Kurikulum
+    // 2. FUNGSI MEMUAT KURIKULUM (Dimodifikasi agar Kurikulum 20 dan 25 selalu muncul)
     async function loadDropdownKurikulum() {
         try {
             const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
-            const data = await response.json();
+            let data = [];
+            try { data = await response.json(); } catch(e) {}
             
             const selectKurikulum = document.getElementById('filterKurikulum');
             selectKurikulum.innerHTML = ''; 
             
-            data.forEach(item => {
-                // Cegah opsi kosong/null muncul di dropdown
-                if (item && item.kurikulum) {
-                    let opt = document.createElement('option');
-                    opt.value = item.kurikulum; 
-                    opt.text = "Kurikulum 20" + item.kurikulum; 
-                    selectKurikulum.appendChild(opt);
-                }
+            // Gunakan Set agar tidak ada kurikulum ganda
+            let kurikulumSet = new Set();
+            
+            if(data && data.length > 0) {
+                data.forEach(item => {
+                    if (item && item.kurikulum) kurikulumSet.add(String(item.kurikulum));
+                });
+            }
+            
+            // PAKSA MASUKKAN 20 DAN 25 
+            // (Mengatasi kelemahan API get-kurikulum-tersedia yang belum mendeteksi kurikulum 20)
+            kurikulumSet.add("25");
+            kurikulumSet.add("20");
+
+            // Urutkan dari yang terbaru (25 di atas, 20 di bawah)
+            let sortedKurikulum = Array.from(kurikulumSet).sort((a, b) => b - a);
+
+            sortedKurikulum.forEach(kur => {
+                let opt = document.createElement('option');
+                opt.value = kur; 
+                opt.text = "Kurikulum 20" + kur; 
+                selectKurikulum.appendChild(opt);
             });
 
             await loadData(); 
@@ -103,7 +120,7 @@
         }
     }
 
-    // 2. Fungsi memuat Data Tabel
+    // 3. FUNGSI MEMUAT DATA TABEL
     async function loadData() { 
         const container = document.getElementById('container-tabel-semester');
         const filterSelect = document.getElementById('filter-semester');
@@ -132,19 +149,15 @@
 
             filterSelect.disabled = false;
             
-            // PROTEKSI EKSTREM FINAL: Buang tipe null/undefined, dan buang juga teks "undefined", "null", atau "0"
             const cleanSemesters = dataMatkulGlobal
                 .filter(item => {
                     if (!item || item.semester === null || item.semester === undefined) return false;
-                    
                     const strSem = String(item.semester).trim().toLowerCase();
                     if (strSem === "" || strSem === "undefined" || strSem === "null" || strSem === "0") return false;
-                    
                     return true;
                 })
                 .map(item => String(item.semester).trim());
             
-            // Pastikan pengurutan angka berjalan benar (membedakan '1' dan '10')
             const semesters = [...new Set(cleanSemesters)].sort((a, b) => parseInt(a) - parseInt(b));
             
             filterSelect.innerHTML = '<option value="">-- Pilih Semester --</option>';
@@ -160,7 +173,7 @@
         }
     }
 
-    // 3. Render Tabel
+    // 4. RENDER TABEL
     function renderTabelSemester() {
         const container = document.getElementById('container-tabel-semester');
         const filterSelect = document.getElementById('filter-semester');
@@ -171,7 +184,6 @@
             return;
         }
 
-        // PROTEKSI EKSTREM: Pastikan perbandingan menggunakan String yang aman
         const dataSemesterIni = dataMatkulGlobal.filter(item => {
             if (!item || item.semester === null || item.semester === undefined) return false;
             return String(item.semester).trim() === String(selectedSem).trim();
@@ -196,7 +208,6 @@
              tableHTML += `<tr><td colspan="3" style="text-align:center; padding:20px; color:#64748b;">Tidak ada mata kuliah di semester ini.</td></tr>`;
         } else {
             dataSemesterIni.forEach(mk => {
-                // Proteksi untuk nama_mk dan sks
                 const safeKode = mk.kode_mk || '-';
                 const safeNama = mk.nama_mk || '-';
                 const safeSks = mk.sks !== undefined && mk.sks !== null ? mk.sks : '0';
@@ -214,7 +225,7 @@
         container.innerHTML = tableHTML;
     }     
 
-    // 4. Fitur Lainnya
+    // 5. EXPORT & IMPORT EXCEL
     async function exportKeExcel() {
         const btn = document.querySelector('.btn-download');
         const oriText = btn.innerHTML;
@@ -260,41 +271,34 @@
         finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
     }
 
-    // 1. Fungsi Buka/Tutup dari Navbar (Garis Tiga)
+    // 6. TOGGLE SIDEBAR
     function toggleMobileSidebar() {
         const sidebar = document.getElementById('sidebar-container');
         if (sidebar) sidebar.classList.toggle('active');
     }
 
-    // 2. Fungsi Buka/Tutup dari dalam Sidebar (Tombol Silang Merah)
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar-container');
         if (sidebar) sidebar.classList.toggle('active');
     }
 
-    // 3. SENSOR PENUTUP (Deteksi klik di layar gelap)
     document.addEventListener('click', function(event) {
         const sidebar = document.getElementById("sidebar-container");
-        
-        // Deteksi tombol hamburger bawaan dari template.js agar tidak terjadi bentrok saat dibuka
         const hamburgerBtn = document.querySelector('.hamburger-btn') || document.querySelector('.mobile-menu-btn'); 
         
-        // Jika sidebar saat ini sedang dalam keadaan terbuka (memiliki class active)...
         if (sidebar && sidebar.classList.contains("active")) {
-            
-            // ...dan jarimu menekan area yang BUKAN bagian dari sidebar, 
-            // serta BUKAN bagian dari tombol hamburger...
             if (!sidebar.contains(event.target) && (!hamburgerBtn || !hamburgerBtn.contains(event.target))) {
-                
-                // ...maka paksa sidebar untuk membuang class 'active' agar tertutup!
                 sidebar.classList.remove("active"); 
             }
         }
     });
 
+    // 7. WINDOW ONLOAD
     window.onload = async () => {
         if (!userLogin) { window.location.replace("../login/login.html"); return; }
-        document.getElementById("prodiBadge").innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+        
+        // Ubah Badge otomatis menjadi TEKNIK INFORMATIKA karena Prodi sudah dikunci ke 'ti'
+        document.getElementById("prodiBadge").innerText = "TEKNIK INFORMATIKA";
         
         await loadDropdownKurikulum();    
     };
