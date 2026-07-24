@@ -138,6 +138,12 @@
             </div>
         </div>
 
+        <div id="notifikasi-area" style="display:none; background-color: #ffcccc; padding: 15px; border-left: 5px solid red; margin-bottom: 20px;">
+            <strong style="color: red;">Peringatan Anomali KRS!</strong>
+            <p>Ditemukan <span id="jumlah-anomali">0</span> mahasiswa mengambil matakuliah beda kurikulum.</p>
+            <button onclick="lihatDetailAnomali()" style="margin-top: 10px; padding: 8px 16px; background-color: #dc2626; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">Lihat Detail & Tindak Lanjut</button>
+        </div>
+
         <div id="content-mapping-mk" class="section">
             <div class="mapping-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
                 <div style="width: 60%;">
@@ -190,6 +196,31 @@
         let chartGradeInst = null; 
         let chartCplInst = null;
         let isDashboardLoaded = false; // Pengaman Anti-Blink
+
+        // Fungsi untuk mengecek anomali secara background saat halaman dimuat
+        function cekAnomaliKRS() {
+            // Sesuaikan URL ini dengan webhook n8n Anda
+            fetch(`${API_BASE}/cek-anomali-krs`)
+                .then(response => response.json())
+                .then(data => {
+                    // data berisi list array mahasiswa anomali dari n8n
+                    if (data.length > 0) {
+                        document.getElementById('jumlah-anomali').innerText = data.length;
+                        document.getElementById('notifikasi-area').style.display = 'block';
+                        // Anda bisa menyimpan data ini ke variabel global untuk ditampilkan ke tabel
+                        window.dataAnomali = data;
+                    }
+                })
+                .catch(error => console.error("Gagal menarik data anomali:", error));
+        }
+
+        // Panggil fungsi segera setelah halaman kaprodi dimuat
+        window.onload = cekAnomaliKRS;
+
+        function lihatDetailAnomali() {
+            // Tampilkan data window.dataAnomali ke dalam tabel HTML
+            console.log("Menampilkan Modal / Tabel Anomali", window.dataAnomali);
+        }
 
         // --- FUNGSI SIDEBAR MOBILE ---
         function toggleSidebar() {

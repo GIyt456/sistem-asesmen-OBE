@@ -1,0 +1,59 @@
+/* ========================================================================
+   FILE SPESIFIK: MAPPING MK - CPL - CPMK (map_mk_cpmk.css)
+   ======================================================================== */
+
+.mapping-panel { background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+.form-group { margin-bottom: 25px; }
+.form-group label { display: block; font-weight: 800; margin-bottom: 15px; font-size: 1.1rem; color: #1e293b; }
+
+/* Kustomisasi Dropdown Pilihan MK */
+.select-custom { width: 100%; padding: 15px 20px; border-radius: 10px; border: 2px solid #cbd5e1; font-size: 1rem; font-weight: 600; outline: none; background: #f8fafc; cursor: pointer; color: #334155; transition: 0.2s;}
+.select-custom:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1);}
+
+/* Layout Grid Kartu CPMK (Desktop) */
+.cpmk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px; }
+.cpmk-card { border: 2px solid #e2e8f0; padding: 20px; border-radius: 12px; display: flex; align-items: flex-start; gap: 15px; cursor: pointer; transition: 0.2s; background: white; }
+.cpmk-card:hover { border-color: var(--primary-blue); background: #f0f9ff; transform: translateY(-3px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+.cpmk-card input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; margin-top: 2px; accent-color: var(--primary-blue); flex-shrink: 0;}
+.cpmk-info { display: flex; flex-direction: column; flex: 1; }
+.cpmk-code { font-weight: 800; font-size: 1.05rem; color: var(--primary-blue); margin-bottom: 5px;}
+.cpmk-desc { font-size: 0.85rem; color: #475569; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; font-weight: 500;}
+
+/* Tombol Simpan */
+.btn-save-mapping { background: var(--primary-blue); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; width: 100%; margin-top: 40px; }
+.btn-save-mapping:hover:not(:disabled) { filter: brightness(0.8); transform: translateY(-2px); }
+.btn-save-mapping:disabled { background: #94a3b8; cursor: not-allowed; }
+
+/* Judul Induk CPL (Pemisah Kategori) */
+.cpl-divider { grid-column: 1 / -1; margin-top: 25px; margin-bottom: 5px; padding: 12px 15px; background: #f1f5f9; border-left: 4px solid var(--primary-blue); border-radius: 6px; display: flex; align-items: center; justify-content: space-between; }
+.cpl-divider-title { font-weight: 800; color: #0f172a; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+.cpl-divider-count { font-size: 0.85rem; color: #64748b; font-weight: 600; }
+
+/* --- RESPONSIVE MOBILE (SULAP KARTU GRID JADI LIST) --- */
+@media screen and (max-width: 768px) {
+    /* Buang jarak pinggir pada Panel Utama */
+    .mapping-panel { padding: 0 !important; border: none !important; box-shadow: none !important; background: transparent !important; }
+    
+    /* Ubah Grid menjadi kolom tegak lurus (List) */
+    .cpmk-grid { grid-template-columns: 1fr; gap: 0 !important; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background: white; margin-top: 10px;}
+    
+    /* Ubah Kartu CPMK menjadi baris List item */
+    .cpmk-card { 
+        border: none !important;
+        border-bottom: 1px dashed #e2e8f0 !important;
+        border-radius: 0 !important;
+        padding: 15px !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        transform: none !important;
+        align-items: center !important;
+    }
+    .cpmk-card:last-child { border-bottom: none !important; }
+
+    /* Atur teks agar tidak terpotong 3 baris di HP */
+    .cpmk-desc { -webkit-line-clamp: unset !important; overflow: visible !important;} 
+
+    /* Sesuaikan pemisah kategori CPL di dalam kotak List */
+    .cpl-divider { border-radius: 0 !important; margin: 0 !important; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+    .cpl-divider:first-child { border-top: none; }
+}
