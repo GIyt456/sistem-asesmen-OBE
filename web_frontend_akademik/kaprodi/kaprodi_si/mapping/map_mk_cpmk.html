@@ -15,12 +15,24 @@
 
     <!-- Panggil CSS -->
     <link rel="stylesheet" href="mk_cpmk.css">
-    <link rel="stylesheet" href="../../../css/global_si.css">
+    <link rel="stylesheet" href="../../../css/global_si.css?v=2">
     <link rel="stylesheet" href="../../../css/admin_si.css">
 </head>
 
 <body>
 
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI"
+                style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;"
+                onclick="window.location.href='/index.html'">
+        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src=""
+                alt="Profil Kaprodi"></div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
     <div id="navbar-container"></div>
 
@@ -95,7 +107,7 @@
         </div>
     </div>
 
-    <script src="../../../js/template.js"></script>
+    <script src="../../../js/template.js?v=2"></script>
 
     <script>
         const PRODI = localStorage.getItem("prodi_aktif") || "ti";
