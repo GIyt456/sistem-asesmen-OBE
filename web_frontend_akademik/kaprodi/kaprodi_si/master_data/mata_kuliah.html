@@ -2,21 +2,115 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kelola Mata Kuliah - Sistem OBE</title>
-    
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/admin_si.css">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    <link rel="stylesheet" href="/css/index_mobile.css">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script>
+
+    <style>
+        /* =========================================
+           🛡️ MANTRA ANTI-BOCOR & ANTI-MEROSOT
+           ========================================= */
+        *, *::before, *::after { box-sizing: border-box !important; }
+        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;}
+        body, input, select, button, textarea { font-family: 'Inter', sans-serif !important; }
+
+        .fixed-header { padding-top: 15px !important; }
+        .main-content { padding-top: 0 !important; }
+
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;}
+        .header-title { font-size: 2.2rem; font-weight: 800; color: #111827; margin: 0;}
+        .header-subtitle { font-size: 0.85rem; font-weight: 700; color: #64748b; letter-spacing: 1px; margin-bottom: 5px;}
+
+        /* FILTER & ACTION BAR */
+        .filter-container { background: white; padding: 20px 25px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; gap: 20px; align-items: center; justify-content: space-between; flex-wrap: wrap;}
+        
+        .select-custom { padding: 12px 20px; border-radius: 8px; border: 2px solid #cbd5e1; font-weight: 700; font-size: 0.95rem; outline: none; transition: 0.2s; background: #f8fafc; color: #1e293b; width: 100%; cursor: pointer;}
+        .select-custom:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1);}
+
+        .table-action-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;}
+        .table-action-header > div:first-child { flex: 1; min-width: 250px;}
+        .table-action-header > div:last-child { display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap;}
+        
+        /* TOMBOL-TOMBOL */
+        .btn-action-custom { border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center; color: white;}
+        .btn-action-custom:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-action-custom:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none;}
+        
+        .btn-download { background: #475569; }
+        .btn-download:hover { background: #334155; }
+        .btn-upload { background: #10b981; }
+        .btn-upload:hover { background: #059669; }
+        .btn-dark { background: #1e293b; }
+        .btn-dark:hover { background: #0f172a; }
+
+        /* TABEL DESKTOP */
+        .table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 30px; width: 100%; }
+        .tabel-mk { width: 100%; min-width: 800px; border-collapse: collapse; text-align: left; }
+        .tabel-mk th { background: #1e293b; color: white; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; border-bottom: 2px solid #0f172a; text-transform: uppercase; position: sticky; top: 0; z-index: 5;}
+        .tabel-mk td { padding: 15px 20px; border-bottom: 1px solid #e5e7eb; font-size: 0.95rem; vertical-align: middle; }
+        .tabel-mk tbody tr:hover td { background-color: #f8fafc; }
+
+        /* =========================================
+           📱 CSS KHUSUS HP (SULAP TABEL JADI KARTU)
+           ========================================= */
+        @media screen and (max-width: 768px) {
+            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
+            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
+            
+            .header-master { margin: 15px 0 10px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
+            .section-master { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
+            
+            .filter-container { flex-direction: column; align-items: stretch; padding: 15px; gap: 15px;}
+            .filter-container > div { width: 100%; }
+            .filter-container label { margin-bottom: 5px; display: block; }
+            .select-custom { width: 100% !important; padding: 12px 15px !important; font-size: 0.95rem !important;}
+
+            .table-action-header { flex-direction: column !important; align-items: stretch !important; gap: 15px;}
+            .table-action-header > div:last-child { display: flex; flex-direction: column; gap: 10px; width: 100%;}
+            .btn-action-custom { width: 100% !important; justify-content: center !important;}
+
+            /* SULAP TABEL MENJADI KARTU */
+            .table-container { border: none !important; box-shadow: none !important; background: transparent !important; padding: 0 !important; overflow-x: hidden !important; margin: 0;}
+            .tabel-mk, .tabel-mk thead, .tabel-mk tbody, .tabel-mk th, .tabel-mk td, .tabel-mk tr { display: block !important; width: 100% !important; min-width: 0 !important; box-sizing: border-box !important;}
+            
+            .tabel-mk thead { display: none !important;}
+            
+            .tabel-mk tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 20px !important; padding: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important;}
+            
+            .tabel-mk td { display: flex !important; flex-direction: column !important; align-items: stretch !important; text-align: left !important; padding: 10px 0 !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
+            .tabel-mk td:last-child { border-bottom: none !important; padding-bottom: 0 !important; margin-top: 10px;}
+            
+            .tabel-mk td::before { font-weight: 800; color: #64748b; font-size: 0.75rem; margin-bottom: 6px; text-transform: uppercase;}
+            
+            /* Mapping Label untuk Kartu MK */
+            .tabel-mk td:nth-child(1)::before { content: "KODE MK"; color: var(--primary-blue);}
+            .tabel-mk td:nth-child(2)::before { content: "NAMA MATA KULIAH"; }
+            .tabel-mk td:nth-child(3)::before { content: "SKS"; }
+            .tabel-mk td:nth-child(4)::before { content: "AKSI"; display: none; }
+            
+            /* Penyesuaian Visual Konten HP */
+            .tabel-mk td:nth-child(1) { font-size: 1.25rem !important; font-weight: 900 !important; color: #0f172a !important; border-bottom: 3px solid var(--primary-blue) !important; padding-bottom: 10px !important; margin-bottom: 5px !important;}
+            .tabel-mk td:nth-child(2) input { width: 100% !important; max-width: 100% !important;}
+            .tabel-mk td:nth-child(3) input { width: 100px !important; text-align: left !important; }
+            .tabel-mk td:nth-child(4) > div { flex-direction: row; width: 100%; gap: 10px; }
+            .tabel-mk td:nth-child(4) button { flex: 1; justify-content: center; height: 42px;}
+        }
+    </style>
 </head>
 <body>
 
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
             <button class="hamburger-btn" onclick="toggleSidebar()">
@@ -31,6 +125,7 @@
         </div>
     </nav>
 
+    <!-- 2. OVERLAY GELAP UNTUK LATAR SIDEBAR DI HP -->
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
     <div id="sidebar-container"></div>
@@ -39,62 +134,84 @@
         <div id="navbar-container"></div>
 
         <div class="fixed-header">
-            <div class="header-container" style="margin-bottom: 20px;">
+            <div class="header-container header-master" style="margin: 0 0 15px 0; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
-                    <div class="header-subtitle">KELOLA KURIKULUM</div>
+                    <div class="header-subtitle" style="margin-bottom: 5px;">KELOLA KURIKULUM</div>
                     <h1 class="header-title">KELOLA MATA <span>KULIAH</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content; background: var(--primary-blue); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">PRODI</div>
+            </div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;" class="header-master"></div>
+        </div>
+
+        <div class="scrollable-content section-master" style="padding-top: 0; padding-bottom: 40px;">
+            
+            <!-- FILTER KURIKULUM & SEMESTER -->
+            <div class="filter-container">
+                <div style="flex: 1; min-width: 250px;">
+                    <label for="filterKurikulum" style="font-weight: 800; color: #1e293b; font-size: 0.95rem;">
+                        <i class="fas fa-filter" style="color: var(--primary-blue); margin-right: 5px;"></i> Tampilkan Kurikulum:
+                    </label>
+                    <select id="filterKurikulum" onchange="loadData()" class="select-custom">
+                        <option value="">Memuat data...</option>
+                    </select>
+                </div>
+
+                <div style="flex: 1; min-width: 250px;">
+                    <label for="filterSemester" style="font-weight: 800; color: #1e293b; font-size: 0.95rem;">
+                        <i class="fas fa-layer-group" style="color: var(--primary-blue); margin-right: 5px;"></i> Pilih Semester:
+                    </label>
+                    <select id="filterSemester" class="select-custom" onchange="renderTableFiltered()">
+                        <option value="all">Semua Semester (Tampilkan Semua)</option>
+                    </select>
+                </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div class="table-action-header">
                 <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Susunan Mata Kuliah</h3>
-                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500;">Menampilkan Daftar Mata Kuliah Terstruktur</p>
+                    <h3 style="margin: 0; font-size: 1.3rem; font-weight: 800; color: #1e293b;">Susunan Mata Kuliah</h3>
+                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500;">Menampilkan Daftar Mata Kuliah Terstruktur Berdasarkan Semester.</p>
                 </div>
                 
-                <div class="action-buttons">
-                    <button class="btn-action btn-download" onclick="exportKeExcel()">
-                        <i class="fas fa-file-download"></i> Download Excel
+                <div>
+                    <button class="btn-action-custom btn-dark" onclick="loadData()">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+
+                    <button class="btn-action-custom btn-download" onclick="exportKeExcel()">
+                        <i class="fas fa-file-excel"></i> Unduh Format
                     </button>
                     
                     <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;" onchange="uploadExcel()">
-                    <button class="btn-action btn-upload" onclick="document.getElementById('fileExcel').click()">
-                        <i class="fas fa-file-upload"></i> Impor Excel
-                    </button>
-
-                    <button class="btn-action btn-dark" onclick="loadData()">
-                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    <button class="btn-action-custom btn-upload" onclick="document.getElementById('fileExcel').click()">
+                        <i class="fas fa-file-upload"></i> Impor Data Baru
                     </button>
                 </div>
             </div>
 
-            <!-- FITUR BARU: FILTER SEMESTER -->
-            <div style="margin-top: 20px; display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <label for="filterSemester" style="font-weight: 700; color: #475569; font-size: 0.9rem;"><i class="fas fa-filter"></i> Pilih Semester:</label>
-                <select id="filterSemester" class="form-control" style="width: 250px; cursor: pointer; border-color: #cbd5e1; margin-bottom: 0;" onchange="renderTableFiltered()">
-                    <option value="all">Semua Semester (Tampilkan Semua)</option>
-                    <!-- Opsi Semester di-generate otomatis via JS -->
-                </select>
+            <!-- AREA TABEL DINAMIS PER SEMESTER -->
+            <div id="container-tabel-semester">
+                <p style="text-align: center; padding: 50px; font-weight: 600; color: #64748b;">
+                    <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); display: block; margin-bottom: 10px;"></i> Memuat data...
+                </p>
             </div>
-        </div>
-
-        <div class="scrollable-content">
-            <div id="container-tabel-semester"></div>
+            
         </div>
     </div>
 
 <script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
+    // --- 1. SETUP IDENTITAS (SIHIR BUNGLON) ---
     const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
     
     document.addEventListener("DOMContentLoaded", () => {
+        const badge = document.getElementById("prodiBadge");
+        
         if(PRODI === "ti") {
-            document.documentElement.style.setProperty('--primary-teal', '#8b0000'); 
             document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
-            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+            badge.innerText = "TEKNIK INFORMATIKA";
         } else {
-            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+            badge.innerText = "SISTEM INFORMASI";
         }
 
         const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
@@ -105,10 +222,56 @@
         }
     });
 
-    // --- FUNGSI SIDEBAR MOBILE ---
+    // --- 2. FUNGSI SIDEBAR MOBILE ---
     function toggleSidebar() {
         document.getElementById('sidebar-container').classList.toggle('active');
         document.getElementById('mobileOverlay').classList.toggle('active');
+    }
+
+    // ==========================================================
+    // 🔮 SIHIR ANTI-MACET DROPDOWN (GLOBAL EVENT DELEGATION)
+    // ==========================================================
+    document.addEventListener('click', function(e) {
+        const dropdownBtn = e.target.closest('.dropdown-btn') || e.target.closest('[data-toggle="dropdown"]');
+        if (dropdownBtn) {
+            e.preventDefault(); 
+            const dropdownContent = dropdownBtn.nextElementSibling;
+            const icon = dropdownBtn.querySelector('.fa-chevron-down') || dropdownBtn.querySelector('i:last-child');
+            
+            if (dropdownContent && (dropdownContent.classList.contains('dropdown-container') || dropdownContent.tagName === 'DIV' || dropdownContent.tagName === 'UL')) {
+                const isHidden = window.getComputedStyle(dropdownContent).display === 'none';
+                
+                if (isHidden) {
+                    dropdownContent.style.display = 'block';
+                    dropdownBtn.classList.add('active');
+                    if (icon) icon.style.transform = 'rotate(180deg)';
+                } else {
+                    dropdownContent.style.display = 'none';
+                    dropdownBtn.classList.remove('active');
+                    if (icon) icon.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
+    });
+
+    function setMenuAktif() {
+        const navDashboard = document.getElementById('nav-home');
+        let navMk = document.querySelector('[data-path="/master_data/matkul_si.html"]') || document.querySelector('[data-path="/master_data/matkul.html"]');
+        
+        if (navDashboard) navDashboard.classList.remove('active');
+        if (navMk) navMk.classList.add('active');
+
+        const menuMaster = document.getElementById('menu-master') || (navMk ? navMk.closest('.dropdown-container') : null);
+        
+        if (menuMaster) {
+            menuMaster.style.display = 'block';
+            const parentBtn = menuMaster.previousElementSibling;
+            if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                parentBtn.classList.add('active');
+                const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
+                if(icon) icon.style.transform = 'rotate(180deg)';
+            }
+        }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -120,53 +283,116 @@
                     .then(html => {
                         sidebar.innerHTML = html;
                         if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                        setMenuAktif();
                     })
-                    .catch(e => console.log('Menggunakan sidebar default'));
+                    .catch(e => console.log('Gagal memuat sidebar otomatis'));
+            } else {
+                setMenuAktif();
             }
-        }, 600); 
+        }, 400); 
     });
 
-    // --- VARIABEL API & CACHE DATA ---
-    const API_MATKUL = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
+    // --- 3. VARIABEL API & STATE ---
+    const API_MATKUL = `${API_BASE}/get-susunan-matkul`;
     const API_UPDATE = `${API_BASE}/admin-update-master`;
     const API_UPLOAD = `${API_BASE}/upload-master-mk`;
     const API_DELETE = `${API_BASE}/delete-master-mk`;
     const userLogin = localStorage.getItem("user_login");
 
-    let allMasterMK = []; // Cache data agar tidak bolak-balik panggil API saat filter
+    let allMasterMK = []; // Cache data agar tidak bolak-balik panggil API saat filter semester
 
-    // --- MENGAMBIL DATA UTAMA ---
+    if (!userLogin) window.location.replace("/login/login.html");
+
+    // --- 4. FUNGSI FILTER KURIKULUM (TRIK MEMAKSA 20 & 25) ---
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            let data = [];
+            try { data = await response.json(); } catch(e) {}
+            
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            selectKurikulum.innerHTML = ''; 
+            
+            // Gunakan Set agar tidak ada kurikulum ganda
+            let kurikulumSet = new Set();
+            
+            if(data && data.length > 0) {
+                data.forEach(item => {
+                    if (item && item.kurikulum) kurikulumSet.add(String(item.kurikulum));
+                });
+            }
+            
+            // 🔥 TRIK: PAKSA MASUKKAN 20 DAN 25 
+            kurikulumSet.add("25");
+            kurikulumSet.add("20");
+
+            // Urutkan dari yang terbaru (25 di atas, 20 di bawah)
+            let sortedKurikulum = Array.from(kurikulumSet).sort((a, b) => b - a);
+
+            sortedKurikulum.forEach(kur => {
+                let opt = document.createElement('option');
+                opt.value = kur; 
+                opt.text = "Kurikulum 20" + kur; 
+                selectKurikulum.appendChild(opt);
+            });
+
+            await loadData(); 
+
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+            document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+        }
+    }
+
+    // --- 5. FUNGSI AMBIL DATA TABEL (DARI API) ---
     async function loadData() { 
         const container = document.getElementById('container-tabel-semester');
         if (!container) return;
         
-        container.innerHTML = "<p style='text-align:center; padding:40px;'><i class='fas fa-spinner fa-spin'></i> Memuat data...</p>";
+        container.innerHTML = "<p style='text-align:center; padding:50px; font-weight: 600; color: #64748b;'><i class='fas fa-spinner fa-spin fa-2x' style='color: var(--primary-blue); display: block; margin-bottom: 10px;'></i> Memuat data Mata Kuliah...</p>";
+
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "";
+        
+        // Membangun URL Dinamis (Filter diproses API)
+        let API_URL_DINAMIS = `${API_MATKUL}?prodi=${PRODI}`;
+        if (kurikulumTerpilih !== "") {
+            API_URL_DINAMIS += `&kurikulum=${kurikulumTerpilih}`;
+        }
 
         try {
-            const res = await fetch(API_MATKUL); 
+            const res = await fetch(API_URL_DINAMIS); 
             allMasterMK = await res.json(); 
 
             if (!allMasterMK || allMasterMK.length === 0) {
-                container.innerHTML = "<p style='text-align:center; padding:40px; color:#64748b;'>Belum ada data mata kuliah untuk prodi ini. Silakan impor via Excel.</p>";
+                container.innerHTML = "<p style='text-align:center; padding:50px; color:#ef4444; font-weight: 700;'><i class='fas fa-exclamation-triangle fa-2x' style='display: block; margin-bottom: 10px;'></i> Belum ada data Mata Kuliah untuk kurikulum ini. Silakan impor via Excel.</p>";
+                document.getElementById('filterSemester').innerHTML = '<option value="">-- Pilih Semester --</option>';
                 return;
             }
 
-            // Update dropdown semester dan tampilkan tabel
             populateSemesterDropdown();
             renderTableFiltered();
 
         } catch(e) { 
-            container.innerHTML = "<p style='color:red; text-align:center; padding: 40px;'>Gagal menarik data. Pastikan n8n menyala.</p>";
+            container.innerHTML = "<p style='color:#ef4444; text-align:center; padding:50px; font-weight: 700;'><i class='fas fa-wifi fa-2x' style='display: block; margin-bottom: 10px;'></i> Gagal menarik data. Pastikan N8N menyala.</p>";
         }
     }
 
-    // --- FUNGSI MENGISI OPSI DROPDOWN ---
+    // --- 6. FUNGSI MENGISI OPSI DROPDOWN SEMESTER ---
     function populateSemesterDropdown() {
         const select = document.getElementById('filterSemester');
         const currentVal = select.value; 
         
-        // Dapatkan angka semester unik dan urutkan
-        const semesters = [...new Set(allMasterMK.map(item => item.semester))].sort((a, b) => a - b);
+        const cleanSemesters = allMasterMK
+            .filter(item => {
+                if (!item || item.semester === null || item.semester === undefined) return false;
+                const strSem = String(item.semester).trim().toLowerCase();
+                if (strSem === "" || strSem === "undefined" || strSem === "null" || strSem === "0") return false;
+                return true;
+            })
+            .map(item => String(item.semester).trim());
+        
+        const semesters = [...new Set(cleanSemesters)].sort((a, b) => parseInt(a) - parseInt(b));
         
         let optionsHTML = `<option value="all">Semua Semester (Tampilkan Semua)</option>`;
         semesters.forEach(sem => {
@@ -175,41 +401,37 @@
         
         select.innerHTML = optionsHTML;
         
-        // Kembalikan ke pilihan sebelumnya jika ada (misal habis direfresh)
-        if (semesters.includes(parseInt(currentVal)) || currentVal === 'all') {
+        if (semesters.includes(currentVal) || currentVal === 'all') {
             select.value = currentVal;
         }
     }
 
-    // --- FUNGSI RENDER TABEL BERDASARKAN FILTER ---
+    // --- 7. FUNGSI RENDER TABEL BERDASARKAN FILTER SEMESTER ---
     function renderTableFiltered() {
         const container = document.getElementById('container-tabel-semester');
         const selectedSem = document.getElementById('filterSemester').value;
         container.innerHTML = "";
 
-        // Saring data berdasarkan dropdown
         let dataToRender = allMasterMK;
         if (selectedSem !== "all") {
-            dataToRender = allMasterMK.filter(item => item.semester.toString() === selectedSem);
+            dataToRender = allMasterMK.filter(item => String(item.semester).trim() === String(selectedSem).trim());
         }
 
         if (dataToRender.length === 0) {
-            container.innerHTML = "<p style='text-align:center; padding:40px; color:#64748b;'>Tidak ada mata kuliah di semester terpilih.</p>";
+            container.innerHTML = "<p style='text-align:center; padding:50px; font-weight: 600; color:#64748b;'>Tidak ada mata kuliah di semester terpilih.</p>";
             return;
         }
 
-        // Kelompokkan data yang disaring berdasarkan semester
         const perSemester = dataToRender.reduce((acc, item) => {
             if (!acc[item.semester]) acc[item.semester] = [];
             acc[item.semester].push(item);
             return acc;
         }, {});
 
-        // Cetak tabelnya
         Object.keys(perSemester).sort((a,b) => a - b).forEach(sem => {
             let tableHTML = `
-                <h4 style="margin-bottom: 15px; margin-top: 10px; font-size: 1.2rem; color: var(--primary-blue); font-weight: 800;">
-                    <i class="fas fa-graduation-cap"></i> SEMESTER ${sem}
+                <h4 style="margin-bottom: 15px; margin-top: 20px; font-size: 1.3rem; color: var(--primary-blue); font-weight: 900; background: #e0f2fe; padding: 10px 15px; border-left: 5px solid var(--primary-blue); border-radius: 0 8px 8px 0; display: inline-block;">
+                    <i class="fas fa-graduation-cap" style="margin-right: 8px;"></i> SEMESTER ${sem}
                 </h4>
                 <div class="table-container" style="margin-bottom: 30px;">
                     <table class="tabel-mk">
@@ -217,7 +439,7 @@
                             <tr>
                                 <th width="15%">Kode MK</th>
                                 <th>Nama Mata Kuliah</th>
-                                <th width="15%" style="text-align: center;">SKS</th>
+                                <th width="10%" style="text-align: center;">SKS</th>
                                 <th width="15%" style="text-align: center;">Aksi</th>
                             </tr>
                         </thead>
@@ -226,15 +448,15 @@
             perSemester[sem].forEach(mk => {
                 tableHTML += `
                     <tr>
-                        <td style="font-weight: 800; color: var(--primary-blue);">${mk.kode_mk}</td>
-                        <td><input type="text" id="in-${mk.kode_mk}" value="${mk.nama_mk}" class="form-control" style="font-size: 0.95rem; margin-bottom: 0;"></td>
-                        <td style="text-align: center;"><input type="number" id="sks-${mk.kode_mk}" value="${mk.sks}" class="form-control" style="text-align:center; font-weight: 600; margin-bottom: 0;" min="1" max="6"></td>
+                        <td style="font-weight: 900; font-size: 1.1rem; color: var(--primary-blue);">${mk.kode_mk}</td>
+                        <td><input type="text" id="in-${mk.kode_mk}" value="${mk.nama_mk}" class="form-control" style="font-size: 0.95rem; margin-bottom: 0; border: 2px solid #cbd5e1; font-weight: 600; color: #1e293b; transition: 0.2s;" onfocus="this.style.borderColor='var(--primary-blue)';"></td>
+                        <td style="text-align: center;"><input type="number" id="sks-${mk.kode_mk}" value="${mk.sks}" class="form-control" style="text-align:center; font-weight: 800; margin-bottom: 0; border: 2px solid #cbd5e1; color: var(--primary-blue); font-size: 1rem;" min="1" max="6" onfocus="this.style.borderColor='var(--primary-blue)';"></td>
                         <td style="text-align:center;">
                             <div style="display: flex; gap: 8px; justify-content: center;">
-                                <button class="btn-action btn-dark" style="padding: 8px 12px;" onclick="simpanEdit('matkul', '${mk.kode_mk}')" title="Simpan">
+                                <button class="btn-action-custom btn-dark" style="padding: 10px 15px;" onclick="simpanEdit('matkul', '${mk.kode_mk}', event)" title="Simpan Perubahan">
                                     <i class="fas fa-save"></i>
                                 </button>
-                                <button class="btn-action btn-danger" style="padding: 8px 12px;" onclick="hapusMK('${mk.kode_mk}')" title="Hapus">
+                                <button class="btn-action-custom" style="padding: 10px 15px; background: #ef4444;" onclick="hapusMK('${mk.kode_mk}', event)" title="Hapus Mata Kuliah" onmouseover="this.style.background='#b91c1c';" onmouseout="this.style.background='#ef4444';">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -247,47 +469,31 @@
         });
     }
 
-    async function exportKeExcel() {
-        const btn = document.querySelector('.btn-download');
-        const oriText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
+    // --- 8. FUNGSI SIMPAN, HAPUS, EXPORT & UPLOAD ---
+    async function simpanEdit(tipe, kode, event) { 
+        const value = document.getElementById(`in-${kode}`).value; 
+        const sksBaru = document.getElementById(`sks-${kode}`).value;
+        const btn = event.currentTarget;
+        const oldHtml = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         btn.disabled = true;
 
         try {
-            if (!allMasterMK || allMasterMK.length === 0) return alert("Tidak ada data.");
-
-            const dataUntukExcel = allMasterMK.map(mk => ({ 'kode_mk': mk.kode_mk, 'nama_mk': mk.nama_mk, 'sks': mk.sks, 'semester': mk.semester, 'prodi': PRODI }));
-            const worksheet = XLSX.utils.json_to_sheet(dataUntukExcel);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Master_MK");
-            XLSX.writeFile(workbook, `Susunan_MK_${PRODI}.xlsx`);
-        } catch (e) { alert("Gagal mengekspor data."); } 
-        finally { btn.innerHTML = oriText; btn.disabled = false; }
+            const res = await fetch(API_UPDATE, { 
+                method: "POST", headers: {"Content-Type":"application/json"}, 
+                body: JSON.stringify({ tipe: "matkul", kode: kode, value: value, sks: parseInt(sksBaru), prodi: PRODI }) 
+            }); 
+            if(res.ok) {
+                alert("✅ Data Mata Kuliah & SKS Berhasil Diperbarui!");
+                loadData(); 
+            }
+            else alert("❌ Gagal menyimpan data.");
+        } catch (e) { alert("Terjadi kesalahan jaringan."); } 
+        finally { btn.innerHTML = oldHtml; btn.disabled = false; }
     }
 
-    async function uploadExcel() {
-        const fileInput = document.getElementById('fileExcel');
-        const file = fileInput.files[0];
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append('data', file); 
-        formData.append('prodi', PRODI);
-
-        const btnUpload = document.querySelector('.btn-upload');
-        const oriText = btnUpload.innerHTML;
-        btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
-        btnUpload.disabled = true;
-
-        try {
-            const res = await fetch(API_UPLOAD, { method: 'POST', body: formData });
-            if (res.ok) { alert("✅ Data Excel berhasil diimpor!"); await loadData(); } 
-            else { alert("❌ Gagal memproses file Excel."); }
-        } catch (e) { alert("❌ Terjadi kesalahan koneksi."); } 
-        finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
-    }
-
-    async function hapusMK(kode) {
+    async function hapusMK(kode, event) {
         if(!confirm(`⚠️ PERINGATAN!\nApakah Anda yakin ingin menghapus Mata Kuliah ${kode}?\nData yang dihapus tidak dapat dikembalikan.`)) {
             return;
         }
@@ -315,33 +521,61 @@
         }
     }
 
-    async function simpanEdit(tipe, kode) { 
-        const value = document.getElementById(`in-${kode}`).value; 
-        const sksBaru = document.getElementById(`sks-${kode}`).value;
-        const btn = event.currentTarget;
-        const oldHtml = btn.innerHTML;
-        
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    async function exportKeExcel() {
+        const btn = document.querySelector('.btn-download');
+        const oriText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
         btn.disabled = true;
 
+        let kurikulumTerpilih = document.getElementById('filterKurikulum').value;
+
         try {
-            const res = await fetch(API_UPDATE, { 
-                method: "POST", headers: {"Content-Type":"application/json"}, 
-                body: JSON.stringify({ tipe: "matkul", kode: kode, value: value, sks: parseInt(sksBaru), prodi: PRODI }) 
-            }); 
-            if(res.ok) {
-                alert("✅ Data Mata Kuliah & SKS Berhasil Diperbarui!");
-                // Panggil ulang loadData untuk refresh memori allMasterMK agar up-to-date
-                loadData(); 
-            }
-            else alert("❌ Gagal menyimpan data.");
-        } catch (e) { alert("Terjadi kesalahan jaringan."); } 
-        finally { btn.innerHTML = oldHtml; btn.disabled = false; }
+            if (!allMasterMK || allMasterMK.length === 0) return alert("Tidak ada data untuk diekspor.");
+
+            const dataUntukExcel = allMasterMK.map(mk => ({ 
+                'kode_mk': mk.kode_mk, 
+                'nama_mk': mk.nama_mk, 
+                'sks': mk.sks, 
+                'semester': mk.semester, 
+                'prodi': PRODI 
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(dataUntukExcel);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Master_MK");
+            
+            XLSX.writeFile(workbook, `Susunan_MK_${PRODI}_Kurikulum_${kurikulumTerpilih}.xlsx`);
+        } catch (e) { alert("Gagal mengekspor data."); } 
+        finally { btn.innerHTML = oriText; btn.disabled = false; }
     }
 
+    async function uploadExcel() {
+        const fileInput = document.getElementById('fileExcel');
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('data', file); 
+        formData.append('prodi', PRODI);
+
+        const btnUpload = document.querySelector('.btn-upload');
+        const oriText = btnUpload.innerHTML;
+        btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
+        btnUpload.disabled = true;
+
+        try {
+            const res = await fetch(API_UPLOAD, { method: 'POST', body: formData });
+            if (res.ok) { 
+                alert("✅ Data Excel berhasil diimpor!"); 
+                await loadDropdownKurikulum(); 
+            } 
+            else { alert("❌ Gagal memproses file Excel."); }
+        } catch (e) { alert("❌ Terjadi kesalahan koneksi."); } 
+        finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
+    }
+
+    // Eksekusi Paling Awal
     window.onload = async () => {
-        if (!userLogin) { window.location.replace("/login/login.html"); return; }
-        await loadData();    
+        await loadDropdownKurikulum();    
     };
 </script>
 </body>
