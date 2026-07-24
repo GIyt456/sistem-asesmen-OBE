@@ -1,439 +1,217 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pemetaan CPL - BK - Sistem OBE</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin_si.css">
-    <link rel="stylesheet" href="/css/index_mobile.css">
-    
-    <script src="/js/api_config.js"></script>
-    <script src="/js/template.js"></script>
-    
-    <style>
-        /* MANTRA ANTI-BOCOR LAYAR */
-        *, *::before, *::after { box-sizing: border-box !important; }
-        html, body { max-width: 100vw; overflow-x: hidden; margin: 0; padding: 0;}
-        body, input, select, button, textarea { font-family: 'Inter', sans-serif !important; }
-
-        .fixed-header { padding-top: 15px !important; }
-        .main-content { padding-top: 0 !important; }
-
-        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;}
-        .header-title { font-size: 2.2rem; font-weight: 800; color: #111827; margin: 0;}
-        .header-subtitle { font-size: 0.85rem; font-weight: 700; color: #64748b; letter-spacing: 1px; margin-bottom: 5px;}
-
-        /* KONTROL TABEL DESKTOP */
-        .table-action-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;}
-        .table-action-header > div:first-child { flex: 1; min-width: 250px;}
-        .table-action-header > div:last-child { display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap;}
-        
-        .btn-primary-dynamic { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center;}
-        .btn-primary-dynamic:hover:not(:disabled) { filter: brightness(0.85); transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn-primary-dynamic:disabled { background: #94a3b8; cursor: not-allowed; transform: none; box-shadow: none; }
-        
-        .btn-dark { background: #1e293b; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; justify-content: center;}
-        .btn-dark:hover { background: #0f172a; transform: translateY(-2px); }
-
-        /* =========================================
-           ✨ BEAUTIFY MATRIKS DESKTOP (ANTI-CACHE) ✨
-           ========================================= */
-        @media screen and (min-width: 769px) {
-            .tabel-cpl-bk-wrapper {
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-                border-radius: 12px !important;
-                overflow: auto !important; 
-                max-height: 65vh !important; 
-                border: 1px solid var(--border-color) !important;
-                background: white;
-                margin-bottom: 30px;
-            }
-            .tabel-cpl-bk {
-                width: 100%;
-                border-collapse: separate !important; 
-                border-spacing: 0 !important;
-                white-space: nowrap !important;
-            }
-            .tabel-cpl-bk th {
-                background: #1e293b !important;
-                color: white !important;
-                text-align: center !important;
-                vertical-align: middle !important;
-                padding: 15px !important;
-                border-bottom: 2px solid #0f172a !important;
-                border-right: 1px solid #334155 !important;
-                position: sticky; 
-                top: 0;
-                z-index: 10;
-            }
-            .tabel-cpl-bk th:first-child {
-                background: #0f172a !important;
-                color: white !important;
-                box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;
-                position: sticky; 
-                left: 0;
-                z-index: 20 !important;
-            }
-            .tabel-cpl-bk td {
-                text-align: center !important;
-                vertical-align: middle !important;
-                padding: 0 !important; 
-                border-bottom: 1px solid var(--border-color) !important;
-                border-right: 1px solid var(--border-color) !important;
-                background: white;
-            }
-            .tabel-cpl-bk td:first-child {
-                text-align: left !important;
-                background: #f8fafc !important;
-                color: var(--primary-blue) !important;
-                font-weight: 800 !important;
-                padding: 15px 25px !important;
-                border-right: 2px solid #cbd5e1 !important;
-                box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;
-                position: sticky; 
-                left: 0;
-                z-index: 5;
-            }
-            .cell-wrapper-cpl-bk {
-                display: flex; justify-content: center; align-items: center;
-                width: 100%; height: 100%; min-height: 60px;
-                cursor: pointer; transition: all 0.2s ease;
-            }
-            .cell-wrapper-cpl-bk:hover { background: #e0f2fe; }
-            .bk-label-mobile { display: none !important; }
-            .chk-matrix-cpl-bk { transform: scale(1.4); cursor: pointer; accent-color: var(--primary-blue); margin: 0; }
-        }
-
-        /* =========================================
-           📱 KARTU LIPAT (ACCORDION) UNTUK MOBILE
-           ========================================= */
-        @media screen and (max-width: 768px) {
-            html, body { overflow-x: hidden !important; width: 100% !important; max-width: 100% !important; margin: 0; padding: 0;}
-            .main-content { overflow-x: hidden !important; width: 100% !important; padding-top: 15px !important;}
-            
-            .header-master { margin: 15px 0 10px 0 !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
-            .section-master { padding: 0 15px 40px 15px !important; width: 100% !important; box-sizing: border-box !important;}
-            
-            .table-action-header { flex-direction: column !important; align-items: stretch !important; gap: 15px;}
-            .table-action-header > div:last-child { display: flex; flex-direction: column; gap: 10px; width: 100%;}
-            .btn-primary-dynamic, .btn-dark { width: 100% !important; justify-content: center !important;}
-
-            .tabel-cpl-bk-wrapper { border: none !important; box-shadow: none !important; background: transparent !important; max-height: none !important; overflow: hidden !important; width: 100% !important; margin-bottom: 0 !important;}
-            .tabel-cpl-bk, .tabel-cpl-bk thead, .tabel-cpl-bk tbody, .tabel-cpl-bk th, .tabel-cpl-bk td, .tabel-cpl-bk tr { display: block !important; width: 100% !important; box-sizing: border-box !important;}
-            .tabel-cpl-bk thead { display: none !important; }
-            
-            .tabel-cpl-bk tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important; }
-
-            .tabel-cpl-bk td:first-child { background: #1f2937 !important; padding: 15px 20px !important; text-align: left !important; position: static !important; border: none !important; border-bottom: 4px solid var(--primary-blue) !important; display: flex !important; justify-content: space-between !important; align-items: center !important; cursor: pointer !important; color: white !important; font-size: 1.15rem !important;}
-            .tabel-cpl-bk td:first-child::after { content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 1.2rem; color: white; transition: transform 0.3s ease; }
-            .tabel-cpl-bk tr.expanded td:first-child::after { transform: rotate(180deg); }
-
-            .tabel-cpl-bk td:not(:first-child) { display: none !important; padding: 15px 20px !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; flex-direction: column !important; align-items: stretch !important;}
-            .tabel-cpl-bk tr.expanded td:not(:first-child) { display: flex !important; }
-            .tabel-cpl-bk td:last-child { border-bottom: none !important; }
-
-            .cell-wrapper-cpl-bk { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 10px 0 !important; width: 100% !important; box-sizing: border-box !important; min-height: auto !important;}
-            .bk-label-mobile { display: block !important; font-weight: 600; color: #334155; font-size: 0.9rem; flex: 1; text-align: left; padding-right: 15px; line-height: 1.4; word-wrap: break-word !important; white-space: normal !important; }
-            .chk-matrix-cpl-bk { width: 22px !important; height: 22px !important; flex-shrink: 0 !important; transform: scale(1) !important; accent-color: var(--primary-blue);}
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../../../js/api_config.js"></script>
+    <link rel="stylesheet" href="pemetaan_cpl_bk.css">
 </head>
+
 <body>
-
-    <nav class="navbar-mobile">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="hamburger-btn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
-        </div>
-        <div class="profile-btn-mobile" onclick="toggleSidebar()">
-            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
-        </div>
-    </nav>
-
-    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
-
+    <div id="navbar-container"></div>
     <div class="main-content">
-        <div id="navbar-container"></div>
-
         <div class="fixed-header">
-            <div class="header-container header-master" style="margin: 0 0 15px 0; border-bottom: none; padding-bottom: 0;">
+            <div class="header-container">
                 <div class="header-title-area">
-                    <div class="header-subtitle" style="margin-bottom: 5px;">PEMETAAN (MAPPING)</div>
+                    <div class="header-subtitle">PEMETAAN (MAPPING)</div>
                     <h1 class="header-title">MATRIKS <span>CPL - BK</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content; background: var(--primary-blue); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;">PRODI</div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
-            <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;" class="header-master"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Bahan Kajian (BK) yang berelasi dengan
+                    Capaian Pembelajaran Lulusan (CPL).</p>
+            </div>
+
         </div>
 
-        <div class="scrollable-content section-master" style="padding-top: 0; padding-bottom: 40px;">
-            
-            <div class="table-action-header">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: #1e293b;">Relasi Antar Matriks</h3>
-                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.9rem;">Centang Bahan Kajian (BK) yang berelasi dengan Capaian Pembelajaran Lulusan (CPL).</p>
-                </div>
-                <div>
-                    <button class="btn-dark" onclick="loadData()">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                    <button id="btnSaveTop" class="btn-primary-dynamic" onclick="simpanMapping()" disabled>
-                        <i class="fas fa-save"></i> Simpan Matriks
-                    </button>
-                </div>
+        <div class="scrollable-content">
+            <div style="margin-bottom: 20px;">
+                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                <select id="filterKurikulum" onchange="loadData()">
+                    <option value="">Memuat data...</option>
+                </select>
             </div>
-
-            <div class="tabel-cpl-bk-wrapper">
-                <table id="matriksTable" class="tabel-cpl-bk">
+            <div
+                style="overflow-x: auto; max-height: 550px; border: 1px solid var(--border-color); border-radius: 8px; background: white;">
+                <table id="matriksTable">
                     <thead>
                         <tr id="headerRow">
-                            <th style="min-width: 120px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #0f172a; z-index: 20;">CPL / BK</th>
+                            <th>CPL / BK</th>
                         </tr>
                     </thead>
                     <tbody id="bodyMatriks">
-                        <tr><td style="text-align: center; padding: 50px !important;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue); margin-bottom: 15px; display:block;"></i> Memuat data matriks...</td></tr>
+                        <tr>
+                            <td style="text-align: center; padding: 30px;">Memuat data...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
+
+            <button id="btnSave" class="btn-save" style="margin-top: 25px;" onclick="simpanMapping()" disabled>
+                <i class="fas fa-save"></i> Simpan Matriks
+            </button>
         </div>
     </div>
 
-<script>
-    // 1. TANGKAP IDENTITAS LOGIN SECARA DINAMIS (SIHIR BUNGLON)
-    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        if(PRODI === "ti") {
-            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
-            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
-        } else {
-            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
-            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
-        }
+    <script src="/js/template.js"></script>
 
-        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
-        const avatarMobile = document.getElementById("mobileNavbarAvatar");
-        if(avatarMobile) {
-            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
-            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
-        }
-    });
+    <script>
+        const PRODI = localStorage.getItem("prodi_aktif") || "si";
+        const API_SAVE_MAPPING = `${API_BASE}/admin-map-cpl-bk`;
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
 
-    // --- FUNGSI SIDEBAR MOBILE ---
-    function toggleSidebar() {
-        document.getElementById('sidebar-container').classList.toggle('active');
-        document.getElementById('mobileOverlay').classList.toggle('active');
-    }
+        let listCPL = [];
+        let listBK = [];
 
-    // ==========================================================
-    // 🔮 SIHIR ANTI-MACET DROPDOWN (GLOBAL EVENT DELEGATION)
-    // ==========================================================
-    document.addEventListener('click', function(e) {
-        const dropdownBtn = e.target.closest('.dropdown-btn') || e.target.closest('[data-toggle="dropdown"]');
-        if (dropdownBtn) {
-            e.preventDefault(); 
-            const dropdownContent = dropdownBtn.nextElementSibling;
-            const icon = dropdownBtn.querySelector('.fa-chevron-down') || dropdownBtn.querySelector('i:last-child');
-            
-            if (dropdownContent && (dropdownContent.classList.contains('dropdown-container') || dropdownContent.tagName === 'DIV' || dropdownContent.tagName === 'UL')) {
-                const isHidden = window.getComputedStyle(dropdownContent).display === 'none';
-                
-                if (isHidden) {
-                    dropdownContent.style.display = 'block';
-                    dropdownBtn.classList.add('active');
-                    if (icon) icon.style.transform = 'rotate(180deg)';
-                } else {
-                    dropdownContent.style.display = 'none';
-                    dropdownBtn.classList.remove('active');
-                    if (icon) icon.style.transform = 'rotate(0deg)';
-                }
-            }
-        }
-    });
-
-    function setMenuAktif() {
-        const navDashboard = document.getElementById('nav-home');
-        let navMapping = document.querySelector('[data-path="/mapping/map_cpl_bk_si.html"]') || document.querySelector('[data-path="/mapping/map_cpl_bk.html"]');
-        
-        if (navDashboard) navDashboard.classList.remove('active');
-        if (navMapping) navMapping.classList.add('active');
-
-        const menuMaster = document.getElementById('menu-mapping') || (navMapping ? navMapping.closest('.dropdown-container') : null);
-        
-        if (menuMaster) {
-            menuMaster.style.display = 'block';
-            const parentBtn = menuMaster.previousElementSibling;
-            if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
-                parentBtn.classList.add('active');
-                const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
-                if(icon) icon.style.transform = 'rotate(180deg)';
-            }
-        }
-    }
-
-    const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
-    const API_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
-    const API_RELASI = `${API_BASE}/get-mapping-cpl-bk?prodi=${PRODI}`;
-    const API_SAVE_MAPPING = `${API_BASE}/admin-map-cpl-bk`;
-
-    const userLogin = localStorage.getItem("user_login");
-    if (!userLogin) window.location.replace("/login/login.html");
-
-    let listCPL = [];
-    let listBK = [];
-
-    window.onload = () => { 
-        setTimeout(loadData, 400); 
-
-        setTimeout(() => {
-            const sidebar = document.getElementById('sidebar-container');
-            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
-                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
-                    .then(res => res.text())
-                    .then(html => {
-                        sidebar.innerHTML = html;
-                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
-                        setMenuAktif();
-                    })
-                    .catch(e => console.log('Gagal memuat sidebar otomatis'));
-            } else {
-                setMenuAktif();
-            }
-        }, 500);
-    };
-
-    function toggleCard(tdElement) {
-        if (window.innerWidth <= 768) {
-            tdElement.parentElement.classList.toggle('expanded');
-        }
-    }
-
-    async function loadData() {
-        const btnSaveTop = document.getElementById("btnSaveTop");
-        const tbody = document.getElementById("bodyMatriks");
-        if(btnSaveTop) {
-            btnSaveTop.disabled = true;
-            btnSaveTop.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
-        }
-
-        try {
-            const [resCpl, resBk, resRelasi] = await Promise.all([
-                fetch(API_CPL), fetch(API_BK), fetch(API_RELASI)
-            ]);
-
-            listCPL = await resCpl.json();
-            listBK = await resBk.json();
-
-            let relasiExisting = [];
+        async function loadDropdownKurikulum() {
             try {
-                relasiExisting = await resRelasi.json();
-                if (!Array.isArray(relasiExisting)) relasiExisting = [];
-            } catch (e) { relasiExisting = []; }
-
-            if (!listCPL || listCPL.length === 0 || !listBK || listBK.length === 0) {
-                tbody.innerHTML = `<tr><td colspan='100%' style='padding: 50px !important; text-align: center; color: #ef4444; font-weight: bold;'><i class="fas fa-exclamation-triangle fa-2x" style="display: block; margin-bottom: 10px;"></i> Data CPL atau BK masih KOSONG! Harap isi Master Data terlebih dahulu.</td></tr>`;
-                if(btnSaveTop) btnSaveTop.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks';
-                return;
+                const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+                const data = await response.json();
+                const selectKurikulum = document.getElementById('filterKurikulum');
+                selectKurikulum.innerHTML = '';
+                data.forEach(item => {
+                    let opt = document.createElement('option');
+                    opt.value = item.kurikulum;
+                    opt.text = "Kurikulum 20" + item.kurikulum;
+                    selectKurikulum.appendChild(opt);
+                });
+                await loadData();
+            } catch (error) {
+                console.error("Gagal memuat list kurikulum:", error);
+                document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
             }
-
-            renderMatriks(relasiExisting);
-            if(btnSaveTop) {
-                btnSaveTop.disabled = false;
-                btnSaveTop.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks';
-            }
-
-        } catch (error) {
-            tbody.innerHTML = `<tr><td colspan='100%' style='padding: 50px !important; text-align: center; color: #ef4444; font-weight:bold;'><i class="fas fa-wifi fa-2x" style="display: block; margin-bottom: 10px;"></i> Gagal terhubung ke API. Periksa N8N!</td></tr>`;
-            if(btnSaveTop) btnSaveTop.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks';
         }
-    }
 
-    function renderMatriks(relasiExisting) {
-        const headerRow = document.getElementById("headerRow");
-        const tbody = document.getElementById("bodyMatriks");
-        if(!headerRow || !tbody) return;
+        async function loadData() {
+            const btnSave = document.getElementById("btnSave");
+            const tbody = document.getElementById("bodyMatriks");
+            if (btnSave) btnSave.disabled = true;
 
-        headerRow.innerHTML = `<th style="min-width: 150px; position: sticky; left: 0;">CPL \\ BK</th>`;
-        listBK.forEach(bk => {
-            headerRow.innerHTML += `
-                <th title="${bk.nama_bk}" style="min-width: 180px;">
-                    <div style="font-weight: 800; font-size: 1.15rem; margin-bottom: 6px; color: #bae6fd;">${bk.kode_bk}</div>
-                    <div style="font-size: 0.75rem; font-weight: 500; white-space: normal; line-height: 1.4; color: #f8fafc; opacity: 0.9;">
-                        ${bk.nama_bk || ''}
-                    </div>
-                </th>`;
-        });
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            let kurikulum = selectKurikulum ? selectKurikulum.value : "";
+            let URL_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
+            let URL_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
+            let URL_RELASI = `${API_BASE}/get-mapping-cpl-bk?prodi=${PRODI}`;
 
-        tbody.innerHTML = "";
-        listCPL.forEach(cpl => {
-            let tr = `<tr>
-                <td style="position: sticky; left: 0; z-index: 5;" title="${cpl.deskripsi || ''}" onclick="toggleCard(this)">
-                    <div style="display: flex; flex-direction: column; width: 85%;">
-                        <span style="font-weight:900; font-size: 1.15rem; color: var(--primary-blue);">${cpl.kode_cpl}</span>
-                    </div>
-                </td>`;
-            
-            listBK.forEach(bk => {
-                const isChecked = relasiExisting.some(r => r.kode_cpl === cpl.kode_cpl && r.kode_bk === bk.kode_bk);
-                const chk = isChecked ? 'checked' : '';
-                const namaBK = bk.nama_bk || '';
-                
-                tr += `<td>
-                           <label class="cell-wrapper-cpl-bk">
-                               <span class="bk-label-mobile">${bk.kode_bk} - ${namaBK}</span>
-                               <input type="checkbox" class="chk-matrix-cpl-bk" data-cpl="${cpl.kode_cpl}" data-bk="${bk.kode_bk}" ${chk}>
-                           </label>
-                       </td>`;
+            if (kurikulum) {
+                URL_CPL += `&kurikulum=${kurikulum}`;
+                URL_BK += `&kurikulum=${kurikulum}`;
+                URL_RELASI += `&kurikulum=${kurikulum}`;
+            }
+
+            try {
+                const [resCpl, resBk, resRelasi] = await Promise.all([
+                    fetch(URL_CPL), fetch(URL_BK), fetch(URL_RELASI)
+                ]);
+
+                listCPL = await resCpl.json();
+                listBK = await resBk.json();
+
+                let relasiExisting = [];
+                try {
+                    relasiExisting = await resRelasi.json();
+                    if (!Array.isArray(relasiExisting)) relasiExisting = [];
+                } catch (e) { relasiExisting = []; }
+
+                if (!listCPL || listCPL.length === 0 || !listBK || listBK.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red; font-weight: bold;'>Data CPL atau BK masih KOSONG untuk kurikulum ini.</td></tr>";
+                    return;
+                }
+
+                renderMatriks(relasiExisting);
+                if (btnSave) btnSave.disabled = false;
+
+            } catch (error) {
+                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red;'>Gagal terhubung ke API.</td></tr>";
+            }
+        }
+
+        function renderMatriks(relasiExisting) {
+            const headerRow = document.getElementById("headerRow");
+            const tbody = document.getElementById("bodyMatriks");
+            if (!headerRow || !tbody) return;
+
+            let headerHTML = `
+            <th style="position: sticky; left: 0; background: #e2e8f0; z-index: 10; width: 40px; text-align: center;">No</th>
+            <th style="position: sticky; left: 40px; background: #e2e8f0; z-index: 10; white-space: nowrap; text-align: left;">Kode BK</th>
+            <th style="position: sticky; left: 120px; background: #e2e8f0; z-index: 10; min-width: 250px; text-align: left;">Bahan Kajian</th>
+        `;
+
+            listCPL.forEach(cpl => {
+                headerHTML += `<th title="${cpl.deskripsi || ''}" style="text-align: center;">${cpl.kode_cpl}</th>`;
             });
-            
-            tr += `</tr>`;
-            tbody.innerHTML += tr;
-        });
-    }
+            headerRow.innerHTML = headerHTML;
 
-    async function simpanMapping() {
-        const btnTop = document.getElementById('btnSaveTop');
-        const originalText = btnTop.innerHTML;
-        btnTop.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-        btnTop.disabled = true;
-        
-        let fetchPromises = [];
+            tbody.innerHTML = "";
+            listBK.forEach((bk, index) => {
+                let tr = `<tr class="bk-row">
+                <td style="position: sticky; left: 0; background: #f8fafc; z-index: 5; text-align: center;">${index + 1}</td>
+                <td style="position: sticky; left: 40px; background: #f8fafc; z-index: 5; font-weight: bold; white-space: nowrap;">${bk.kode_bk}</td>
+                <td style="position: sticky; left: 120px; background: #f8fafc; z-index: 5; text-align: left;" title="${bk.nama_bk}">${bk.nama_bk}</td>`;
 
-        listCPL.forEach(cpl => {
-            const checkedBoxes = document.querySelectorAll(`.chk-matrix-cpl-bk[data-cpl="${cpl.kode_cpl}"]:checked`);
-            const bkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-bk'));
-
-            const payload = {
-                kode_cpl: cpl.kode_cpl,
-                bk_list: bkList,
-                prodi: PRODI
-            };
-
-            fetchPromises.push(fetch(API_SAVE_MAPPING, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }));
-        });
-
-        try {
-            await Promise.all(fetchPromises);
-            alert("✅ Matriks Relasi CPL - BK berhasil disimpan!");
-        } catch (error) {
-            alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi.");
-        } finally {
-            btnTop.innerHTML = originalText;
-            btnTop.disabled = false;
+                listCPL.forEach(cpl => {
+                    const isChecked = relasiExisting.some(r => r.kode_cpl === cpl.kode_cpl && r.kode_bk === bk.kode_bk);
+                    const chk = isChecked ? 'checked' : '';
+                    tr += `<td style="text-align: center;"><input type="checkbox" class="chk-matrix" data-cpl="${cpl.kode_cpl}" data-bk="${bk.kode_bk}" ${chk}></td>`;
+                });
+                tr += `</tr>`;
+                tbody.innerHTML += tr;
+            });
         }
-    }
-</script>
+
+        async function simpanMapping() {
+            const btnSave = document.getElementById('btnSave');
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btnSave.disabled = true;
+
+            // 1. Tangkap Kurikulum yang sedang diedit Kaprodi
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25"; // default 25
+
+            let fetchPromises = [];
+
+            listCPL.forEach(cpl => {
+                const checkedBoxes = document.querySelectorAll(`.chk-matrix[data-cpl="${cpl.kode_cpl}"]:checked`);
+                const bkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-bk'));
+
+                // 2. Tambahkan kurikulumTerpilih ke dalam payload
+                const payload = {
+                    kode_cpl: cpl.kode_cpl,
+                    bk_list: bkList,
+                    prodi: PRODI,
+                    kurikulum: kurikulumTerpilih
+                };
+
+                const request = fetch(API_SAVE_MAPPING, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                });
+                fetchPromises.push(request);
+            });
+
+            try {
+                await Promise.all(fetchPromises);
+                alert("✅ Matriks Relasi CPL - BK berhasil disimpan!");
+            } catch (error) { alert("❌ Gagal menyimpan beberapa data ke server."); }
+            finally { btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks'; btnSave.disabled = false; }
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById("sidebar-container");
+            if (sidebar) sidebar.classList.toggle("show-mobile");
+        }
+
+        window.onload = async () => { await loadDropdownKurikulum(); };
+    </script>
 </body>
+
 </html>

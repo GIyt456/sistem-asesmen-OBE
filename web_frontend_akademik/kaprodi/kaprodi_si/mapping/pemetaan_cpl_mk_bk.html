@@ -1,23 +1,47 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pemetaan CPL - BK - Sistem OBE</title>
-    
+
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/admin_si.css">
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script>
-    
+
     <style>
-        .btn-save-mapping { background: var(--primary-blue); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; font-size: 0.95rem; }
-        .btn-save-mapping:hover { filter: brightness(0.85); transform: translateY(-2px); }
-        .btn-save-mapping:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
-        
+        .btn-save-mapping {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .btn-save-mapping:hover {
+            filter: brightness(0.85);
+            transform: translateY(-2px);
+        }
+
+        .btn-save-mapping:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         /* =========================================
            ✨ BEAUTIFY MATRIKS DESKTOP (ANTI-CACHE) ✨
            ========================================= */
@@ -25,44 +49,55 @@
             .tabel-cpl-bk-wrapper {
                 box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
                 border-radius: 12px !important;
-                overflow: auto !important; 
-                max-height: 68vh !important; 
+                /* PERBAIKAN: Izinkan scroll dan beri batas tinggi layar */
+                overflow: auto !important;
+                max-height: 68vh !important;
                 border: 1px solid var(--border-color) !important;
                 background: white;
             }
+
             .tabel-cpl-bk {
                 width: 100%;
-                border-collapse: separate !important; 
+                /* PERBAIKAN: Agar border tidak bertabrakan dengan sticky & teks tidak melipat */
+                border-collapse: separate !important;
                 border-spacing: 0 !important;
                 white-space: nowrap !important;
             }
+
             .tabel-cpl-bk th {
-                background: #1e293b !important; 
+                background: #1e293b !important;
+                /* Header Gelap Elegan */
                 color: white !important;
                 text-align: center !important;
                 vertical-align: middle !important;
                 padding: 15px !important;
                 border-bottom: 2px solid #0f172a !important;
                 border-right: 1px solid #334155 !important;
-                position: sticky; 
+                /* Mengambangkan Header ke atas */
+                position: sticky;
                 top: 0;
                 z-index: 10;
             }
+
             .tabel-cpl-bk th:first-child {
-                background: #0f172a !important; 
+                background: #0f172a !important;
+                /* Ujung kiri lebih gelap */
                 color: white !important;
-                box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;
-                position: sticky; 
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2) !important;
+                /* Mengunci Header Pojok Kiri Atas */
+                position: sticky;
                 left: 0;
                 z-index: 20 !important;
             }
+
             .tabel-cpl-bk td {
                 text-align: center !important;
                 vertical-align: middle !important;
-                padding: 0 !important; 
+                padding: 0 !important;
                 border-bottom: 1px solid var(--border-color) !important;
                 border-right: 1px solid var(--border-color) !important;
             }
+
             .tabel-cpl-bk td:first-child {
                 text-align: left !important;
                 background: #f8fafc !important;
@@ -70,24 +105,37 @@
                 font-weight: 800 !important;
                 padding: 12px 25px !important;
                 border-right: 2px solid #cbd5e1 !important;
-                box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;
-                position: sticky; 
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05) !important;
+                /* Mengunci Kolom Kiri CPL */
+                position: sticky;
                 left: 0;
                 z-index: 5;
             }
+
             .cell-wrapper-cpl-bk {
-                display: flex; justify-content: center; align-items: center;
-                width: 100%; height: 100%; min-height: 50px;
-                cursor: pointer; transition: all 0.2s ease;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+                min-height: 50px;
+                cursor: pointer;
+                transition: all 0.2s ease;
             }
+
             .cell-wrapper-cpl-bk:hover {
-                background: #e0f2fe; 
+                background: #e0f2fe;
+                /* Efek sorot (hover) biru muda menyala */
             }
+
             .bk-label-mobile {
-                display: none !important; 
+                display: none !important;
+                /* SEMBUNYIKAN TEKS BOCOR DI DESKTOP */
             }
+
             .chk-matrix-cpl-bk {
-                transform: scale(1.3); 
+                transform: scale(1.3);
+                /* Besarkan checkbox biar enak diklik */
                 cursor: pointer;
             }
         }
@@ -96,29 +144,135 @@
            📱 KARTU LIPAT (ACCORDION) UNTUK MOBILE
            ========================================= */
         @media screen and (max-width: 768px) {
-            .btn-save-mapping { width: 100%; margin-top: 0 !important; }
-            .header-mapping-mhs { margin: 15px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px;}
-            .section-mapping-mhs { padding: 0 20px 40px 20px !important; }
+            .btn-save-mapping {
+                width: 100%;
+                margin-top: 0 !important;
+            }
 
-            .tabel-cpl-bk-wrapper { border: none !important; box-shadow: none !important; background: transparent !important; max-height: none !important; overflow: hidden !important; width: 100% !important; margin-bottom: 0 !important;}
-            .tabel-cpl-bk, .tabel-cpl-bk thead, .tabel-cpl-bk tbody, .tabel-cpl-bk th, .tabel-cpl-bk td, .tabel-cpl-bk tr { display: block !important; width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
-            .tabel-cpl-bk thead { display: none !important; }
-            .tabel-cpl-bk tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important; }
+            .header-mapping-mhs {
+                margin: 15px 20px 10px 20px !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 15px;
+            }
 
-            .tabel-cpl-bk td:first-child { background: #1f2937 !important; padding: 15px 20px !important; text-align: left !important; position: static !important; border: none !important; border-bottom: 4px solid var(--primary-red) !important; display: flex !important; justify-content: space-between !important; align-items: center !important; cursor: pointer !important; color: white !important; font-size: 1.15rem !important;}
-            .tabel-cpl-bk td:first-child::after { content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 1.2rem; color: white; transition: transform 0.3s ease; }
-            .tabel-cpl-bk tr.expanded td:first-child::after { transform: rotate(180deg); }
+            .section-mapping-mhs {
+                padding: 0 20px 40px 20px !important;
+            }
 
-            .tabel-cpl-bk td:not(:first-child) { display: none !important; padding: 15px 20px !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; flex-direction: column !important; align-items: stretch !important;}
-            .tabel-cpl-bk tr.expanded td:not(:first-child) { display: flex !important; }
-            .tabel-cpl-bk td:last-child { border-bottom: none !important; }
+            .tabel-cpl-bk-wrapper {
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                max-height: none !important;
+                overflow: hidden !important;
+                width: 100% !important;
+                margin-bottom: 0 !important;
+            }
 
-            .cell-wrapper-cpl-bk { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 15px 20px !important; width: 100% !important; box-sizing: border-box !important; min-height: auto !important;}
-            .bk-label-mobile { display: block !important; font-weight: 600; color: #334155; font-size: 0.9rem; flex: 1; text-align: left; padding-right: 15px; line-height: 1.4; word-wrap: break-word !important; white-space: normal !important; }
-            .chk-matrix-cpl-bk { width: 22px !important; height: 22px !important; flex-shrink: 0 !important; transform: scale(1) !important;}
+            .tabel-cpl-bk,
+            .tabel-cpl-bk thead,
+            .tabel-cpl-bk tbody,
+            .tabel-cpl-bk th,
+            .tabel-cpl-bk td,
+            .tabel-cpl-bk tr {
+                display: block !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .tabel-cpl-bk thead {
+                display: none !important;
+            }
+
+            .tabel-cpl-bk tr {
+                background: white !important;
+                border: 1px solid #cbd5e1 !important;
+                border-radius: 12px !important;
+                margin-bottom: 15px !important;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+                overflow: hidden !important;
+            }
+
+            .tabel-cpl-bk td:first-child {
+                background: #1f2937 !important;
+                padding: 15px 20px !important;
+                text-align: left !important;
+                position: static !important;
+                border: none !important;
+                border-bottom: 4px solid var(--primary-red) !important;
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                cursor: pointer !important;
+                color: white !important;
+                font-size: 1.15rem !important;
+            }
+
+            .tabel-cpl-bk td:first-child::after {
+                content: "\f078";
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                font-size: 1.2rem;
+                color: white;
+                transition: transform 0.3s ease;
+            }
+
+            .tabel-cpl-bk tr.expanded td:first-child::after {
+                transform: rotate(180deg);
+            }
+
+            .tabel-cpl-bk td:not(:first-child) {
+                display: none !important;
+                padding: 15px 20px !important;
+                border: none !important;
+                border-bottom: 1px dashed #e2e8f0 !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+
+            .tabel-cpl-bk tr.expanded td:not(:first-child) {
+                display: flex !important;
+            }
+
+            .tabel-cpl-bk td:last-child {
+                border-bottom: none !important;
+            }
+
+            .cell-wrapper-cpl-bk {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 15px 20px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                min-height: auto !important;
+            }
+
+            .bk-label-mobile {
+                display: block !important;
+                font-weight: 600;
+                color: #334155;
+                font-size: 0.9rem;
+                flex: 1;
+                text-align: left;
+                padding-right: 15px;
+                line-height: 1.4;
+                word-wrap: break-word !important;
+                white-space: normal !important;
+            }
+
+            .chk-matrix-cpl-bk {
+                width: 22px !important;
+                height: 22px !important;
+                flex-shrink: 0 !important;
+                transform: scale(1) !important;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <nav class="navbar-mobile">
@@ -126,9 +280,9 @@
             <button class="hamburger-btn" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
-            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
-                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
-                 onclick="window.location.href='/index.html'">
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI"
+                style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;"
+                onclick="window.location.href='/index.html'">
         </div>
         <div class="profile-btn-mobile" onclick="toggleSidebar()">
             <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
@@ -142,16 +296,19 @@
         <div id="navbar-container"></div>
 
         <div class="fixed-header">
-            <div class="header-container header-mapping-mhs">
+            <div class="header-container header-mapping-mhs"
+                style="margin: 0 50px 15px 50px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
                     <div class="header-subtitle" style="margin-bottom: 5px;">PEMETAAN (MAPPING)</div>
                     <h1 class="header-title" style="font-size: 2rem;">MATRIKS <span>CPL - BK</span></h1>
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
-            
-            <div class="header-mapping-mhs" style="display: flex; justify-content: space-between; align-items: center; margin: 0 50px 15px 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
-                <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Bahan Kajian (BK) yang berelasi dengan Capaian Pembelajaran Lulusan (CPL).</p>
+
+            <div class="header-mapping-mhs"
+                style="display: flex; justify-content: space-between; align-items: center; margin: 0 50px 15px 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Bahan Kajian (BK) yang berelasi dengan
+                    Capaian Pembelajaran Lulusan (CPL).</p>
                 <div style="display: flex; gap: 10px;">
                     <button class="btn-save-mapping" style="background: #475569;" onclick="loadData()">
                         <i class="fas fa-sync-alt"></i> Refresh Data
@@ -168,189 +325,191 @@
                 <table id="matriksTable" class="tabel-cpl-bk">
                     <thead>
                         <tr id="headerRow">
-                            <th style="min-width: 120px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">CPL / BK</th>
+                            <th
+                                style="min-width: 120px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">
+                                CPL / BK</th>
                         </tr>
                     </thead>
                     <tbody id="bodyMatriks">
-                        <tr><td style="text-align: center; padding: 50px !important;">Memuat data...</td></tr>
+                        <tr>
+                            <td style="text-align: center; padding: 50px !important;">Memuat data...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-<script>
-    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        // PERBAIKAN LOGIKA WARNA BUNGlon
-        if(PRODI === "ti") {
-            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
-            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
-        } else {
-            // Paksa kembalikan ke warna biru jika SI yang login
-            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
-            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
-        }
+    <script>
+        const PRODI = localStorage.getItem("prodi_aktif") || "si";
 
-        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
-        const avatarMobile = document.getElementById("mobileNavbarAvatar");
-        if(avatarMobile) {
-            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
-            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
-        }
-    });
-
-    function toggleSidebar() {
-        document.getElementById('sidebar-container').classList.toggle('active');
-        document.getElementById('mobileOverlay').classList.toggle('active');
-    }
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        setTimeout(() => {
-            const sidebar = document.getElementById('sidebar-container');
-            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
-                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
-                    .then(res => res.text())
-                    .then(html => {
-                        sidebar.innerHTML = html;
-                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
-                    })
-                    .catch(e => console.log('Gagal memuat sidebar darurat'));
+        document.addEventListener("DOMContentLoaded", () => {
+            if (PRODI === "ti") {
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000');
+                document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+            } else {
+                document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
             }
-        }, 600); 
-    });
 
-    const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
-    const API_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
-    const API_RELASI = `${API_BASE}/get-mapping-cpl-bk?prodi=${PRODI}`;
-    const API_SAVE_MAPPING = `${API_BASE}/admin-map-cpl-bk`;
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if (avatarMobile) {
+                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+            }
+        });
 
-    const userLogin = localStorage.getItem("user_login");
-    if (!userLogin) window.location.replace("/login/login.html");
-
-    let listCPL = [];
-    let listBK = [];
-
-    window.onload = () => { setTimeout(loadData, 400); };
-
-    function toggleCard(tdElement) {
-        if (window.innerWidth <= 768) {
-            tdElement.parentElement.classList.toggle('expanded');
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
         }
-    }
 
-    async function loadData() {
-        const btnSaveTop = document.getElementById("btnSaveTop");
-        const tbody = document.getElementById("bodyMatriks");
-        if(btnSaveTop) btnSaveTop.disabled = true;
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebar.innerHTML = html;
+                            if (typeof initSmartSidebar === 'function') initSmartSidebar();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar darurat'));
+                }
+            }, 600);
+        });
 
-        try {
-            const [resCpl, resBk, resRelasi] = await Promise.all([
-                fetch(API_CPL), fetch(API_BK), fetch(API_RELASI)
-            ]);
+        const API_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
+        const API_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
+        const API_RELASI = `${API_BASE}/get-mapping-cpl-bk?prodi=${PRODI}`;
+        const API_SAVE_MAPPING = `${API_BASE}/admin-map-cpl-bk`;
 
-            listCPL = await resCpl.json();
-            listBK = await resBk.json();
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
 
-            let relasiExisting = [];
+        let listCPL = [];
+        let listBK = [];
+
+        window.onload = () => { setTimeout(loadData, 400); };
+
+        function toggleCard(tdElement) {
+            if (window.innerWidth <= 768) {
+                tdElement.parentElement.classList.toggle('expanded');
+            }
+        }
+
+        async function loadData() {
+            const btnSaveTop = document.getElementById("btnSaveTop");
+            const tbody = document.getElementById("bodyMatriks");
+            if (btnSaveTop) btnSaveTop.disabled = true;
+
             try {
-                relasiExisting = await resRelasi.json();
-                if (!Array.isArray(relasiExisting)) relasiExisting = [];
-            } catch (e) { relasiExisting = []; }
+                const [resCpl, resBk, resRelasi] = await Promise.all([
+                    fetch(API_CPL), fetch(API_BK), fetch(API_RELASI)
+                ]);
 
-            if (!listCPL || listCPL.length === 0 || !listBK || listBK.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 50px !important; color: red; font-weight: bold;'>Data CPL atau BK masih KOSONG! Harap isi terlebih dahulu.</td></tr>";
-                return;
+                listCPL = await resCpl.json();
+                listBK = await resBk.json();
+
+                let relasiExisting = [];
+                try {
+                    relasiExisting = await resRelasi.json();
+                    if (!Array.isArray(relasiExisting)) relasiExisting = [];
+                } catch (e) { relasiExisting = []; }
+
+                if (!listCPL || listCPL.length === 0 || !listBK || listBK.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='100%' style='padding: 50px !important; color: red; font-weight: bold;'>Data CPL atau BK masih KOSONG! Harap isi terlebih dahulu.</td></tr>";
+                    return;
+                }
+
+                renderMatriks(relasiExisting);
+                if (btnSaveTop) btnSaveTop.disabled = false;
+
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 50px !important; color: red;'>Gagal terhubung ke API. Cek n8n!</td></tr>";
             }
-
-            renderMatriks(relasiExisting);
-            if(btnSaveTop) btnSaveTop.disabled = false;
-
-        } catch (error) {
-            console.error(error);
-            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 50px !important; color: red;'>Gagal terhubung ke API. Cek n8n!</td></tr>";
         }
-    }
 
-    function renderMatriks(relasiExisting) {
-        const headerRow = document.getElementById("headerRow");
-        const tbody = document.getElementById("bodyMatriks");
-        if(!headerRow || !tbody) return;
+        function renderMatriks(relasiExisting) {
+            const headerRow = document.getElementById("headerRow");
+            const tbody = document.getElementById("bodyMatriks");
+            if (!headerRow || !tbody) return;
 
-        headerRow.innerHTML = `<th style="min-width: 150px; position: sticky; left: 0;">CPL \\ BK</th>`;
-        listBK.forEach(bk => {
-            headerRow.innerHTML += `
+            headerRow.innerHTML = `<th style="min-width: 150px; position: sticky; left: 0;">CPL \\ BK</th>`;
+            listBK.forEach(bk => {
+                headerRow.innerHTML += `
                 <th title="${bk.nama_bk}" style="min-width: 180px;">
                     <div style="font-weight: 800; font-size: 1.15rem; margin-bottom: 6px; color: #bae6fd;">${bk.kode_bk}</div>
                     <div style="font-size: 0.75rem; font-weight: 500; white-space: normal; line-height: 1.4; color: #f8fafc; opacity: 0.9;">
                         ${bk.nama_bk || ''}
                     </div>
                 </th>`;
-        });
+            });
 
-        tbody.innerHTML = "";
-        listCPL.forEach(cpl => {
-            let tr = `<tr>
+            tbody.innerHTML = "";
+            listCPL.forEach(cpl => {
+                let tr = `<tr>
                 <td style="position: sticky; left: 0; z-index: 5;" title="${cpl.deskripsi || ''}" onclick="toggleCard(this)">
                     <div style="display: flex; flex-direction: column; width: 85%;">
                         <span style="font-weight:800; font-size: 1.1rem;">${cpl.kode_cpl}</span>
                     </div>
                 </td>`;
-            
-            listBK.forEach(bk => {
-                const isChecked = relasiExisting.some(r => r.kode_cpl === cpl.kode_cpl && r.kode_bk === bk.kode_bk);
-                const chk = isChecked ? 'checked' : '';
-                const namaBK = bk.nama_bk || '';
-                
-                tr += `<td>
+
+                listBK.forEach(bk => {
+                    const isChecked = relasiExisting.some(r => r.kode_cpl === cpl.kode_cpl && r.kode_bk === bk.kode_bk);
+                    const chk = isChecked ? 'checked' : '';
+                    const namaBK = bk.nama_bk || '';
+
+                    tr += `<td>
                            <label class="cell-wrapper-cpl-bk">
                                <span class="bk-label-mobile">${bk.kode_bk} - ${namaBK}</span>
                                <input type="checkbox" class="chk-matrix-cpl-bk" data-cpl="${cpl.kode_cpl}" data-bk="${bk.kode_bk}" ${chk}>
                            </label>
                        </td>`;
+                });
+
+                tr += `</tr>`;
+                tbody.innerHTML += tr;
             });
-            
-            tr += `</tr>`;
-            tbody.innerHTML += tr;
-        });
-    }
-
-    async function simpanMapping() {
-        const btnTop = document.getElementById('btnSaveTop');
-        const originalText = btnTop.innerHTML;
-        btnTop.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-        btnTop.disabled = true;
-        
-        let fetchPromises = [];
-
-        listCPL.forEach(cpl => {
-            const checkedBoxes = document.querySelectorAll(`.chk-matrix-cpl-bk[data-cpl="${cpl.kode_cpl}"]:checked`);
-            const bkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-bk'));
-
-            const payload = {
-                kode_cpl: cpl.kode_cpl,
-                bk_list: bkList,
-                prodi: PRODI
-            };
-
-            fetchPromises.push(fetch(API_SAVE_MAPPING, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }));
-        });
-
-        try {
-            await Promise.all(fetchPromises);
-            alert("✅ Matriks Relasi CPL - BK berhasil disimpan!");
-        } catch (error) {
-            alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi.");
-        } finally {
-            btnTop.innerHTML = originalText;
-            btnTop.disabled = false;
         }
-    }
-</script>
+
+        async function simpanMapping() {
+            const btnTop = document.getElementById('btnSaveTop');
+            const originalText = btnTop.innerHTML;
+            btnTop.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btnTop.disabled = true;
+
+            let fetchPromises = [];
+
+            listCPL.forEach(cpl => {
+                const checkedBoxes = document.querySelectorAll(`.chk-matrix-cpl-bk[data-cpl="${cpl.kode_cpl}"]:checked`);
+                const bkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-bk'));
+
+                const payload = {
+                    kode_cpl: cpl.kode_cpl,
+                    bk_list: bkList,
+                    prodi: PRODI
+                };
+
+                fetchPromises.push(fetch(API_SAVE_MAPPING, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }));
+            });
+
+            try {
+                await Promise.all(fetchPromises);
+                alert("✅ Matriks Relasi CPL - BK berhasil disimpan!");
+            } catch (error) {
+                alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi.");
+            } finally {
+                btnTop.innerHTML = originalText;
+                btnTop.disabled = false;
+            }
+        }
+    </script>
 </body>
+
 </html>

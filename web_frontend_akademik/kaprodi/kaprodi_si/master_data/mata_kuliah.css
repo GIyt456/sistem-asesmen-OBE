@@ -1,0 +1,19 @@
+/* TABEL MATA KULIAH DESKTOP */
+.table-container { background: white; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow-x: auto; margin-bottom: 40px; }
+table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: left; }
+th { background: #f8fafc; padding: 15px 20px; font-size: 0.85rem; font-weight: 700; color: #475569; border-bottom: 2px solid var(--border-color); text-transform: uppercase; }
+td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; color: #1e293b; vertical-align: middle; }
+
+@media screen and (max-width: 768px) {
+    /* TABEL MENJADI KARTU */
+    .table-container { background: transparent !important; border: none !important; box-shadow: none !important; overflow-x: visible !important; width: 100% !important; margin-bottom: 20px !important; padding: 0 !important; }
+    table, thead, tbody, th, td, tr { display: block !important; width: 100% !important; min-width: 0 !important; box-sizing: border-box !important; margin: 0 !important;}
+    thead tr { display: none !important; }
+    
+    tbody tr { background: white !important; border: 1px solid var(--border-color) !important; border-radius: 12px !important; padding: 15px !important; margin-bottom: 15px !important; box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important; }
+    td { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 10px 0 !important; border-bottom: 1px dashed #e2e8f0 !important; font-size: 0.9rem !important; text-align: right !important; }
+    td:last-child { border-bottom: none !important; padding-bottom: 0 !important; margin-bottom: 0 !important; }
+
+    td::before { content: attr(data-label) !important; font-weight: 700 !important; color: #64748b !important; text-transform: uppercase !important; font-size: 0.75rem !important; letter-spacing: 0.5px !important; flex: 1 !important; text-align: left !important; }
+    td > * { flex: 2 !important; text-align: right !important; }
+}
