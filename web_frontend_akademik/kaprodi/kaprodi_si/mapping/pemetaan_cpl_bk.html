@@ -183,41 +183,46 @@
             });
         }
 
-        async function simpanMapping() {
-            const btnSave = document.getElementById('btnSave');
-            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-            btnSave.disabled = true;
+       async function simpanMapping() {
+    const btnSave = document.getElementById('btnSave');
+    btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+    btnSave.disabled = true;
 
-            // 1. Tangkap Kurikulum yang sedang diedit Kaprodi
-            const selectKurikulum = document.getElementById('filterKurikulum');
-            let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25"; // default 25
+    // 1. Tangkap Kurikulum yang sedang diedit Kaprodi
+    const selectKurikulum = document.getElementById('filterKurikulum');
+    let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25"; // default 25
 
-            let fetchPromises = [];
+    try {
+        // 2. Gunakan For...Of Loop agar pengiriman data MENGANTRE SATU PER SATU (Sekuensial)
+        // Ini mencegah N8N dan MySQL kewalahan karena menerima belasan request di detik yang sama.
+        for (const cpl of listCPL) {
+            const checkedBoxes = document.querySelectorAll(`.chk-matrix[data-cpl="${cpl.kode_cpl}"]:checked`);
+            const bkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-bk'));
 
-            listCPL.forEach(cpl => {
-                const checkedBoxes = document.querySelectorAll(`.chk-matrix[data-cpl="${cpl.kode_cpl}"]:checked`);
-                const bkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-bk'));
+            const payload = {
+                kode_cpl: cpl.kode_cpl,
+                bk_list: bkList,
+                prodi: PRODI,
+                kurikulum: kurikulumTerpilih
+            };
 
-                // 2. Tambahkan kurikulumTerpilih ke dalam payload
-                const payload = {
-                    kode_cpl: cpl.kode_cpl,
-                    bk_list: bkList,
-                    prodi: PRODI,
-                    kurikulum: kurikulumTerpilih
-                };
-
-                const request = fetch(API_SAVE_MAPPING, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                });
-                fetchPromises.push(request);
+            // Tunggu 1 request selesai, baru lanjut ke request berikutnya
+            await fetch(API_SAVE_MAPPING, {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify(payload)
             });
-
-            try {
-                await Promise.all(fetchPromises);
-                alert("✅ Matriks Relasi CPL - BK berhasil disimpan!");
-            } catch (error) { alert("❌ Gagal menyimpan beberapa data ke server."); }
-            finally { btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks'; btnSave.disabled = false; }
         }
+        
+        alert("✅ Matriks Relasi CPL - BK berhasil disimpan!");
+    } catch (error) { 
+        alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi N8N."); 
+        console.error(error);
+    } finally { 
+        btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks'; 
+        btnSave.disabled = false; 
+    }
+}
 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById("sidebar-container");

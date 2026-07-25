@@ -233,7 +233,7 @@
 
 <body>
 
-    <!-- 1. NAVBAR KHUSUS MOBILE (Warna Gelap otomatis dari admin_si.css) -->
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
             <button class="hamburger-btn" onclick="toggleSidebar()">
@@ -280,7 +280,7 @@
         <div class="scrollable-content">
             <div style="margin-bottom: 20px;">
                 <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
-                <select id="filterKurikulum" onchange="loadData()">
+                <select id="filterKurikulum" onchange="loadData()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none;">
                     <option value="">Memuat data...</option>
                 </select>
             </div>
@@ -451,40 +451,43 @@
             });
         }
 
+        // 🔥 LOGIKA PENGIRIMAN DATA DIPERBAIKI (ANTRE RAPI) 🔥
         async function simpanMapping() {
             const btnSave = document.getElementById('btnSave');
             btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             btnSave.disabled = true;
 
-            // 1. Tangkap Kurikulum yang sedang diedit Kaprodi
             const selectKurikulum = document.getElementById('filterKurikulum');
             let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25"; // default 25
 
-            let fetchPromises = [];
-
-            listBK.forEach(bk => {
-                const checkedBoxes = document.querySelectorAll(`.chk-matrix[data-bk="${bk.kode_bk}"]:checked`);
-                const mkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-mk'));
-
-                // 2. Tambahkan kurikulumTerpilih ke dalam payload
-                const payload = {
-                    kode_bk: bk.kode_bk,
-                    mk_list: mkList,
-                    prodi: PRODI,
-                    kurikulum: kurikulumTerpilih
-                };
-
-                const request = fetch(API_SAVE_MAPPING, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-                });
-                fetchPromises.push(request);
-            });
-
             try {
-                await Promise.all(fetchPromises);
+                // Loop Sekuensial: Tunggu request pertama selesai, baru lanjut ke request berikutnya
+                for (const bk of listBK) {
+                    const checkedBoxes = document.querySelectorAll(`.chk-matrix[data-bk="${bk.kode_bk}"]:checked`);
+                    const mkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-mk'));
+
+                    const payload = {
+                        kode_bk: bk.kode_bk,
+                        mk_list: mkList,
+                        prodi: PRODI,
+                        kurikulum: kurikulumTerpilih
+                    };
+
+                    await fetch(API_SAVE_MAPPING, {
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify(payload)
+                    });
+                }
+                
                 alert("✅ Matriks Relasi BK - MK berhasil disimpan!");
-            } catch (error) { alert("❌ Gagal menyimpan beberapa data ke server."); }
-            finally { btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks'; btnSave.disabled = false; }
+            } catch (error) { 
+                alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi N8N."); 
+                console.error(error);
+            } finally { 
+                btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks'; 
+                btnSave.disabled = false; 
+            }
         }
 
         window.onload = async () => { await loadDropdownKurikulum(); };
