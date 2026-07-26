@@ -1,350 +1,360 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perumusan BK - Sistem OBE</title>
-    
-    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/admin_si.css">
-    
+    <link rel="stylesheet" href="../../../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Script untuk Export Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="/js/api_config.js"></script>
-    <script src="/js/template.js"></script>
+    <script src="../../../js/api_config.js"></script>
+
+    <!-- Panggil CSS -->
+    <link rel="stylesheet" href="bahan_kajian.css">
+    <link rel="stylesheet" href="../../../css/global_si.css?v=2">
+    <link rel="stylesheet" href="../../../css/admin_si.css">
 </head>
+
 <body>
 
-    <!-- 1. NAVBAR KHUSUS MOBILE -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="hamburger-btn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
-                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
-                 onclick="window.location.href='/index.html'">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI"
+                style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;"
+                onclick="window.location.href='/index.html'">
         </div>
-        
-        <div class="profile-btn-mobile" onclick="toggleSidebar()">
-            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
-        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src=""
+                alt="Profil Kaprodi"></div>
     </nav>
 
-    <!-- 2. OVERLAY GELAP UNTUK LATAR SIDEBAR DI HP -->
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
-
     <div id="sidebar-container"></div>
+    <div id="navbar-container"></div>
 
     <div class="main-content">
-        <div id="navbar-container"></div>
+        <!-- SATUKAN SEMUA KE DALAM CONTENT-WRAPPER -->
+        <div class="content-wrapper">
 
-        <div class="fixed-header">
-            <div class="header-container" style="margin-bottom: 20px;">
-                <div class="header-title-area">
-                    <div class="header-subtitle">KELOLA KURIKULUM</div>
-                    <h1 class="header-title">PERUMUSAN <span>BAHAN KAJIAN</span></h1>
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="header-title-area">
+                        <div class="header-subtitle">KELOLA KURIKULUM</div>
+                        <h1 class="header-title">PERUMUSAN <span id="titleSpan">BAHAN KAJIAN</span></h1>
+                    </div>
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Bahan Kajian (BK)</h3>
-                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500;">Kelola detail rumusan atau Impor massal melalui Excel.</p>
+            <!-- TEMPLATE: Filter Section -->
+            <div class="filter-section">
+                <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
+                <select id="filterKurikulum" onchange="loadData()" class="filter-select">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
+
+            <!-- TEMPLATE: Section Header -->
+            <div class="section-header">
+                <div class="section-title-area">
+                    <h3 class="section-title">Daftar Bahan Kajian</h3>
+                    <p class="section-subtitle">Kelola detail rumusan atau Impor massal melalui Excel</p>
                 </div>
-                
-                <div class="action-buttons" style="flex-wrap: wrap;">
+
+                <div class="action-buttons">
+                    <button class="btn-action btn-add" onclick="openModalAdd()">
+                        <i class="fas fa-plus"></i> <span class="btn-text">Tambah BK</span>
+                    </button>
                     <button class="btn-action btn-download" onclick="exportKeExcel()">
-                        <i class="fas fa-file-download"></i> Template
+                        <i class="fas fa-file-download"></i> <span class="btn-text">Template</span>
                     </button>
-                    
-                    <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;" onchange="uploadExcel()">
+
+                    <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;"
+                        onchange="uploadExcel()">
                     <button class="btn-action btn-upload" onclick="document.getElementById('fileExcel').click()">
-                        <i class="fas fa-file-upload"></i> Impor Excel
-                    </button>
-                    
-                    <button class="btn-action btn-primary-si" onclick="openModalAdd()">
-                        <i class="fas fa-plus"></i> Tambah BK
+                        <i class="fas fa-file-upload"></i> <span class="btn-text">Impor</span>
                     </button>
                 </div>
             </div>
-        </div>
 
-        <div class="scrollable-content">
+            <!-- Area Tabel (DIBIARKAN UTUH SESUAI PERMINTAAN) -->
             <div class="table-container">
-                <!-- SUNTIKKAN KELAS tabel-bk DI SINI -->
-                <table class="tabel-bk">
+                <table>
                     <thead>
                         <tr>
-                            <th style="width: 8%;">Kode</th>
-                            <th style="width: 15%;">Bahan Kajian</th>
-                            <th style="width: 25%;">Deskripsi</th>
-                            <th style="width: 20%;">Kompetensi</th>
-                            <th style="width: 12%;">Koordinator</th>
-                            <th style="width: 12%;">Referensi</th>
-                            <th style="width: 8%; text-align: center;">Opsi</th>
+                            <th>Kode</th>
+                            <th>Bahan Kajian</th>
+                            <th>Deskripsi</th>
+                            <th>Kompetensi</th>
+                            <th>Koordinator</th>
+                            <th>Referensi</th>
+                            <th style="text-align: center;">Opsi</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr><td colspan="7" style="text-align: center; padding: 40px;">Memuat data...</td></tr>
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px;">Memuat data...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- MODAL POP UP (TAMBAH / EDIT) -->
-    <div class="modal-overlay" id="inputModal">
-        <div class="modal-box" style="width: 600px; max-height: 90vh; overflow-y: auto;">
-            <h2 id="modalTitle" style="margin-top: 0; margin-bottom: 25px; font-weight: 800; color: var(--text-dark); font-size: 1.4rem;">Tambah Bahan Kajian</h2>
+    <!-- Modal Form (DIBIARKAN UTUH) -->
+    <div class="modal" id="inputModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Tambah Bahan Kajian</div>
             <input type="hidden" id="modalMode" value="add">
-            
+
             <div class="form-group">
                 <label>Kode BK (Contoh: BK01)</label>
-                <input type="text" id="inpKode" class="form-control" placeholder="Masukkan kode unik BK...">
+                <input type="text" id="inpKode" placeholder="Masukkan kode unik BK...">
             </div>
             <div class="form-group">
                 <label>Nama Bahan Kajian</label>
-                <input type="text" id="inpNama" class="form-control" placeholder="Contoh: Foundation of IS">
+                <input type="text" id="inpNama" placeholder="Contoh: Foundation of IS">
             </div>
             <div class="form-group">
                 <label>Deskripsi</label>
-                <textarea id="inpDeskripsi" rows="3" class="form-control" style="resize: vertical;" placeholder="Jelaskan cakupan materi BK ini..."></textarea>
+                <textarea id="inpDeskripsi" rows="4" placeholder="Jelaskan cakupan materi BK ini..."></textarea>
             </div>
             <div class="form-group">
                 <label>Kompetensi</label>
-                <textarea id="inpKompetensi" rows="3" class="form-control" style="resize: vertical;" placeholder="Target kemampuan yang ingin dicapai..."></textarea>
+                <textarea id="inpKompetensi" rows="4" placeholder="Target kemampuan yang ingin dicapai..."></textarea>
             </div>
             <div class="form-group">
                 <label>Koordinator BK</label>
-                <input type="text" id="inpKoordinator" class="form-control" placeholder="Nama dosen pengampu utama...">
+                <input type="text" id="inpKoordinator" placeholder="Nama dosen pengampu utama...">
             </div>
-            <div class="form-group" style="margin-bottom: 30px;">
+            <div class="form-group">
                 <label>Referensi</label>
-                <textarea id="inpReferensi" rows="2" class="form-control" style="resize: vertical;" placeholder="Daftar buku atau sumber pustaka..."></textarea>
+                <textarea id="inpReferensi" rows="3" placeholder="Daftar buku atau sumber pustaka..."></textarea>
             </div>
 
-            <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button onclick="closeModal()" style="padding: 12px 20px; border: 1px solid #cbd5e1; background: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; color: #475569;">Batal</button>
-                <button onclick="saveData()" class="btn-primary-si" style="margin: 0;"><i class="fas fa-save"></i> Simpan Data</button>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
+                <button onclick="closeModal()"
+                    style="padding: 12px 20px; border: 1px solid #cbd5e1; background: none; border-radius: 8px; cursor: pointer; font-weight: 600;">Batal</button>
+                <button onclick="saveData()"
+                    style="padding: 12px 20px; background: var(--primary-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">Simpan
+                    Data</button>
             </div>
         </div>
     </div>
 
-<script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
-    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        if(PRODI === "ti") {
-            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
-            document.documentElement.style.setProperty('--primary-red', '#8b0000'); 
-            document.getElementById('prodiBadge').innerText = "PRODI TI";
-        } else {
-            document.getElementById('prodiBadge').innerText = "PRODI SI";
+    <!-- Memanggil Template Sidebar -->
+    <script src="../../../js/template.js?v=2"></script>
+
+    <script>
+        const PRODI = localStorage.getItem("prodi_aktif") || "ti";
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        // Setting Badge & Warna Prodi
+        const pAktif = localStorage.getItem("prodi_aktif") || "ti";
+        const warnaProdi = pAktif === 'si' ? '#1e3a8a' : '#8b0000';
+
+        document.getElementById("titleSpan").style.color = warnaProdi;
+        const badge = document.getElementById("prodiBadge");
+        if (badge) {
+            badge.style.backgroundColor = warnaProdi;
+            badge.innerText = pAktif === 'si' ? "SISTEM INFORMASI" : "TEKNIK INFORMATIKA";
         }
 
-        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
-        const avatarMobile = document.getElementById("mobileNavbarAvatar");
-        if(avatarMobile) {
-            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
-            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+        async function loadDropdownKurikulum() {
+            try {
+                const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+                const data = await response.json();
+                const selectKurikulum = document.getElementById('filterKurikulum');
+                selectKurikulum.innerHTML = '';
+                data.forEach(item => {
+                    let opt = document.createElement('option');
+                    opt.value = item.kurikulum;
+                    opt.text = "Kurikulum 20" + item.kurikulum;
+                    selectKurikulum.appendChild(opt);
+                });
+                await loadData();
+            } catch (error) {
+                console.error("Gagal memuat list kurikulum:", error);
+                document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+            }
         }
-    });
 
-    // --- FUNGSI SIDEBAR MOBILE ---
-    function toggleSidebar() {
-        document.getElementById('sidebar-container').classList.toggle('active');
-        document.getElementById('mobileOverlay').classList.toggle('active');
-    }
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        setTimeout(() => {
-            const sidebar = document.getElementById('sidebar-container');
-            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
-                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
-                    .then(res => res.text())
-                    .then(html => {
-                        sidebar.innerHTML = html;
-                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
-                    })
-                    .catch(e => console.log('Gagal memuat sidebar darurat'));
-            }
-        }, 600); 
-    });
+        async function loadData() {
+            const tbody = document.getElementById('tableBody');
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "";
+            let API_BK_DINAMIS = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
+            if (kurikulumTerpilih !== "") API_BK_DINAMIS += `&kurikulum=${kurikulumTerpilih}`;
 
-    const userLogin = localStorage.getItem("user_login");
-    if (!userLogin) window.location.replace("/login/login.html");
+            try {
+                const res = await fetch(API_BK_DINAMIS);
+                const data = await res.json();
+                tbody.innerHTML = '';
 
-    window.onload = () => { setTimeout(loadDataBK, 400); };
+                const aman = (str) => {
+                    if (!str) return '';
+                    return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n').replace(/\r/g, '');
+                };
 
-    // FUNGSI UPLOAD EXCEL KE N8N
-    async function uploadExcel() {
-        const fileInput = document.getElementById('fileExcel');
-        const file = fileInput.files[0];
-        if (!file) return;
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 40px;">Data BK Kosong untuk kurikulum ini.</td></tr>';
+                    return;
+                }
 
-        const formData = new FormData();
-        formData.append('data', file); 
-        formData.append('prodi', PRODI);
-
-        const btnUpload = document.querySelector('.btn-upload');
-        const oriText = btnUpload.innerHTML;
-        btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
-        btnUpload.disabled = true;
-
-        try {
-            const res = await fetch(`${API_BASE}/upload-master-bk?prodi=${PRODI}`, {
-                method: 'POST', body: formData 
-            });
-
-            if (res.ok) {
-                alert("✅ Data Excel berhasil diimpor!");
-                await loadDataBK(); 
-            } else { alert("❌ Gagal memproses file Excel."); }
-        } catch (e) { alert("❌ Terjadi kesalahan koneksi."); } 
-        finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
-    }
-
-    async function loadDataBK() {
-        const tbody = document.getElementById('tableBody');
-        try {
-            const res = await fetch(`${API_BASE}/get-master-bk?prodi=${PRODI}`);
-            const data = await res.json();
-            
-            tbody.innerHTML = '';
-
-            const aman = (str) => {
-                if (!str) return '';
-                return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n').replace(/\r/g, '');
-            };
-
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 40px;">Belum ada data Bahan Kajian. Silakan impor via Excel atau Tambah BK.</td></tr>'; 
-                return;
-            }
-
-            data.forEach(bk => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="font-weight: 800; color: var(--primary-red);">${bk.kode_bk}</td>
-                    <td style="font-weight: 800; color: #1e293b;">${bk.nama_bk}</td>
-                    <td style="color: #475569; white-space: pre-wrap;">${bk.deskripsi || '-'}</td>
-                    <td style="color: #475569; white-space: pre-wrap;">${bk.kompetensi || '-'}</td>
-                    <td style="font-weight: 700; color: var(--primary-blue);">${bk.koordinator_bk || '-'}</td>
-                    <td style="font-size: 0.85rem; font-style: italic; color: #64748b; white-space: pre-wrap;">${bk.referensi || '-'}</td>
-                    <td style="text-align: center;">
-                        <button class="btn-action btn-edit" style="background:#f1f5f9; color:var(--primary-blue); border:1px solid #cbd5e1; padding: 6px 12px; margin: 0 auto;" onclick="openModalEdit('${bk.kode_bk}', '${aman(bk.nama_bk)}', '${aman(bk.deskripsi)}', '${aman(bk.kompetensi)}', '${aman(bk.koordinator_bk)}', '${aman(bk.referensi)}')">
+                data.forEach(bk => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                    <td style="font-weight: 800; color: var(--primary-blue);">${bk.kode_bk}</td>
+                    <td style="font-weight: 700; color: #1e293b;">${bk.nama_bk}</td>
+                    <td style="color: #64748b; white-space: pre-wrap;">${bk.deskripsi || '-'}</td>
+                    <td style="color: #64748b; white-space: pre-wrap;">${bk.kompetensi || '-'}</td>
+                    <td style="font-weight: 600; color: #475569;">${bk.koordinator_bk || '-'}</td>
+                    <td style="font-size: 0.8rem; font-style: italic; color: #64748b; white-space: pre-wrap;">${bk.referensi || '-'}</td>
+                    <td>
+                        <button class="btn-edit" onclick="openModalEdit('${bk.kode_bk}', '${aman(bk.nama_bk)}', '${aman(bk.deskripsi)}', '${aman(bk.kompetensi)}', '${aman(bk.koordinator_bk)}', '${aman(bk.referensi)}')">
                             <i class="fas fa-edit"></i> Edit
                         </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        } catch (e) { tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 40px;">Gagal memuat data dari server.</td></tr>'; }
-    }
-
-    function openModalAdd() {
-        document.getElementById('modalTitle').innerText = "Tambah Bahan Kajian";
-        document.getElementById('modalMode').value = "add";
-        document.getElementById('inpKode').disabled = false;
-        document.getElementById('inpKode').style.background = "#fff";
-        resetForm();
-        document.getElementById('inputModal').style.display = 'flex';
-        setTimeout(() => document.getElementById('inputModal').classList.add('show'), 10);
-    }
-
-    function openModalEdit(kode, nama, desk, komp, koor, ref) {
-        document.getElementById('modalTitle').innerText = "Edit Perumusan BK";
-        document.getElementById('modalMode').value = "edit";
-        document.getElementById('inpKode').value = kode;
-        document.getElementById('inpKode').disabled = true; 
-        document.getElementById('inpKode').style.background = "#f8fafc";
-        document.getElementById('inpNama').value = nama;
-        document.getElementById('inpDeskripsi').value = desk;
-        document.getElementById('inpKompetensi').value = komp;
-        document.getElementById('inpKoordinator').value = koor;
-        document.getElementById('inpReferensi').value = ref;
-        
-        document.getElementById('inputModal').style.display = 'flex';
-        setTimeout(() => document.getElementById('inputModal').classList.add('show'), 10);
-    }
-
-    function closeModal() { 
-        document.getElementById('inputModal').classList.remove('show');
-        setTimeout(() => document.getElementById('inputModal').style.display = 'none', 200); 
-    }
-    
-    function resetForm() { 
-        document.getElementById('inpKode').value = ''; 
-        document.getElementById('inpNama').value = ''; 
-        document.getElementById('inpDeskripsi').value = ''; 
-        document.getElementById('inpKompetensi').value = ''; 
-        document.getElementById('inpKoordinator').value = ''; 
-        document.getElementById('inpReferensi').value = ''; 
-    }
-
-    async function saveData() {
-        const mode = document.getElementById('modalMode').value;
-        const endpoint = mode === 'add' ? 'add-master-bk' : 'update-master-bk';
-        
-        const payload = {
-            kode_bk: document.getElementById('inpKode').value,
-            nama_bk: document.getElementById('inpNama').value,
-            deskripsi: document.getElementById('inpDeskripsi').value,
-            kompetensi: document.getElementById('inpKompetensi').value,
-            koordinator_bk: document.getElementById('inpKoordinator').value,
-            referensi: document.getElementById('inpReferensi').value,
-            prodi: PRODI
-        };
-
-        if(!payload.kode_bk || !payload.nama_bk) return alert("Kode dan Nama BK wajib diisi!");
-
-        const btnSimpan = document.querySelector("#inputModal .btn-primary-si");
-        const textAwal = btnSimpan.innerHTML;
-        btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-        btnSimpan.disabled = true;
-
-        try {
-            const res = await fetch(`${API_BASE}/${endpoint}`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-            });
-            if (res.ok) { alert("✅ Data berhasil disimpan!"); closeModal(); loadDataBK(); }
-            else { alert("❌ Gagal menyimpan data ke server."); }
-        } catch (e) { alert("❌ Terjadi kesalahan koneksi."); }
-        finally { btnSimpan.innerHTML = textAwal; btnSimpan.disabled = false; }
-    }
-
-    async function exportKeExcel() {
-        const btn = document.querySelector('.btn-download');
-        const oriText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
-
-        try {
-            const res = await fetch(`${API_BASE}/get-master-bk?prodi=${PRODI}`);
-            const data = await res.json();
-
-            if (!data || data.length === 0) {
-                alert("Belum ada data untuk di-export. Silakan tambah BK manual dulu satu kali.");
-                return;
+                    </td>`;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 40px;">Gagal memuat data.</td></tr>';
             }
+        }
 
-            const dataMapping = data.map(bk => ({
-                'kode_bk': bk.kode_bk, 'nama_bk': bk.nama_bk, 'deskripsi': bk.deskripsi || '',
-                'kompetensi': bk.kompetensi || '', 'koordinator_bk': bk.koordinator_bk || '', 'referensi': bk.referensi || ''
-            }));
+        async function uploadExcel() {
+            const fileInput = document.getElementById('fileExcel');
+            const file = fileInput.files[0];
+            if (!file) return;
 
-            const worksheet = XLSX.utils.json_to_sheet(dataMapping);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Master_BK");
-            XLSX.writeFile(workbook, `Data_Master_BK_${PRODI}.xlsx`);
+            const formData = new FormData();
+            formData.append('data', file);
+            formData.append('prodi', PRODI);
 
-        } catch (e) { alert("Gagal mengambil data untuk export."); } 
-        finally { btn.innerHTML = oriText; }
-    }
-</script>
+            const btnUpload = document.querySelector('.btn-upload');
+            const oriText = btnUpload.innerHTML;
+            btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
+            btnUpload.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/upload-master-bk?prodi=${PRODI}`, { method: 'POST', body: formData });
+                if (res.ok) { alert("✅ Data Excel berhasil diimpor!"); await loadDropdownKurikulum(); }
+                else { alert("❌ Gagal memproses file Excel."); }
+            } catch (e) { alert("❌ Terjadi kesalahan koneksi."); }
+            finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
+        }
+
+        function openModalAdd() {
+            document.getElementById('modalTitle').innerText = "Tambah Bahan Kajian";
+            document.getElementById('modalMode').value = "add";
+            document.getElementById('inpKode').disabled = false;
+            resetForm();
+            document.getElementById('inputModal').style.display = 'flex';
+        }
+
+        function openModalEdit(kode, nama, desk, komp, koor, ref) {
+            document.getElementById('modalTitle').innerText = "Edit Perumusan BK";
+            document.getElementById('modalMode').value = "edit";
+            document.getElementById('inpKode').value = kode;
+            document.getElementById('inpKode').disabled = true;
+            document.getElementById('inpNama').value = nama;
+            document.getElementById('inpDeskripsi').value = desk;
+            document.getElementById('inpKompetensi').value = komp;
+            document.getElementById('inpKoordinator').value = koor;
+            document.getElementById('inpReferensi').value = ref;
+            document.getElementById('inputModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('inputModal').style.display = 'none'; }
+
+        function resetForm() {
+            document.getElementById('inpKode').value = '';
+            document.getElementById('inpNama').value = '';
+            document.getElementById('inpDeskripsi').value = '';
+            document.getElementById('inpKompetensi').value = '';
+            document.getElementById('inpKoordinator').value = '';
+            document.getElementById('inpReferensi').value = '';
+        }
+
+        async function saveData() {
+            const mode = document.getElementById('modalMode').value;
+            const endpoint = mode === 'add' ? 'add-master-bk' : 'update-master-bk';
+
+            const payload = {
+                kode_bk: document.getElementById('inpKode').value,
+                nama_bk: document.getElementById('inpNama').value,
+                deskripsi: document.getElementById('inpDeskripsi').value,
+                kompetensi: document.getElementById('inpKompetensi').value,
+                koordinator_bk: document.getElementById('inpKoordinator').value,
+                referensi: document.getElementById('inpReferensi').value,
+                prodi: PRODI
+            };
+
+            if (!payload.kode_bk || !payload.nama_bk) return alert("Kode dan Nama BK wajib diisi!");
+
+            try {
+                const res = await fetch(`${API_BASE}/${endpoint}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+                });
+                if (res.ok) { alert("✅ Data berhasil disimpan!"); closeModal(); loadData(); }
+            } catch (e) { alert("❌ Terjadi kesalahan koneksi."); }
+        }
+
+        async function exportKeExcel() {
+            const btn = document.querySelector('.btn-download');
+            const oriText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan...';
+
+            let kurikulumTerpilih = document.getElementById('filterKurikulum').value;
+            let API_BK_DINAMIS = `${API_BASE}/get-master-bk?prodi=${PRODI}&kurikulum=${kurikulumTerpilih}`;
+
+            try {
+                const res = await fetch(API_BK_DINAMIS);
+                const data = await res.json();
+                if (!data || data.length === 0) { alert("Belum ada data untuk di-export."); return; }
+
+                const dataMapping = data.map(bk => ({
+                    'kode_bk': bk.kode_bk, 'nama_bk': bk.nama_bk, 'deskripsi': bk.deskripsi || '', 'kompetensi': bk.kompetensi || '', 'koordinator_bk': bk.koordinator_bk || '', 'referensi': bk.referensi || ''
+                }));
+                const worksheet = XLSX.utils.json_to_sheet(dataMapping);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Master_BK");
+                XLSX.writeFile(workbook, `Data_Master_BK_${PRODI}_Kurikulum_${kurikulumTerpilih}.xlsx`);
+            } catch (e) { alert("Gagal mengambil data untuk export."); }
+            finally { btn.innerHTML = oriText; }
+        }
+
+        // 1. Fungsi Buka/Tutup dari Navbar 
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar) sidebar.classList.toggle('active');
+        }
+
+        // 2. Fungsi Buka/Tutup dari dalam Sidebar 
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar) sidebar.classList.toggle('active');
+        }
+
+        // 3. SENSOR PENUTUP (Deteksi klik di layar gelap)
+        document.addEventListener('click', function (event) {
+            const sidebar = document.getElementById("sidebar-container");
+            const hamburgerBtn = document.querySelector('.hamburger-btn') || document.querySelector('.mobile-menu-btn');
+
+            if (sidebar && sidebar.classList.contains("active")) {
+                if (!sidebar.contains(event.target) && (!hamburgerBtn || !hamburgerBtn.contains(event.target))) {
+                    sidebar.classList.remove("active");
+                }
+            }
+        });
+
+        window.onload = async () => { await loadDropdownKurikulum(); };
+    </script>
 </body>
+
 </html>

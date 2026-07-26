@@ -5,142 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matriks CPL vs MK - Sistem OBE</title>
     
-    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/admin_si.css">
-    
+    <!-- MEMANGGIL FILE CSS STANDAR -->
+    <link rel="stylesheet" href="../../../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="/js/api_config.js"></script>
-    <script src="/js/template.js"></script>
-
-    <style>
-        /* =========================================
-           ✨ BEAUTIFY MATRIKS DESKTOP (ANTI-CACHE) ✨
-           ========================================= */
-        .tabel-matriks-cpl-mk-wrapper { 
-            overflow: auto !important; 
-            max-height: 68vh !important; /* Ditinggikan agar pas di layar */
-            border: 1px solid var(--border-color) !important; 
-            border-radius: 12px; 
-            background: white; 
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
-            margin-bottom: 0 !important;
-        }
-        .tabel-matriks-cpl-mk { 
-            width: 100%; 
-            border-collapse: separate !important; 
-            border-spacing: 0 !important; 
-            white-space: nowrap !important; 
-        }
-        .tabel-matriks-cpl-mk th { 
-            background: #1e293b !important; /* Navy Gelap */
-            color: white !important; 
-            font-weight: 700; 
-            padding: 15px 10px !important; 
-            position: sticky; 
-            top: 0; 
-            z-index: 10; 
-            border-bottom: 2px solid #0f172a !important; 
-            border-right: 1px solid #334155 !important; 
-            text-align: center; 
-            vertical-align: middle; 
-            font-size: 0.85rem;
-        }
-        .tabel-matriks-cpl-mk td { 
-            border-bottom: 1px solid var(--border-color) !important; 
-            border-right: 1px solid var(--border-color) !important; 
-            padding: 12px 10px !important; 
-            font-size: 0.85rem; 
-            text-align: center; 
-            color: #1e293b; 
-            background: white; 
-        }
-
-        /* STICKY KOLOM 1: SEMESTER */
-        .tabel-matriks-cpl-mk th.sticky-col-1 { position: sticky; left: 0; z-index: 20 !important; background: #0f172a !important; min-width: 60px; max-width: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;}
-        .tabel-matriks-cpl-mk td.sticky-col-1 { position: sticky; left: 0; z-index: 5 !important; background: #f8fafc !important; font-weight: 600; border-right: 1px solid #cbd5e1 !important; min-width: 60px; max-width: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;}
-
-        /* STICKY KOLOM 2: KODE MK */
-        .tabel-matriks-cpl-mk th.sticky-col-2 { position: sticky; left: 60px; z-index: 20 !important; background: #0f172a !important; min-width: 100px; box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;}
-        .tabel-matriks-cpl-mk td.sticky-col-2 { position: sticky; left: 60px; z-index: 5 !important; background: #f8fafc !important; font-weight: 800; color: var(--primary-blue) !important; border-right: 2px solid #cbd5e1 !important; box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;}
-
-        /* GAYA CHECKMARK DAN HOVER */
-        .tabel-matriks-cpl-mk .check-mark { color: #10b981; font-weight: 900; font-size: 1.2rem; }
-        .tabel-matriks-cpl-mk tbody tr:hover td { background-color: #f0f9ff !important; } /* Biru muda saat disorot */
-        .tabel-matriks-cpl-mk tbody tr:hover td.sticky-col-1,
-        .tabel-matriks-cpl-mk tbody tr:hover td.sticky-col-2 { background-color: #e0f2fe !important; }
-
-        @media screen and (max-width: 768px) {
-            .header-matriks-mk { margin: 15px 20px 10px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 15px; padding-bottom: 0 !important; border-bottom: none !important;}
-            .section-matriks-mk { padding: 0 20px 20px 20px !important; }
-        }
-    </style>
+    <script src="../../../js/api_config.js"></script>
+    
+    <!-- Panggil CSS -->
+    <link rel="stylesheet" href="cpl_mk.css">
+    <link rel="stylesheet" href="../../../css/global_ti.css">
 </head>
 <body>
 
-    <nav class="navbar-mobile">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="hamburger-btn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
-                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
-                 onclick="window.location.href='/index.html'">
-        </div>
-        <div class="profile-btn-mobile" onclick="toggleSidebar()">
-            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
-        </div>
-    </nav>
-
-    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
     <div id="sidebar-container"></div>
+    <div id="navbar-container"></div>
 
-    <!-- PANGKAS PADDING ATAS -->
-    <div class="main-content" style="padding-top: 20px;">
-        <div id="navbar-container"></div>
+    <div class="main-content">
+        <!-- SATUKAN SEMUA KE DALAM CONTENT-WRAPPER -->
+        <div class="content-wrapper">
 
-        <div class="fixed-header">
-            <!-- PANGKAS MARGIN ATAS MENJADI 0 -->
-            <div class="header-container header-matriks-mk" style="margin: 0 50px 15px 50px; border-bottom: none; padding-bottom: 0;">
-                <div class="header-title-area">
-                    <div class="header-subtitle" style="margin-bottom: 5px;">MATRIKS KURIKULUM</div>
-                    <h1 class="header-title" style="font-size: 2rem;">PEMETAAN <span>CPL - MK</span></h1>
+            <!-- TEMPLATE: Header -->
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="header-title-area">
+                        <div class="header-subtitle">MATRIKS KURIKULUM</div>
+                        <h1 class="header-title">PEMETAAN <span>CPL - MK</span></h1>
+                    </div>
                 </div>
-                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
-            
-            <div class="header-matriks-mk" style="display: flex; justify-content: space-between; align-items: center; margin: 0 50px 15px 50px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
-                <p style="color: #6b7280; font-size: 0.95rem; margin: 0;">
-                    Tabel di bawah ini menunjukkan sebaran Capaian Pembelajaran Lulusan (CPL) pada setiap Mata Kuliah.
-                </p>
-                <button id="btnSaveMatriks" class="btn-primary-si" onclick="simpanMatriks()" style="margin: 0;">
-                    <i class="fas fa-save"></i> Simpan Matriks CPL - MK
-                </button>
-            </div>
-        </div>
 
-        <div class="scrollable-content section-matriks-mk" style="padding: 0 50px 20px 50px;">
-            </br>
-            <div style="margin-bottom: 20px;">
-                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
-                <select id="filterKurikulum" onchange="loadData()">
+            <!-- TEMPLATE: Filter Section -->
+            <div class="filter-section">
+                <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
+                <select id="filterKurikulum" onchange="loadDataMatriks()" class="filter-select">
                     <option value="">Memuat data...</option>
                 </select>
             </div>
+
+            <!-- TEMPLATE: Section Header -->
+            <div class="section-header">
+                <div class="section-title-area">
+                    <h3 class="section-title">Relasi Matriks</h3>
+                    <p class="section-subtitle">Tabel sebaran Capaian Pembelajaran Lulusan (CPL) pada setiap Mata Kuliah.</p>
+                </div>
+                <div class="action-buttons">
+                    <!-- Tombol Simpan Matriks -->
+                    <button id="btnSaveMatriks" class="btn-action btn-dark" onclick="simpanMatriks()">
+                        <i class="fas fa-save"></i> <span class="btn-text">Simpan Matriks</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Area Tabel Matriks (Logika CSS dibiarkan utuh) -->
             <div class="tabel-matriks-cpl-mk-wrapper" id="areaTabel">
                 <p style="padding: 50px; text-align: center; color: #6b7280; font-weight: 600;">
                     <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; color: var(--primary-blue);"></i><br>
                     Memuat Matriks Kurikulum dari Database...
                 </p>
             </div>
+
         </div>
     </div>
 
+<script src="../../../js/template.js"></script>
+
 <script>
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
+    const userLogin = localStorage.getItem("user_login");
+    if (!userLogin) window.location.replace("/login/login.html");
     
+    // SET TEMA WARNA SESUAI PRODI
     document.addEventListener("DOMContentLoaded", () => {
         if(PRODI === "ti") {
             document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
@@ -149,33 +85,23 @@
             document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
             document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
         }
-        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
-        const avatarMobile = document.getElementById("mobileNavbarAvatar");
-        if(avatarMobile) {
-            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
-            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
-        }
     });
 
-    function toggleSidebar() {
-        document.getElementById('sidebar-container').classList.toggle('active');
-        document.getElementById('mobileOverlay').classList.toggle('active');
-    }
-    
-    const userLogin = localStorage.getItem("user_login");
-    if (!userLogin) window.location.replace("/login/login.html");
-
+    // --- FUNGSI LOAD KURIKULUM (Standar Tanpa "Semua Kurikulum") ---
     async function loadDropdownKurikulum() {
         try {
             const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
             const data = await response.json();
             const selectKurikulum = document.getElementById('filterKurikulum');
             selectKurikulum.innerHTML = ''; 
+            
             data.forEach(item => {
-                let opt = document.createElement('option');
-                opt.value = item.kurikulum; 
-                opt.text = "Kurikulum 20" + item.kurikulum; 
-                selectKurikulum.appendChild(opt);
+                if (item && item.kurikulum) {
+                    let opt = document.createElement('option');
+                    opt.value = item.kurikulum; 
+                    opt.text = "Kurikulum 20" + item.kurikulum; 
+                    selectKurikulum.appendChild(opt);
+                }
             });
             await loadDataMatriks(); 
         } catch (error) {
@@ -184,6 +110,7 @@
         }
     }
 
+    // --- LOGIKA TABEL MATRIKS ---
     async function loadDataMatriks() {
         const areaTabel = document.getElementById('areaTabel');
         areaTabel.innerHTML = `<p style="padding: 50px; text-align: center; color: #6b7280; font-weight: 600;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; color: var(--primary-blue);"></i><br>Memuat Matriks Kurikulum dari Database...</p>`;
@@ -217,7 +144,7 @@
             renderTabel(daftarCPL, dataMatriks);
 
         } catch (error) {
-            areaTabel.innerHTML = `<p style="padding: 40px; text-align: center; color: red; font-weight: bold;">❌ Gagal terhubung ke Server N8N. Periksa koneksi.</p>`;
+            areaTabel.innerHTML = `<p style="padding: 40px; text-align: center; color: red; font-weight: bold;">❌ Gagal terhubung ke Server. Periksa koneksi.</p>`;
         }
     }
 
@@ -241,7 +168,7 @@
             let labelSingkat = cpl.kode.replace('SI-CPL', '').replace('TI-CPL', '').replace('CPL', '');
             if(labelSingkat.startsWith('-') || labelSingkat.startsWith('0')) labelSingkat = labelSingkat.substring(1); 
             if(labelSingkat === '') labelSingkat = cpl.kode;
-            html += `<th title="${cpl.label || cpl.nama || ''}">${labelSingkat}</th>`;
+            html += `<th title="${cpl.label || cpl.nama || cpl.deskripsi || ''}">${labelSingkat}</th>`;
         });
         html += `</tr></thead><tbody id="bodyMatriksMk">`;
 
@@ -257,10 +184,16 @@
                         <td style="text-align: left; font-weight: 600;">${row.nama_mk}</td>
                         <td>${row.sks}</td>
                 `;
+                
+                // --- GANTI BAGIAN INI DI DALAM FUNGSI renderTabel ---
                 daftarCPL.forEach(cpl => {
                     const isChecked = cplTerkait.includes(cpl.kode);
                     const chk = isChecked ? 'checked' : '';
-                    html += `<td style="text-align: center;">
+                    
+                    // 🔴 PERUBAHAN: Hanya mengambil kode CPL saja (Misal: TI-CPL01) tanpa deskripsi panjang
+                    let safeLabel = cpl.kode; 
+                    
+                    html += `<td class="td-cpl" data-label="${safeLabel}" style="text-align: center;">
                                 <input type="checkbox" class="chk-matrix-mk" data-mk="${row.kode_mk}" data-cpl="${cpl.kode}" ${chk} style="cursor: pointer; transform: scale(1.2);">
                              </td>`;
                 });
@@ -273,7 +206,10 @@
 
     async function simpanMatriks() {
         const btnSave = document.getElementById('btnSaveMatriks');
-        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        const textAwal = btnSave.innerHTML; // Simpan teks HTML awal
+        
+        // Memakai struktur <span> agar konsisten dengan template mobile
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span class="btn-text">Menyimpan...</span>';
         btnSave.disabled = true;
 
         const checkedBoxes = document.querySelectorAll('.chk-matrix-mk:checked');
@@ -283,11 +219,9 @@
             mappingData.push({ kode_mk: cb.getAttribute('data-mk'), kode_cpl: cb.getAttribute('data-cpl') });
         });
 
-        // 1. Tangkap Kurikulum
         const selectKurikulum = document.getElementById('filterKurikulum');
         let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
 
-        // 2. Sisipkan kurikulum ke payload
         const payload = { 
             prodi: PRODI, 
             mapping: mappingData,
@@ -301,8 +235,35 @@
             if (response.ok) alert("✅ Matriks Relasi CPL - MK berhasil disimpan!");
             else throw new Error("Respon server tidak ok");
         } catch (error) { alert("❌ Gagal menyimpan data ke server."); } 
-        finally { btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks CPL - MK'; btnSave.disabled = false; }
+        finally { 
+            btnSave.innerHTML = textAwal; 
+            btnSave.disabled = false; 
+        }
     }
+
+    // 1. Fungsi Buka/Tutup dari Navbar 
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('sidebar-container');
+        if (sidebar) sidebar.classList.toggle('active');
+    }
+
+    // 2. Fungsi Buka/Tutup dari dalam Sidebar 
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar-container');
+        if (sidebar) sidebar.classList.toggle('active');
+    }
+
+    // 3. SENSOR PENUTUP (Deteksi klik di layar gelap)
+    document.addEventListener('click', function(event) {
+        const sidebar = document.getElementById("sidebar-container");
+        const hamburgerBtn = document.querySelector('.hamburger-btn') || document.querySelector('.mobile-menu-btn'); 
+        
+        if (sidebar && sidebar.classList.contains("active")) {
+            if (!sidebar.contains(event.target) && (!hamburgerBtn || !hamburgerBtn.contains(event.target))) {
+                sidebar.classList.remove("active"); 
+            }
+        }
+    });
 
     window.onload = async () => { await loadDropdownKurikulum(); };
 </script>

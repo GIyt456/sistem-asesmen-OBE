@@ -13,48 +13,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="../../../js/api_config.js"></script>    
     <link rel="stylesheet" href="cpl.css">
+    <link rel="stylesheet" href="../../../css/global_ti.css">
 </head>
 <body>
     <div id="sidebar-container"></div>
     <div id="navbar-container"></div>
+    
     <div class="main-content">
-        <div class="fixed-header">
+        <!-- SATUKAN SEMUA KE DALAM CONTENT-WRAPPER -->
+        <div class="content-wrapper"> 
+            
             <div class="header-container">
-                <div class="header-title-area">
-                    <div class="header-subtitle">KELOLA KURIKULUM</div>
-                    <!-- Warna span judul disetel dinamis oleh JS di bawah -->
-                    <h1 class="header-title">CAPAIAN <span id="titleSpan">PEMBELAJARAN (CPL)</span></h1>
+                <div class="header-left">
+                    <div class="header-title-area">
+                        <div class="header-subtitle">KELOLA KURIKULUM</div>
+                        <h1 class="header-title">CAPAIAN <span id="titleSpan">PEMBELAJARAN (CPL)</span></h1>
+                    </div>
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
-                <select id="filterKurikulum" onchange="loadData()">
+            <!-- TEMPLATE: Filter Section -->
+            <div class="filter-section">
+                <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
+                <select id="filterKurikulum" onchange="loadData()" class="filter-select">
                     <option value="">Memuat data...</option>
                 </select>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar CPL</h3>
-                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500;">Rumusan Capaian Pembelajaran Lulusan</p>
+            <!-- TEMPLATE: Section Header -->
+            <div class="section-header">
+                <div class="section-title-area">
+                    <h3 class="section-title">Daftar CPL</h3>
+                    <p class="section-subtitle">Rumusan Capaian Pembelajaran Lulusan</p>
                 </div>
                 
                 <div class="action-buttons">
                     <button class="btn-action btn-download" onclick="exportKeExcel()">
-                        <i class="fas fa-file-download"></i> Download Excel
+                        <i class="fas fa-file-download"></i> <span class="btn-text">Download</span>
                     </button>
                     
                     <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;" onchange="uploadExcel()">
                     <button class="btn-action btn-upload" onclick="document.getElementById('fileExcel').click()">
-                        <i class="fas fa-file-upload"></i> Impor Excel
+                        <i class="fas fa-file-upload"></i> <span class="btn-text">Impor</span>
                     </button>
                 </div>
             </div>
-        </div>
-        
-        <div class="scrollable-content">
+            
+            <!-- Area Tabel CPL -->
             <div class="table-container">
                 <table>
                     <thead>
@@ -71,8 +77,9 @@
             </div>
             
             <div id="pagination-container"></div>
-        </div>
-    </div>
+            
+        </div> 
+    </div> 
 
 <!-- Memanggil Template Sidebar -->
 <script src="../../../js/template.js"></script>
@@ -282,17 +289,34 @@
         finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
     }
 
+    // 1. Fungsi Buka/Tutup dari Navbar (Garis Tiga)
     function toggleMobileSidebar() {
-        const sidebar = document.getElementById("sidebar-container");
-        if (sidebar) sidebar.classList.toggle("show-mobile");
+        const sidebar = document.getElementById('sidebar-container');
+        if (sidebar) sidebar.classList.toggle('active');
     }
 
+    // 2. Fungsi Buka/Tutup dari dalam Sidebar (Tombol Silang Merah)
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar-container');
+        if (sidebar) sidebar.classList.toggle('active');
+    }
+
+    // 3. SENSOR PENUTUP (Deteksi klik di layar gelap)
     document.addEventListener('click', function(event) {
         const sidebar = document.getElementById("sidebar-container");
-        const toggleBtn = document.getElementById("btnToggleSidebar");
-        if (sidebar && sidebar.classList.contains("show-mobile")) {
-            if (!sidebar.contains(event.target) && (!toggleBtn || !toggleBtn.contains(event.target))) {
-                sidebar.classList.remove("show-mobile");
+        
+        // Deteksi tombol hamburger bawaan dari template.js agar tidak terjadi bentrok saat dibuka
+        const hamburgerBtn = document.querySelector('.hamburger-btn') || document.querySelector('.mobile-menu-btn'); 
+        
+        // Jika sidebar saat ini sedang dalam keadaan terbuka (memiliki class active)...
+        if (sidebar && sidebar.classList.contains("active")) {
+            
+            // ...dan jarimu menekan area yang BUKAN bagian dari sidebar, 
+            // serta BUKAN bagian dari tombol hamburger...
+            if (!sidebar.contains(event.target) && (!hamburgerBtn || !hamburgerBtn.contains(event.target))) {
+                
+                // ...maka paksa sidebar untuk membuang class 'active' agar tertutup!
+                sidebar.classList.remove("active"); 
             }
         }
     });

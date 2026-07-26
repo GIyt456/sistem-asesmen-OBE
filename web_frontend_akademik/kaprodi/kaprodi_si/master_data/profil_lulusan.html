@@ -1,80 +1,86 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Lulusan - Sistem OBE</title>
-    
-    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/admin_si.css">
-    
+    <title>Profil Lulusan</title>
+    <!-- Pastikan path CSS dan JS ini sesuai dengan foldermu -->
+    <link rel="stylesheet" href="../../../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="/js/api_config.js"></script>
-    <script src="/js/template.js"></script>
+
+    <!-- Script untuk Export Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="../../../js/api_config.js"></script>
+    <link rel="stylesheet" href="profil_lulusan.css">
+    <link rel="stylesheet" href="../../../css/global_si.css?v=2">
+    <link rel="stylesheet" href="../../../css/admin_si.css">
+
 </head>
+
 <body>
 
-    <!-- 1. NAVBAR KHUSUS MOBILE -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="hamburger-btn" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
-                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
-                 onclick="window.location.href='/index.html'">
+            <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI"
+                style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;"
+                onclick="window.location.href='/index.html'">
         </div>
-        
-        <div class="profile-btn-mobile" onclick="toggleSidebar()">
-            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
-        </div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src=""
+                alt="Profil Kaprodi"></div>
     </nav>
 
-    <!-- 2. OVERLAY GELAP UNTUK LATAR SIDEBAR DI HP -->
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
-
     <div id="sidebar-container"></div>
+    <div id="navbar-container"></div>
 
     <div class="main-content">
-        <!-- WADAH NAVBAR ASLI DARI TEMPLATE.JS -->
-        <div id="navbar-container"></div>
+        <!-- SATUKAN SEMUA KE DALAM CONTENT-WRAPPER -->
+        <div class="content-wrapper">
 
-        <div class="fixed-header">
-            <div class="header-container" style="margin-bottom: 20px;">
-                <div class="header-title-area">
-                    <div class="header-subtitle">KELOLA KURIKULUM</div>
-                    <h1 class="header-title">PROFIL <span>LULUSAN</span></h1>
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="header-title-area">
+                        <div class="header-subtitle">KELOLA KURIKULUM</div>
+                        <h1 class="header-title">PROFIL <span id="titleSpan">LULUSAN</span></h1>
+                    </div>
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 1.4rem; font-weight: 800;">Daftar Profil Lulusan</h3>
-                    <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.95rem; font-weight: 500;">Rumusan standar kompetensi lulusan Program Studi.</p>
+            <!-- TEMPLATE: Filter Section -->
+            <div class="filter-section">
+                <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
+                <select id="filterKurikulum" onchange="loadData()" class="filter-select">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
+
+            <!-- TEMPLATE: Section Header -->
+            <div class="section-header">
+                <div class="section-title-area">
+                    <h3 class="section-title">Daftar Profil Lulusan</h3>
+                    <p class="section-subtitle">Rumusan standar kompetensi lulusan Program Studi.</p>
                 </div>
-                
+
                 <div class="action-buttons">
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-                    <button class="btn-action btn-download" onclick="downloadExcel()">
-                        <i class="fas fa-file-download"></i> Download Excel
+                    <button class="btn-action btn-download" onclick="exportKeExcel()">
+                        <i class="fas fa-file-download"></i> <span class="btn-text">Template</span>
                     </button>
-                    
-                    <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;" onchange="uploadExcel()">
+
+                    <input type="file" id="fileExcel" accept=".xlsx, .xls" style="display: none;"
+                        onchange="uploadExcel()">
                     <button class="btn-action btn-upload" onclick="document.getElementById('fileExcel').click()">
-                        <i class="fas fa-file-import"></i> Impor Excel
+                        <i class="fas fa-file-upload"></i> <span class="btn-text">Impor</span>
                     </button>
                 </div>
             </div>
-        </div>
 
-        <div class="scrollable-content">
+            <!-- Area Tabel PL -->
             <div class="table-container">
-                <!-- SUNTIKKAN KELAS tabel-pl AGAR CSS MOBILE BEKERJA -->
-                <table class="tabel-pl">
+                <table>
                     <thead>
                         <tr>
                             <th style="width: 15%;">KODE PL</th>
@@ -84,7 +90,9 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr><td colspan="4" style="text-align: center; padding: 50px;">Memuat data...</td></tr>
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 40px;">Memuat data...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -94,13 +102,16 @@
     <!-- MODAL EDIT PROFIL LULUSAN -->
     <div class="modal-overlay" id="editModal">
         <div class="modal-box">
-            <h2 style="margin-top: 0; margin-bottom: 25px; font-weight: 800; color: var(--text-dark); font-size: 1.4rem;">Edit Profil Lulusan</h2>
+            <h2
+                style="margin-top: 0; margin-bottom: 25px; font-weight: 800; color: var(--text-dark); font-size: 1.4rem;">
+                Edit Profil Lulusan</h2>
             <input type="hidden" id="editKode">
-            <input type="hidden" id="editProfesi"> 
-            
+            <input type="hidden" id="editProfesi">
+
             <div class="form-group">
                 <label>KODE PL</label>
-                <input type="text" id="inpKodeShow" disabled class="form-control" style="background: #f8fafc; font-weight: 700; color: var(--primary-blue);">
+                <input type="text" id="inpKodeShow" disabled class="form-control"
+                    style="background: #f8fafc; font-weight: 700; color: var(--primary-blue);">
             </div>
             <div class="form-group">
                 <label>NAMA PROFIL LULUSAN</label>
@@ -110,80 +121,104 @@
                 <label>RUMUSAN DESKRIPSI</label>
                 <textarea id="editDeskripsi" rows="6" class="form-control" style="resize: vertical;"></textarea>
             </div>
-            
+
             <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                <button onclick="closeModal()" style="padding: 12px 20px; border: 1px solid #cbd5e1; background: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s;">Batal</button>
-                <button onclick="updatePL()" class="btn-primary-si" style="margin: 0;"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                <button onclick="closeModal()"
+                    style="padding: 12px 20px; border: 1px solid #cbd5e1; background: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; color: #475569; transition: 0.2s;">Batal</button>
+                <button onclick="updatePL()" class="btn-primary-si" style="margin: 0;"><i class="fas fa-save"></i>
+                    Simpan Perubahan</button>
             </div>
         </div>
     </div>
- 
-<script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
-    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        if(PRODI === "ti") {
-            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
-            document.getElementById('prodiBadge').innerText = "PRODI TI";
-        } else {
-            document.getElementById('prodiBadge').innerText = "PRODI SI";
+
+    <!-- Memanggil Template Sidebar -->
+    <script src="../../../js/template.js?v=2"></script>
+
+    <script>
+        const PRODI = localStorage.getItem("prodi_aktif") || "si";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (PRODI === "ti") {
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000');
+                document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+            } else {
+                document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+            }
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if (avatarMobile) {
+                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+            }
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
         }
 
-        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
-        const avatarMobile = document.getElementById("mobileNavbarAvatar");
-        if(avatarMobile) {
-            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
-            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebar.innerHTML = html;
+                            if (typeof initSmartSidebar === 'function') initSmartSidebar();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar'));
+                }
+            }, 600);
+        });
+
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        async function loadDropdownKurikulum() {
+            try {
+                const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+                const data = await response.json();
+                const selectKurikulum = document.getElementById('filterKurikulum');
+                selectKurikulum.innerHTML = '';
+                data.forEach(item => {
+                    let opt = document.createElement('option');
+                    opt.value = item.kurikulum;
+                    opt.text = "Kurikulum 20" + item.kurikulum;
+                    selectKurikulum.appendChild(opt);
+                });
+                await loadData();
+            } catch (error) {
+                console.error("Gagal memuat list kurikulum:", error);
+                document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+            }
         }
-    });
 
-    // --- FUNGSI SIDEBAR MOBILE ---
-    function toggleSidebar() {
-        document.getElementById('sidebar-container').classList.toggle('active');
-        document.getElementById('mobileOverlay').classList.toggle('active');
-    }
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        setTimeout(() => {
-            const sidebar = document.getElementById('sidebar-container');
-            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
-                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
-                    .then(res => res.text())
-                    .then(html => {
-                        sidebar.innerHTML = html;
-                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
-                    })
-                    .catch(e => console.log('Gagal memuat sidebar darurat'));
-            }
-        }, 600); 
-    });
+        async function loadData() {
+            const tbody = document.getElementById('tableBody');
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "";
+            let API_PL_DINAMIS = `${API_BASE}/get-master-pl?prodi=${PRODI}`;
+            if (kurikulumTerpilih !== "") API_PL_DINAMIS += `&kurikulum=${kurikulumTerpilih}`;
 
-    const userLogin = localStorage.getItem("user_login");
-    if (!userLogin) window.location.replace("/login/login.html");
+            try {
+                const res = await fetch(API_PL_DINAMIS);
+                const data = await res.json();
+                tbody.innerHTML = '';
 
-    window.onload = () => { setTimeout(loadDataPL, 400); };
+                const aman = (str) => {
+                    if (!str) return '';
+                    return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n').replace(/\r/g, '');
+                };
 
-    async function loadDataPL() {
-        const tbody = document.getElementById('tableBody');
-        try {
-            const res = await fetch(`${API_BASE}/get-master-pl?prodi=${PRODI}`);
-            const data = await res.json();
-            tbody.innerHTML = '';
-            
-            const aman = (str) => {
-                if (!str) return '';
-                return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n').replace(/\r/g, '');
-            };
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color:#64748b;">Belum ada data Profil Lulusan untuk kurikulum ini.</td></tr>';
+                    return;
+                }
 
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color:#64748b;">Belum ada data Profil Lulusan. Silakan impor via Excel.</td></tr>';
-                return;
-            }
-
-            data.forEach(pl => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
+                data.forEach(pl => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
                     <td style="font-weight: 800; color: var(--primary-blue);">${pl.kode_pl}</td>
                     <td style="font-weight: 700;">${pl.nama_profil || '-'}</td>
                     <td style="font-size: 0.9rem;">${pl.deskripsi || '-'}</td>
@@ -193,108 +228,113 @@
                         </button>
                     </td>
                 `;
-                tbody.appendChild(tr);
-            });
-        } catch (e) { 
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color:red;">Gagal memuat data dari server.</td></tr>'; 
-        }
-    }
-
-    async function downloadExcel() {
-        const btn = document.querySelector('.btn-download'); 
-        const oriText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengekspor...';
-        btn.disabled = true;
-
-        try {
-            const res = await fetch(`${API_BASE}/get-master-pl?prodi=${PRODI}`);
-            const data = await res.json();
-
-            if (!data || data.length === 0) {
-                alert("Belum ada data untuk di-export.");
-                return;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px; color:red;">Gagal memuat data dari server.</td></tr>';
             }
-
-            const dataMapping = data.map(pl => ({
-                'kode_pl': pl.kode_pl,
-                'nama_profil': pl.nama_profil,
-                'deskripsi': pl.deskripsi || '',
-                'profesi': pl.profesi || ''
-            }));
-
-            const worksheet = XLSX.utils.json_to_sheet(dataMapping);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Master_PL");
-            XLSX.writeFile(workbook, `Data_Master_PL_${PRODI}.xlsx`);
-
-        } catch (e) {
-            console.error(e);
-            alert("Gagal mengambil data untuk export.");
-        } finally {
-            btn.innerHTML = oriText;
-            btn.disabled = false;
         }
-    }
 
-    async function uploadExcel() {
-        const fileInput = document.getElementById('fileExcel');
-        const file = fileInput.files[0];
-        if (!file) { alert("Pilih file Excel terlebih dahulu!"); return; }
+        async function downloadExcel() {
+            const btn = document.querySelector('.btn-download');
+            const oriText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengekspor...';
+            btn.disabled = true;
 
-        const formData = new FormData();
-        formData.append('data', file);
-        formData.append('prodi', PRODI); 
+            let kurikulumTerpilih = document.getElementById('filterKurikulum').value;
+            let API_PL_DINAMIS = `${API_BASE}/get-master-pl?prodi=${PRODI}&kurikulum=${kurikulumTerpilih}`;
 
-        const btnUpload = document.querySelector('.btn-upload'); 
-        const oriText = btnUpload.innerHTML;
-        btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
-        btnUpload.disabled = true;
+            try {
+                const res = await fetch(API_PL_DINAMIS);
+                const data = await res.json();
+                if (!data || data.length === 0) { alert("Belum ada data untuk di-export."); return; }
 
-        try {
-            const res = await fetch(`${API_BASE}/upload-master-pl`, { method: 'POST', body: formData });
-            if (res.ok) { 
-                alert("✅ Data Excel PL berhasil diimpor!"); 
-                location.reload(); 
-            } else { alert("❌ Gagal memproses file Excel. Cek format kolom."); }
-        } catch (e) { alert("❌ Terjadi kesalahan koneksi."); } 
-        finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
-    }
+                const dataMapping = data.map(pl => ({ 'kode_pl': pl.kode_pl, 'nama_profil': pl.nama_profil, 'deskripsi': pl.deskripsi || '', 'profesi': pl.profesi || '' }));
+                const worksheet = XLSX.utils.json_to_sheet(dataMapping);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Master_PL");
+                XLSX.writeFile(workbook, `Data_Master_PL_${PRODI}_Kurikulum_${kurikulumTerpilih}.xlsx`);
+            } catch (e) { alert("Gagal mengambil data untuk export."); }
+            finally { btn.innerHTML = oriText; btn.disabled = false; }
+        }
 
-    function openModal(kode, nama, desk, prof) {
-        document.getElementById('editKode').value = kode;
-        document.getElementById('inpKodeShow').value = kode;
-        document.getElementById('editNamaProfil').value = nama;
-        document.getElementById('editDeskripsi').value = desk;
-        document.getElementById('editProfesi').value = prof;
-        document.getElementById('editModal').style.display = 'flex';
-        // Animasi pop-up
-        setTimeout(() => document.getElementById('editModal').classList.add('show'), 10);
-    }
+        async function uploadExcel() {
+            const fileInput = document.getElementById('fileExcel');
+            const file = fileInput.files[0];
+            if (!file) { alert("Pilih file Excel terlebih dahulu!"); return; }
 
-    function closeModal() { 
-        document.getElementById('editModal').classList.remove('show');
-        setTimeout(() => document.getElementById('editModal').style.display = 'none', 200); 
-    }
+            const formData = new FormData();
+            formData.append('data', file);
+            formData.append('prodi', PRODI);
 
-    async function updatePL() {
-        const payload = {
-            kode_pl: document.getElementById('editKode').value,
-            nama_profil: document.getElementById('editNamaProfil').value,
-            deskripsi: document.getElementById('editDeskripsi').value,
-            profesi: document.getElementById('editProfesi').value,
-            prodi: PRODI
-        };
-        try {
-            const res = await fetch(`${API_BASE}/update-master-pl`, {
-                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-            });
-            if (res.ok) { 
-                alert("✅ Profil Lulusan berhasil diperbarui!"); 
-                closeModal(); 
-                loadDataPL(); 
+            const btnUpload = document.querySelector('.btn-upload');
+            const oriText = btnUpload.innerHTML;
+            btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengimpor...';
+            btnUpload.disabled = true;
+
+            try {
+                const res = await fetch(`${API_BASE}/upload-master-pl`, { method: 'POST', body: formData });
+                if (res.ok) { alert("✅ Data Excel PL berhasil diimpor!"); await loadDropdownKurikulum(); }
+                else { alert("❌ Gagal memproses file Excel. Cek format kolom."); }
+            } catch (e) { alert("❌ Terjadi kesalahan koneksi."); }
+            finally { btnUpload.innerHTML = oriText; btnUpload.disabled = false; fileInput.value = ''; }
+        }
+
+        function openModal(kode, nama, desk, prof) {
+            document.getElementById('editKode').value = kode;
+            document.getElementById('inpKodeShow').value = kode;
+            document.getElementById('editNamaProfil').value = nama;
+            document.getElementById('editDeskripsi').value = desk;
+            document.getElementById('editProfesi').value = prof;
+            document.getElementById('editModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('editModal').classList.add('show'), 10);
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('show');
+            setTimeout(() => document.getElementById('editModal').style.display = 'none', 200);
+        }
+
+        async function updatePL() {
+            const payload = {
+                kode_pl: document.getElementById('editKode').value,
+                nama_profil: document.getElementById('editNamaProfil').value,
+                deskripsi: document.getElementById('editDeskripsi').value,
+                profesi: document.getElementById('editProfesi').value,
+                prodi: PRODI
+            };
+            try {
+                const res = await fetch(`${API_BASE}/update-master-pl`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (res.ok) { alert("✅ Profil Lulusan berhasil diperbarui!"); closeModal(); loadData(); }
+            } catch (e) { alert("❌ Gagal menyimpan."); }
+        }
+
+        // 1. Fungsi Buka/Tutup dari Navbar 
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar) sidebar.classList.toggle('active');
+        }
+
+        // 2. Fungsi Buka/Tutup dari dalam Sidebar 
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar) sidebar.classList.toggle('active');
+        }
+
+        // 3. SENSOR PENUTUP (Deteksi klik di layar gelap)
+        document.addEventListener('click', function (event) {
+            const sidebar = document.getElementById("sidebar-container");
+            const hamburgerBtn = document.querySelector('.hamburger-btn') || document.querySelector('.mobile-menu-btn');
+
+            if (sidebar && sidebar.classList.contains("active")) {
+                if (!sidebar.contains(event.target) && (!hamburgerBtn || !hamburgerBtn.contains(event.target))) {
+                    sidebar.classList.remove("active");
+                }
             }
-        } catch (e) { alert("❌ Gagal menyimpan."); }
-    }
-</script>
+        });
+
+        window.onload = async () => { await loadDropdownKurikulum(); };
+    </script>
 </body>
+
 </html>

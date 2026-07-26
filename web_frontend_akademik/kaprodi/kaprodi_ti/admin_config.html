@@ -112,29 +112,52 @@
         let chartCplInst = null;
         let isDashboardLoaded = false;
 
-        // Fungsi untuk mengecek anomali secara background saat halaman dimuat
+        
+        // 1. Fungsi Cek Anomali Background (Tahan Banting & Menggunakan Backtick)
         function cekAnomaliKRS() {
-            // Sesuaikan URL ini dengan webhook n8n Anda
-            fetch('${API_BASE}/cek-anomali-krs')
-                .then(response => response.json())
+            fetch(`${API_BASE}/cek-anomali-krs?prodi=${PRODI}`)
+                .then(async response => {
+                    if (!response.ok) throw new Error("Gagal menghubungi server n8n");
+                    
+                    const text = await response.text();
+                    if (!text || text.trim() === "") return []; 
+
+                    try {
+                        const dataRaw = JSON.parse(text);
+                        if (Array.isArray(dataRaw)) {
+                            return dataRaw.map(item => item.json ? item.json : item);
+                        } else if (dataRaw && typeof dataRaw === 'object' && Object.keys(dataRaw).length > 0) {
+                            return dataRaw.json ? [dataRaw.json] : [dataRaw];
+                        }
+                        return [];
+                    } catch (e) {
+                        throw new Error("Respons bukan JSON yang valid.");
+                    }
+                })
                 .then(data => {
-                    // data berisi list array mahasiswa anomali dari n8n
                     if (data.length > 0) {
                         document.getElementById('jumlah-anomali').innerText = data.length;
                         document.getElementById('notifikasi-area').style.display = 'block';
-                        // Anda bisa menyimpan data ini ke variabel global untuk ditampilkan ke tabel
-                        window.dataAnomali = data;
+                        window.dataAnomali = data; // Simpan ke memori browser
+                    } else {
+                        document.getElementById('notifikasi-area').style.display = 'none';
                     }
                 })
                 .catch(error => console.error("Gagal menarik data anomali:", error));
+        }
+
+        // 2. Fungsi Tombol Tindak Lanjut
+        function lihatDetailAnomali() {
+            // Arahkan Kaprodi langsung ke Pusat Resolusi (Halaman Import KRS)
+            window.location.href = 'KRS/import_krs.html';
         }
 
         // Panggil fungsi segera setelah halaman kaprodi dimuat
         window.onload = cekAnomaliKRS;
 
         function lihatDetailAnomali() {
-            // Tampilkan data window.dataAnomali ke dalam tabel HTML
-            console.log("Menampilkan Modal / Tabel Anomali", window.dataAnomali);
+            // Arahkan Kaprodi langsung ke Pusat Resolusi (Halaman Import KRS)
+            window.location.href = 'KRS/import_krs.html';
         }
 
         // 2. FUNGSI PEMUAT DATA DASHBOARD
