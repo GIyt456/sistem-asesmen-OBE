@@ -2,58 +2,58 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rekap Bobot CPL Kurikulum - Sistem OBE</title>
     
+    <!-- PANGGILAN CSS YANG DIPISAH -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    <link rel="stylesheet" href="/css/global_si.css?v=2">
+    <link rel="stylesheet" href="rekap_bobot_cpl.css"> <!-- INI CSS BARUNYA -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
-    
-    <style>
-        .dashboard-container { display: flex; flex-direction: column; gap: 30px; margin-top: 20px; }
-        .card-box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; overflow-x: auto; }
-        
-        .section-header { margin-top: 0; margin-bottom: 20px; color: #0f172a; font-size: 1.2rem; font-weight: 800; border-left: 5px solid #2563eb; padding-left: 15px; text-transform: uppercase; }
-        
-        /* Desain Tabel Super Rapi ala Excel */
-        .table-excel { width: 100%; border-collapse: collapse; min-width: 1000px; font-size: 0.9rem; }
-        .table-excel th, .table-excel td { border: 1px solid #cbd5e1; padding: 10px 8px; text-align: center; vertical-align: middle; }
-        .table-excel th { background: #f1f5f9; color: #1e293b; font-weight: 800; }
-        .table-excel th.sticky-col, .table-excel td.sticky-col { position: sticky; left: 0; background: white; z-index: 2; border-right: 2px solid #94a3b8; text-align: left; }
-        .table-excel th.sticky-col { background: #f1f5f9; }
-        
-        .cell-bobot { background: #dcfce7; color: #166534; font-weight: 700; }
-        .cell-empty { color: #cbd5e1; }
-        
-        /* Tabel Grand Total yang lebih mencolok */
-        .table-summary { border-collapse: collapse; width: 100%; max-width: 600px; font-size: 1rem; }
-        .table-summary th, .table-summary td { border: 1px solid #cbd5e1; padding: 12px; }
-        .table-summary th { background: #1e293b; color: white; text-align: left; }
-        .table-summary td:nth-child(2), .table-summary td:nth-child(3) { text-align: right; font-weight: bold; font-family: monospace; font-size: 1.1rem; }
-        .text-danger { color: #dc2626 !important; }
-        .text-success { color: #059669 !important; }
-        
-        body { animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
 </head>
 <body>
 
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
+                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
+                 onclick="window.location.href='/index.html'">
+        </div>
+        
+        <div class="profile-btn-mobile" onclick="toggleSidebar()">
+            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
+        </div>
+    </nav>
+
+    <!-- 2. OVERLAY GELAP UNTUK LATAR SIDEBAR DI HP -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
     <div id="sidebar-container"></div>
+    
     <div class="main-content">
+        <!-- WADAH NAVBAR ASLI DARI TEMPLATE.JS -->
         <div id="navbar-container"></div>
 
         <div class="content-wrapper">
-            <div class="header-container">
+            <div class="header-container" style="border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
                     <div class="header-subtitle">EVALUASI KURIKULUM</div>
                     <h1 class="header-title">REKAP BOBOT <span>CPL</span></h1>
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
+
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;"></div>
 
             <p style="color: #64748b; margin-bottom: 25px;">Memantau distribusi beban pemenuhan Capaian Pembelajaran Lulusan (CPL) pada setiap mata kuliah dan semester.</p>
 
@@ -94,7 +94,7 @@
 
                 <!-- TABEL 3: GRAND TOTAL (TARGET VS SEMENTARA) -->
                 <div class="card-box" style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 300px;">
+                    <div style="flex: 1; min-width: 100%;"> <!-- Ubah min-width jadi 100% untuk Mobile -->
                         <h3 class="section-header">3. Grand Total CPL Kurikulum</h3>
                         <p style="color: #64748b; font-size: 0.9rem; margin-bottom: 15px;">
                             Bandingkan total bobot yang sedang berjalan saat ini dengan Target Bobot Kurikulum yang ideal.
@@ -118,43 +118,89 @@
     </div>
 
     <script>
-        // SATPAM & TEMA DINAMIS
-        const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
+        // ==========================================
+        // 0. SIHIR BUNGLON (TEMA DINAMIS SI / TI)
+        // ==========================================
+        const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+        
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            if (PRODI === "si") {
+                document.documentElement.style.setProperty('--primary-blue', '#1e3a8a');
+                document.documentElement.style.setProperty('--primary-red', '#1e3a8a');
+                if(badge) badge.innerText = "SISTEM INFORMASI";
+            } else {
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000');
+                document.documentElement.style.setProperty('--primary-red', '#8b0000');
+                if(badge) badge.innerText = "TEKNIK INFORMATIKA";
+            }
+
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if(avatarMobile) {
+                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+            }
+        });
+
+        // ==========================================
+        // 1. FUNGSI SIDEBAR MOBILE
+        // ==========================================
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+
+        function setMenuAktif() {
+            const navDashboard = document.getElementById('nav-home');
+            const navRekapBobot = document.querySelector('[data-path="/evaluasi/rekap_bobot_cpl.html"]') || document.querySelector('[data-path="/evaluasi/rekap_bobot_cpl_si.html"]');
+
+            if (navDashboard) navDashboard.classList.remove('active');
+            if (navRekapBobot) navRekapBobot.classList.add('active');
+            
+            const menuEvaluasi = document.getElementById('menu-evaluasi') || (navRekapBobot ? navRekapBobot.closest('.dropdown-container') : null);
+            if (menuEvaluasi) {
+                menuEvaluasi.style.display = 'block';
+                const parentBtn = menuEvaluasi.previousElementSibling;
+                if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                    parentBtn.classList.add('active');
+                    const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
+                    if(icon) icon.style.transform = 'rotate(180deg)';
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebar.innerHTML = html;
+                            if (typeof initSmartSidebar === 'function') initSmartSidebar();
+                            setMenuAktif();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar'));
+                } else {
+                    setMenuAktif();
+                }
+            }, 600);
+        });
+
+        // ==========================================
+        // 2. LOGIKA UTAMA & RENDER DATA
+        // ==========================================
         const userLogin = localStorage.getItem("user_login");
         if (!userLogin) window.location.replace("/login/login.html");
 
-        // Target CPL Asumsi (Seperti di gambar referensi Excel)
+        // Target CPL Asumsi
         const TARGET_CPL = {
             'CPL01': 470, 'CPL02': 165, 'CPL03': 490, 'CPL04': 710, 'CPL05': 750,
             'CPL06': 600, 'CPL07': 170, 'CPL08': 655, 'CPL09': 890, 'CPL10': 200, 'CPL11': 300
         };
 
-        // Ganti nama CPL mengikuti prodi aktif (Contoh: TI-CPL01 atau SI-CPL01)
-        const prefixCPL = PRODI === 'si' ? 'SI-CPL' : 'TI-CPL';
-        const numCPL = 11; // Diasumsikan selalu ada 11 CPL
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const badge = document.getElementById("prodiBadge");
-            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
-            
-            if(PRODI === "si") {
-                badge.style.background = "var(--primary-teal)";
-                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
-                const headers = document.querySelectorAll('.section-header');
-                headers.forEach(h => h.style.borderLeftColor = "var(--primary-teal)");
-            }
-        });
-
-        async function loadRekapBobot() {
-            // Karena belum ada API khusus, kita gunakan fungsi dummy
-            // Nanti, data ini diganti dengan "const res = await fetch(API_BARU); const dataMK = await res.json();"
-            try {
-                let dataMK = loadRekapBobot(); 
-                renderTabel(dataMK); 
-            } catch(e) {
-                console.error("Gagal memproses data", e);
-            }
-        }
+        const numCPL = 11;
 
         function renderTabel(dataMK) {
             // 1. Generate Header Dinamis
@@ -216,34 +262,30 @@
             }
             document.getElementById('bodyTableSemester').innerHTML = htmlSmt;
 
-            // 4. Render Tabel 3 (Grand Total Target vs Berjalan)
+            // 4. Render Tabel 3 (Grand Total)
             let htmlSummary = '';
             cplKeys.forEach(c => {
                 let current = grandTotal[c];
                 
-                // Format Label CPL (NILAI CPL01)
+                // Format Label CPL
                 let labelCPL = `NILAI CPL${c.replace('CPL0', '').replace('CPL', '')}`; 
                 if(c.replace('CPL', '') < 10) labelCPL = `NILAI CPL0${c.replace('CPL0', '')}`;
 
-                // Beri warna hijau jika ada nilainya, abu-abu jika 0
                 let colorClass = current > 0 ? 'text-success' : 'cell-empty';
                 
                 htmlSummary += `<tr>
                     <td><b>${labelCPL}</b></td>
-                    <td class="${colorClass}" style="text-align: right;">${current.toFixed(2).replace('.',',')}</td>
+                    <td class="${colorClass}">${current.toFixed(2).replace('.',',')}</td>
                 </tr>`;
             });
             document.getElementById('bodyTableSummary').innerHTML = htmlSummary;
         }
 
-        // Dummy Data untuk mensimulasikan struktur (Mirip gambar Excel Anda)
-        // Semester, Kode, Nama, Object Bobot per CPL (Sesuai output n8n idealnya)
         async function loadRekapBobot() {
             const tbodyMK = document.getElementById('bodyTableMK');
-            tbodyMK.innerHTML = `<tr><td colspan="15" style="padding:30px;"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Menarik, memecah, dan mengkalkulasi bobot dari N8N...</td></tr>`;
+            tbodyMK.innerHTML = `<tr><td colspan="15" style="padding:30px;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue);"></i><br><br>Menarik, memecah, dan mengkalkulasi bobot dari N8N...</td></tr>`;
             
             try {
-                // Endpoint baru yang akan kita buat di n8n
                 const res = await fetch(`${API_BASE}/get-rekap-bobot?prodi=${PRODI}`);
                 if (!res.ok) throw new Error("Gagal load API N8N");
                 const dataFlat = await res.json();
@@ -254,7 +296,7 @@
                      return;
                 }
 
-                // JURUS GROUPING JAVASCRIPT: Mengubah deretan baris SQL menjadi Object yang terstruktur
+                // JURUS GROUPING
                 let mkMap = {};
                 
                 dataFlat.forEach(item => {
@@ -269,23 +311,21 @@
                         };
                     }
                     
-                    // Regex Cerdas: Mengambil "CPL02" dari format kotor seperti "SI-CPL02-G1"
                     if(item.cpl) {
                         let match = item.cpl.match(/CPL(\d+)/);
                         if(match) {
-                            let cplKey = match[0]; // Menghasilkan CPL01, CPL02, dst
+                            let cplKey = match[0]; 
                             mkMap[key].bobot[cplKey] = (mkMap[key].bobot[cplKey] || 0) + parseFloat(item.total_bobot);
                         }
                     }
                 });
 
-                // Mengubah Map kembali menjadi Array dan Mengurutkannya (Sort) berdasarkan Semester, lalu Kode MK
+                // Urutkan Array
                 let dataMK = Object.values(mkMap).sort((a, b) => {
                     if(a.smt === b.smt) return a.kode.localeCompare(b.kode);
                     return a.smt - b.smt;
                 });
 
-                // Lempar ke fungsi perenderan tabel
                 renderTabel(dataMK);
 
             } catch(e) {

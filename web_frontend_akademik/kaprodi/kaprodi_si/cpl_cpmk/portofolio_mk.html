@@ -2,76 +2,45 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portofolio Mata Kuliah - Sistem OBE</title>
     
-    <!-- PANGGIL CSS GLOBAL SECARA ABSOLUT -->
+    <!-- PANGGIL CSS GLOBAL & KHUSUS SECARA ABSOLUT -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/admin_si.css">
+    <link rel="stylesheet" href="/css/global_si.css?v=2">
+    <link rel="stylesheet" href="portofolio_mk.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
-    <style>
-        .select2-container .select2-selection--single {
-            height: 42px !important;
-            border: 1px solid #ccc !important;
-            border-radius: 8px !important;
-            display: flex !important;
-            align-items: center !important;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 40px !important;
-        }
-
-        .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
-
-        .filter-container { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; justify-content: space-between; }
-        
-        .report-page { background: white; padding: 50px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; max-width: 1000px; margin-left: auto; margin-right: auto; }
-        .report-header { text-align: center; border-bottom: 4px solid var(--primary-red); padding-bottom: 20px; margin-bottom: 30px; }
-        .report-header h1 { margin: 0; color: #0f172a; text-transform: uppercase; font-size: 1.8rem; letter-spacing: 1px; font-weight: 800; }
-        .report-header p { margin: 5px 0 0 0; color: #475569; font-weight: 600; font-size: 1.1rem; }
-        
-        .section-title { background: #f8fafc; padding: 12px 15px; border-left: 6px solid var(--primary-red); font-weight: 800; margin: 30px 0 15px 0; color: #1e293b; text-transform: uppercase; font-size: 1.1rem; }
-        
-        .info-grid { display: grid; grid-template-columns: 200px 1fr; gap: 12px; margin-bottom: 25px; font-size: 1.05rem; }
-        .info-label { font-weight: 700; color: #475569; }
-        .info-value { font-weight: 600; color: #0f172a; }
-        
-        table.laporan { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
-        table.laporan th, table.laporan td { border: 1px solid #cbd5e1; padding: 12px; text-align: center; vertical-align: middle; }
-        table.laporan th { background: #f1f5f9; font-weight: 800; color: #1e293b; text-transform: uppercase; font-size: 0.9rem; }
-        table.laporan td { color: #334155; font-weight: 500; font-size: 0.95rem; }
-        
-        body { animation: transitionIn 0.3s ease-in-out; }
-        @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* PENGATURAN CETAK (PRINT) YANG RAPI */
-        @media print {
-            .no-print, #sidebar-container, #navbar-container, .header-container { display: none !important; }
-            .main-content { padding: 0 !important; margin: 0 !important; background: white; }
-            .report-page { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
-            body { background: white; }
-            table.laporan th {
-                background-color: #f1f5f9 !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            .section-title {
-                background-color: #f8fafc !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-        }
-    </style>
 </head>
 <body>
 
-    <!-- WADAH SMART SIDEBAR -->
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
+                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
+                 onclick="window.location.href='/index.html'">
+        </div>
+        
+        <div class="profile-btn-mobile" onclick="toggleSidebar()">
+            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
+        </div>
+    </nav>
+
+    <!-- 2. OVERLAY GELAP UNTUK LATAR SIDEBAR DI HP -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
     <div id="sidebar-container"></div>
     
     <div class="main-content">
@@ -80,32 +49,34 @@
 
         <div class="content-wrapper">
             <!-- HEADER HALAMAN (DISembunyikan saat di-print) -->
-            <div class="header-container no-print" style="margin-bottom: 20px;">
+            <div class="header-container no-print" style="margin-bottom: 20px; border-bottom: none; padding-bottom: 0;">
                 <div class="header-title-area">
                     <div class="header-subtitle">EVALUASI & RPS</div>
                     <h1 class="header-title">PORTOFOLIO <span>MATA KULIAH</span></h1>
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
+            
+            <div class="no-print" style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;"></div>
 
             <!-- KOTAK FILTER (DISembunyikan saat di-print) -->
             <div class="filter-container no-print">
-                <div style="display: flex; gap: 15px; align-items: center;">
-                    <label style="font-weight: 700; color: #1e293b;"><i class="fas fa-file-invoice"></i> Pilih Kelas:</label>
+                <div class="filter-left">
+                    <label style="font-weight: 700; color: #1e293b; min-width: 100px;"><i class="fas fa-file-invoice"></i> Pilih Kelas:</label>
                     
                     <!-- Dropdown MK -->
-                    <select id="selectMK" class="form-control" style="width: 400px; font-weight: 500;">
+                    <select id="selectMK" class="form-control" style="width: 100%; max-width: 400px; font-weight: 500;">
                         <option value="">⏳ Memuat daftar kelas aktif...</option>
                     </select>
                     
                     <!-- Tombol Generate yang sudah diubah warnanya -->
-                    <button class="btn-dark" style="padding: 10px 20px; border: none; font-size: 0.95rem; background: #2563eb; color: #ffffff; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap;" onclick="loadPortofolio()">
+                    <button class="btn-dark" style="padding: 10px 20px; border: none; font-size: 0.95rem; background: var(--primary-blue); color: #ffffff; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap;" onclick="loadPortofolio()">
                         <i class="fas fa-cogs"></i> Generate Portofolio
                     </button>
                 </div>
 
                 <button class="btn-dark" style="padding: 10px 20px; border: none; font-size: 0.95rem; background: #10b981; color: #ffffff; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; white-space: nowrap;" onclick="window.print()">
-                    <i class="fas fa-print"></i> Cetak Dokumen PDF
+                    <i class="fas fa-print"></i> Cetak Dokumen
                 </button>
             </div>
 
@@ -114,7 +85,7 @@
                 <div class="report-header" id="docHeader">
                     <img src="/gambar/LogoUnaki.png" style="height: 70px; margin-bottom: 15px;" alt="Logo UNAKI">
                     <h1 style="font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 5px;">PORTOFOLIO MATA KULIAH (OBE)</h1>
-                    <p id="labelProdiPrint" style="margin: 0; font-size: 1.1rem; color: #475569; font-weight: 600;">Program Studi Teknik Informatika - Universitas AKI</p>
+                    <p id="labelProdiPrint" style="margin: 0; font-size: 1.1rem; color: #475569; font-weight: 600;">Program Studi Sistem Informasi - Universitas AKI</p>
                 </div>
 
                 <!-- I. IDENTITAS -->
@@ -132,35 +103,39 @@
 
                 <!-- II. PENCAPAIAN CPMK -->
                 <div class="section-title" id="secTitle2">II. Pencapaian CPMK (Rerata Kelas)</div>
-                <table class="laporan">
-                    <thead>
-                        <tr>
-                            <th width="20%">Kode CPMK</th>
-                            <th width="30%">Target Luaran</th>
-                            <th width="25%">Rata-Rata Nilai</th>
-                            <th width="25%">Ketercapaian (%)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resCPMK">
-                        <tr><td colspan="4" style="color: #64748b; padding: 20px;">Silakan pilih kelas dan klik "Generate Portofolio".</td></tr>
-                    </tbody>
-                </table>
+                <div class="table-wrapper">
+                    <table class="laporan">
+                        <thead>
+                            <tr>
+                                <th width="20%">Kode CPMK</th>
+                                <th width="30%">Target Luaran</th>
+                                <th width="25%">Rata-Rata Nilai</th>
+                                <th width="25%">Ketercapaian (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resCPMK">
+                            <tr><td colspan="4" style="color: #64748b; padding: 20px;">Silakan pilih kelas dan klik "Generate Portofolio".</td></tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <!-- III. PENCAPAIAN CPL -->
                 <div class="section-title" id="secTitle3">III. Pencapaian CPL (Rerata Kelas)</div>
-                <table class="laporan">
-                    <thead>
-                        <tr>
-                            <th width="25%">Kode CPL</th>
-                            <th width="25%">Target Luaran</th>
-                            <th width="25%">Rerata Nilai</th>
-                            <th width="25%">Status Evaluasi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resCPL">
-                        <tr><td colspan="4" style="color: #64748b; padding: 20px;">-</td></tr>
-                    </tbody>
-                </table>
+                <div class="table-wrapper">
+                    <table class="laporan">
+                        <thead>
+                            <tr>
+                                <th width="25%">Kode CPL</th>
+                                <th width="25%">Target Luaran</th>
+                                <th width="25%">Rerata Nilai</th>
+                                <th width="25%">Status Evaluasi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resCPL">
+                            <tr><td colspan="4" style="color: #64748b; padding: 20px;">-</td></tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <!-- IV. KESIMPULAN & TINDAK LANJUT -->
                 <div class="section-title" id="secTitle4">IV. Kesimpulan & Rekomendasi</div>
@@ -181,44 +156,92 @@
     </div>
 
     <script>
-        // DETEKSI PRODI DINAMIS
+        // ==========================================
+        // 0. SIHIR BUNGLON (TEMA DINAMIS SI / TI)
+        // ==========================================
         const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
         
-        // Pinjam API Rekap Nilai untuk Dropdown Kelas
-        const API_GET_KELAS = `${API_BASE}/get-rekap-nilai?prodi=${PRODI}`;
-        const API_PORTOFOLIO = `${API_BASE}/get-portofolio-mk`;
-
-        // SATPAM HALAMAN
-        const userLogin = localStorage.getItem("user_login");
-        if (!userLogin) window.location.replace("/login/login.html");
-
-        // Warna Dokumen Cetak Menyesuaikan Prodi
-        let colorLine = '#7f1d1d'; // Merah Gelap TI Default
-
         document.addEventListener("DOMContentLoaded", () => {
             const badge = document.getElementById("prodiBadge");
             const labelPrint = document.getElementById("labelProdiPrint");
-            const docHeader = document.getElementById("docHeader");
             
-            if(badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
-            
-            if(PRODI === "si") {
-                badge.style.background = "var(--primary-teal)";
-                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
-                
-                labelPrint.innerText = "Program Studi Sistem Informasi - Universitas AKI";
-                colorLine = '#0f766e'; // Teal Tua
-                
-                // Ubah warna garis bawah header laporan
-                docHeader.style.borderBottom = `4px solid ${colorLine}`;
-                document.getElementById('secTitle1').style.borderLeftColor = colorLine;
-                document.getElementById('secTitle2').style.borderLeftColor = colorLine;
-                document.getElementById('secTitle3').style.borderLeftColor = colorLine;
-                document.getElementById('secTitle4').style.borderLeftColor = colorLine;
+            if (PRODI === "si") {
+                document.documentElement.style.setProperty('--primary-blue', '#1e3a8a');
+                document.documentElement.style.setProperty('--primary-red', '#1e3a8a');
+                if(badge) badge.innerText = "SISTEM INFORMASI";
+                if(labelPrint) labelPrint.innerText = "Program Studi Sistem Informasi - Universitas AKI";
+            } else {
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000');
+                document.documentElement.style.setProperty('--primary-red', '#8b0000');
+                if(badge) badge.innerText = "TEKNIK INFORMATIKA";
+                if(labelPrint) labelPrint.innerText = "Program Studi Teknik Informatika - Universitas AKI";
+            }
+
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if(avatarMobile) {
+                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
             }
         });
 
-        // FUNGSI LOAD DROPDOWN KELAS (Dinamis & Anti Duplikat)
+        // ==========================================
+        // 1. FUNGSI SIDEBAR MOBILE
+        // ==========================================
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+
+        function setMenuAktif() {
+            const navDashboard = document.getElementById('nav-home');
+            const navPortofolio = document.querySelector('[data-path="/evaluasi/portofolio_mk.html"]') || document.querySelector('[data-path="/evaluasi/portofolio_mk_si.html"]');
+
+            if (navDashboard) navDashboard.classList.remove('active');
+            if (navPortofolio) navPortofolio.classList.add('active');
+            
+            const menuEvaluasi = document.getElementById('menu-evaluasi') || (navPortofolio ? navPortofolio.closest('.dropdown-container') : null);
+            if (menuEvaluasi) {
+                menuEvaluasi.style.display = 'block';
+                const parentBtn = menuEvaluasi.previousElementSibling;
+                if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                    parentBtn.classList.add('active');
+                    const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
+                    if(icon) icon.style.transform = 'rotate(180deg)';
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebar.innerHTML = html;
+                            if (typeof initSmartSidebar === 'function') initSmartSidebar();
+                            setMenuAktif();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar'));
+                } else {
+                    setMenuAktif();
+                }
+            }, 600);
+        });
+
+        // ==========================================
+        // 2. VARIABEL API
+        // ==========================================
+        const API_GET_KELAS = `${API_BASE}/get-rekap-nilai?prodi=${PRODI}`;
+        const API_PORTOFOLIO = `${API_BASE}/get-portofolio-mk`;
+
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        // ==========================================
+        // 3. FUNGSI LOAD DROPDOWN (Anti Duplikat)
+        // ==========================================
         async function loadPilihanKelas() {
             const selectMk = document.getElementById("selectMK");
             try {
@@ -232,8 +255,6 @@
                 }
 
                 let html = "<option value=''>-- Pilih Kelas Mata Kuliah --</option>";
-                
-                // ✨ JURUS SARINGAN ANTI-DUPLIKAT & FILTER PRODI ✨
                 let kelasUnik = new Set();
 
                 data.forEach(item => {
@@ -241,14 +262,12 @@
                     let namaKelas = (item.kelas || "").toLowerCase();
                     let isMilikProdi = false;
                     
-                    // Logika Deteksi Prodi
                     if (PRODI === 'ti' && (namaKelas.includes('ti') || namaKelas.includes('teknik'))) {
                         isMilikProdi = true;
                     } else if (PRODI === 'si' && (namaKelas.includes('si') || namaKelas.includes('sistem'))) {
                         isMilikProdi = true;
                     }
 
-                    // Eksekusi jika cocok & unik
                     if (isMilikProdi && !kelasUnik.has(kunci)) {
                         kelasUnik.add(kunci);
                         html += `<option value="${item.kode_mk}">[${item.kelas}] ${item.nama_mk} - ${item.dosen}</option>`;
@@ -262,26 +281,26 @@
             }
         }
 
+        // ==========================================
+        // 4. FUNGSI GENERATE PORTOFOLIO
+        // ==========================================
         async function loadPortofolio() {
             const selectEl = document.getElementById("selectMK");
             const kodeMK = selectEl.value;
             
             if(!kodeMK) return alert("⚠️ Silakan pilih kelas mata kuliah terlebih dahulu!");
             
-            // Ekstrak nama Dosen & MK dari text dropdown untuk ditampilkan di dokumen
             const textDropdown = selectEl.options[selectEl.selectedIndex].text; 
             const parts = textDropdown.split(' - ');
-            const namaMKLengkap = parts[0].replace(/\[.*?\]\s*/, ''); // Buang [TI-A] dll
+            const namaMKLengkap = parts[0].replace(/\[.*?\]\s*/, ''); 
             const namaDosen = parts[1] || "(Dosen Belum Di-mapping di Master Mengajar)";
 
             document.getElementById("resTanggal").innerText = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-            // Tampilkan Loading
             document.getElementById("resCPMK").innerHTML = `<tr><td colspan="4"><i class="fas fa-spinner fa-spin"></i> Mengekstrak portofolio...</td></tr>`;
             document.getElementById("resCPL").innerHTML = `<tr><td colspan="4"><i class="fas fa-spinner fa-spin"></i> Mengekstrak portofolio...</td></tr>`;
 
             try {
-                // Minta data kalkulasi dari N8N
                 const res = await fetch(`${API_PORTOFOLIO}?kode_mk=${kodeMK}`);
                 const data = await res.json();
 
@@ -308,7 +327,6 @@
                     if(items.length > 0 && items[0].total_bobot_cpmk > 0) {
                         let avg = (items.reduce((a, b) => a + (b.total_nilai_tertimbang / b.total_bobot_cpmk * 100), 0) / items.length).toFixed(2);
                         
-                        // Cari tertinggi terendah untuk Kesimpulan
                         if(avg > cpmkTertinggi.skor) { cpmkTertinggi.skor = avg; cpmkTertinggi.nama = c; }
                         if(avg < cpmkTerendah.skor) { cpmkTerendah.skor = avg; cpmkTerendah.nama = c; }
 
@@ -364,13 +382,14 @@
         }
 
         window.onload = () => {
-            setTimeout(loadPilihanKelas, 400); // Otomatis muat dropdown kelas
+            setTimeout(loadPilihanKelas, 400);
         };
+
         $(document).ready(function() {
             $('#selectMK').select2({
                 placeholder: "Ketik / Pilih Kelas Mata Kuliah...",
                 allowClear: true,
-                width: '400px' // Lebar sesuai dengan desain form-control Anda
+                width: '100%' // ✨ DIUBAH KE 100% AGAR RESPONSIF DI HP ✨
             });
         });
     </script>

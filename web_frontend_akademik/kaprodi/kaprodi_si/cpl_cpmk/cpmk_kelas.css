@@ -1,0 +1,173 @@
+/* ========================================================================
+   FILE SPESIFIK: PEMENUHAN NILAI CPMK (cpmk_kelas.css)
+   ======================================================================== */
+
+.select2-container .select2-selection--single {
+    height: 42px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+}
+
+.filter-container { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 12px; 
+    border: 1px solid #e5e7eb; 
+    margin-bottom: 25px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    display: flex; 
+    gap: 15px; 
+    align-items: center; 
+}
+
+.table-responsive { 
+    overflow-x: auto; 
+    background: white; 
+    border-radius: 12px; 
+    padding: 20px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    border: 1px solid #e5e7eb; 
+}
+
+.table-cpmk { 
+    width: 100%; 
+    border-collapse: collapse; 
+    min-width: 1000px; 
+}
+
+.table-cpmk th, .table-cpmk td { 
+    padding: 12px 10px; 
+    border: 1px solid #e5e7eb; 
+    text-align: center; 
+    font-size: 0.9rem; 
+    vertical-align: middle; 
+}
+
+.table-cpmk th { 
+    background: #111827; 
+    color: white; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    font-size: 0.85rem; 
+    position: sticky; 
+    top: 0; 
+    z-index: 2; 
+}
+
+/* Sticky Column untuk No dan Nama di Desktop */
+.table-cpmk th.sticky-col, .table-cpmk td.sticky-col { 
+    position: sticky; 
+    left: 0; 
+    background-color: white; 
+    z-index: 3; 
+    border-right: 2px solid #cbd5e1; 
+}
+
+.table-cpmk th.sticky-col { background-color: #111827; }
+.table-cpmk th.sticky-col:nth-child(2), .table-cpmk td.sticky-col:nth-child(2) { left: 40px; }
+
+.badge-score { 
+    padding: 6px 12px; 
+    border-radius: 6px; 
+    font-weight: 800; 
+    font-size: 0.9rem; 
+}
+
+/* =========================================
+   📱 RESPONSIVE MOBILE (SULAP KARTU)
+   ========================================= */
+@media screen and (max-width: 768px) {
+    .filter-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* Memaksa dropdown Select2 agar full 100% di layar HP */
+    .select2-container {
+        width: 100% !important;
+    }
+    
+    .filter-container button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* SULAP TABEL MENJADI KARTU */
+    .table-responsive {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        padding: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    .table-cpmk, .table-cpmk thead, .table-cpmk tbody, .table-cpmk tr, .table-cpmk td, .table-cpmk th {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .table-cpmk thead { display: none !important; }
+
+    .table-cpmk tr {
+        background: white !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 12px !important;
+        margin-bottom: 20px !important;
+        padding: 15px !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+    }
+
+    .table-cpmk td {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 10px 0 !important;
+        border: none !important;
+        border-bottom: 1px dashed #e2e8f0 !important;
+        text-align: right !important;
+    }
+
+    .table-cpmk td:last-child {
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* Menggunakan attr(data-label) yang disuntikkan JS untuk judul dinamis */
+    .table-cpmk td::before {
+        content: attr(data-label);
+        font-weight: 800;
+        color: #64748b;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        flex: 1;
+        text-align: left;
+    }
+
+    /* Matikan Sticky di HP */
+    .table-cpmk td.sticky-col {
+        position: static !important;
+        background: transparent !important;
+        border-right: none !important;
+    }
+
+    /* Format Ulang Kolom NO dan NAMA */
+    .table-cpmk td:nth-child(1) { display: none !important; } /* Sembunyikan Nomor Urut */
+    
+    .table-cpmk td:nth-child(2) {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        border-bottom: 2px solid var(--primary-blue) !important;
+        padding-bottom: 10px !important;
+        margin-bottom: 5px !important;
+    }
+    
+    .table-cpmk td:nth-child(2)::before { display: none !important; }
+}
