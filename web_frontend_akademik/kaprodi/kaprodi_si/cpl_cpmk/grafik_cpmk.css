@@ -1,0 +1,92 @@
+/* ========================================================================
+   FILE SPESIFIK: GRAFIK RERATA CPMK (grafik_cpmk.css)
+   ======================================================================== */
+
+.select2-container .select2-selection--single {
+    height: 42px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+}
+
+.filter-container { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 12px; 
+    border: 1px solid #e5e7eb; 
+    margin-bottom: 25px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    display: flex; 
+    gap: 15px; 
+    align-items: center; 
+    justify-content: space-between; 
+}
+
+.filter-left {
+    display: flex; 
+    gap: 15px; 
+    align-items: center; 
+    flex: 1;
+}
+
+.card-container { 
+    background: white; 
+    padding: 25px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    border: 1px solid #e5e7eb; 
+    margin-bottom: 40px;
+}
+
+.chart-wrapper { 
+    position: relative; 
+    height: 450px; 
+    width: 100%; 
+    margin-top: 10px; 
+}
+
+@media print {
+    #sidebar-container, #navbar-container, .filter-container, .header-container, .navbar-mobile, .mobile-overlay { display: none !important; }
+    .main-content { padding: 0 !important; margin: 0 !important; }
+    .card-container { box-shadow: none; border: none; padding: 0; }
+}
+
+/* =========================================
+   📱 RESPONSIVE MOBILE (SULAP KARTU & LAYOUT)
+   ========================================= */
+@media screen and (max-width: 768px) {
+    .filter-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .filter-left {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+    
+    /* Memaksa dropdown Select2 agar full 100% di layar HP */
+    .select2-container {
+        width: 100% !important;
+    }
+    
+    .filter-container button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .chart-wrapper {
+        height: 350px; /* Sedikit dipendekkan agar proporsional di HP */
+    }
+    
+    .card-container {
+        padding: 15px;
+    }
+}

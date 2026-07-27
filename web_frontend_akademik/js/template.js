@@ -89,6 +89,7 @@ window.initSmartSidebar = function() {
     const adminNameEl = document.getElementById("adminName");
     const adminRoleEl = document.getElementById("adminRole");
     const avatarEl = document.getElementById("sidebarAvatar");
+    const mobileAvatarEl = document.getElementById("mobileNavbarAvatar");
     const sidebarEl = document.querySelector('.sidebar');
     
     if (sidebarEl && prodi === 'si') {
@@ -97,9 +98,15 @@ window.initSmartSidebar = function() {
 
     if(adminNameEl) adminNameEl.innerText = loginName;
     if(adminRoleEl) adminRoleEl.innerText = prodi === 'si' ? "PRODI SISTEM INFORMASI" : "PRODI TEKNIK INFORMATIKA";
+    
+    const avatarColor = prodi === 'si' ? '0097a7' : '8b0000'; 
+    const avatarUrl = `https://ui-avatars.com/api/?name=${loginName}&background=${avatarColor}&color=fff&bold=true`;
+    
     if(avatarEl) {
-        const avatarColor = prodi === 'si' ? '0097a7' : '8b0000'; 
-        avatarEl.src = `https://ui-avatars.com/api/?name=${loginName}&background=${avatarColor}&color=fff&bold=true`;
+        avatarEl.src = avatarUrl;
+    }
+    if(mobileAvatarEl) {
+        mobileAvatarEl.src = avatarUrl;
     }
 
     document.querySelectorAll('.sidebar [data-path]').forEach(el => {
@@ -201,3 +208,16 @@ function toggleMobileMenu() {
     navMenu.classList.toggle('active');
     overlay.classList.toggle('active');
 }
+
+window.toggleSidebar = function() {
+    const sidebar = document.getElementById('sidebar-container');
+    const overlay = document.getElementById('mobileOverlay');
+    if (sidebar) {
+        sidebar.classList.toggle('active');
+        sidebar.classList.toggle('show-mobile');
+    }
+    if (overlay) {
+        overlay.classList.toggle('active');
+        overlay.classList.toggle('show-mobile');
+    }
+};

@@ -1,105 +1,249 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pemetaan BK - MK - Sistem OBE</title>
-    
+
     <!-- MEMANGGIL FILE CSS EKSTERNAL -->
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/admin_si.css">
-    
+    <link rel="stylesheet" href="../../../css/style.css">
+    <link rel="stylesheet" href="../../../css/admin_si.css">
+    <link rel="stylesheet" href="/css/global_si.css?v=2">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="/js/api_config.js"></script>
-    <script src="/js/template.js"></script> 
-    
+
+    <script src="../../../js/api_config.js"></script>
+    <script src="../../../js/template.js?v=2"></script>
+
     <style>
         /* =========================================
            STYLE KHUSUS MATRIKS (TIDAK ADA DI ADMIN_SI.CSS)
         ========================================= */
-        
+
         /* WADAH TABEL DESKTOP */
-        .table-responsive-wrapper { 
-            overflow-x: auto; 
-            max-height: 550px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            background: white; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        .table-responsive-wrapper {
+            overflow-x: auto;
+            max-height: 550px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
-        
-        .table-responsive-wrapper table { width: 100%; min-width: 700px; border-collapse: collapse; text-align: center; }
-        .table-responsive-wrapper th, .table-responsive-wrapper td { border: 1px solid var(--border-color); font-size: 0.9rem; }
-        .table-responsive-wrapper th { background: #f8fafc; font-weight: 700; color: #475569; position: sticky; top: 0; z-index: 5; box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1); padding: 15px; }
-        
+
+        .table-responsive-wrapper table {
+            width: 100%;
+            min-width: 700px;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .table-responsive-wrapper th,
+        .table-responsive-wrapper td {
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .table-responsive-wrapper th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: #475569;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+        }
+
         /* 🚨 SOLUSI TEKS MENEMPEL: Hapus padding default td, TAPI kembalikan padding khusus kolom 1 🚨 */
-        .table-responsive-wrapper td { color: #1e293b; padding: 0; }
-        .table-responsive-wrapper td:first-child { 
-            padding: 15px 20px !important; /* Memberi jarak napas lega */
-            text-align: left; 
+        .table-responsive-wrapper td {
+            color: #1e293b;
+            padding: 0;
+        }
+
+        .table-responsive-wrapper td:first-child {
+            padding: 15px 20px !important;
+            /* Memberi jarak napas lega */
+            text-align: left;
             line-height: 1.4;
         }
-        
+
         /* STYLING CHECKBOX DAN BUNGKUS LABEL */
-        .bk-label-mobile { display: none; }
-        .cell-wrapper { 
-            display: flex; justify-content: center; align-items: center; 
-            width: 100%; height: 100%; padding: 15px; cursor: pointer; transition: 0.2s;
+        .bk-label-mobile {
+            display: none;
         }
-        .cell-wrapper:hover { background: #f1f5f9; }
-        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary-blue); margin: 0;}
-        
+
+        .cell-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .cell-wrapper:hover {
+            background: #f1f5f9;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-blue);
+            margin: 0;
+        }
+
         /* Tombol Save Khusus Matriks (Agar warnanya dinamis ikut Prodi) */
-        .btn-save { background: var(--primary-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; margin-top: 25px; width: 100%; justify-content: center; font-size: 1rem;}
-        .btn-save:hover { filter: brightness(0.85); transform: translateY(-2px); }
-        .btn-save:disabled { background: #94a3b8; cursor: not-allowed; transform: none; }
+        .btn-save {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            margin-top: 25px;
+            width: 100%;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .btn-save:hover {
+            filter: brightness(0.85);
+            transform: translateY(-2px);
+        }
+
+        .btn-save:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         /* =========================================
            RESPONSIVE MOBILE (AKTIF KHUSUS DI HP)
         ========================================= */
         @media screen and (max-width: 768px) {
-            .btn-save[onclick="loadData()"] { width: 100% !important; justify-content: center; margin-top: 0 !important; }
+            .btn-save[onclick="loadData()"] {
+                width: 100% !important;
+                justify-content: center;
+                margin-top: 0 !important;
+            }
 
             /* SULAP MATRIKS MENJADI KARTU (CARD) DI HP */
-            .table-responsive-wrapper { border: none !important; box-shadow: none !important; background: transparent !important; max-height: none !important; overflow: hidden !important; width: 100% !important; }
-            .table-responsive-wrapper table, .table-responsive-wrapper thead, .table-responsive-wrapper tbody, .table-responsive-wrapper th, .table-responsive-wrapper td, .table-responsive-wrapper tr { display: block !important; width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
-            .table-responsive-wrapper thead { display: none !important; }
-            .table-responsive-wrapper tr { background: white !important; border: 1px solid #cbd5e1 !important; border-radius: 12px !important; margin-bottom: 25px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important; overflow: hidden !important; }
-            
-            .table-responsive-wrapper td:first-child { 
-                background: #1f2937 !important; 
-                color: #f8fafc !important; 
-                padding: 15px 20px !important; 
-                text-align: left !important; 
-                position: static !important; 
+            .table-responsive-wrapper {
                 border: none !important;
-                border-bottom: 3px solid var(--primary-blue) !important; 
+                box-shadow: none !important;
+                background: transparent !important;
+                max-height: none !important;
+                overflow: hidden !important;
+                width: 100% !important;
             }
-            .table-responsive-wrapper td:first-child .mk-kode-badge { color: #facc15; font-size: 0.8rem; margin-bottom: 5px; font-weight: 800; letter-spacing: 1px;}
-            .table-responsive-wrapper td:not(:first-child) { padding: 0 !important; border: none !important; border-bottom: 1px dashed #e2e8f0 !important; }
-            .table-responsive-wrapper td:last-child { border-bottom: none !important; }
-            
-            .cell-wrapper { display: flex !important; justify-content: space-between !important; align-items: center !important; padding: 15px 20px !important; width: 100% !important; box-sizing: border-box !important; }
-            .bk-label-mobile { display: block !important; font-weight: 600; color: #334155; font-size: 0.9rem; flex: 1; text-align: left; padding-right: 15px; line-height: 1.4; word-wrap: break-word !important; white-space: normal !important; }
-            input[type="checkbox"] { width: 22px !important; height: 22px !important; flex-shrink: 0 !important; }
+
+            .table-responsive-wrapper table,
+            .table-responsive-wrapper thead,
+            .table-responsive-wrapper tbody,
+            .table-responsive-wrapper th,
+            .table-responsive-wrapper td,
+            .table-responsive-wrapper tr {
+                display: block !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .table-responsive-wrapper thead {
+                display: none !important;
+            }
+
+            .table-responsive-wrapper tr {
+                background: white !important;
+                border: 1px solid #cbd5e1 !important;
+                border-radius: 12px !important;
+                margin-bottom: 25px !important;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+                overflow: hidden !important;
+            }
+
+            .table-responsive-wrapper td:first-child {
+                background: #1f2937 !important;
+                color: #f8fafc !important;
+                padding: 15px 20px !important;
+                text-align: left !important;
+                position: static !important;
+                border: none !important;
+                border-bottom: 3px solid var(--primary-blue) !important;
+            }
+
+            .table-responsive-wrapper td:first-child .mk-kode-badge {
+                color: #facc15;
+                font-size: 0.8rem;
+                margin-bottom: 5px;
+                font-weight: 800;
+                letter-spacing: 1px;
+            }
+
+            .table-responsive-wrapper td:not(:first-child) {
+                padding: 0 !important;
+                border: none !important;
+                border-bottom: 1px dashed #e2e8f0 !important;
+            }
+
+            .table-responsive-wrapper td:last-child {
+                border-bottom: none !important;
+            }
+
+            .cell-wrapper {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 15px 20px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .bk-label-mobile {
+                display: block !important;
+                font-weight: 600;
+                color: #334155;
+                font-size: 0.9rem;
+                flex: 1;
+                text-align: left;
+                padding-right: 15px;
+                line-height: 1.4;
+                word-wrap: break-word !important;
+                white-space: normal !important;
+            }
+
+            input[type="checkbox"] {
+                width: 22px !important;
+                height: 22px !important;
+                flex-shrink: 0 !important;
+            }
         }
     </style>
 </head>
+
 <body>
 
-    <!-- 1. NAVBAR KHUSUS MOBILE (Warna Gelap otomatis dari admin_si.css) -->
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
             <button class="hamburger-btn" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
-            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
-                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
-                 onclick="window.location.href='/index.html'">
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI"
+                style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;"
+                onclick="window.location.href='/index.html'">
         </div>
-        
+
         <div class="profile-btn-mobile" onclick="toggleSidebar()">
             <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
         </div>
@@ -122,9 +266,11 @@
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
-                <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Mata Kuliah (MK) yang berelasi dengan Bahan Kajian (BK).</p>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
+                <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Mata Kuliah (MK) yang berelasi dengan
+                    Bahan Kajian (BK).</p>
                 <button class="btn-save" style="width: auto; margin-top: 0; background: #475569;" onclick="loadData()">
                     <i class="fas fa-sync-alt"></i> Refresh Data
                 </button>
@@ -132,15 +278,25 @@
         </div>
 
         <div class="scrollable-content">
+            <div style="margin-bottom: 20px;">
+                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
+                <select id="filterKurikulum" onchange="loadData()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none;">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
             <div class="table-responsive-wrapper">
                 <table id="matriksTable">
                     <thead>
                         <tr id="headerRow">
-                            <th style="min-width: 120px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">MATA KULIAH (MK) \ BAHAN KAJIAN (BK)</th>
+                            <th
+                                style="min-width: 120px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">
+                                MATA KULIAH (MK) \ BAHAN KAJIAN (BK)</th>
                         </tr>
                     </thead>
                     <tbody id="bodyMatriks">
-                        <tr><td style="text-align: center; padding: 30px !important;">Memuat data...</td></tr>
+                        <tr>
+                            <td style="text-align: center; padding: 30px !important;">Memuat data...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -151,180 +307,191 @@
         </div>
     </div>
 
-<script>
-    // --- SETUP TEMA & WARNA DINAMIS BERDASARKAN PRODI ---
-    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        // Jika TI, ganti warna aksentuasi Biru Gelap menjadi Merah Marun
-        if(PRODI === "ti") {
-            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
-            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
-        } else {
-            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
-        }
+    <script>
+        const PRODI = localStorage.getItem("prodi_aktif") || "si";
 
-        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
-        const avatarMobile = document.getElementById("mobileNavbarAvatar");
-        if(avatarMobile) {
-            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
-            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
-        }
-    });
-
-    // --- FUNGSI SIDEBAR MOBILE ---
-    function toggleSidebar() {
-        document.getElementById('sidebar-container').classList.toggle('active');
-        document.getElementById('mobileOverlay').classList.toggle('active');
-    }
-    
-    // --- PENGAMAN SIDEBAR ---
-    document.addEventListener("DOMContentLoaded", () => {
-        setTimeout(() => {
-            const sidebar = document.getElementById('sidebar-container');
-            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
-                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
-                    .then(res => res.text())
-                    .then(html => {
-                        sidebar.innerHTML = html;
-                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
-                    })
-                    .catch(e => console.log('Gagal memuat sidebar darurat'));
-            }
-        }, 600); 
-    });
-
-    // --- VARIABEL API ---
-    const API_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
-    const API_MK = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
-    const API_RELASI = `${API_BASE}/get-mapping-bk-mk?prodi=${PRODI}`;
-    const API_SAVE_MAPPING = `${API_BASE}/admin-map-bk-mk`;
-
-    const userLoginCheck = localStorage.getItem("user_login");
-    if (!userLoginCheck) window.location.replace("/login/login.html");
-
-    window.onload = () => {
-        setTimeout(loadData, 400); 
-    };
-
-    let listBK = [];
-    let listMK = [];
-
-    async function loadData() {
-        const btnSave = document.getElementById("btnSave");
-        const tbody = document.getElementById("bodyMatriks");
-        if(btnSave) btnSave.disabled = true;
-        tbody.innerHTML = "<tr><td colspan='100%' style='text-align: center; padding: 30px !important;'><i class='fas fa-spinner fa-spin'></i> Memuat data matriks...</td></tr>";
-
-        try {
-            const [resBk, resMk, resRelasi] = await Promise.all([
-                fetch(API_BK),
-                fetch(API_MK),
-                fetch(API_RELASI)
-            ]);
-
-            listBK = await resBk.json();
-            listMK = await resMk.json();
-
-            let relasiExisting = [];
-            try {
-                relasiExisting = await resRelasi.json();
-                if (!Array.isArray(relasiExisting)) relasiExisting = [];
-            } catch (e) {
-                console.warn("Info: Data relasi saat ini masih kosong di database.");
-                relasiExisting = [];
+        document.addEventListener("DOMContentLoaded", () => {
+            if (PRODI === "ti") {
+                document.documentElement.style.setProperty('--primary-blue', '#8b0000');
+                document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+            } else {
+                document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
             }
 
-            if (!listBK || listBK.length === 0 || !listMK || listMK.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px !important; color: red; font-weight: bold;'>Data BK atau MK masih KOSONG! Harap isi terlebih dahulu.</td></tr>";
-                return;
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if (avatarMobile) {
+                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
             }
-
-            renderMatriks(relasiExisting);
-            if(btnSave) btnSave.disabled = false;
-
-        } catch (error) {
-            console.error(error);
-            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px !important; color: red;'>Gagal terhubung ke API. Cek koneksi internet atau link Cloudflare!</td></tr>";
-        }
-    }
-
-    function renderMatriks(relasiExisting) {
-        const headerRow = document.getElementById("headerRow");
-        const tbody = document.getElementById("bodyMatriks");
-        if(!headerRow || !tbody) return;
-
-        headerRow.innerHTML = `<th style="min-width: 250px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">MATA KULIAH (MK) \\ BAHAN KAJIAN (BK)</th>`;
-        
-        listBK.forEach(bk => {
-            headerRow.innerHTML += `<th title="${bk.nama_bk || ''}">${bk.kode_bk}</th>`;
         });
 
-        tbody.innerHTML = "";
-        listMK.forEach(mk => {
-            
-            // Header Kartu di HP & Kolom Pertama di Desktop
-            let tr = `<tr>
+        function toggleSidebar() {
+            document.getElementById('sidebar-container').classList.toggle('active');
+            document.getElementById('mobileOverlay').classList.toggle('active');
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setTimeout(() => {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebar.innerHTML = html;
+                            if (typeof initSmartSidebar === 'function') initSmartSidebar();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar'));
+                }
+            }, 600);
+        });
+
+        const API_SAVE_MAPPING = `${API_BASE}/admin-map-bk-mk`;
+        const userLoginCheck = localStorage.getItem("user_login");
+        if (!userLoginCheck) window.location.replace("/login/login.html");
+
+        let listBK = [];
+        let listMK = [];
+
+        async function loadDropdownKurikulum() {
+            try {
+                const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+                const data = await response.json();
+                const selectKurikulum = document.getElementById('filterKurikulum');
+                selectKurikulum.innerHTML = '';
+                data.forEach(item => {
+                    let opt = document.createElement('option');
+                    opt.value = item.kurikulum;
+                    opt.text = "Kurikulum 20" + item.kurikulum;
+                    selectKurikulum.appendChild(opt);
+                });
+                await loadData();
+            } catch (error) {
+                console.error("Gagal memuat list kurikulum:", error);
+                document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+            }
+        }
+
+        async function loadData() {
+            const btnSave = document.getElementById("btnSave");
+            const tbody = document.getElementById("bodyMatriks");
+            if (btnSave) btnSave.disabled = true;
+            tbody.innerHTML = "<tr><td colspan='100%' style='text-align: center; padding: 30px !important;'><i class='fas fa-spinner fa-spin'></i> Memuat data matriks...</td></tr>";
+
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            let kurikulum = selectKurikulum ? selectKurikulum.value : "";
+            let URL_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
+            let URL_MK = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}`;
+            let URL_RELASI = `${API_BASE}/get-mapping-bk-mk?prodi=${PRODI}`;
+
+            if (kurikulum) {
+                URL_BK += `&kurikulum=${kurikulum}`;
+                URL_MK += `&kurikulum=${kurikulum}`;
+                URL_RELASI += `&kurikulum=${kurikulum}`;
+            }
+
+            try {
+                const [resBk, resMk, resRelasi] = await Promise.all([
+                    fetch(URL_BK), fetch(URL_MK), fetch(URL_RELASI)
+                ]);
+
+                listBK = await resBk.json();
+                listMK = await resMk.json();
+
+                let relasiExisting = [];
+                try {
+                    relasiExisting = await resRelasi.json();
+                    if (!Array.isArray(relasiExisting)) relasiExisting = [];
+                } catch (e) { relasiExisting = []; }
+
+                if (!listBK || listBK.length === 0 || !listMK || listMK.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px !important; color: red; font-weight: bold;'>Data BK atau MK masih KOSONG untuk kurikulum ini!</td></tr>";
+                    return;
+                }
+
+                renderMatriks(relasiExisting);
+                if (btnSave) btnSave.disabled = false;
+
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px !important; color: red;'>Gagal terhubung ke API.</td></tr>";
+            }
+        }
+
+        function renderMatriks(relasiExisting) {
+            const headerRow = document.getElementById("headerRow");
+            const tbody = document.getElementById("bodyMatriks");
+            if (!headerRow || !tbody) return;
+
+            headerRow.innerHTML = `<th style="min-width: 250px; white-space: nowrap; text-align: left; position: sticky; left: 0; background: #e2e8f0; z-index: 10;">MATA KULIAH (MK) \\ BAHAN KAJIAN (BK)</th>`;
+            listBK.forEach(bk => { headerRow.innerHTML += `<th title="${bk.nama_bk || ''}">${bk.kode_bk}</th>`; });
+
+            tbody.innerHTML = "";
+            listMK.forEach(mk => {
+                let tr = `<tr>
                 <td style="position: sticky; left: 0; background: #f8fafc; z-index: 5; font-weight: 600; color: var(--text-dark);" title="Kode: ${mk.kode_mk}">
                     <div class="mk-kode-badge" style="color: #64748b; font-size: 0.75rem; margin-bottom: 4px; font-weight: 800;">${mk.kode_mk}</div>
                     ${mk.nama_mk || mk.nama_mata_kuliah || mk.kode_mk}
                 </td>`;
-            
-            // Loop checkbox untuk setiap BK
-            listBK.forEach(bk => {
-                const isChecked = relasiExisting.some(r => r.kode_bk === bk.kode_bk && r.kode_mk === mk.kode_mk);
-                const chk = isChecked ? 'checked' : '';
-                const namaBKLengkap = bk.nama_bk || '';
-                
-                tr += `<td>
+
+                listBK.forEach(bk => {
+                    const isChecked = relasiExisting.some(r => r.kode_bk === bk.kode_bk && r.kode_mk === mk.kode_mk);
+                    const chk = isChecked ? 'checked' : '';
+                    const namaBKLengkap = bk.nama_bk || '';
+
+                    tr += `<td>
                            <label class="cell-wrapper">
                                <span class="bk-label-mobile">${bk.kode_bk} - ${namaBKLengkap}</span>
                                <input type="checkbox" class="chk-matrix" data-bk="${bk.kode_bk}" data-mk="${mk.kode_mk}" ${chk}>
                            </label>
                        </td>`;
+                });
+                tr += `</tr>`;
+                tbody.innerHTML += tr;
             });
-            
-            tr += `</tr>`;
-            tbody.innerHTML += tr;
-        });
-    }
-
-    async function simpanMapping() {
-        const btnSave = document.getElementById('btnSave');
-        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
-        btnSave.disabled = true;
-        
-        let fetchPromises = [];
-
-        listBK.forEach(bk => {
-            const checkedBoxes = document.querySelectorAll(`.chk-matrix[data-bk="${bk.kode_bk}"]:checked`);
-            const mkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-mk'));
-
-            const payload = {
-                kode_bk: bk.kode_bk,
-                mk_list: mkList,
-                prodi: PRODI
-            };
-
-            const request = fetch(API_SAVE_MAPPING, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            fetchPromises.push(request);
-        });
-
-        try {
-            await Promise.all(fetchPromises);
-            alert("✅ Matriks Relasi BK - MK berhasil disimpan!");
-        } catch (error) {
-            console.error(error);
-            alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi.");
-        } finally {
-            btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks';
-            btnSave.disabled = false;
         }
-    }
-</script>
+
+        // 🔥 LOGIKA PENGIRIMAN DATA DIPERBAIKI (ANTRE RAPI) 🔥
+        async function simpanMapping() {
+            const btnSave = document.getElementById('btnSave');
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btnSave.disabled = true;
+
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25"; // default 25
+
+            try {
+                // Loop Sekuensial: Tunggu request pertama selesai, baru lanjut ke request berikutnya
+                for (const bk of listBK) {
+                    const checkedBoxes = document.querySelectorAll(`.chk-matrix[data-bk="${bk.kode_bk}"]:checked`);
+                    const mkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-mk'));
+
+                    const payload = {
+                        kode_bk: bk.kode_bk,
+                        mk_list: mkList,
+                        prodi: PRODI,
+                        kurikulum: kurikulumTerpilih
+                    };
+
+                    await fetch(API_SAVE_MAPPING, {
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify(payload)
+                    });
+                }
+                
+                alert("✅ Matriks Relasi BK - MK berhasil disimpan!");
+            } catch (error) { 
+                alert("❌ Gagal menyimpan beberapa data ke server. Cek koneksi N8N."); 
+                console.error(error);
+            } finally { 
+                btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks'; 
+                btnSave.disabled = false; 
+            }
+        }
+
+        window.onload = async () => { await loadDropdownKurikulum(); };
+    </script>
 </body>
+
 </html>

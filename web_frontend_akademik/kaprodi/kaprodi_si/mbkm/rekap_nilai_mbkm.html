@@ -3,704 +3,41 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rekap Nilai MBKM - Panel Kaprodi</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
     <link rel="stylesheet" href="../../../css/style.css">
+    <!-- MEMANGGIL FILE CSS YANG BARU KITA PISAHKAN -->
+    <link rel="stylesheet" href="rekap_nilai_mbkm.css">
+    
     <script src="../../../js/template.js"></script>
     <script src="../../../js/api_config.js"></script>
-
-    <style>
-        :root {
-            --primary-red: #8b0000;
-            --text-dark: #1f2937;
-            --primary-blue: #1e3a8a;
-            --bg-light: #f9fafb;
-            --border-color: #e5e7eb;
-        }
-
-        /* --- PERBAIKAN CSS 1: Mengatur Body agar Flex (Menyamping) --- */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-light);
-            margin: 0;
-            padding: 0;
-            /* Padding dipindah ke main-content */
-            color: var(--text-dark);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            /* Mencegah double scrollbar */
-        }
-
-        /* --- PERBAIKAN CSS 2: Memunculkan Scrollbar di Konten Utama --- */
-        .main-content {
-            flex: 1;
-            height: 100vh;
-            overflow-y: auto;
-            /* INI YANG MEMUNCULKAN SCROLLBAR */
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .page-title {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-bottom: 25px;
-            color: #000;
-            letter-spacing: -0.5px;
-        }
-
-        .page-title span {
-            color: var(--primary-red);
-        }
-
-        /* --- STYLING DROPDOWN PENCARIAN MAHASISWA --- */
-        .selection-card {
-            background: #ffffff;
-            border: 1.5px solid var(--border-color);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .input-group label {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #1f2937;
-        }
-
-        .custom-dropdown {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            cursor: pointer;
-        }
-
-        .custom-dropdown input {
-            width: 100%;
-            padding: 12px 40px 12px 15px;
-            border: 1.5px solid #d1d5db;
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1f2937;
-            outline: none;
-            transition: 0.2s;
-            box-sizing: border-box;
-            cursor: pointer;
-            background-color: #f9fafb;
-        }
-
-        .custom-dropdown input:focus,
-        .custom-dropdown.active input {
-            border-color: var(--primary-red);
-            background-color: #ffffff;
-            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
-        }
-
-        .dropdown-toggle-btn {
-            position: absolute;
-            right: 0;
-            top: 0;
-            height: 100%;
-            width: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6b7280;
-            border-radius: 0 8px 8px 0;
-            transition: 0.2s;
-        }
-
-        .custom-dropdown.active .dropdown-toggle-btn {
-            transform: rotate(180deg);
-            color: var(--primary-red);
-        }
-
-        .dropdown-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            margin-top: 5px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            max-height: 220px;
-            overflow-y: auto;
-            z-index: 50;
-            display: none;
-        }
-
-        .dropdown-list.show {
-            display: block;
-        }
-
-        .dropdown-item {
-            padding: 12px 15px;
-            cursor: pointer;
-            border-bottom: 1px solid #f3f4f6;
-            transition: 0.15s;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background-color: #fef2f2;
-        }
-
-        .dropdown-item strong {
-            color: var(--primary-red);
-            font-size: 0.95rem;
-        }
-
-        .dropdown-item span {
-            font-size: 0.8rem;
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        /* --- STYLING KARTU PROFIL MAHASISWA --- */
-        .student-profile {
-            background: #f8fafc;
-            border-left: 4px solid var(--primary-red);
-            padding: 18px 24px;
-            border-radius: 0 8px 8px 0;
-            margin-bottom: 25px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            border: 1px solid #e2e8f0;
-            transition: 0.3s;
-        }
-
-        .profile-item span {
-            display: block;
-            color: #6b7280;
-            font-size: 0.75rem;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-
-        .profile-item strong {
-            color: #111827;
-            font-size: 1rem;
-        }
-
-        /* --- LAYOUT SECTION MK --- */
-        .section-card {
-            border: 1.5px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 25px;
-            background: #ffffff;
-        }
-
-        .section-header {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--primary-red);
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* --- STYLING TABEL MATKUL (MAIN) --- */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            table-layout: fixed;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 8px;
-            overflow: hidden;
-            background: white;
-        }
-
-        th {
-            background-color: #f3f4f6;
-            padding: 14px 16px;
-            border-bottom: 2px solid #e5e7eb;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: var(--text-dark);
-            text-align: left;
-            font-weight: 700;
-        }
-
-        td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 0.9rem;
-            vertical-align: middle;
-            word-wrap: break-word;
-        }
-
-        tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .comp-wrapper {
-            position: relative;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-comp {
-            width: 100%;
-            padding: 8px 35px 8px 12px;
-            border: 1.5px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-family: 'Inter', sans-serif;
-            outline: none;
-            box-sizing: border-box;
-            transition: 0.2s;
-        }
-
-        .input-comp:focus {
-            border-color: var(--primary-red);
-        }
-
-        .btn-remove-comp {
-            position: absolute;
-            right: 10px;
-            color: #9ca3af;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 0.9rem;
-            padding: 0;
-        }
-
-        .btn-remove-comp:hover {
-            color: #ef4444;
-        }
-
-        .btn-add-comp {
-            background: #f3f4f6;
-            border: 1.5px dashed #d1d5db;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            font-weight: 600;
-            margin-top: 2px;
-            transition: 0.2s;
-            color: #4b5563;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-add-comp:hover {
-            background: #e5e7eb;
-            color: var(--primary-red);
-            border-color: var(--primary-red);
-        }
-
-        /* --- DROPDOWN STATUS CUSTOM --- */
-        .custom-status-dropdown {
-            position: relative;
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .custom-status-dropdown .status-input {
-            width: 100%;
-            padding: 8px 30px 8px 12px;
-            border-radius: 8px;
-            border: 1.5px solid #d1d5db;
-            font-size: 0.85rem;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            color: #1f2937;
-            outline: none;
-            cursor: pointer;
-            background-color: #f9fafb;
-            box-sizing: border-box;
-            transition: 0.2s;
-        }
-
-        .custom-status-dropdown.active .status-input {
-            border-color: var(--primary-red);
-            background-color: #ffffff;
-            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
-        }
-
-        .custom-status-dropdown .fa-chevron-down {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6b7280;
-            pointer-events: none;
-            font-size: 0.8rem;
-            transition: 0.2s;
-        }
-
-        .custom-status-dropdown.active .fa-chevron-down {
-            transform: translateY(-50%) rotate(180deg);
-            color: var(--primary-red);
-        }
-
-        .status-list {
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            z-index: 100;
-            display: none;
-            overflow: hidden;
-        }
-
-        .custom-status-dropdown.active .status-list {
-            display: block;
-        }
-
-        .status-item {
-            padding: 10px 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #1f2937;
-            transition: 0.2s;
-        }
-
-        .status-item:not(:last-child) {
-            border-bottom: 1px solid #f3f4f6;
-        }
-
-        .status-item:hover {
-            background-color: #fef2f2;
-            color: var(--primary-red);
-        }
-
-        /* --- BUTTONS --- */
-        .btn-action-primary {
-            background: #eef2ff;
-            color: #4338ca;
-            border: 1px solid #a5b4fc;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-action-primary:hover {
-            background: #e0e7ff;
-        }
-
-        .btn-action-danger {
-            background: #fef2f2;
-            color: #ef4444;
-            border: 1px solid #fca5a5;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-action-danger:hover {
-            background: #fee2e2;
-        }
-
-        .btn-add-mk {
-            background: #f3f4f6;
-            color: #4b5563;
-            border: 1.5px dashed #cbd5e1;
-            padding: 10px 15px;
-            width: 100%;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-top: 15px;
-            margin-bottom: 10px;
-        }
-
-        .btn-add-mk:hover {
-            background: #e5e7eb;
-            color: var(--primary-red);
-            border-color: var(--primary-red);
-        }
-
-        .action-footer {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 35px;
-            padding-top: 25px;
-            border-top: 2px dashed #e5e7eb;
-        }
-
-        .btn-save {
-            background: var(--primary-red);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: 0.2s;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-        }
-
-        .btn-save:hover:not(:disabled) {
-            background: #6b0000;
-            transform: translateY(-2px);
-        }
-
-        .btn-save:disabled {
-            background: #d1d5db;
-            cursor: not-allowed;
-        }
-
-        .btn-outline {
-            background: white;
-            border: 1.5px solid #cbd5e1;
-            color: #4b5563;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-outline:hover {
-            background: #f1f5f9;
-            border-color: #9ca3af;
-        }
-
-        .btn-preview {
-            background: #e0f2fe;
-            color: #0369a1;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-preview:hover {
-            background: #bae6fd;
-        }
-
-        .total-row {
-            background-color: #f9fafb;
-            font-weight: 800;
-        }
-
-        .empty-state {
-            padding: 40px;
-            text-align: center;
-            color: #9ca3af;
-            font-style: italic;
-            border: 1.5px dashed #e5e7eb;
-            border-radius: 8px;
-            background: #fff;
-        }
-
-        .grade-box {
-            font-weight: 800;
-            color: white;
-            background: var(--primary-red);
-            font-size: 0.95rem;
-            text-align: center;
-            padding: 4px 10px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-
-        /* MODAL */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(3px);
-        }
-
-        .modal-box {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            width: 500px;
-            max-width: 90%;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-
-        .modal-box.large {
-            width: 700px;
-            max-width: 95%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-list-mk {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 15px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-        }
-
-        .modal-mk-item {
-            padding: 12px 15px;
-            border-bottom: 1px solid #f1f5f9;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-mk-item:hover {
-            background: #f8fafc;
-        }
-
-        .modal-mk-item:last-child {
-            border-bottom: none;
-        }
-
-        .input-num {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: 700;
-            outline: none;
-            box-sizing: border-box;
-            font-family: 'Inter';
-            transition: 0.2s;
-        }
-
-        .input-num:focus:not(:disabled):not([readonly]) {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
-        }
-
-        input[type=number]::-webkit-inner-spin-button,
-        input[type=number]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .summary-box {
-            background: #f8fafc;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-        }
-
-        .summary-item {
-            text-align: center;
-        }
-
-        .summary-item span {
-            display: block;
-            font-size: 0.75rem;
-            color: #6b7280;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .summary-item strong {
-            font-size: 1.5rem;
-            color: #111827;
-        }
-
-        .status-error {
-            color: #ef4444 !important;
-        }
-
-        .status-ok {
-            color: #10b981 !important;
-        }
-
-        .input-text {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-family: 'Inter';
-            font-size: 0.85rem;
-            outline: none;
-            transition: 0.2s;
-            box-sizing: border-box;
-        }
-
-        .input-text:focus:not(:disabled) {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
-        }
-    </style>
 </head>
 
 <body>
+
+    <!-- 1. NAVBAR KHUSUS MOBILE -->
+    <nav class="navbar-mobile">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" 
+                 style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" 
+                 onclick="window.location.href='/index.html'">
+        </div>
+        
+        <div class="profile-btn-mobile" onclick="toggleSidebar()">
+            <img id="mobileNavbarAvatar" src="https://ui-avatars.com/api/?name=K&background=1e3a8a&color=fff&bold=true" alt="Profil Kaprodi">
+        </div>
+    </nav>
+
+    <!-- 2. OVERLAY GELAP UNTUK LATAR SIDEBAR DI HP -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
     <div id="sidebar-container"></div>
 
@@ -880,6 +217,15 @@
 
     </div>
     <script>
+        const PRODI_AKTIF = localStorage.getItem("prodi_aktif") || "si";
+        
+        // Jika yang login adalah Kaprodi SI, sulap semua variabel merah menjadi Biru SI
+        if (PRODI_AKTIF === "si") {
+            document.documentElement.style.setProperty('--primary-red', '#1e3a8a');
+        } else {
+            // Jika TI, biarkan tetap Merah
+            document.documentElement.style.setProperty('--primary-red', '#8b0000');
+        }
 
         const API_MBKM_LIST = `${API_BASE}/get-mbkm-data`;
         const API_MK_MASTER = `${API_BASE}/get-master-matkul`;
@@ -1363,10 +709,10 @@
 
                 html += `
                     <tr style="${bgRow}">
-                        <td style="text-align: center; font-weight: 800; color: #4b5563; font-size:1.1rem;">${labelMinggu}</td>
-                        <td><input type="number" class="input-num bbt-input" id="bobot_${i}" value="${valBobot}" readonly style="background:#f3f4f6; color:#6b7280; width:100%; cursor:not-allowed;"></td>
-                        <td><input type="number" class="input-num nil-input" id="nilai_${i}" value="${valNilai}" placeholder="0-100" oninput="kalkulasiModal()" ${isNilaiDisabled} style="width:100%;"></td>
-                        <td style="text-align: center; font-weight: 800; color: var(--primary-blue); font-size:1.1rem;" id="skor_${i}">0.0</td>
+                        <td data-label="Minggu Ke" style="text-align: center; font-weight: 800; color: #4b5563; font-size:1.1rem;">${labelMinggu}</td>
+                        <td data-label="Bobot (%)"><input type="number" class="input-num bbt-input" id="bobot_${i}" value="${valBobot}" readonly style="background:#f3f4f6; color:#6b7280; width:100%; cursor:not-allowed;"></td>
+                        <td data-label="Nilai"><input type="number" class="input-num nil-input" id="nilai_${i}" value="${valNilai}" placeholder="0-100" oninput="kalkulasiModal()" ${isNilaiDisabled} style="width:100%;"></td>
+                        <td data-label="Skor Kalkulasi" style="text-align: center; font-weight: 800; color: var(--primary-blue); font-size:1.1rem;" id="skor_${i}">0.0</td>
                     </tr>
                 `;
             }
@@ -1729,18 +1075,56 @@
             }
         }
 
+        // FUNGSI SIDEBAR
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-container');
+            const overlay = document.getElementById('mobileOverlay');
+            if (sidebar) sidebar.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
+        }
+
         // KENDALI PENYUNTIKAN MENU AKTIF (INTEGRASI TEMPLATE.JS)
         window.onload = () => {
             initData(); // Pastikan ini sesuai dengan nama fungsi inisiasi di kodemu
 
             setTimeout(() => {
-                const navDashboard = document.getElementById('nav-home');
-                const navRekapMbkm = document.querySelector('[data-path="/mbkm/rekap_nilai_mbkm.html"]');
-
-                if (navDashboard) navDashboard.classList.remove('active');
-                if (navRekapMbkm) navRekapMbkm.classList.add('active');
+                // Render Sidebar (jika template.js belum jalan)
+                const sidebarContainer = document.getElementById('sidebar-container');
+                if (sidebarContainer && !sidebarContainer.innerHTML.includes('sidebar-profile')) {
+                    const prodiAktif = localStorage.getItem("prodi_aktif") || "si";
+                    fetch(`/kaprodi/kaprodi_${prodiAktif}/sidebar.html`)
+                        .then(res => res.text())
+                        .then(html => {
+                            sidebarContainer.innerHTML = html;
+                            if (typeof initSmartSidebar === 'function') initSmartSidebar();
+                            setMenuAktif();
+                        })
+                        .catch(e => console.log('Gagal memuat sidebar'));
+                } else {
+                    setMenuAktif();
+                }
             }, 300);
         };
+
+        function setMenuAktif() {
+            const navDashboard = document.getElementById('nav-home');
+            const navRekapMbkm = document.querySelector('[data-path="/mbkm/rekap_nilai_mbkm.html"]');
+
+            if (navDashboard) navDashboard.classList.remove('active');
+            if (navRekapMbkm) navRekapMbkm.classList.add('active');
+            
+            // Buka dropdown Evaluasi & RPS jika tertutup
+            const menuEvaluasi = document.getElementById('menu-evaluasi') || (navRekapMbkm ? navRekapMbkm.closest('.dropdown-container') : null);
+            if (menuEvaluasi) {
+                menuEvaluasi.style.display = 'block';
+                const parentBtn = menuEvaluasi.previousElementSibling;
+                if(parentBtn && parentBtn.classList.contains('dropdown-btn')) {
+                    parentBtn.classList.add('active');
+                    const icon = parentBtn.querySelector('.fa-chevron-down') || parentBtn.querySelector('i:last-child');
+                    if(icon) icon.style.transform = 'rotate(180deg)';
+                }
+            }
+        }
     </script>
 </body>
 

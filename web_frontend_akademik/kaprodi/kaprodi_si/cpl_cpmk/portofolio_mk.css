@@ -1,0 +1,201 @@
+/* ========================================================================
+   FILE SPESIFIK: PORTOFOLIO MATA KULIAH (portofolio_mk.css)
+   ======================================================================== */
+
+.select2-container .select2-selection--single {
+    height: 42px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+}
+
+.filter-container { 
+    background: white; 
+    padding: 20px; 
+    border-radius: 12px; 
+    border: 1px solid #e5e7eb; 
+    margin-bottom: 25px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    display: flex; 
+    gap: 15px; 
+    align-items: center; 
+    justify-content: space-between; 
+}
+
+.filter-left {
+    display: flex; 
+    gap: 15px; 
+    align-items: center; 
+    flex: 1;
+}
+
+.report-page { 
+    background: white; 
+    padding: 50px; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    margin-top: 20px; 
+    max-width: 1000px; 
+    margin-left: auto; 
+    margin-right: auto; 
+}
+
+.report-header { 
+    text-align: center; 
+    border-bottom: 4px solid var(--primary-red); 
+    padding-bottom: 20px; 
+    margin-bottom: 30px; 
+}
+
+.report-header h1 { 
+    margin: 0; 
+    color: #0f172a; 
+    text-transform: uppercase; 
+    font-size: 1.8rem; 
+    letter-spacing: 1px; 
+    font-weight: 800; 
+}
+
+.report-header p { 
+    margin: 5px 0 0 0; 
+    color: #475569; 
+    font-weight: 600; 
+    font-size: 1.1rem; 
+}
+
+.section-title { 
+    background: #f8fafc; 
+    padding: 12px 15px; 
+    border-left: 6px solid var(--primary-red); 
+    font-weight: 800; 
+    margin: 30px 0 15px 0; 
+    color: #1e293b; 
+    text-transform: uppercase; 
+    font-size: 1.1rem; 
+}
+
+.info-grid { 
+    display: grid; 
+    grid-template-columns: 200px 1fr; 
+    gap: 12px; 
+    margin-bottom: 25px; 
+    font-size: 1.05rem; 
+}
+
+.info-label { font-weight: 700; color: #475569; }
+.info-value { font-weight: 600; color: #0f172a; }
+
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+table.laporan { 
+    width: 100%; 
+    border-collapse: collapse; 
+    min-width: 600px; /* Minimal lebar agar tidak gepeng di HP */
+}
+
+table.laporan th, table.laporan td { 
+    border: 1px solid #cbd5e1; 
+    padding: 12px; 
+    text-align: center; 
+    vertical-align: middle; 
+}
+
+table.laporan th { 
+    background: #f1f5f9; 
+    font-weight: 800; 
+    color: #1e293b; 
+    text-transform: uppercase; 
+    font-size: 0.9rem; 
+}
+
+table.laporan td { 
+    color: #334155; 
+    font-weight: 500; 
+    font-size: 0.95rem; 
+}
+
+/* PENGATURAN CETAK (PRINT) YANG RAPI */
+@media print {
+    .no-print, #sidebar-container, #navbar-container, .header-container, .navbar-mobile, .mobile-overlay { display: none !important; }
+    .main-content { padding: 0 !important; margin: 0 !important; background: white; }
+    .report-page { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
+    body { background: white; }
+    
+    table.laporan th {
+        background-color: #f1f5f9 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .section-title {
+        background-color: #f8fafc !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* =========================================
+   📱 RESPONSIVE MOBILE
+   ========================================= */
+@media screen and (max-width: 768px) {
+    .filter-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .filter-left {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+    
+    /* Memaksa dropdown Select2 agar full 100% di layar HP */
+    .select2-container {
+        width: 100% !important;
+    }
+    
+    .filter-container button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .report-page {
+        padding: 20px;
+    }
+    
+    .report-header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .report-header p {
+        font-size: 0.9rem;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr; /* Tumpuk informasi ke bawah */
+        gap: 5px;
+    }
+    
+    .info-label {
+        margin-top: 10px;
+    }
+    
+    .info-label:first-child {
+        margin-top: 0;
+    }
+    
+    .section-title {
+        font-size: 1rem;
+        padding: 10px 12px;
+    }
+}

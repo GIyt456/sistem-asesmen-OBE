@@ -1619,6 +1619,7 @@
             }
 
             // 5. TARIK DATA BOBOT PENILAIAN (DISAMAKAN DENGAN INPUT_NILAI.HTML)
+            // 5. TARIK DATA BOBOT PENILAIAN (DISAMAKAN DENGAN INPUT_NILAI.HTML)
             try {
                 // Cari prodi dari matkul ini untuk ditarik master bobotnya
                 let matkulData = globalDaftarMK.find(m => m.kode_mk === kodeMK);
@@ -1628,7 +1629,9 @@
                     if (p.includes('si') || p.includes('sistem')) prodiMatkul = 'si';
                 }
 
-                const resBobot = await fetch(`${API_GET_BOBOT}?prodi=${prodiMatkul}`);
+                // INJEKSI MULTI-KURIKULUM
+                let digitKurikulum = kodeMK.substring(0, 2);
+                const resBobot = await fetch(`${API_GET_BOBOT}?prodi=${prodiMatkul}&kurikulum=${digitKurikulum}`);
                 let rawText = await resBobot.text();
                 let allData = rawText ? JSON.parse(rawText) : [];
                 if (allData.data) allData = allData.data;

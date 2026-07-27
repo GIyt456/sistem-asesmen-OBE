@@ -1,0 +1,132 @@
+/* ========================================================================
+   FILE SPESIFIK: REKAP BOBOT CPL (rekap_bobot_cpl.css)
+   ======================================================================== */
+
+.dashboard-container { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 30px; 
+    margin-top: 20px; 
+}
+
+.card-box { 
+    background: white; 
+    padding: 25px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    border: 1px solid #e5e7eb; 
+    overflow-x: auto; 
+    /* Mencegah isi meluber */
+    max-width: 100%; 
+}
+
+.section-header { 
+    margin-top: 0; 
+    margin-bottom: 20px; 
+    color: #0f172a; 
+    font-size: 1.2rem; 
+    font-weight: 800; 
+    border-left: 5px solid var(--primary-red); 
+    padding-left: 15px; 
+    text-transform: uppercase; 
+}
+
+/* Desain Tabel Super Rapi ala Excel */
+.table-excel { 
+    width: 100%; 
+    border-collapse: collapse; 
+    min-width: 1000px; /* Memaksa scroll horizontal jika layar sempit */
+    font-size: 0.9rem; 
+}
+
+.table-excel th, .table-excel td { 
+    border: 1px solid #cbd5e1; 
+    padding: 10px 8px; 
+    text-align: center; 
+    vertical-align: middle; 
+}
+
+.table-excel th { 
+    background: #f1f5f9; 
+    color: #1e293b; 
+    font-weight: 800; 
+}
+
+/* Sticky Column HANYA berlaku di Desktop */
+.table-excel th.sticky-col, .table-excel td.sticky-col { 
+    position: sticky; 
+    left: 0; 
+    background: white; 
+    z-index: 2; 
+    border-right: 2px solid #94a3b8; 
+    text-align: left; 
+}
+
+.table-excel th.sticky-col { background: #f1f5f9; }
+
+.cell-bobot { background: #dcfce7; color: #166534; font-weight: 700; }
+.cell-empty { color: #cbd5e1; }
+
+/* Tabel Grand Total yang lebih mencolok */
+.table-summary { 
+    border-collapse: collapse; 
+    width: 100%; 
+    max-width: 600px; 
+    font-size: 1rem; 
+}
+
+.table-summary th, .table-summary td { border: 1px solid #cbd5e1; padding: 12px; }
+.table-summary th { background: #1e293b; color: white; text-align: left; }
+.table-summary td:nth-child(2), .table-summary td:nth-child(3) { 
+    text-align: right; 
+    font-weight: bold; 
+    font-family: monospace; 
+    font-size: 1.1rem; 
+}
+
+.text-danger { color: #dc2626 !important; }
+.text-success { color: #059669 !important; }
+
+/* =========================================
+   📱 RESPONSIVE MOBILE (BEBAS BEBAN VISUAL)
+   ========================================= */
+@media screen and (max-width: 768px) {
+    .dashboard-container {
+        gap: 20px;
+    }
+
+    .card-box {
+        padding: 15px; /* Mengurangi ruang kosong agar konten lebih lega */
+        border-radius: 8px;
+    }
+
+    .section-header {
+        font-size: 1rem;
+        margin-bottom: 15px;
+    }
+
+    /* Membungkus tabel dengan izin scroll horizontal penuh */
+    .table-excel {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Kelancaran scroll di Safari/iOS */
+    }
+
+    /* Mematikan Sticky Column di HP agar tabel bisa dis-scroll seutuhnya tanpa mengganggu layar */
+    .table-excel th.sticky-col, .table-excel td.sticky-col {
+        position: static !important;
+        border-right: 1px solid #cbd5e1 !important;
+    }
+
+    /* Penyesuaian Tabel Summary */
+    .table-summary {
+        max-width: 100%;
+        display: block;
+        overflow-x: auto;
+    }
+
+    .table-summary th, .table-summary td {
+        white-space: nowrap; /* Mencegah tulisan patah-patah ke bawah */
+    }
+}

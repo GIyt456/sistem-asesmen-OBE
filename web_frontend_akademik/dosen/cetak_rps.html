@@ -674,8 +674,9 @@
                     prodiMatkul = 'si';
                 }
 
-                // 2. Tarik Master Bobot berdasarkan Prodi persis seperti RPS Dosen
-                const res = await fetch(`${API_GET_BOBOT}?prodi=${prodiMatkul}`);
+                // 2. Tarik Master Bobot dengan Injeksi Multi-Kurikulum
+                let digitKurikulum = kodeMK.substring(0, 2);
+                const res = await fetch(`${API_GET_BOBOT}?prodi=${prodiMatkul}&kurikulum=${digitKurikulum}`);
                 if (res.ok) {
                     const jsonBobot = await res.json();
                     let allData = safeExtractN8N(jsonBobot);

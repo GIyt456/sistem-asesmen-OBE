@@ -1,0 +1,168 @@
+/* ========================================================================
+   FILE SPESIFIK: MATRIKS CPL - MK (matriks_mk.css)
+   ======================================================================== */
+
+.tabel-matriks-cpl-mk-wrapper { 
+    overflow: auto !important; 
+    max-height: 68vh !important; 
+    border: 1px solid var(--border-color) !important; 
+    border-radius: 12px; 
+    background: white; 
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
+    margin-bottom: 0 !important;
+}
+
+.tabel-matriks-cpl-mk { 
+    width: 100%; 
+    border-collapse: separate !important; 
+    border-spacing: 0 !important; 
+    white-space: nowrap !important; 
+}
+
+.tabel-matriks-cpl-mk th { 
+    background: #1e293b !important; 
+    color: white !important; 
+    font-weight: 700; 
+    padding: 15px 10px !important; 
+    position: sticky; 
+    top: 0; 
+    z-index: 10; 
+    border-bottom: 2px solid #0f172a !important; 
+    border-right: 1px solid #334155 !important; 
+    text-align: center; 
+    vertical-align: middle; 
+    font-size: 0.85rem;
+}
+
+.tabel-matriks-cpl-mk td { 
+    border-bottom: 1px solid var(--border-color) !important; 
+    border-right: 1px solid var(--border-color) !important; 
+    padding: 12px 10px !important; 
+    font-size: 0.85rem; 
+    text-align: center; 
+    color: #1e293b; 
+    background: white; 
+}
+
+/* STICKY KOLOM 1: SEMESTER */
+.tabel-matriks-cpl-mk th.sticky-col-1 { position: sticky; left: 0; z-index: 20 !important; background: #0f172a !important; min-width: 60px; max-width: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;}
+.tabel-matriks-cpl-mk td.sticky-col-1 { position: sticky; left: 0; z-index: 5 !important; background: #f8fafc !important; font-weight: 600; border-right: 1px solid #cbd5e1 !important; min-width: 60px; max-width: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;}
+
+/* STICKY KOLOM 2: KODE MK */
+.tabel-matriks-cpl-mk th.sticky-col-2 { position: sticky; left: 60px; z-index: 20 !important; background: #0f172a !important; min-width: 100px; box-shadow: 2px 0 5px rgba(0,0,0,0.2) !important;}
+.tabel-matriks-cpl-mk td.sticky-col-2 { position: sticky; left: 60px; z-index: 5 !important; background: #f8fafc !important; font-weight: 800; color: var(--primary-blue) !important; border-right: 2px solid #cbd5e1 !important; box-shadow: 2px 0 5px rgba(0,0,0,0.05) !important;}
+
+/* GAYA CHECKMARK DAN HOVER */
+.tabel-matriks-cpl-mk .check-mark { color: #10b981; font-weight: 900; font-size: 1.2rem; }
+.tabel-matriks-cpl-mk tbody tr:hover td { background-color: #f0f9ff !important; }
+.tabel-matriks-cpl-mk tbody tr:hover td.sticky-col-1,
+.tabel-matriks-cpl-mk tbody tr:hover td.sticky-col-2 { background-color: #e0f2fe !important; }
+
+/* --- RESPONSIVE MOBILE (SULAP TABEL JADI KARTU LIST) --- */
+@media screen and (max-width: 768px) {
+    /* Bebaskan pembungkus tabel */
+    .tabel-matriks-cpl-mk-wrapper { 
+        border: none !important; 
+        box-shadow: none !important;
+        background: transparent !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-height: none !important; 
+        overflow: hidden !important; 
+    }
+    
+    /* 🔴 KUNCI ANTI-MENGHILANG: Cabut paksa sifat nowrap dan set min-width: 0 */
+    .tabel-matriks-cpl-mk, .tabel-matriks-cpl-mk thead, .tabel-matriks-cpl-mk tbody, .tabel-matriks-cpl-mk th, .tabel-matriks-cpl-mk td, .tabel-matriks-cpl-mk tr { 
+        display: block !important; 
+        width: 100% !important; 
+        min-width: 0 !important; 
+        box-sizing: border-box !important; 
+        white-space: normal !important; /* Mengizinkan teks turun ke bawah */
+    }
+    .tabel-matriks-cpl-mk thead { display: none !important; } 
+    
+    /* 1. KARTU UTAMA */
+    .tabel-matriks-cpl-mk tr { 
+        background: white !important; 
+        margin-bottom: 20px !important; 
+        border-radius: 12px !important; 
+        padding: 0 !important; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08) !important; 
+        border: 1px solid var(--border-color) !important; 
+        overflow: hidden !important; 
+    }
+
+    /* OBAT KOTAK PUTIH: Sembunyikan SMT & SKS dan cabut sifat Sticky-nya! */
+    .tabel-matriks-cpl-mk td.sticky-col-1, 
+    .tabel-matriks-cpl-mk td:nth-child(4) { 
+        display: none !important; 
+        position: static !important;
+    }
+
+    /* 2. HEADER KARTU (KODE MK) */
+    .tabel-matriks-cpl-mk td.sticky-col-2 { 
+        background: #1e293b !important; 
+        color: var(--primary-blue) !important; 
+        font-size: 0.85rem !important; 
+        font-weight: 800 !important; 
+        padding: 15px 15px 5px 15px !important; 
+        border: none !important; 
+        text-align: left !important;
+        position: static !important; 
+        box-shadow: none !important; 
+    }
+
+    /* 3. HEADER KARTU (NAMA MK) */
+    .tabel-matriks-cpl-mk td:nth-child(3) { 
+        background: #1e293b !important; 
+        color: white !important; 
+        font-size: 1.15rem !important; 
+        font-weight: 700 !important; 
+        padding: 0 15px 15px 15px !important; 
+        border: none !important; 
+        border-bottom: 4px solid var(--primary-blue) !important; 
+        text-align: left !important;
+    }
+
+    /* 4. LIST ITEM (TEKS DI KIRI, CHECKBOX DI KANAN) */
+    .tabel-matriks-cpl-mk td.td-cpl {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 15px !important;
+        border: none !important;
+        border-bottom: 1px dashed #e2e8f0 !important; 
+        background: white !important;
+        min-width: 0 !important; /* Paksa Flexbox patuh pada batas layar */
+    }
+    
+    .tabel-matriks-cpl-mk td.td-cpl:last-child { border-bottom: none !important; }
+
+    /* LABEL TEKS CPL */
+    .tabel-matriks-cpl-mk td.td-cpl::before {
+        content: attr(data-label) !important;
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+        text-align: left !important;
+        flex: 1 1 auto !important; /* Izinkan teks menyusut */
+        padding-right: 15px !important;
+        line-height: 1.4 !important;
+        word-wrap: break-word !important; /* Paksa patah jika kata terlalu panjang */
+        white-space: normal !important;
+    }
+
+    /* CHECKBOX */
+    .tabel-matriks-cpl-mk td.td-cpl input[type="checkbox"] {
+        margin: 0 !important;
+        transform: scale(1.4) !important;
+        flex-shrink: 0 !important; /* Kunci ukuran checkbox agar tidak mengecil tergencet teks */
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    /* Menghilangkan efek hover mengganggu di HP */
+    .tabel-matriks-cpl-mk tbody tr:hover td { background-color: white !important; }
+    .tabel-matriks-cpl-mk tbody tr:hover td.sticky-col-2,
+    .tabel-matriks-cpl-mk tbody tr:hover td:nth-child(3) { background-color: #1e293b !important; }
+}
