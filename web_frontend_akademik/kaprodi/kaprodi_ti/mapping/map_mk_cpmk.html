@@ -55,12 +55,26 @@
             <!-- PANEL MAPPING KONTEN -->
             <div class="mapping-panel">
                 <!-- 1. PILIH MATA KULIAH -->
-                <div class="form-group">
-                    <label for="selectMk"><i class="fas fa-book dynamic-icon" style="margin-right: 8px;"></i> Pilih Mata Kuliah</label>
-                    <select id="selectMk" class="select-custom" onchange="fetchExistingMapping()">
-                        <option value="">-- Memuat daftar Mata Kuliah... --</option>
-                    </select>
+                <div class="form-group" style="position: relative;">
+                    <label for="searchMk"><i class="fas fa-search dynamic-icon" style="margin-right: 8px;"></i> Cari & Pilih Mata Kuliah</label>
+                    
+                    <div style="display: flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px 15px; background: #fff;">
+                        <input type="text" id="searchMk" placeholder="Ketik Kode atau Nama MK... (Misal: Pendi)" oninput="handleSearchInput()" autocomplete="off" style="border: none; outline: none; width: 100%; font-family: 'Inter', sans-serif; font-size: 0.95rem;">
+                    </div>
+                    
+                    <!-- Kotak Rekomendasi yang akan muncul saat mengetik -->
+                    <div id="mkSuggestions" style="display: none; position: absolute; width: 100%; background: white; border: 1px solid #cbd5e1; border-top: none; border-radius: 0 0 6px 6px; max-height: 250px; overflow-y: auto; z-index: 1000; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
+                    </div>
+                    
+                    <!-- Input tersembunyi untuk menyimpan Kode MK saat item diklik -->
+                    <input type="hidden" id="selectedKodeMk" value="">
                 </div>
+
+                <!-- Tambahan sedikit CSS untuk efek hover pada hasil pencarian -->
+                <style>
+                    .suggestion-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-size: 0.95rem; transition: background 0.2s; }
+                    .suggestion-item:hover { background-color: #f8fafc; color: var(--primary-blue); font-weight: 600; }
+                </style>
 
                 <hr style="border: 0; border-top: 2px dashed #cbd5e1; margin: 40px 0;">
 
@@ -92,6 +106,7 @@
     const PRODI = localStorage.getItem("prodi_aktif") || "ti";
     const API_SAVE_MAPPING = `${API_BASE}/admin-map-mk-cpmk`;
     let listCPMK = [];
+    let listMataKuliah = [];
 
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace("/login/login.html");
@@ -131,9 +146,13 @@
         }
     }
 
-    // --- LOGIKA MAPPING API ---
+    // --- 1. INISIASI DATA DARI API ---
     async function initDropdownAndCheckboxes() {
-        const selectMk = document.getElementById('selectMk');
+        // Reset Area Pencarian saat kurikulum diganti
+        document.getElementById('searchMk').value = '';
+        document.getElementById('selectedKodeMk').value = '';
+        document.getElementById('mkSuggestions').style.display = 'none';
+
         const cpmkContainer = document.getElementById('cpmkContainer');
         const btnSave = document.getElementById('btnSave');
         
@@ -142,7 +161,6 @@
         const selectKurikulum = document.getElementById('filterKurikulum');
         let kurikulum = selectKurikulum ? selectKurikulum.value : "";
         
-        // Anti-Cache
         const timeStamp = new Date().getTime();
         let URL_MK = `${API_BASE}/get-susunan-matkul?prodi=${PRODI}&_t=${timeStamp}`;
         let URL_CPMK = `${API_BASE}/get-master-cpmk?prodi=${PRODI}&_t=${timeStamp}`;
@@ -157,18 +175,10 @@
                 fetch(URL_MK, { cache: "no-store" }), fetch(URL_CPMK, { cache: "no-store" })
             ]);
 
-            const dataMk = await resMk.json();
+            listMataKuliah = await resMk.json(); // Simpan array MK ke variabel global
             listCPMK = await resCpmk.json();
 
-            if (selectMk) {
-                selectMk.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah --</option>';
-                if (dataMk.length > 0) {
-                    dataMk.forEach(mk => {
-                        selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
-                    });
-                } else { selectMk.innerHTML = '<option value="">Data Mata Kuliah Kosong</option>'; }
-            }
-
+            // Render daftar CPMK (Sama seperti sebelumnya)
             if (cpmkContainer) {
                 cpmkContainer.innerHTML = '';
                 if (listCPMK.length > 0) {
@@ -187,7 +197,6 @@
                     });
 
                     sortedCPLs.forEach(cpl => {
-                        // Kategori CPL Header
                         cpmkContainer.innerHTML += `
                             <div class="cpl-divider">
                                 <div class="cpl-divider-title">
@@ -199,7 +208,6 @@
                             </div>
                         `;
 
-                        // Daftar Kartu CPMK
                         groupedCPMK[cpl].forEach(cpmk => {
                             cpmkContainer.innerHTML += `
                                 <label class="cpmk-card">
@@ -213,7 +221,6 @@
                         });
                     });
                     
-                    // Trigger pewarnaan ikon divider
                     const dynamicIcons = document.querySelectorAll('.dynamic-icon');
                     const color = PRODI === 'si' ? '#1e3a8a' : '#8b0000';
                     dynamicIcons.forEach(icon => icon.style.color = color);
@@ -224,14 +231,77 @@
             }
 
         } catch (error) {
-            if (selectMk) selectMk.innerHTML = '<option value="">Gagal terhubung ke API</option>';
             if (cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; text-align:center; padding:20px; font-weight:bold;">Gagal menarik data Master dari Server.</div>';
         } 
     }
 
+    // --- 2. LOGIKA AUTOCOMPLETE SEARCH ---
+    function handleSearchInput() {
+        const keyword = document.getElementById('searchMk').value.toLowerCase().trim();
+        const suggestionsContainer = document.getElementById('mkSuggestions');
+        
+        // Jika teks pencarian dihapus/dikosongkan
+        if (keyword === "") {
+            suggestionsContainer.style.display = 'none';
+            document.getElementById('selectedKodeMk').value = '';
+            
+            // Matikan checkbox dan tombol simpan
+            document.querySelectorAll('.cpmk-checkbox').forEach(cb => { cb.checked = false; cb.disabled = true; });
+            document.getElementById('btnSave').disabled = true;
+            return;
+        }
+
+        // Lakukan filter dari listMataKuliah berdasarkan Kode ATAU Nama
+        const filteredData = listMataKuliah.filter(mk => {
+            const kode = (mk.kode_mk || "").toLowerCase();
+            const nama = (mk.nama_mk || "").toLowerCase();
+            return kode.includes(keyword) || nama.includes(keyword);
+        });
+
+        // Tampilkan hasilnya ke kotak rekomendasi
+        if (filteredData.length > 0) {
+            let html = '';
+            filteredData.forEach(mk => {
+                html += `<div class="suggestion-item" onclick="selectMatkul('${mk.kode_mk}', '${mk.nama_mk.replace(/'/g, "\\'")}')">
+                            <strong>${mk.kode_mk}</strong> - ${mk.nama_mk}
+                         </div>`;
+            });
+            suggestionsContainer.innerHTML = html;
+            suggestionsContainer.style.display = 'block';
+        } else {
+            suggestionsContainer.innerHTML = '<div style="padding: 10px 15px; color: #94a3b8; font-style: italic;">Mata kuliah tidak ditemukan...</div>';
+            suggestionsContainer.style.display = 'block';
+        }
+    }
+
+    // Fungsi ketika user mengklik salah satu hasil dari rekomendasi pencarian
+    function selectMatkul(kodeMk, namaMk) {
+        // Tampilkan tulisan di kotak pencarian, simpan kodenya ke hidden input
+        document.getElementById('searchMk').value = `${kodeMk} - ${namaMk}`;
+        document.getElementById('selectedKodeMk').value = kodeMk;
+        
+        // Sembunyikan kotak rekomendasi
+        document.getElementById('mkSuggestions').style.display = 'none';
+        
+        // Lanjutkan menarik relasi data dari database
+        fetchExistingMapping();
+    }
+
+    // Sensor pintar: Menutup kotak rekomendasi jika user klik di sembarang tempat
+    document.addEventListener('click', function(e) {
+        const searchInput = document.getElementById('searchMk');
+        const suggestions = document.getElementById('mkSuggestions');
+        if (searchInput && suggestions) {
+            if (e.target !== searchInput && !suggestions.contains(e.target)) {
+                suggestions.style.display = 'none';
+            }
+        }
+    });
+
+    // --- 3. MENYIMPAN & MENAMPILKAN MAPPING ---
     async function fetchExistingMapping() {
-        const selectMk = document.getElementById('selectMk');
-        const kodeMk = selectMk ? selectMk.value : null;
+        // Mengubah referensi dari dropdown lama ke input hidden baru
+        const kodeMk = document.getElementById('selectedKodeMk').value;
         const btnSave = document.getElementById('btnSave');
         const checkboxes = document.querySelectorAll('.cpmk-checkbox');
 
@@ -274,7 +344,8 @@
     }
 
     async function saveMapping() {
-        const kodeMk = document.getElementById('selectMk').value;
+        // Mengubah referensi dari dropdown lama ke input hidden baru
+        const kodeMk = document.getElementById('selectedKodeMk').value;
         const btnSave = document.getElementById('btnSave');
         const textAwal = btnSave.innerHTML;
         
