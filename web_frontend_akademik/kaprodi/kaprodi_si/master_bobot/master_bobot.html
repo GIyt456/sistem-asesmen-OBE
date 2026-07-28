@@ -22,12 +22,9 @@
     <nav class="navbar-mobile">
         <div style="display: flex; align-items: center; gap: 15px;">
             <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI"
-                style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;"
-                onclick="window.location.href='/index.html'">
+            <img src="/gambar/LogoUnaki.png" alt="Logo Universitas AKI" style="height: 28px; object-fit: contain; filter: brightness(0) invert(1); cursor: pointer;" onclick="window.location.href='/index.html'">
         </div>
-        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src=""
-                alt="Profil Kaprodi"></div>
+        <div class="profile-btn-mobile" onclick="toggleSidebar()"><img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi"></div>
     </nav>
 
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
@@ -36,7 +33,7 @@
     <div class="main-content">
         <div id="navbar-container"></div>
 
-        <div class="fixed-header">
+         <div class="fixed-header">
             <div class="header-container header-bobot-mhs">
                 <div class="header-title-area">
                     <div class="header-subtitle" style="margin-bottom: 5px;">MEKANISME ASESMEN</div>
@@ -44,16 +41,21 @@
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
-            <div style="border-bottom: 1px solid var(--border-color); margin: 0 50px 20px 50px;"
-                class="header-bobot-mhs"></div>
+            <div style="border-bottom: 1px solid var(--border-color); margin: 0 50px 20px 50px;" class="header-bobot-mhs"></div>
         </div>
 
         <div class="scrollable-content section-bobot-mhs" style="padding: 0 50px 40px 50px;">
+            <!-- TEMPLATE: Filter Section -->
+            <div class="filter-section">
+                <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
+                <select id="filterKurikulum" onchange="initMatkulDropdown()" class="filter-select">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
             <div class="control-panel">
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
                     <label style="font-weight: 700; color: #475569; font-size: 0.95rem;">
-                        <i class="fas fa-book-open" style="color: var(--primary-blue); margin-right: 5px;"></i> Pilih
-                        Mata Kuliah:
+                        <i class="fas fa-book-open" style="color: var(--primary-blue); margin-right: 5px;"></i> Pilih Mata Kuliah:
                     </label>
                     <select id="selectMk" class="select-matkul" onchange="loadDataBobot()">
                         <option value="" disabled selected>-- Memuat Daftar Mata Kuliah... --</option>
@@ -93,12 +95,7 @@
                         </tr>
                     </thead>
                     <tbody id="tableBody">
-                        <tr>
-                            <td colspan="10"
-                                style="text-align: center; padding: 40px !important; font-weight: 600; color: #64748b;">
-                                <i class="fas fa-arrow-up" style="margin-right: 8px; color: var(--primary-blue);"></i>
-                                Silakan pilih Mata Kuliah di atas terlebih dahulu.</td>
-                        </tr>
+                        <tr><td colspan="10" style="text-align: center; padding: 40px !important; font-weight: 600; color: #64748b;"><i class="fas fa-arrow-up" style="margin-right: 8px; color: var(--primary-blue);"></i> Silakan pilih Mata Kuliah di atas terlebih dahulu.</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -113,224 +110,270 @@
         <div id="mobileTotalValue" class="mobile-total-value warn">0%</div>
     </div>
 
-    <script>
-        const PRODI = localStorage.getItem("prodi_aktif") || "si";
-
-        document.addEventListener("DOMContentLoaded", () => {
-            if (PRODI === "ti") {
-                document.documentElement.style.setProperty('--primary-blue', '#8b0000');
-                document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
-            } else {
-                document.documentElement.style.setProperty('--primary-blue', '#1e3a8a');
-                document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
-            }
-
-            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
-            const avatarMobile = document.getElementById("mobileNavbarAvatar");
-            if (avatarMobile) {
-                const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
-                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
-            }
-        });
-
-        function toggleSidebar() {
-            document.getElementById('sidebar-container').classList.toggle('active');
-            document.getElementById('mobileOverlay').classList.toggle('active');
+<script>
+    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        if(PRODI === "ti") {
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+        } else {
+            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            setTimeout(() => {
-                const sidebar = document.getElementById('sidebar-container');
-                if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
-                    fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
-                        .then(res => res.text())
-                        .then(html => {
-                            sidebar.innerHTML = html;
-                            if (typeof initSmartSidebar === 'function') initSmartSidebar();
-                        })
-                        .catch(e => console.log('Gagal memuat sidebar darurat'));
+        const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+        const avatarMobile = document.getElementById("mobileNavbarAvatar");
+        if(avatarMobile) {
+            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+            avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+        }
+    });
+
+    function toggleSidebar() {
+        document.getElementById('sidebar-container').classList.toggle('active');
+        document.getElementById('mobileOverlay').classList.toggle('active');
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+            const sidebar = document.getElementById('sidebar-container');
+            if (sidebar && !sidebar.innerHTML.includes('sidebar-profile')) {
+                fetch(`/kaprodi/kaprodi_${PRODI}/sidebar.html`)
+                    .then(res => res.text())
+                    .then(html => {
+                        sidebar.innerHTML = html;
+                        if(typeof initSmartSidebar === 'function') initSmartSidebar();
+                    })
+                    .catch(e => console.log('Gagal memuat sidebar darurat'));
+            }
+        }, 600); 
+    });
+
+    const API_GET_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
+    const API_GET_KOMPONEN = `${API_BASE}/get-master-komponen`;
+    const API_SAVE_BOBOT = `${API_BASE}/admin-save-bobot`;
+
+    const userLogin = localStorage.getItem("user_login");
+    if (!userLogin) window.location.replace("/login/login.html");
+
+    let daftarMasterKomponen = [];
+    let activeKomponenIds = [];   
+    let dataCpmkGrouped = [];
+
+    window.onload = async () => { 
+        await fetchMasterKomponen();
+        await loadDropdownKurikulum(); // Panggil dropdown kurikulum dulu
+    };
+
+    // --- FUNGSI BARU: LOAD KURIKULUM ---
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            let data = [];
+            try { data = await response.json(); } catch(e) {}
+            
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            if(!selectKurikulum) return;
+            selectKurikulum.innerHTML = ''; 
+            
+            let kurikulumSet = new Set();
+            if(data && data.length > 0) {
+                data.forEach(item => { if (item && item.kurikulum) kurikulumSet.add(String(item.kurikulum)); });
+            }
+            // Paksa 20 dan 25 muncul
+            kurikulumSet.add("25");
+            kurikulumSet.add("20");
+
+            let sortedKurikulum = Array.from(kurikulumSet).sort((a, b) => b - a);
+
+            sortedKurikulum.forEach(kur => {
+                let opt = document.createElement('option');
+                opt.value = kur; 
+                opt.text = "Kurikulum 20" + kur; 
+                selectKurikulum.appendChild(opt);
+            });
+
+            await initMatkulDropdown(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+        }
+    }
+
+    // 1. Ambil Master Komponen dari Database
+    async function fetchMasterKomponen() {
+        try {
+            const res = await fetch(API_GET_KOMPONEN);
+            daftarMasterKomponen = await res.json();
+        } catch (error) {
+            console.error("Gagal muat komponen");
+        }
+    }
+
+    function getNamaKomponen(id) {
+        const komp = daftarMasterKomponen.find(k => k.id_komponen == id);
+        return komp ? komp.nama_komponen.toUpperCase() : `KOMP-${id}`;
+    }
+
+    // 2. Ambil Daftar Matkul (Tetap gunakan logika aslimu)
+    async function initMatkulDropdown() {
+        const selectMk = document.getElementById('selectMk');
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
+
+        // Bersihkan tabel saat kurikulum diganti
+        document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px !important; font-weight: 600; color: #64748b;"><i class="fas fa-arrow-up" style="margin-right: 8px; color: var(--primary-blue);"></i> Silakan pilih Mata Kuliah di atas terlebih dahulu.</td></tr>';
+        document.getElementById('mobileTotalPanel').classList.remove('active');
+
+        try {
+            // Tetap mengambil data dari n8n get-master-bobot (mk_cpmk_relation)
+            const res = await fetch(`${API_GET_BOBOT}&kurikulum=${kurikulumTerpilih}`);
+            const data = await res.json();
+            
+            let uniqueMk = [];
+            let seen = new Set();
+            
+            data.forEach(row => {
+                if (!seen.has(row.kode_mk)) {
+                    seen.add(row.kode_mk);
+                    uniqueMk.push({ kode_mk: row.kode_mk, nama_mk: row.nama_mk });
                 }
-            }, 600);
-        });
+            });
 
-        const API_GET_BOBOT = `${API_BASE}/get-master-bobot?prodi=${PRODI}`;
-        const API_GET_KOMPONEN = `${API_BASE}/get-master-komponen`;
-        const API_SAVE_BOBOT = `${API_BASE}/admin-save-bobot`;
-
-        const userLogin = localStorage.getItem("user_login");
-        if (!userLogin) window.location.replace("/login/login.html");
-
-        let daftarMasterKomponen = [];
-        let activeKomponenIds = [];
-        let dataCpmkGrouped = [];
-
-        window.onload = async () => {
-            await fetchMasterKomponen();
-            await initMatkulDropdown();
-        };
-
-        // 1. Ambil Master Komponen dari Database
-        async function fetchMasterKomponen() {
-            try {
-                const res = await fetch(API_GET_KOMPONEN);
-                daftarMasterKomponen = await res.json();
-            } catch (error) {
-                console.error("Gagal muat komponen");
-            }
-        }
-
-        function getNamaKomponen(id) {
-            const komp = daftarMasterKomponen.find(k => k.id_komponen == id);
-            return komp ? komp.nama_komponen.toUpperCase() : `KOMP-${id}`;
-        }
-
-        // 2. Ambil Daftar Matkul
-        async function initMatkulDropdown() {
-            const selectMk = document.getElementById('selectMk');
-            try {
-                const res = await fetch(API_GET_BOBOT);
-                const data = await res.json();
-
-                let uniqueMk = [];
-                let seen = new Set();
-
-                data.forEach(row => {
-                    if (!seen.has(row.kode_mk)) {
-                        seen.add(row.kode_mk);
-                        uniqueMk.push({ kode_mk: row.kode_mk, nama_mk: row.nama_mk });
-                    }
-                });
-
-                selectMk.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah yang Tersedia --</option>';
+            selectMk.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah yang Tersedia --</option>';
+            if(uniqueMk.length > 0) {
                 uniqueMk.forEach(mk => {
                     selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
                 });
-            } catch (error) {
-                if (selectMk) selectMk.innerHTML = '<option value="">❌ Gagal memuat daftar matkul. Cek n8n!</option>';
+            } else {
+                // Jika Kurikulum 20 belum ada mapping, ini yang akan muncul:
+                selectMk.innerHTML = '<option value="" disabled selected>-- Belum ada pemetaan di Kurikulum ini --</option>';
             }
+        } catch (error) {
+            if(selectMk) selectMk.innerHTML = '<option value="">❌ Gagal memuat daftar matkul. Cek n8n!</option>';
         }
+    }
 
-        // 3. Load Data & Grouping Berdasar Matkul Terpilih
-        async function loadDataBobot() {
-            const tbody = document.getElementById('tableBody');
-            const kodeMkTerpilih = document.getElementById('selectMk').value;
-            const mobilePanel = document.getElementById('mobileTotalPanel');
+    // 3. Load Data & Grouping Berdasar Matkul Terpilih (DIUPDATE: Baca Kurikulum)
+    async function loadDataBobot() {
+        const tbody = document.getElementById('tableBody'); 
+        const kodeMkTerpilih = document.getElementById('selectMk').value;
+        const mobilePanel = document.getElementById('mobileTotalPanel');
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
 
-            if (!kodeMkTerpilih) return;
+        if (!kodeMkTerpilih) return;
 
-            tbody.innerHTML = '<tr><td colspan="15" style="text-align: center; padding: 40px !important;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue);"></i><br><br>Memuat form bobot...</td></tr>';
-            mobilePanel.classList.remove('active');
-            activeKomponenIds = [];
-            dataCpmkGrouped = [];
+        tbody.innerHTML = '<tr><td colspan="15" style="text-align: center; padding: 40px !important;"><i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-blue);"></i><br><br>Memuat form bobot...</td></tr>';
+        mobilePanel.classList.remove('active'); 
+        activeKomponenIds = [];
+        dataCpmkGrouped = [];
 
-            try {
-                const res = await fetch(API_GET_BOBOT);
-                const allData = await res.json();
-                const dataMatkul = allData.filter(row => row.kode_mk === kodeMkTerpilih);
-
-                if (dataMatkul.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="15" style="text-align: center; padding: 40px !important; color: #dc2626; font-weight:bold;">Belum ada pemetaan CPMK untuk Mata Kuliah ini di database.</td></tr>';
-                    return;
-                }
-
-                let grouped = {};
-                let activeIdsSet = new Set();
-
-                dataMatkul.forEach(row => {
-                    let key = row.kode_cpmk || row.cpmk;
-                    if (!grouped[key]) {
-                        grouped[key] = {
-                            cpl: row.cpl,
-                            kode_mk: row.kode_mk,
-                            nama_mk: row.nama_mk,
-                            kode_cpmk: key,
-                            bobot_komponen: {}
-                        };
-                    }
-                    if (row.id_komponen && parseFloat(row.bobot) > 0) {
-                        grouped[key].bobot_komponen[row.id_komponen] = parseFloat(row.bobot);
-                        activeIdsSet.add(row.id_komponen.toString());
-                    }
-                });
-
-                dataCpmkGrouped = Object.values(grouped);
-                activeKomponenIds = Array.from(activeIdsSet);
-
-                renderTabelDinamis();
-                mobilePanel.classList.add('active');
-
-            } catch (error) {
-                tbody.innerHTML = '<tr><td colspan="15" style="text-align: center; padding: 40px !important; color: red; font-weight:bold;">❌ Gagal memuat data dari API.</td></tr>';
-            }
-        }
-
-        // 4. Sinkronisasi Data Input Sementara Sebelum Tambah Komponen Baru
-        function syncInputValues() {
-            if (activeKomponenIds.length === 0) return;
-            const rows = document.querySelectorAll('tbody tr[data-cpmk]');
-
-            rows.forEach(row => {
-                const cpmk = row.getAttribute('data-cpmk');
-                let dataRow = dataCpmkGrouped.find(d => d.kode_cpmk === cpmk);
-
-                if (dataRow) {
-                    activeKomponenIds.forEach(idKomp => {
-                        const input = row.querySelector(`input[data-idkomp="${idKomp}"]`);
-                        if (input) dataRow.bobot_komponen[idKomp] = parseFloat(input.value) || 0;
-                    });
-                }
-            });
-        }
-
-        // 5. Logika Tambah Komponen (Desktop & Mobile)
-        function tambahKomponenInline() {
-            const select = document.getElementById('selectKompInline');
-            if (!select) return;
-            eksekusiTambahKomponen(select.value);
-        }
-
-        function tambahKomponenMobile() {
-            const select = document.getElementById('selectKompMobile');
-            if (!select) return;
-            eksekusiTambahKomponen(select.value);
-        }
-
-        function eksekusiTambahKomponen(idVal) {
-            if (!idVal) {
-                alert("Pilih komponen terlebih dahulu!");
+        try {
+            const res = await fetch(`${API_GET_BOBOT}&kurikulum=${kurikulumTerpilih}`);
+            const allData = await res.json();
+            const dataMatkul = allData.filter(row => row.kode_mk === kodeMkTerpilih);
+            
+            if (dataMatkul.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="15" style="text-align: center; padding: 40px !important; color: #dc2626; font-weight:bold;">Belum ada pemetaan CPMK untuk Mata Kuliah ini di database.</td></tr>';
                 return;
             }
-            if (!activeKomponenIds.includes(idVal)) {
-                syncInputValues();
-                activeKomponenIds.push(idVal);
-                renderTabelDinamis();
-            }
-        }
 
-        // 6. RENDER UTAMA TABEL DAN KARTU MOBILE SECARA DINAMIS
-        function renderTabelDinamis() {
-            const table = document.getElementById('bobotTable');
-            const thead = document.getElementById('tableHead');
-            const tbody = document.getElementById('tableBody');
-            const selectMobile = document.getElementById('selectKompMobile');
+            let grouped = {};
+            let activeIdsSet = new Set();
 
-            // --- BUAT OPTION DROPDOWN YANG BELUM AKTIF ---
-            let hasAvailable = false;
-            let optionsHtml = '<option value="" disabled selected>Pilih Komponen...</option>';
-            daftarMasterKomponen.forEach(k => {
-                if (!activeKomponenIds.includes(k.id_komponen.toString())) {
-                    optionsHtml += `<option value="${k.id_komponen}">${k.nama_komponen.toUpperCase()}</option>`;
-                    hasAvailable = true;
+            dataMatkul.forEach(row => {
+                let key = row.kode_cpmk || row.cpmk;
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        cpl: row.cpl,
+                        kode_mk: row.kode_mk,
+                        nama_mk: row.nama_mk,
+                        kode_cpmk: key,
+                        bobot_komponen: {} 
+                    };
+                }
+                if (row.id_komponen && parseFloat(row.bobot) > 0) {
+                    grouped[key].bobot_komponen[row.id_komponen] = parseFloat(row.bobot);
+                    activeIdsSet.add(row.id_komponen.toString());
                 }
             });
 
-            // Update Dropdown Versi HP
-            if (selectMobile) selectMobile.innerHTML = optionsHtml;
+            dataCpmkGrouped = Object.values(grouped);
+            activeKomponenIds = Array.from(activeIdsSet);
 
-            // --- THEAD (HEADER TABEL DESKTOP) ---
-            let totalKolomKomp = activeKomponenIds.length > 0 ? (activeKomponenIds.length + 1) : 1;
+            renderTabelDinamis();
+            mobilePanel.classList.add('active');
 
-            let theadHtml = `
+        } catch (error) {
+            tbody.innerHTML = '<tr><td colspan="15" style="text-align: center; padding: 40px !important; color: red; font-weight:bold;">❌ Gagal memuat data dari API.</td></tr>';
+        }
+    }
+
+    // 4. Sinkronisasi Data Input Sementara Sebelum Tambah Komponen Baru
+    function syncInputValues() {
+        if (activeKomponenIds.length === 0) return;
+        const rows = document.querySelectorAll('tbody tr[data-cpmk]');
+        
+        rows.forEach(row => {
+            const cpmk = row.getAttribute('data-cpmk');
+            let dataRow = dataCpmkGrouped.find(d => d.kode_cpmk === cpmk);
+            
+            if (dataRow) {
+                activeKomponenIds.forEach(idKomp => {
+                    const input = row.querySelector(`input[data-idkomp="${idKomp}"]`);
+                    if (input) dataRow.bobot_komponen[idKomp] = parseFloat(input.value) || 0;
+                });
+            }
+        });
+    }
+
+    // 5. Logika Tambah Komponen (Desktop & Mobile)
+    function tambahKomponenInline() {
+        const select = document.getElementById('selectKompInline');
+        if(!select) return;
+        eksekusiTambahKomponen(select.value);
+    }
+
+    function tambahKomponenMobile() {
+        const select = document.getElementById('selectKompMobile');
+        if(!select) return;
+        eksekusiTambahKomponen(select.value);
+    }
+
+    function eksekusiTambahKomponen(idVal) {
+        if (!idVal) {
+            alert("Pilih komponen terlebih dahulu!");
+            return;
+        }
+        if (!activeKomponenIds.includes(idVal)) {
+            syncInputValues(); 
+            activeKomponenIds.push(idVal); 
+            renderTabelDinamis(); 
+        }
+    }
+
+    // 6. RENDER UTAMA TABEL DAN KARTU MOBILE SECARA DINAMIS
+    function renderTabelDinamis() {
+        const table = document.getElementById('bobotTable');
+        const thead = document.getElementById('tableHead');
+        const tbody = document.getElementById('tableBody');
+        const selectMobile = document.getElementById('selectKompMobile');
+        
+        let hasAvailable = false;
+        let optionsHtml = '<option value="" disabled selected>Pilih Komponen...</option>';
+        daftarMasterKomponen.forEach(k => {
+            if (!activeKomponenIds.includes(k.id_komponen.toString())) {
+                optionsHtml += `<option value="${k.id_komponen}">${k.nama_komponen.toUpperCase()}</option>`;
+                hasAvailable = true;
+            }
+        });
+
+        if(selectMobile) selectMobile.innerHTML = optionsHtml;
+
+        let totalKolomKomp = activeKomponenIds.length > 0 ? (activeKomponenIds.length + 1) : 1;
+
+        let theadHtml = `
             <tr>
                 <th rowspan="2" class="hide-mobile">CPL</th>
                 <th rowspan="2" class="hide-mobile">KODE MK</th>
@@ -340,13 +383,13 @@
                 <th rowspan="2" class="bg-primary hide-mobile">TOTAL</th>
             </tr>
             <tr>`;
+            
+        activeKomponenIds.forEach(idKomp => {
+            theadHtml += `<th>${getNamaKomponen(idKomp)}</th>`;
+        });
 
-            activeKomponenIds.forEach(idKomp => {
-                theadHtml += `<th>${getNamaKomponen(idKomp)}</th>`;
-            });
-
-            if (hasAvailable) {
-                theadHtml += `
+        if (hasAvailable) {
+            theadHtml += `
                 <th style="background:#0f172a !important; min-width:140px;" class="hide-mobile">
                     <div style="display:flex; justify-content:center; align-items:center; gap:5px;">
                         <select id="selectKompInline" class="select-inline">${optionsHtml}</select>
@@ -355,174 +398,170 @@
                         </button>
                     </div>
                 </th>`;
-            } else {
-                theadHtml += `<th style="background:#0f172a !important; color:#9ca3af; font-weight:normal;" class="hide-mobile">Maksimal</th>`;
+        } else {
+            theadHtml += `<th style="background:#0f172a !important; color:#9ca3af; font-weight:normal;" class="hide-mobile">Maksimal</th>`;
+        }
+        
+        theadHtml += `</tr>`;
+        thead.innerHTML = theadHtml;
+
+        let html = '';
+        let cplCount = {};
+        let renderedCpl = {};
+        let renderedMkTotal = false;
+
+        dataCpmkGrouped.forEach(row => {
+            let cplKey = row.kode_mk + '_' + row.cpl;
+            cplCount[cplKey] = (cplCount[cplKey] || 0) + 1;
+        });
+
+        dataCpmkGrouped.forEach((row, index) => {
+            let cplKey = row.kode_mk + '_' + row.cpl;
+            let tr = `<tr data-cpmk="${row.kode_cpmk}" data-mk="${row.kode_mk}">`;
+
+            if (!renderedCpl[cplKey]) {
+                tr += `<td class="col-cpl hide-mobile" rowspan="${cplCount[cplKey]}">${row.cpl}</td>`;
+                renderedCpl[cplKey] = true;
             }
 
-            theadHtml += `</tr>`;
-            thead.innerHTML = theadHtml;
+            if (index === 0) {
+                tr += `<td class="col-mk hide-mobile" rowspan="${dataCpmkGrouped.length}">${row.kode_mk}</td>`;
+                tr += `<td class="hide-mobile" style="text-align: left; font-weight: 600;" rowspan="${dataCpmkGrouped.length}">${row.nama_mk}</td>`;
+            }
 
-            // --- TBODY (KARTU MOBILE & BARIS DESKTOP) ---
-            let html = '';
-            let cplCount = {};
-            let renderedCpl = {};
-            let renderedMkTotal = false;
-
-            dataCpmkGrouped.forEach(row => {
-                let cplKey = row.kode_mk + '_' + row.cpl;
-                cplCount[cplKey] = (cplCount[cplKey] || 0) + 1;
-            });
-
-            dataCpmkGrouped.forEach((row, index) => {
-                let cplKey = row.kode_mk + '_' + row.cpl;
-                let tr = `<tr data-cpmk="${row.kode_cpmk}" data-mk="${row.kode_mk}">`;
-
-                // CPL & MK info (Disembunyikan di HP memakai 'hide-mobile')
-                if (!renderedCpl[cplKey]) {
-                    tr += `<td class="col-cpl hide-mobile" rowspan="${cplCount[cplKey]}">${row.cpl}</td>`;
-                    renderedCpl[cplKey] = true;
-                }
-
-                if (index === 0) {
-                    tr += `<td class="col-mk hide-mobile" rowspan="${dataCpmkGrouped.length}">${row.kode_mk}</td>`;
-                    tr += `<td class="hide-mobile" style="text-align: left; font-weight: 600;" rowspan="${dataCpmkGrouped.length}">${row.nama_mk}</td>`;
-                }
-
-                // Header Kartu di HP / Judul Kolom CPMK di Desktop
-                tr += `
+            tr += `
                 <td class="col-cpmk">
                     <div class="mobile-cpl-badge show-mobile"><i class="fas fa-tag"></i> ${row.cpl}</div>
                     <span class="cpmk-title">${row.kode_cpmk}</span>
                 </td>`;
 
-                // Render Input Dinamis Berdasarkan Komponen yang Aktif
-                activeKomponenIds.forEach(idKomp => {
-                    let val = row.bobot_komponen[idKomp] || 0;
-                    let labelKomp = getNamaKomponen(idKomp);
-                    tr += `<td class="input-cell" data-label="${labelKomp}"><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-idkomp="${idKomp}" value="${val}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>`;
-                });
-
-                // Kolom kosong Desktop penyangga area bawah tombol [+]
-                tr += `<td style="background: #f8fafc;" class="hide-mobile"></td>`;
-
-                // Kolom Grand Total Desktop (Disembunyikan di Mobile)
-                if (!renderedMkTotal) {
-                    let tempTotal = 0;
-                    activeKomponenIds.forEach(idKomp => { tempTotal += (dataCpmkGrouped[0].bobot_komponen[idKomp] || 0) });
-                    const warnaWarna = tempTotal === 100 ? 'total-ok' : 'total-warn';
-                    tr += `<td id="total-mk-${row.kode_mk}" class="col-total hide-mobile ${warnaWarna}" rowspan="${dataCpmkGrouped.length}">${tempTotal}%</td>`;
-                    renderedMkTotal = true;
-                }
-
-                tr += `</tr>`;
-                html += tr;
+            activeKomponenIds.forEach(idKomp => {
+                let val = row.bobot_komponen[idKomp] || 0;
+                let labelKomp = getNamaKomponen(idKomp);
+                tr += `<td class="input-cell" data-label="${labelKomp}"><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-idkomp="${idKomp}" value="${val}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>`;
             });
 
-            tbody.innerHTML = html;
+            tr += `<td style="background: #f8fafc;" class="hide-mobile"></td>`;
 
-            if (dataCpmkGrouped.length > 0) {
-                hitungTotalMK(dataCpmkGrouped[0].kode_mk);
+            if (!renderedMkTotal) {
+                let tempTotal = 0;
+                activeKomponenIds.forEach(idKomp => { tempTotal += (dataCpmkGrouped[0].bobot_komponen[idKomp] || 0) });
+                const warnaWarna = tempTotal === 100 ? 'total-ok' : 'total-warn';
+                tr += `<td id="total-mk-${row.kode_mk}" class="col-total hide-mobile ${warnaWarna}" rowspan="${dataCpmkGrouped.length}">${tempTotal}%</td>`;
+                renderedMkTotal = true;
+            }
+
+            tr += `</tr>`;
+            html += tr;
+        });
+
+        tbody.innerHTML = html;
+        
+        if(dataCpmkGrouped.length > 0) {
+           hitungTotalMK(dataCpmkGrouped[0].kode_mk);
+        }
+    }
+
+    // 7. Kalkulasi Total Persentase (Desktop & Mobile Panel)
+    function hitungTotalMK(kodeMk) {
+        const inputs = document.querySelectorAll(`input[data-mk="${kodeMk}"]`);
+        let sum = 0;
+        inputs.forEach(input => { sum += (parseFloat(input.value) || 0); });
+
+        const totalCell = document.getElementById(`total-mk-${kodeMk}`);
+        if (totalCell) {
+            totalCell.innerText = sum + "%";
+            if (sum === 100) {
+                totalCell.classList.remove('total-warn');
+                totalCell.classList.add('total-ok');
+            } else {
+                totalCell.classList.remove('total-ok');
+                totalCell.classList.add('total-warn');
             }
         }
-
-        // 7. Kalkulasi Total Persentase (Desktop & Mobile Panel)
-        function hitungTotalMK(kodeMk) {
-            const inputs = document.querySelectorAll(`input[data-mk="${kodeMk}"]`);
-            let sum = 0;
-            inputs.forEach(input => { sum += (parseFloat(input.value) || 0); });
-
-            // Update Text di Desktop
-            const totalCell = document.getElementById(`total-mk-${kodeMk}`);
-            if (totalCell) {
-                totalCell.innerText = sum + "%";
-                if (sum === 100) {
-                    totalCell.classList.remove('total-warn');
-                    totalCell.classList.add('total-ok');
-                } else {
-                    totalCell.classList.remove('total-ok');
-                    totalCell.classList.add('total-warn');
-                }
-            }
-
-            // Update Panel Sticky di Mobile
-            const mobileVal = document.getElementById('mobileTotalValue');
-            if (mobileVal) {
-                mobileVal.innerText = sum + "%";
-                if (sum === 100) {
-                    mobileVal.classList.remove('warn');
-                    mobileVal.classList.add('ok');
-                } else {
-                    mobileVal.classList.remove('ok');
-                    mobileVal.classList.add('warn');
-                }
+        
+        const mobileVal = document.getElementById('mobileTotalValue');
+        if (mobileVal) {
+            mobileVal.innerText = sum + "%";
+            if (sum === 100) {
+                mobileVal.classList.remove('warn');
+                mobileVal.classList.add('ok');
+            } else {
+                mobileVal.classList.remove('ok');
+                mobileVal.classList.add('warn');
             }
         }
+    }
 
-        // 8. Simpan Perubahan Secara Relasional Vertikal ke Database MySQL via n8n
-        async function simpanBobot() {
-            const btnSave = document.querySelector('.btn-save-bobot');
-            const oriText = btnSave.innerHTML;
+    // 8. Simpan Perubahan Secara Relasional Vertikal ke Database MySQL via n8n (DIUPDATE: Baca Kurikulum)
+    async function simpanBobot() {
+        const btnSave = document.querySelector('.btn-save-bobot');
+        const oriText = btnSave.innerHTML;
+        
+        const rows = document.querySelectorAll('tbody tr[data-cpmk]');
+        if(rows.length === 0) {
+            alert("Silakan pilih Mata Kuliah terlebih dahulu!");
+            return;
+        }
 
-            const rows = document.querySelectorAll('tbody tr[data-cpmk]');
-            if (rows.length === 0) {
-                alert("Silakan pilih Mata Kuliah terlebih dahulu!");
-                return;
-            }
+        let kodeMk = document.getElementById('selectMk').value;
+        const inputs = document.querySelectorAll(`input[data-mk="${kodeMk}"]`);
+        let totalMK = 0;
+        inputs.forEach(input => totalMK += (parseFloat(input.value) || 0));
 
-            let kodeMk = document.getElementById('selectMk').value;
-            const inputs = document.querySelectorAll(`input[data-mk="${kodeMk}"]`);
-            let totalMK = 0;
-            inputs.forEach(input => totalMK += (parseFloat(input.value) || 0));
+        if (totalMK !== 100 && totalMK > 0) {
+            alert(`⚠️ GAGAL MENYIMPAN!\n\nTotal seluruh bobot CPMK harus pas 100%. (Saat ini: ${totalMK}%)`);
+            return;
+        }
 
-            if (totalMK !== 100 && totalMK > 0) {
-                alert(`⚠️ GAGAL MENYIMPAN!\n\nTotal seluruh bobot CPMK harus pas 100%. (Saat ini: ${totalMK}%)`);
-                return;
-            }
+        // --- AMBIL KURIKULUM DARI DROPDOWN BARU ---
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
+        let payloadData = [];
 
-            let payloadData = [];
-
-            rows.forEach(row => {
-                const kodeCpmk = row.getAttribute('data-cpmk');
-                activeKomponenIds.forEach(idKomp => {
-                    const input = row.querySelector(`input[data-idkomp="${idKomp}"]`);
-                    if (input) {
-                        payloadData.push({
-                            kode_mk: kodeMk,
-                            kode_cpmk: kodeCpmk,
-                            id_komponen: parseInt(idKomp),
-                            prodi: PRODI,
-                            bobot: parseFloat(input.value) || 0
-                        });
-                    }
-                });
-            });
-
-            if (payloadData.length === 0) {
-                alert("❌ Belum ada data komponen yang dikonfigurasi.");
-                return;
-            }
-
-            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin fa-lg" style="margin-right:8px;"></i> Menyimpan...';
-            btnSave.disabled = true;
-
-            try {
-                for (const payload of payloadData) {
-                    await fetch(API_SAVE_BOBOT, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+        rows.forEach(row => {
+            const kodeCpmk = row.getAttribute('data-cpmk');
+            activeKomponenIds.forEach(idKomp => {
+                const input = row.querySelector(`input[data-idkomp="${idKomp}"]`);
+                if (input) {
+                    payloadData.push({
+                        kode_mk: kodeMk,
+                        kode_cpmk: kodeCpmk,
+                        id_komponen: parseInt(idKomp),
+                        prodi: PRODI,
+                        bobot: parseFloat(input.value) || 0,
+                        kurikulum: kurikulumTerpilih // <--- DIBUAT DINAMIS
                     });
                 }
-                alert("✅ Sempurna! Master Bobot dinamis berhasil disimpan!");
-                loadDataBobot();
-            } catch (error) {
-                alert("❌ Gagal terhubung ke server.");
-            } finally {
-                btnSave.innerHTML = oriText;
-                btnSave.disabled = false;
-            }
+            });
+        });
+
+        if (payloadData.length === 0) {
+            alert("❌ Belum ada data komponen yang dikonfigurasi.");
+            return;
         }
-    </script>
+
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin fa-lg" style="margin-right:8px;"></i> Menyimpan...';
+        btnSave.disabled = true;
+
+        try {
+            for (const payload of payloadData) {
+                await fetch(API_SAVE_BOBOT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            }
+            alert("✅ Sempurna! Master Bobot dinamis berhasil disimpan!");
+            loadDataBobot(); 
+        } catch (error) {
+            alert("❌ Gagal terhubung ke server.");
+        } finally {
+            btnSave.innerHTML = oriText;
+            btnSave.disabled = false;
+        }
+    }
+</script>
 </body>
 
 </html>

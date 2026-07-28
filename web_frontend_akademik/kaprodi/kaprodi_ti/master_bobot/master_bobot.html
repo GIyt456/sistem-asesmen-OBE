@@ -47,7 +47,7 @@
             <!-- TEMPLATE: Filter Section -->
             <div class="filter-section">
                 <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
-                <select id="filterKurikulum" onchange="loadData()" class="filter-select">
+                <select id="filterKurikulum" onchange="initMatkulDropdown()" class="filter-select">
                     <option value="">Memuat data...</option>
                 </select>
             </div>
@@ -110,7 +110,7 @@
     </div>
 
 <script>
-    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+    const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
     
     document.addEventListener("DOMContentLoaded", () => {
         if(PRODI === "ti") {
@@ -214,7 +214,7 @@
         return komp ? komp.nama_komponen.toUpperCase() : `KOMP-${id}`;
     }
 
-    // 2. Ambil Daftar Matkul (DIUPDATE: Baca Kurikulum)
+    // 2. Ambil Daftar Matkul (Tetap gunakan logika aslimu)
     async function initMatkulDropdown() {
         const selectMk = document.getElementById('selectMk');
         const selectKurikulum = document.getElementById('filterKurikulum');
@@ -225,6 +225,7 @@
         document.getElementById('mobileTotalPanel').classList.remove('active');
 
         try {
+            // Tetap mengambil data dari n8n get-master-bobot (mk_cpmk_relation)
             const res = await fetch(`${API_GET_BOBOT}&kurikulum=${kurikulumTerpilih}`);
             const data = await res.json();
             
@@ -244,6 +245,7 @@
                     selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
                 });
             } else {
+                // Jika Kurikulum 20 belum ada mapping, ini yang akan muncul:
                 selectMk.innerHTML = '<option value="" disabled selected>-- Belum ada pemetaan di Kurikulum ini --</option>';
             }
         } catch (error) {
