@@ -44,7 +44,9 @@
 
         /* TABEL ANOMALI DI BAWAH GRID */
         .card-anomali { width: 100%; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f87171; overflow: hidden; margin-top: 25px; animation: slideUp 0.4s ease;}
-        .header-anomali { background: #fef2f2; padding: 20px; border-bottom: 1px solid #f87171; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* HEADER ANOMALI DIRAPIKAN AGAR TOMBOL MASSAL BISA MASUK */
+        .header-anomali { background: #fef2f2; padding: 20px; border-bottom: 1px solid #f87171; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;}
         .title-anomali { font-size: 1.2rem; font-weight: 800; color: #b91c1c; margin: 0; display: flex; align-items: center; gap: 10px; }
         
         .tabel-anomali { width: 100%; border-collapse: collapse; }
@@ -66,6 +68,9 @@
         @media (max-width: 900px) {
             .dashboard-grid { grid-template-columns: 1fr; }
             .stat-card { flex-direction: column; }
+            .header-anomali { flex-direction: column; align-items: flex-start; }
+            .header-anomali > div { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+            .header-anomali button { width: 100%; justify-content: center; margin-left: 0; }
         }
     </style>
 </head>
@@ -127,8 +132,20 @@
             <!-- BAWAH: TABEL ANOMALI (LEBAR PENUH, HANYA MUNCUL JIKA ADA ANOMALI) -->
             <div class="card-anomali" id="cardTabelAnomali" style="display: none;">
                 <div class="header-anomali">
-                    <h4 class="title-anomali"><i class="fas fa-exclamation-triangle"></i> Ditemukan Ketidaksesuaian Kurikulum</h4>
-                    <span style="font-size: 0.85rem; color: #991b1b; font-weight: 600;">Butuh Tindakan Kaprodi</span>
+                    <div>
+                        <h4 class="title-anomali"><i class="fas fa-exclamation-triangle"></i> Ditemukan Ketidaksesuaian Kurikulum</h4>
+                        <span style="font-size: 0.85rem; color: #991b1b; font-weight: 600;">Butuh Tindakan Kaprodi</span>
+                    </div>
+                    
+                    <!-- TOMBOL MASSAL DITAMBAHKAN DI SINI -->
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-resolusi btn-ekuivalensi" onclick="jalankanResolusiMassal('ekuivalensi')" id="btnMassalEkuivalensi" style="padding: 10px 15px; font-size: 0.9rem;">
+                            <i class="fas fa-exchange-alt"></i> Ekuivalensi Massal
+                        </button>
+                        <button class="btn-resolusi btn-migrasi" onclick="jalankanResolusiMassal('migrasi')" id="btnMassalMigrasi" style="padding: 10px 15px; font-size: 0.9rem;">
+                            <i class="fas fa-angle-double-right"></i> Migrasi Massal
+                        </button>
+                    </div>
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="tabel-anomali">
@@ -136,7 +153,7 @@
                             <tr>
                                 <th>MAHASISWA (ANGKATAN)</th>
                                 <th>MATA KULIAH (KURIKULUM)</th>
-                                <th width="32%">TINDAKAN RESOLUSI</th>
+                                <th width="32%">TINDAKAN RESOLUSI PER ORANGAN</th>
                             </tr>
                         </thead>
                         <tbody id="bodyAnomali">
@@ -153,6 +170,9 @@
         const PRODI = localStorage.getItem("prodi_aktif") || "si";
         const userLogin = localStorage.getItem("user_login");
         if (!userLogin) window.location.replace("../../../login/login.html");
+
+        // MEMORI GLOBAL UNTUK MASS ACTION
+        window.currentAnomalies = []; 
 
         document.addEventListener("DOMContentLoaded", () => {
             const badge = document.getElementById("prodiBadge");
@@ -236,6 +256,9 @@
                     }
                 }
 
+                // Update Memori Global untuk Fitur Massal
+                window.currentAnomalies = listAnomali;
+
                 document.getElementById('statSukses').innerHTML = '<i class="fas fa-check-circle"></i> Sinkron';
                 document.getElementById('statAnomali').innerText = listAnomali.length;
 
@@ -266,6 +289,7 @@
                                     <span style="font-size: 0.8rem; color: #10b981; font-weight: 700; margin-left: 5px;">(Kelas 20${k_mk})</span>
                                 </td>
                                 <td>
+                                    <!-- TOMBOL PER ORANGAN -->
                                     <button class="btn-resolusi btn-ekuivalensi" onclick="jalankanResolusi(event, ${item.id_krs}, 'ekuivalensi', '${item.nim}', '${item.kode_mk}')" title="CPL disetarakan ke kurikulum mahasiswa">
                                         <i class="fas fa-exchange-alt"></i> Ekuivalensi
                                     </button>
@@ -287,7 +311,7 @@
         }
 
         // ==========================================
-        // 3. FUNGSI RESOLUSI ANOMALI
+        // 3A. FUNGSI RESOLUSI ANOMALI (PER ORANGAN)
         // ==========================================
         async function jalankanResolusi(event, idKrs, tipe, nim, kodeMk) {
             let pesan = tipe === 'ekuivalensi' 
@@ -313,7 +337,6 @@
                 });
 
                 if (res.ok) {
-                    alert(`✅ Tindakan ${tipe.toUpperCase()} berhasil direkam ke database.`);
                     if(rowTabel) {
                         rowTabel.style.opacity = '0.5';
                         rowTabel.style.pointerEvents = 'none';
@@ -324,6 +347,9 @@
                     if(!isNaN(currentCount) && currentCount > 0) {
                         statEl.innerText = currentCount - 1;
                     }
+                    
+                    // Hapus data dari memori global agar jika ditekan massal, yang ini tidak ikut terproses lagi
+                    window.currentAnomalies = window.currentAnomalies.filter(item => item.id_krs !== idKrs);
                 } else {
                     alert("❌ Gagal menyimpan resolusi. Periksa MySQL dan n8n Anda.");
                     targetBtn.innerHTML = originalHTML;
@@ -334,6 +360,52 @@
                 targetBtn.innerHTML = originalHTML;
                 semuaTombol.forEach(btn => btn.disabled = false);
             }
+        }
+
+        // ==========================================
+        // 3B. FUNGSI RESOLUSI ANOMALI (MASSAL)
+        // ==========================================
+        async function jalankanResolusiMassal(tipe) {
+            const anomalies = window.currentAnomalies || [];
+            if(anomalies.length === 0) return;
+
+            let namaTindakan = tipe === 'ekuivalensi' ? 'EKUIVALENSI' : 'MIGRASI';
+            if(!confirm(`PERINGATAN!\nAnda akan memproses ${anomalies.length} mahasiswa sekaligus menggunakan tindakan ${namaTindakan}.\n\nLanjutkan?`)) return;
+
+            const btnId = tipe === 'ekuivalensi' ? 'btnMassalEkuivalensi' : 'btnMassalMigrasi';
+            const btn = document.getElementById(btnId);
+            const originalHTML = btn.innerHTML;
+            
+            // Kunci semua tombol di layar agar tidak bisa di-spam
+            document.querySelectorAll('.btn-resolusi').forEach(b => b.disabled = true);
+
+            let successCount = 0;
+            let failCount = 0;
+
+            // Proses satu per satu secara sekuensial agar N8N tidak kewalahan (DDoS)
+            for (let i = 0; i < anomalies.length; i++) {
+                const item = anomalies[i];
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Proses ${i+1}/${anomalies.length}...`;
+                
+                try {
+                    const res = await fetch(`${API_BASE}/proses-resolusi-krs`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id_krs: item.id_krs, tipe: tipe })
+                    });
+                    if (res.ok) successCount++;
+                    else failCount++;
+                } catch(e) {
+                    failCount++;
+                }
+            }
+
+            alert(`✅ Proses ${namaTindakan} Massal Selesai!\nBerhasil: ${successCount} Data\nGagal: ${failCount} Data`);
+            
+            // Kembalikan tombol ke semula dan segarkan (refresh) layar untuk menghilangkan baris yang sudah diproses
+            btn.innerHTML = originalHTML;
+            document.querySelectorAll('.btn-resolusi').forEach(b => b.disabled = false);
+            cekAnomaliSistem();
         }
     </script>
 </body>
