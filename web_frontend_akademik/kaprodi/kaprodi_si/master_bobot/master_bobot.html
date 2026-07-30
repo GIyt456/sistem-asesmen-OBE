@@ -15,6 +15,26 @@
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js?v=2"></script>
     <link rel="stylesheet" href="master_bobot.css">
+    
+    <style>
+        /* CSS Khusus untuk Filter Kurikulum agar sesuai dengan screenshot */
+        .filter-kurikulum-mobile select:focus {
+            border-color: var(--primary-blue) !important;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1) !important;
+        }
+
+        @media screen and (max-width: 768px) {
+            .filter-kurikulum-mobile {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                margin: 0 15px 20px 15px !important;
+                gap: 8px !important;
+            }
+            .select-kurikulum-mobile {
+                width: 100% !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -45,13 +65,15 @@
         </div>
 
         <div class="scrollable-content section-bobot-mhs" style="padding: 0 50px 40px 50px;">
-            <!-- TEMPLATE: Filter Section -->
-            <div class="filter-section">
-                <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
-                <select id="filterKurikulum" onchange="initMatkulDropdown()" class="filter-select">
+            
+            <!-- ✨ FILTER KURIKULUM (STYLE SESUAI SCREENSHOT) ✨ -->
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;" class="filter-kurikulum-mobile">
+                <label for="filterKurikulum" style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 0;">Tampilkan Data Kurikulum:</label>
+                <select id="filterKurikulum" onchange="initMatkulDropdown()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-family: 'Inter', sans-serif; font-size: 1rem; color: #1e293b; background-color: #fff; cursor: pointer; outline: none; min-width: 220px; transition: 0.2s;" class="select-kurikulum-mobile">
                     <option value="">Memuat data...</option>
                 </select>
             </div>
+
             <div class="control-panel">
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
                     <label style="font-weight: 700; color: #475569; font-size: 0.95rem;">
@@ -163,10 +185,10 @@
 
     window.onload = async () => { 
         await fetchMasterKomponen();
-        await loadDropdownKurikulum(); // 1. Load Kurikulum terlebih dahulu
+        await loadDropdownKurikulum(); 
     };
 
-    // --- FUNGSI 1: MENGAMBIL LIST KURIKULUM DINAMIS DARI N8N ---
+    // --- FUNGSI MENGAMBIL LIST KURIKULUM ---
     async function loadDropdownKurikulum() {
         try {
             const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
@@ -179,18 +201,14 @@
             
             let kurikulumSet = new Set();
             if(data && data.length > 0) {
-                // Saring dan kumpulkan semua kurikulum unik dari N8N
                 data.forEach(item => { if (item && item.kurikulum) kurikulumSet.add(String(item.kurikulum)); });
             }
             
-            // Fallback (Pastikan 20 dan 25 minimal ada jika API kosong)
             kurikulumSet.add("25");
             kurikulumSet.add("20");
 
-            // Urutkan dari yang terbaru (Descending)
             let sortedKurikulum = Array.from(kurikulumSet).sort((a, b) => b - a);
 
-            // Masukkan ke dalam elemen HTML
             sortedKurikulum.forEach(kur => {
                 let opt = document.createElement('option');
                 opt.value = kur; 
@@ -198,7 +216,6 @@
                 selectKurikulum.appendChild(opt);
             });
 
-            // 2. Setelah kurikulum diload, inisiasi dropdown Matkul berdasarkan kurikulum teratas
             await initMatkulDropdown(); 
         } catch (error) {
             console.error("Gagal memuat list kurikulum:", error);
@@ -223,23 +240,18 @@
         return komp ? komp.nama_komponen.toUpperCase() : `KOMP-${id}`;
     }
 
-    // 2. Ambil Daftar Matkul (DIFILTER BERDASARKAN KURIKULUM)
+    // 2. Ambil Daftar Matkul Berdasarkan Kurikulum
     async function initMatkulDropdown() {
         const selectMk = document.getElementById('selectMk');
         const selectKurikulum = document.getElementById('filterKurikulum');
-        
-        // Ambil nilai kurikulum yang sedang dipilih
         let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
 
-        // Bersihkan tabel saat kurikulum diganti agar tidak ada data hantu
         document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px !important; font-weight: 600; color: #64748b;"><i class="fas fa-arrow-up" style="margin-right: 8px; color: var(--primary-blue);"></i> Silakan pilih Mata Kuliah di atas terlebih dahulu.</td></tr>';
         document.getElementById('mobileTotalPanel').classList.remove('active');
         
-        // Tampilkan loading di dropdown MK
         selectMk.innerHTML = '<option value="" disabled selected>-- Memuat Mata Kuliah Kurikulum 20' + kurikulumTerpilih + '... --</option>';
 
         try {
-            // Tembak API n8n dengan parameter kurikulum
             const res = await fetch(`${API_GET_BOBOT}&kurikulum=${kurikulumTerpilih}`);
             const data = await res.json();
             
@@ -259,7 +271,6 @@
                     selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
                 });
             } else {
-                // Jika Kurikulum 20 belum ada mapping di DB, ini yang akan muncul:
                 selectMk.innerHTML = '<option value="" disabled selected>-- Belum ada relasi MK - CPMK di Kurikulum 20' + kurikulumTerpilih + ' --</option>';
             }
         } catch (error) {
@@ -283,7 +294,6 @@
         dataCpmkGrouped = [];
 
         try {
-            // Tarik data ulang untuk memastikan kita mendapatkan data ter-update sesuai kurikulum
             const res = await fetch(`${API_GET_BOBOT}&kurikulum=${kurikulumTerpilih}`);
             const allData = await res.json();
             const dataMatkul = allData.filter(row => row.kode_mk === kodeMkTerpilih);
@@ -528,7 +538,6 @@
             return;
         }
 
-        // --- AMBIL KURIKULUM DARI DROPDOWN BARU ---
         const selectKurikulum = document.getElementById('filterKurikulum');
         let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
         let payloadData = [];
@@ -544,7 +553,7 @@
                         id_komponen: parseInt(idKomp),
                         prodi: PRODI,
                         bobot: parseFloat(input.value) || 0,
-                        kurikulum: kurikulumTerpilih // <--- DIBUAT DINAMIS
+                        kurikulum: kurikulumTerpilih 
                     });
                 }
             });
@@ -559,7 +568,6 @@
         btnSave.disabled = true;
 
         try {
-            // Looping simpan per baris data
             for (const payload of payloadData) {
                 await fetch(API_SAVE_BOBOT, {
                     method: 'POST',
