@@ -3,22 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Import KRS Mahasiswa - Sistem OBE</title>
+    <title>Import KRS & Resolusi Anomali - Sistem OBE</title>
 
     <link rel="stylesheet" href="../../../css/style.css">
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
     <link rel="stylesheet" href="import_krs.css">
+
+    <style>
+        /* ========================================================
+           LAYOUT GRID: ANTI SCROLL & SPOTLIGHT DASHBOARD
+           ======================================================== */
+        .content-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; max-width: 1200px; margin: 0 auto;}
+        .header-container { width: 100%; margin-bottom: 25px; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr; /* Kiri lebih lebar (Spotlight) */
+            gap: 25px;
+            width: 100%;
+            align-items: start;
+        }
+
+        /* PERMAK KOTAK UPLOAD MENJADI COMPACT (Override import_krs.css) */
+        .upload-card.compact { padding: 30px 25px; margin: 0; width: 100%; max-width: 100%; }
+        .upload-card.compact #uploadIcon { font-size: 3.5rem; margin-bottom: 15px; }
+        .upload-card.compact h4 { font-size: 1.2rem; margin-bottom: 8px; }
+        .upload-card.compact p { font-size: 0.85rem; margin-bottom: 20px; }
+        .file-input-wrapper.compact { padding: 10px; margin-bottom: 15px; }
+        .file-input-wrapper.compact input { font-size: 0.85rem; }
+
+        /* GAYA STATISTIK DASHBOARD */
+        .stat-card { display: flex; gap: 15px; height: 100%; }
+        .stat-box { flex: 1; background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; border-left: 6px solid #10b981; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: center;}
+        .stat-box.warning { border-left-color: #f59e0b; }
+        .stat-title { font-size: 0.9rem; color: #64748b; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .stat-value { font-size: 2.8rem; font-weight: 900; color: #1e293b; line-height: 1; }
+
+        /* TABEL ANOMALI DI BAWAH GRID */
+        .card-anomali { width: 100%; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #f87171; overflow: hidden; margin-top: 25px; animation: slideUp 0.4s ease;}
+        
+        /* HEADER ANOMALI DIRAPIKAN AGAR TOMBOL MASSAL BISA MASUK */
+        .header-anomali { background: #fef2f2; padding: 20px; border-bottom: 1px solid #f87171; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;}
+        .title-anomali { font-size: 1.2rem; font-weight: 800; color: #b91c1c; margin: 0; display: flex; align-items: center; gap: 10px; }
+        
+        .tabel-anomali { width: 100%; border-collapse: collapse; }
+        .tabel-anomali th { background: #f8fafc; color: #475569; font-weight: 700; padding: 12px 15px; text-align: left; border-bottom: 2px solid #e2e8f0; font-size: 0.9rem; }
+        .tabel-anomali td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-size: 0.95rem; }
+        .badge-mhs { background: #f1f5f9; color: #334155; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; }
+        .badge-mk { background: #eff6ff; color: #1d4ed8; padding: 4px 8px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; }
+        
+        .btn-resolusi { padding: 8px 12px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; font-size: 0.85rem; }
+        .btn-ekuivalensi { background: #10b981; color: white; }
+        .btn-ekuivalensi:hover:not(:disabled) { background: #059669; transform: translateY(-2px); }
+        .btn-migrasi { background: #3b82f6; color: white; margin-left: 8px; }
+        .btn-migrasi:hover:not(:disabled) { background: #2563eb; transform: translateY(-2px); }
+        .btn-resolusi:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsif untuk Layar HP / Tablet Kecil */
+        @media (max-width: 900px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .stat-card { flex-direction: column; }
+            .header-anomali { flex-direction: column; align-items: flex-start; }
+            .header-anomali > div { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+            .header-anomali button { width: 100%; justify-content: center; margin-left: 0; }
+        }
+    </style>
 </head>
 <body>
 
     <div id="sidebar-container"></div>
     <div id="navbar-container"></div>
+    
     <div class="main-content">
         <div class="content-wrapper">
+            
             <div class="header-container">
                 <div class="header-title-area">
                     <div class="header-subtitle">KELOLA KURIKULUM</div>
@@ -27,33 +90,90 @@
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
 
-            <div class="upload-card" id="dropZone">
-                <i class="fas fa-cloud-upload-alt" id="uploadIcon" style="font-size: 4.5rem; margin-bottom: 20px;"></i>
-                <h4 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; color: #1e293b;">Upload File KRS</h4>
-                <p style="color: #64748b; font-size: 0.95rem; line-height: 1.6; margin-bottom: 30px;">
-                    Sistem akan otomatis mengekstrak data dan menyinkronkan Mahasiswa, Mata Kuliah, serta Dosen ke dalam database sesuai program studi aktif. Format yang didukung: <strong>.xlsx</strong>
-                </p>
-
-                <div class="file-input-wrapper">
-                    <input type="file" id="krsFileInput" accept=".xlsx" style="width: 100%; font-family: 'Inter', sans-serif; font-size: 0.95rem; color: #475569; cursor: pointer; outline: none;">
+            <!-- LAYOUT BERDAMPINGAN (GRID) -->
+            <div class="dashboard-grid">
+                
+                <!-- KIRI: LAPORAN DASHBOARD UTAMA (SPOTLIGHT) -->
+                <div id="dashboardAnomali">
+                    <h3 style="margin-bottom: 15px; font-weight: 800; color: #1e293b; font-size: 1.4rem;">
+                        <i class="fas fa-chart-bar" style="color:var(--primary-blue); margin-right:8px;"></i> Laporan Sinkronisasi N8N
+                    </h3>
+                    <div class="stat-card">
+                        <div class="stat-box">
+                            <div class="stat-title">Status Integrasi</div>
+                            <div class="stat-value" id="statSukses" style="color:#10b981; font-size: 1.8rem;"><i class="fas fa-spinner fa-spin"></i> Cek...</div>
+                        </div>
+                        <div class="stat-box warning">
+                            <div class="stat-title">Anomali Terdeteksi</div>
+                            <div class="stat-value" id="statAnomali">0</div>
+                        </div>
+                    </div>
                 </div>
 
-                <button class="btn-upload" id="btnUploadAction" style="background: #10b981;" onclick="handleKRSUpload()">
-                    <i class="fas fa-magic"></i> Jalankan Sinkronisasi n8n
-                </button>
+                <!-- KANAN: KOTAK UPLOAD COMPACT -->
+                <div>
+                    <div class="upload-card compact" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt" id="uploadIcon"></i>
+                        <h4>Upload File KRS</h4>
+                        <p>Format yang didukung: <strong>.xlsx</strong></p>
+
+                        <div class="file-input-wrapper compact">
+                            <input type="file" id="krsFileInput" accept=".xlsx" style="width: 100%; color: #475569; cursor: pointer; outline: none;">
+                        </div>
+
+                        <button class="btn-upload" id="btnUploadAction" style="background: #10b981; padding: 12px; font-size: 0.95rem;" onclick="handleKRSUpload()">
+                            <i class="fas fa-magic"></i> Jalankan Sinkronisasi
+                        </button>
+                    </div>
+                </div>
+
             </div>
+
+            <!-- BAWAH: TABEL ANOMALI (LEBAR PENUH, HANYA MUNCUL JIKA ADA ANOMALI) -->
+            <div class="card-anomali" id="cardTabelAnomali" style="display: none;">
+                <div class="header-anomali">
+                    <div>
+                        <h4 class="title-anomali"><i class="fas fa-exclamation-triangle"></i> Ditemukan Ketidaksesuaian Kurikulum</h4>
+                        <span style="font-size: 0.85rem; color: #991b1b; font-weight: 600;">Butuh Tindakan Kaprodi</span>
+                    </div>
+                    
+                    <!-- TOMBOL MASSAL DITAMBAHKAN DI SINI -->
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-resolusi btn-ekuivalensi" onclick="jalankanResolusiMassal('ekuivalensi')" id="btnMassalEkuivalensi" style="padding: 10px 15px; font-size: 0.9rem;">
+                            <i class="fas fa-exchange-alt"></i> Ekuivalensi Massal
+                        </button>
+                        <button class="btn-resolusi btn-migrasi" onclick="jalankanResolusiMassal('migrasi')" id="btnMassalMigrasi" style="padding: 10px 15px; font-size: 0.9rem;">
+                            <i class="fas fa-angle-double-right"></i> Migrasi Massal
+                        </button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="tabel-anomali">
+                        <thead>
+                            <tr>
+                                <th>MAHASISWA (ANGKATAN)</th>
+                                <th>MATA KULIAH (KURIKULUM)</th>
+                                <th width="32%">TINDAKAN RESOLUSI PER ORANGAN</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyAnomali">
+                            <!-- Data anomali di-inject di sini -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
-        // DETEKSI PRODI DINAMIS
         const PRODI = localStorage.getItem("prodi_aktif") || "si";
-
-        // SATPAM HALAMAN
         const userLogin = localStorage.getItem("user_login");
         if (!userLogin) window.location.replace("../../../login/login.html");
 
-        // TEMA DINAMIS MENYESUAIKAN PRODI
+        // MEMORI GLOBAL UNTUK MASS ACTION
+        window.currentAnomalies = []; 
+
         document.addEventListener("DOMContentLoaded", () => {
             const badge = document.getElementById("prodiBadge");
             const uploadCard = document.getElementById("dropZone");
@@ -65,80 +185,228 @@
             if(PRODI === "si") {
                 badge.style.background = "var(--primary-teal)";
                 titleSpan.style.color = "var(--primary-teal)";
-                uploadCard.style.borderColor = "var(--primary-teal)";
                 uploadIcon.style.color = "var(--primary-teal)";
+                document.documentElement.style.setProperty('--primary-blue', 'var(--primary-teal)');
             } else {
                 badge.style.background = "var(--primary-red)";
                 titleSpan.style.color = "var(--primary-red)";
-                uploadCard.style.borderColor = "var(--primary-red)";
                 uploadIcon.style.color = "var(--primary-red)";
+                document.documentElement.style.setProperty('--primary-blue', 'var(--primary-red)');
             }
+
+            cekAnomaliSistem();
         });
 
-        // FUNGSI SINKRONISASI UPLOAD KE N8N
+        // ==========================================
+        // 1. FUNGSI UPLOAD KE N8N
+        // ==========================================
         async function handleKRSUpload() {
             const fileInput = document.getElementById('krsFileInput');
             const file = fileInput.files[0];
             const btnUpload = document.getElementById('btnUploadAction');
 
-            if (!file) {
-                alert("⚠️ Silakan pilih file Excel (.xlsx) terlebih dahulu!");
-                return;
-            }
+            if (!file) { alert("⚠️ Silakan pilih file Excel (.xlsx) terlebih dahulu!"); return; }
 
-            // Animasi Loading Tombol
-            btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunggah & Memproses...';
+            btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Proses...';
             btnUpload.disabled = true;
-            btnUpload.style.opacity = '0.7';
 
-            // Bungkus data file
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('prodi', PRODI); // Kirim keterangan prodi ke n8n
+            formData.append('prodi', PRODI);
 
             try {
-                const response = await fetch(`${API_BASE}/upload-krs`, {
+                const response = await fetch(`${API_BASE}/upload-krs`, { method: 'POST', body: formData });
+                
+                if (response.ok) {
+                    alert("✅ File berhasil dikirim! N8n sedang memproses data.");
+                    fileInput.value = ""; 
+                    setTimeout(() => { cekAnomaliSistem(); }, 3000); 
+                } else {
+                    alert("❌ Gagal memproses data KRS.");
+                }
+            } catch (error) { alert("⚠️ Terjadi kesalahan jaringan."); }
+
+            btnUpload.innerHTML = '<i class="fas fa-magic"></i> Jalankan Sinkronisasi';
+            btnUpload.disabled = false;
+        }
+
+        // ==========================================
+        // 2. FUNGSI CEK ANOMALI LINTAS KURIKULUM
+        // ==========================================
+        async function cekAnomaliSistem() {
+            document.getElementById('statSukses').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...';
+            document.getElementById('statSukses').style.color = '#10b981'; 
+            
+            try {
+                const res = await fetch(`${API_BASE}/cek-anomali-krs?prodi=${PRODI}`); 
+                const rawText = await res.text();
+                
+                let listAnomali = [];
+                
+                if (rawText && rawText.trim() !== "") {
+                    let dataRaw;
+                    try { dataRaw = JSON.parse(rawText); } 
+                    catch (e) { throw new Error("Respons bukan JSON yang valid."); }
+
+                    if (Array.isArray(dataRaw)) {
+                        listAnomali = dataRaw.map(item => item.json ? item.json : item);
+                    } else if (dataRaw && typeof dataRaw === 'object' && Object.keys(dataRaw).length > 0) {
+                        if (dataRaw.json) listAnomali.push(dataRaw.json);
+                        else listAnomali.push(dataRaw);
+                    }
+                }
+
+                // Update Memori Global untuk Fitur Massal
+                window.currentAnomalies = listAnomali;
+
+                document.getElementById('statSukses').innerHTML = '<i class="fas fa-check-circle"></i> Sinkron';
+                document.getElementById('statAnomali').innerText = listAnomali.length;
+
+                const cardTabel = document.getElementById('cardTabelAnomali');
+                const tbody = document.getElementById('bodyAnomali');
+
+                if (listAnomali.length > 0) {
+                    cardTabel.style.display = 'block';
+                    tbody.innerHTML = '';
+
+                    listAnomali.forEach(item => {
+                        let k_mhs = parseInt(item.kurikulum_mhs);
+                        let k_mk = parseInt(item.kurikulum_mk);
+                        
+                        if(isNaN(k_mhs)) k_mhs = '??';
+                        if(isNaN(k_mk)) k_mk = '??';
+
+                        tbody.innerHTML += `
+                            <tr id="row_anomali_${item.id_krs}">
+                                <td>
+                                    <div style="font-weight: 800; color: #1e293b; margin-bottom: 4px;">${item.nama}</div>
+                                    <span class="badge-mhs"><i class="fas fa-user-graduate"></i> ${item.nim}</span> 
+                                    <span style="font-size: 0.8rem; color: #ef4444; font-weight: 700; margin-left: 5px;">(Kurikulum 20${k_mhs})</span>
+                                </td>
+                                <td>
+                                    <div style="font-weight: 700; color: #1e293b; margin-bottom: 4px;">${item.nama_mk}</div>
+                                    <span class="badge-mk"><i class="fas fa-book"></i> ${item.kode_mk}</span>
+                                    <span style="font-size: 0.8rem; color: #10b981; font-weight: 700; margin-left: 5px;">(Kelas 20${k_mk})</span>
+                                </td>
+                                <td>
+                                    <!-- TOMBOL PER ORANGAN -->
+                                    <button class="btn-resolusi btn-ekuivalensi" onclick="jalankanResolusi(event, ${item.id_krs}, 'ekuivalensi', '${item.nim}', '${item.kode_mk}')" title="CPL disetarakan ke kurikulum mahasiswa">
+                                        <i class="fas fa-exchange-alt"></i> Ekuivalensi
+                                    </button>
+                                    <button class="btn-resolusi btn-migrasi" onclick="jalankanResolusi(event, ${item.id_krs}, 'migrasi', '${item.nim}', '${item.kode_mk}')" title="Mahasiswa memakai standar kelas ini">
+                                        <i class="fas fa-angle-double-right"></i> Migrasi
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    cardTabel.style.display = 'none';
+                }
+
+            } catch(e) {
+                document.getElementById('statSukses').innerHTML = '<i class="fas fa-times-circle" style="color:#ef4444;"></i> Gagal';
+                document.getElementById('statSukses').style.color = '#ef4444';
+            }
+        }
+
+        // ==========================================
+        // 3A. FUNGSI RESOLUSI ANOMALI (PER ORANGAN)
+        // ==========================================
+        async function jalankanResolusi(event, idKrs, tipe, nim, kodeMk) {
+            let pesan = tipe === 'ekuivalensi' 
+                ? `Pilih Ekuivalensi: Mahasiswa ${nim} akan mengikuti Matkul ${kodeMk}, namun nilai CPMK-nya akan dikonversi ke CPL kurikulum lama.\n\nLanjutkan?`
+                : `Pilih Migrasi: Mahasiswa ${nim} akan sepenuhnya diukur menggunakan standar kelulusan CPL Matkul ${kodeMk} (Kurikulum Baru).\n\nLanjutkan?`;
+            
+            if(!confirm(pesan)) return;
+
+            const targetBtn = event.currentTarget;
+            const rowTabel = document.getElementById(`row_anomali_${idKrs}`);
+            
+            const semuaTombol = rowTabel.querySelectorAll('button');
+            semuaTombol.forEach(btn => btn.disabled = true);
+
+            const originalHTML = targetBtn.innerHTML;
+            targetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Proses...';
+
+            try {
+                const res = await fetch(`${API_BASE}/proses-resolusi-krs`, {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_krs: idKrs, tipe: tipe })
                 });
 
-                if (response.ok) {
-                    alert("✅ File berhasil dikirim! Mesin n8n sedang memproses relasi Database di belakang layar.");
-                    fileInput.value = ""; // Bersihkan form setelah sukses
+                if (res.ok) {
+                    if(rowTabel) {
+                        rowTabel.style.opacity = '0.5';
+                        rowTabel.style.pointerEvents = 'none';
+                        rowTabel.querySelector('td:last-child').innerHTML = `<span style="color:#10b981; font-weight:800; font-size:0.9rem;"><i class="fas fa-check-circle"></i> TERSIMPAN</span>`;
+                    }
+                    let statEl = document.getElementById('statAnomali');
+                    let currentCount = parseInt(statEl.innerText);
+                    if(!isNaN(currentCount) && currentCount > 0) {
+                        statEl.innerText = currentCount - 1;
+                    }
+                    
+                    // Hapus data dari memori global agar jika ditekan massal, yang ini tidak ikut terproses lagi
+                    window.currentAnomalies = window.currentAnomalies.filter(item => item.id_krs !== idKrs);
                 } else {
-                    alert("❌ Gagal memproses data. Pastikan format file sesuai dan n8n Anda aktif.");
+                    alert("❌ Gagal menyimpan resolusi. Periksa MySQL dan n8n Anda.");
+                    targetBtn.innerHTML = originalHTML;
+                    semuaTombol.forEach(btn => btn.disabled = false);
                 }
-            } catch (error) {
-                alert("⚠️ Terjadi kesalahan jaringan saat menghubungi server n8n.");
-            }
-
-            // Kembalikan Tombol ke Semula
-            btnUpload.innerHTML = '<i class="fas fa-magic"></i> Jalankan Sinkronisasi n8n';
-            btnUpload.disabled = false;
-            btnUpload.style.opacity = '1';
-        }
-
-        // Fungsi untuk memunculkan dan menyembunyikan sidebar di mobile
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById("sidebar-container");
-            if (sidebar) {
-                // Tambahkan atau hapus class 'show-mobile' yang ada di CSS tadi
-                sidebar.classList.toggle("show-mobile");
+            } catch (e) {
+                alert("⚠️ Terjadi kesalahan jaringan.");
+                targetBtn.innerHTML = originalHTML;
+                semuaTombol.forEach(btn => btn.disabled = false);
             }
         }
 
-        // Opsional: Klik di sembarang tempat (luar sidebar) untuk menutupnya
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById("sidebar-container");
-            const toggleBtn = document.getElementById("btnToggleSidebar");
+        // ==========================================
+        // 3B. FUNGSI RESOLUSI ANOMALI (MASSAL)
+        // ==========================================
+        async function jalankanResolusiMassal(tipe) {
+            const anomalies = window.currentAnomalies || [];
+            if(anomalies.length === 0) return;
+
+            let namaTindakan = tipe === 'ekuivalensi' ? 'EKUIVALENSI' : 'MIGRASI';
+            if(!confirm(`PERINGATAN!\nAnda akan memproses ${anomalies.length} mahasiswa sekaligus menggunakan tindakan ${namaTindakan}.\n\nLanjutkan?`)) return;
+
+            const btnId = tipe === 'ekuivalensi' ? 'btnMassalEkuivalensi' : 'btnMassalMigrasi';
+            const btn = document.getElementById(btnId);
+            const originalHTML = btn.innerHTML;
             
-            // Jika sidebar sedang terbuka, dan user mengklik di luar sidebar & bukan di tombol garis tiga
-            if (sidebar && sidebar.classList.contains("show-mobile")) {
-                if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
-                    sidebar.classList.remove("show-mobile");
+            // Kunci semua tombol di layar agar tidak bisa di-spam
+            document.querySelectorAll('.btn-resolusi').forEach(b => b.disabled = true);
+
+            let successCount = 0;
+            let failCount = 0;
+
+            // Proses satu per satu secara sekuensial agar N8N tidak kewalahan (DDoS)
+            for (let i = 0; i < anomalies.length; i++) {
+                const item = anomalies[i];
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Proses ${i+1}/${anomalies.length}...`;
+                
+                try {
+                    const res = await fetch(`${API_BASE}/proses-resolusi-krs`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id_krs: item.id_krs, tipe: tipe })
+                    });
+                    if (res.ok) successCount++;
+                    else failCount++;
+                } catch(e) {
+                    failCount++;
                 }
             }
-        });
+
+            alert(`✅ Proses ${namaTindakan} Massal Selesai!\nBerhasil: ${successCount} Data\nGagal: ${failCount} Data`);
+            
+            // Kembalikan tombol ke semula dan segarkan (refresh) layar untuk menghilangkan baris yang sudah diproses
+            btn.innerHTML = originalHTML;
+            document.querySelectorAll('.btn-resolusi').forEach(b => b.disabled = false);
+            cekAnomaliSistem();
+        }
     </script>
 </body>
 </html>

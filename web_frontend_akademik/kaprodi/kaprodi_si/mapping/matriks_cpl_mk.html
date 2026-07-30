@@ -166,8 +166,21 @@
             }
         }
 
-        function renderTabel(daftarCPL, dataMatriks) {
+       function renderTabel(daftarCPL, dataMatriks) {
             const container = document.getElementById('areaTabel');
+
+            // --- JURUS ANTI-DOUBLE CPL ---
+            // Menyaring daftarCPL agar hanya CPL dengan kode unik yang dirender
+            const uniqueCPLs = [];
+            const seenCPLCodes = new Set();
+
+            daftarCPL.forEach(cpl => {
+                if (!seenCPLCodes.has(cpl.kode)) {
+                    seenCPLCodes.add(cpl.kode);
+                    uniqueCPLs.push(cpl);
+                }
+            });
+            // -----------------------------
 
             let html = `
             <table class="tabel-matriks-cpl-mk">
@@ -177,12 +190,13 @@
                         <th rowspan="2" class="sticky-col-2">Kode MK</th>
                         <th rowspan="2" style="min-width: 250px; text-align: left;">Nama Mata Kuliah</th>
                         <th rowspan="2" style="min-width: 60px;">SKS</th>
-                        <th colspan="${daftarCPL.length}" style="letter-spacing: 1px;">CAPAIAN PEMBELAJARAN LULUSAN (CPL)</th>
+                        <th colspan="${uniqueCPLs.length}" style="letter-spacing: 1px;">CAPAIAN PEMBELAJARAN LULUSAN (CPL)</th>
                     </tr>
                     <tr>
-        `;
+            `;
 
-            daftarCPL.forEach(cpl => {
+            // Render header tabel HANYA menggunakan uniqueCPLs yang sudah disaring
+            uniqueCPLs.forEach(cpl => {
                 let labelSingkat = cpl.kode.replace('SI-CPL', '').replace('TI-CPL', '').replace('CPL', '');
                 if (labelSingkat.startsWith('-') || labelSingkat.startsWith('0')) labelSingkat = labelSingkat.substring(1);
                 if (labelSingkat === '') labelSingkat = cpl.kode;
@@ -191,7 +205,7 @@
             html += `</tr></thead><tbody id="bodyMatriksMk">`;
 
             if (dataMatriks.length === 0) {
-                html += `<tr><td colspan="${4 + daftarCPL.length}" style="padding: 30px; text-align: center; color: #64748b;">Belum ada relasi Matriks untuk kurikulum ini.</td></tr>`;
+                html += `<tr><td colspan="${4 + uniqueCPLs.length}" style="padding: 30px; text-align: center; color: #64748b;">Belum ada relasi Matriks untuk kurikulum ini.</td></tr>`;
             } else {
                 dataMatriks.forEach(row => {
                     const cplTerkait = row.cpl_terhubung ? row.cpl_terhubung.split(', ') : [];
@@ -201,14 +215,13 @@
                         <td class="sticky-col-2">${row.kode_mk}</td>
                         <td style="text-align: left; font-weight: 600;">${row.nama_mk}</td>
                         <td>${row.sks}</td>
-                `;
+                    `;
 
-                    // --- GANTI BAGIAN INI DI DALAM FUNGSI renderTabel ---
-                    daftarCPL.forEach(cpl => {
+                    // Render kotak centang (checkbox) HANYA untuk uniqueCPLs
+                    uniqueCPLs.forEach(cpl => {
                         const isChecked = cplTerkait.includes(cpl.kode);
                         const chk = isChecked ? 'checked' : '';
 
-                        // 🔴 PERUBAHAN: Hanya mengambil kode CPL saja (Misal: TI-CPL01) tanpa deskripsi panjang
                         let safeLabel = cpl.kode;
 
                         html += `<td class="td-cpl" data-label="${safeLabel}" style="text-align: center;">
@@ -221,7 +234,6 @@
             html += `</tbody></table>`;
             container.innerHTML = html;
         }
-
         async function simpanMatriks() {
             const btnSave = document.getElementById('btnSaveMatriks');
             const textAwal = btnSave.innerHTML; // Simpan teks HTML awal

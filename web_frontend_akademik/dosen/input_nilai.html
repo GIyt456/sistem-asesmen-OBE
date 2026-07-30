@@ -1358,7 +1358,13 @@
 
             try {
                 let prodiMatkul = document.querySelector(`#pilihMK_SI option[value="${mkKode}"]`) ? "si" : "ti";
-                const res = await fetch(`${API_BASE}/get-master-bobot?prodi=${prodiMatkul}`);
+                
+                // INJEKSI MULTI-KURIKULUM: Ambil 2 digit pertama kode MK (Contoh: "20" atau "25")
+                let digitKurikulum = mkKode.substring(0, 2); 
+                
+                // Tambahkan parameter &kurikulum=... ke URL API
+                const res = await fetch(`${API_BASE}/get-master-bobot?prodi=${prodiMatkul}&kurikulum=${digitKurikulum}`);
+                
                 let rawText = await res.text();
                 let allData = rawText ? JSON.parse(rawText) : [];
                 if (allData.data) allData = allData.data;
@@ -1367,7 +1373,7 @@
 
                 const dataMk = allData.filter(d => d.kode_mk === mkKode);
                 if (dataMk.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color: #ef4444;">Kaprodi belum mengatur Master Bobot.</td></tr>';
+                    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color: #ef4444;">Kaprodi belum mengatur Master Bobot untuk Kurikulum 20${digitKurikulum}.</td></tr>`;
                     gTotal.innerText = "0%"; kaprodiQuotas = []; return;
                 }
 
@@ -1388,19 +1394,19 @@
                 let htmlBody = ''; let grandTotal = 0; kaprodiQuotas = [];
                 urutanCpmk.forEach(cKey => {
                     let b = grouped[cKey]; let tb = 0;
-                    let trHtml = `<tr><td style="padding:15px; color:darkred;">${b.cpl}</td><td style="padding:15px;">${b.cpmk}</td>`;
+                    let trHtml = `<tr><td style="padding:15px; color:darkred; font-weight:800;">${b.cpl}</td><td style="padding:15px; font-weight:800;">${b.cpmk}</td>`;
                     listKomp.forEach(k => {
                         let nil = b.bobot[k.nama] || 0; tb += nil; trHtml += `<td>${nil}%</td>`;
                         if (nil > 0) kaprodiQuotas.push({ cpl: b.cpl, cpmk: b.cpmk, kategori: k.nama, bobot: nil });
                     });
-                    grandTotal += tb; trHtml += `<td style="background:#f8fafc;">${tb}%</td></tr>`;
+                    grandTotal += tb; trHtml += `<td style="background:#f8fafc; font-weight:800; color:#0369a1;">${tb}%</td></tr>`;
                     htmlBody += trHtml;
                 });
                 tbody.innerHTML = htmlBody;
                 document.querySelector("#masterBobotTable tfoot tr td:first-child").colSpan = listKomp.length + 2;
                 gTotal.innerText = grandTotal + "%"; gTotal.style.color = grandTotal === 100 ? "#16a34a" : "#dc2626";
             } catch (e) {
-                tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#ef4444;">Gagal memuat Master Bobot.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#ef4444;">Gagal memuat Master Bobot. Cek koneksi N8N.</td></tr>`;
             }
         }
 

@@ -19,6 +19,10 @@
 .cpmk-code { font-weight: 800; font-size: 1.05rem; color: var(--primary-blue); margin-bottom: 5px;}
 .cpmk-desc { font-size: 0.85rem; color: #475569; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5; font-weight: 500;}
 
+/* Pencarian */
+.suggestion-item { padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-size: 0.95rem; transition: background 0.2s; }
+.suggestion-item:hover { background-color: #f8fafc; color: var(--primary-blue); font-weight: 600; }
+
 /* Tombol Simpan */
 .btn-save-mapping { background: var(--primary-blue); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; width: 100%; margin-top: 40px; }
 .btn-save-mapping:hover:not(:disabled) { filter: brightness(0.8); transform: translateY(-2px); }

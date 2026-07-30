@@ -3,69 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pemetaan CPL - BK - Sistem OBE</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <title>Matriks CPL - BK - Sistem OBE</title>
+    
+    <!-- MEMANGGIL FILE CSS STANDAR -->
+    <link rel="stylesheet" href="../../../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="../../../js/api_config.js"></script>
+    
+    <!-- Panggil CSS Spesifik -->
     <link rel="stylesheet" href="pemetaan_cpl_bk.css">
+    <link rel="stylesheet" href="../../../css/global_ti.css">
 </head>
 <body>
+
     <div id="sidebar-container"></div>
     <div id="navbar-container"></div>
+
     <div class="main-content">
-        <div class="fixed-header">
+        <!-- SATUKAN SEMUA KE DALAM CONTENT-WRAPPER -->
+        <div class="content-wrapper">
+
+            <!-- TEMPLATE: Header -->
             <div class="header-container">
-                <div class="header-title-area">
-                    <div class="header-subtitle">PEMETAAN (MAPPING)</div>
-                    <h1 class="header-title">MATRIKS <span>CPL - BK</span></h1>
+                <div class="header-left">
+                    <div class="header-title-area">
+                        <div class="header-subtitle">PEMETAAN (MAPPING)</div>
+                        <h1 class="header-title">MATRIKS <span>CPL - BK</span></h1>
+                    </div>
                 </div>
                 <div class="badge-prodi" id="prodiBadge">PRODI</div>
             </div>
-            
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <p style="color: #64748b; font-size: 0.95rem; margin: 0;">Centang Bahan Kajian (BK) yang berelasi dengan Capaian Pembelajaran Lulusan (CPL).</p>
-            </div>
-            
-        </div>
 
-        <div class="scrollable-content">
-            <div style="margin-bottom: 20px;">
-                <label for="filterKurikulum"><strong>Tampilkan Data Kurikulum:</strong></label>
-                <select id="filterKurikulum" onchange="loadData()">
+            <!-- TEMPLATE: Filter Section -->
+            <div class="filter-section">
+                <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
+                <select id="filterKurikulum" onchange="loadData()" class="filter-select">
                     <option value="">Memuat data...</option>
                 </select>
             </div>
-            <div style="overflow-x: auto; max-height: 550px; border: 1px solid var(--border-color); border-radius: 8px; background: white;">
-                <table id="matriksTable">
-                    <thead>
-                        <tr id="headerRow">
-                            <th>CPL / BK</th>
+
+            <!-- TEMPLATE: Section Header -->
+            <div class="section-header">
+                <div class="section-title-area">
+                    <h3 class="section-title">Relasi Matriks</h3>
+                    <p class="section-subtitle">Centang Bahan Kajian (BK) yang berelasi dengan Capaian Pembelajaran Lulusan (CPL).</p>
+                </div>
+                <div class="action-buttons">
+                    <!-- Tombol Simpan Matriks -->
+                    <button id="btnSave" class="btn-action btn-dark" onclick="simpanMapping()" disabled>
+                        <i class="fas fa-save"></i> <span class="btn-text">Simpan Matriks</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Area Tabel Matriks -->
+            <div class="tabel-matriks-cpl-bk-wrapper">
+                <table class="tabel-matriks-cpl-bk">
+                    <thead id="headerRow">
+                        <tr>
+                            <th class="sticky-col-1">No</th>
+                            <th class="sticky-col-2">Kode BK</th>
+                            <th class="sticky-col-3">Bahan Kajian</th>
                         </tr>
                     </thead>
                     <tbody id="bodyMatriks">
-                        <tr><td style="text-align: center; padding: 30px;">Memuat data...</td></tr>
+                        <tr>
+                            <td colspan="100%" style="padding: 50px; text-align: center; color: #6b7280; font-weight: 600;">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; color: var(--primary-blue);"></i><br>
+                                Memuat Matriks Kurikulum...
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
 
-            <button id="btnSave" class="btn-save" style="margin-top: 25px;" onclick="simpanMapping()" disabled>
-                <i class="fas fa-save"></i> Simpan Matriks
-            </button>
         </div>
     </div>
 
-<script src="/js/template.js"></script>
+<script src="../../../js/template.js"></script>
 
 <script>
     const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
     const API_SAVE_MAPPING = `${API_BASE}/admin-map-cpl-bk`;
+    
     const userLogin = localStorage.getItem("user_login");
     if (!userLogin) window.location.replace("/login/login.html");
+
+    // SET TEMA WARNA SESUAI PRODI
+    document.addEventListener("DOMContentLoaded", () => {
+        if(PRODI === "ti") {
+            document.documentElement.style.setProperty('--primary-blue', '#8b0000'); 
+            document.getElementById('prodiBadge').innerText = "TEKNIK INFORMATIKA";
+        } else {
+            document.documentElement.style.setProperty('--primary-blue', '#1e3a8a'); 
+            document.getElementById('prodiBadge').innerText = "SISTEM INFORMASI";
+        }
+    });
 
     let listCPL = [];
     let listBK = [];
 
+    // --- FUNGSI LOAD KURIKULUM ---
     async function loadDropdownKurikulum() {
         try {
             const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
@@ -73,28 +113,45 @@
             const selectKurikulum = document.getElementById('filterKurikulum');
             selectKurikulum.innerHTML = ''; 
             data.forEach(item => {
-                let opt = document.createElement('option');
-                opt.value = item.kurikulum; 
-                opt.text = "Kurikulum 20" + item.kurikulum; 
-                selectKurikulum.appendChild(opt);
+                if (item && item.kurikulum) {
+                    let opt = document.createElement('option');
+                    opt.value = item.kurikulum; 
+                    opt.text = "Kurikulum 20" + item.kurikulum; 
+                    selectKurikulum.appendChild(opt);
+                }
             });
             await loadData(); 
         } catch (error) {
-            console.error("Gagal memuat list kurikulum:", error);
             document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
         }
     }
 
+    // --- LOGIKA TABEL MATRIKS (DENGAN ANTI-CACHE) ---
     async function loadData() {
         const btnSave = document.getElementById("btnSave");
         const tbody = document.getElementById("bodyMatriks");
+        const headerRow = document.getElementById("headerRow");
+        
         if(btnSave) btnSave.disabled = true;
+        
+        // Reset header CPL sebelum diload ulang
+        headerRow.innerHTML = `
+            <tr>
+                <th class="sticky-col-1">No</th>
+                <th class="sticky-col-2">Kode BK</th>
+                <th class="sticky-col-3">Bahan Kajian</th>
+            </tr>
+        `;
+        tbody.innerHTML = `<tr><td colspan="100%" style="padding: 50px; text-align: center; color: #6b7280; font-weight: 600;"><i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; color: var(--primary-blue);"></i><br>Memuat Matriks Kurikulum...</td></tr>`;
 
         const selectKurikulum = document.getElementById('filterKurikulum');
         let kurikulum = selectKurikulum ? selectKurikulum.value : "";
-        let URL_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}`;
-        let URL_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}`;
-        let URL_RELASI = `${API_BASE}/get-mapping-cpl-bk?prodi=${PRODI}`;
+        
+        // 🔴 SUNTIKAN ANTI-CACHE
+        const timeStamp = new Date().getTime();
+        let URL_CPL = `${API_BASE}/get-master-cpl?prodi=${PRODI}&_t=${timeStamp}`;
+        let URL_BK = `${API_BASE}/get-master-bk?prodi=${PRODI}&_t=${timeStamp}`;
+        let URL_RELASI = `${API_BASE}/get-mapping-cpl-bk?prodi=${PRODI}&_t=${timeStamp}`;
 
         if(kurikulum) {
             URL_CPL += `&kurikulum=${kurikulum}`;
@@ -104,7 +161,9 @@
 
         try {
             const [resCpl, resBk, resRelasi] = await Promise.all([
-                fetch(URL_CPL), fetch(URL_BK), fetch(URL_RELASI)
+                fetch(URL_CPL, { cache: "no-store" }), 
+                fetch(URL_BK, { cache: "no-store" }), 
+                fetch(URL_RELASI, { cache: "no-store" })
             ]);
 
             listCPL = await resCpl.json();
@@ -117,7 +176,7 @@
             } catch (e) { relasiExisting = []; }
 
             if (!listCPL || listCPL.length === 0 || !listBK || listBK.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red; font-weight: bold;'>Data CPL atau BK masih KOSONG untuk kurikulum ini.</td></tr>";
+                tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; text-align:center; color: red; font-weight: bold;'>Data Master CPL atau BK masih KOSONG untuk kurikulum ini.</td></tr>";
                 return;
             }
 
@@ -125,37 +184,41 @@
             if(btnSave) btnSave.disabled = false;
 
         } catch (error) {
-            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; color: red;'>Gagal terhubung ke API.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='100%' style='padding: 30px; text-align:center; color: red; font-weight:bold;'>Gagal terhubung ke Server.</td></tr>";
         }
     }
 
     function renderMatriks(relasiExisting) {
-        const headerRow = document.getElementById("headerRow");
+        const headerRow = document.querySelector("#headerRow tr");
         const tbody = document.getElementById("bodyMatriks");
-        if(!headerRow || !tbody) return;
-
-        let headerHTML = `
-            <th style="position: sticky; left: 0; background: #e2e8f0; z-index: 10; width: 40px; text-align: center;">No</th>
-            <th style="position: sticky; left: 40px; background: #e2e8f0; z-index: 10; white-space: nowrap; text-align: left;">Kode BK</th>
-            <th style="position: sticky; left: 120px; background: #e2e8f0; z-index: 10; min-width: 250px; text-align: left;">Bahan Kajian</th>
-        `;
         
+        // 1. Render Kolom Tambahan CPL ke Header
         listCPL.forEach(cpl => {
-            headerHTML += `<th title="${cpl.deskripsi || ''}" style="text-align: center;">${cpl.kode_cpl}</th>`;
+            let labelSingkat = cpl.kode_cpl.replace('SI-CPL', '').replace('TI-CPL', '').replace('CPL', '');
+            if(labelSingkat.startsWith('-') || labelSingkat.startsWith('0')) labelSingkat = labelSingkat.substring(1);
+            if(labelSingkat === '') labelSingkat = cpl.kode_cpl;
+            
+            headerRow.innerHTML += `<th title="${cpl.deskripsi || ''}">${labelSingkat}</th>`;
         });
-        headerRow.innerHTML = headerHTML;
 
+        // 2. Render Baris BK
         tbody.innerHTML = "";
         listBK.forEach((bk, index) => {
-            let tr = `<tr class="bk-row">
-                <td style="position: sticky; left: 0; background: #f8fafc; z-index: 5; text-align: center;">${index + 1}</td>
-                <td style="position: sticky; left: 40px; background: #f8fafc; z-index: 5; font-weight: bold; white-space: nowrap;">${bk.kode_bk}</td>
-                <td style="position: sticky; left: 120px; background: #f8fafc; z-index: 5; text-align: left;" title="${bk.nama_bk}">${bk.nama_bk}</td>`;
+            let tr = `<tr>
+                <td class="sticky-col-1">${index + 1}</td>
+                <td class="sticky-col-2">${bk.kode_bk}</td>
+                <td class="sticky-col-3" title="${bk.nama_bk}">${bk.nama_bk}</td>`;
             
             listCPL.forEach(cpl => {
                 const isChecked = relasiExisting.some(r => r.kode_cpl === cpl.kode_cpl && r.kode_bk === bk.kode_bk);
                 const chk = isChecked ? 'checked' : '';
-                tr += `<td style="text-align: center;"><input type="checkbox" class="chk-matrix" data-cpl="${cpl.kode_cpl}" data-bk="${bk.kode_bk}" ${chk}></td>`;
+                
+                // 🔴 HANYA MENGAMBIL KODE CPL SESUAI PERMINTAAN
+                let safeLabel = cpl.kode_cpl; 
+                
+                tr += `<td class="td-cpl" data-label="${safeLabel}">
+                            <input type="checkbox" class="chk-matrix" data-cpl="${cpl.kode_cpl}" data-bk="${bk.kode_bk}" ${chk}>
+                       </td>`;
             });
             tr += `</tr>`;
             tbody.innerHTML += tr;
@@ -164,12 +227,13 @@
 
     async function simpanMapping() {
         const btnSave = document.getElementById('btnSave');
-        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        const textAwal = btnSave.innerHTML;
+        
+        btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span class="btn-text">Menyimpan...</span>';
         btnSave.disabled = true;
 
-        // 1. Tangkap Kurikulum yang sedang diedit Kaprodi
         const selectKurikulum = document.getElementById('filterKurikulum');
-        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25"; // default 25
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25"; 
         
         let fetchPromises = [];
 
@@ -177,7 +241,6 @@
             const checkedBoxes = document.querySelectorAll(`.chk-matrix[data-cpl="${cpl.kode_cpl}"]:checked`);
             const bkList = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-bk'));
             
-            // 2. Tambahkan kurikulumTerpilih ke dalam payload
             const payload = { 
                 kode_cpl: cpl.kode_cpl, 
                 bk_list: bkList, 
@@ -194,14 +257,43 @@
         try {
             await Promise.all(fetchPromises);
             alert("✅ Matriks Relasi CPL - BK berhasil disimpan!");
-        } catch (error) { alert("❌ Gagal menyimpan beberapa data ke server."); } 
-        finally { btnSave.innerHTML = '<i class="fas fa-save"></i> Simpan Matriks'; btnSave.disabled = false; }
+            
+            // 🔴 AUTO-RELOAD UNTUK MENCEGAH BUG DATA GAIB
+            setTimeout(() => {
+                loadData();
+            }, 1000); 
+            
+        } catch (error) { 
+            alert("❌ Gagal menyimpan data ke server."); 
+        } finally { 
+            btnSave.innerHTML = textAwal; 
+            btnSave.disabled = false; 
+        }
     }
 
+    // 1. Fungsi Buka/Tutup dari Navbar 
     function toggleMobileSidebar() {
-        const sidebar = document.getElementById("sidebar-container");
-        if (sidebar) sidebar.classList.toggle("show-mobile");
+        const sidebar = document.getElementById('sidebar-container');
+        if (sidebar) sidebar.classList.toggle('active');
     }
+
+    // 2. Fungsi Buka/Tutup dari dalam Sidebar 
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar-container');
+        if (sidebar) sidebar.classList.toggle('active');
+    }
+
+    // 3. SENSOR PENUTUP (Deteksi klik di layar gelap)
+    document.addEventListener('click', function(event) {
+        const sidebar = document.getElementById("sidebar-container");
+        const hamburgerBtn = document.querySelector('.hamburger-btn') || document.querySelector('.mobile-menu-btn'); 
+        
+        if (sidebar && sidebar.classList.contains("active")) {
+            if (!sidebar.contains(event.target) && (!hamburgerBtn || !hamburgerBtn.contains(event.target))) {
+                sidebar.classList.remove("active"); 
+            }
+        }
+    });
 
     window.onload = async () => { await loadDropdownKurikulum(); };
 </script>

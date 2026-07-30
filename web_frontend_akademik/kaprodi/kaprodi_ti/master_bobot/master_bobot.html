@@ -14,6 +14,7 @@
     <script src="/js/api_config.js"></script>
     <script src="/js/template.js"></script> 
     <link rel="stylesheet" href="master_bobot.css">
+    <link rel="stylesheet" href="../../../css/global_ti.css">
 </head>
 <body>
 
@@ -43,6 +44,13 @@
         </div>
 
         <div class="scrollable-content section-bobot-mhs" style="padding: 0 50px 40px 50px;">
+            <!-- TEMPLATE: Filter Section -->
+            <div class="filter-section">
+                <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
+                <select id="filterKurikulum" onchange="initMatkulDropdown()" class="filter-select">
+                    <option value="">Memuat data...</option>
+                </select>
+            </div>
             <div class="control-panel">
                 <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
                     <label style="font-weight: 700; color: #475569; font-size: 0.95rem;">
@@ -102,7 +110,7 @@
     </div>
 
 <script>
-    const PRODI = localStorage.getItem("prodi_aktif") || "si"; 
+    const PRODI = localStorage.getItem("prodi_aktif") || "ti"; 
     
     document.addEventListener("DOMContentLoaded", () => {
         if(PRODI === "ti") {
@@ -154,8 +162,42 @@
 
     window.onload = async () => { 
         await fetchMasterKomponen();
-        await initMatkulDropdown(); 
+        await loadDropdownKurikulum(); // Panggil dropdown kurikulum dulu
     };
+
+    // --- FUNGSI BARU: LOAD KURIKULUM ---
+    async function loadDropdownKurikulum() {
+        try {
+            const response = await fetch(`${API_BASE}/get-kurikulum-tersedia`);
+            let data = [];
+            try { data = await response.json(); } catch(e) {}
+            
+            const selectKurikulum = document.getElementById('filterKurikulum');
+            if(!selectKurikulum) return;
+            selectKurikulum.innerHTML = ''; 
+            
+            let kurikulumSet = new Set();
+            if(data && data.length > 0) {
+                data.forEach(item => { if (item && item.kurikulum) kurikulumSet.add(String(item.kurikulum)); });
+            }
+            // Paksa 20 dan 25 muncul
+            kurikulumSet.add("25");
+            kurikulumSet.add("20");
+
+            let sortedKurikulum = Array.from(kurikulumSet).sort((a, b) => b - a);
+
+            sortedKurikulum.forEach(kur => {
+                let opt = document.createElement('option');
+                opt.value = kur; 
+                opt.text = "Kurikulum 20" + kur; 
+                selectKurikulum.appendChild(opt);
+            });
+
+            await initMatkulDropdown(); 
+        } catch (error) {
+            console.error("Gagal memuat list kurikulum:", error);
+        }
+    }
 
     // 1. Ambil Master Komponen dari Database
     async function fetchMasterKomponen() {
@@ -172,11 +214,19 @@
         return komp ? komp.nama_komponen.toUpperCase() : `KOMP-${id}`;
     }
 
-    // 2. Ambil Daftar Matkul
+    // 2. Ambil Daftar Matkul (Tetap gunakan logika aslimu)
     async function initMatkulDropdown() {
         const selectMk = document.getElementById('selectMk');
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
+
+        // Bersihkan tabel saat kurikulum diganti
+        document.getElementById('tableBody').innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px !important; font-weight: 600; color: #64748b;"><i class="fas fa-arrow-up" style="margin-right: 8px; color: var(--primary-blue);"></i> Silakan pilih Mata Kuliah di atas terlebih dahulu.</td></tr>';
+        document.getElementById('mobileTotalPanel').classList.remove('active');
+
         try {
-            const res = await fetch(API_GET_BOBOT);
+            // Tetap mengambil data dari n8n get-master-bobot (mk_cpmk_relation)
+            const res = await fetch(`${API_GET_BOBOT}&kurikulum=${kurikulumTerpilih}`);
             const data = await res.json();
             
             let uniqueMk = [];
@@ -190,19 +240,26 @@
             });
 
             selectMk.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah yang Tersedia --</option>';
-            uniqueMk.forEach(mk => {
-                selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
-            });
+            if(uniqueMk.length > 0) {
+                uniqueMk.forEach(mk => {
+                    selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
+                });
+            } else {
+                // Jika Kurikulum 20 belum ada mapping, ini yang akan muncul:
+                selectMk.innerHTML = '<option value="" disabled selected>-- Belum ada pemetaan di Kurikulum ini --</option>';
+            }
         } catch (error) {
             if(selectMk) selectMk.innerHTML = '<option value="">❌ Gagal memuat daftar matkul. Cek n8n!</option>';
         }
     }
 
-    // 3. Load Data & Grouping Berdasar Matkul Terpilih
+    // 3. Load Data & Grouping Berdasar Matkul Terpilih (DIUPDATE: Baca Kurikulum)
     async function loadDataBobot() {
         const tbody = document.getElementById('tableBody'); 
         const kodeMkTerpilih = document.getElementById('selectMk').value;
         const mobilePanel = document.getElementById('mobileTotalPanel');
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
 
         if (!kodeMkTerpilih) return;
 
@@ -212,7 +269,7 @@
         dataCpmkGrouped = [];
 
         try {
-            const res = await fetch(API_GET_BOBOT);
+            const res = await fetch(`${API_GET_BOBOT}&kurikulum=${kurikulumTerpilih}`);
             const allData = await res.json();
             const dataMatkul = allData.filter(row => row.kode_mk === kodeMkTerpilih);
             
@@ -302,7 +359,6 @@
         const tbody = document.getElementById('tableBody');
         const selectMobile = document.getElementById('selectKompMobile');
         
-        // --- BUAT OPTION DROPDOWN YANG BELUM AKTIF ---
         let hasAvailable = false;
         let optionsHtml = '<option value="" disabled selected>Pilih Komponen...</option>';
         daftarMasterKomponen.forEach(k => {
@@ -312,10 +368,8 @@
             }
         });
 
-        // Update Dropdown Versi HP
         if(selectMobile) selectMobile.innerHTML = optionsHtml;
 
-        // --- THEAD (HEADER TABEL DESKTOP) ---
         let totalKolomKomp = activeKomponenIds.length > 0 ? (activeKomponenIds.length + 1) : 1;
 
         let theadHtml = `
@@ -350,7 +404,6 @@
         theadHtml += `</tr>`;
         thead.innerHTML = theadHtml;
 
-        // --- TBODY (KARTU MOBILE & BARIS DESKTOP) ---
         let html = '';
         let cplCount = {};
         let renderedCpl = {};
@@ -365,7 +418,6 @@
             let cplKey = row.kode_mk + '_' + row.cpl;
             let tr = `<tr data-cpmk="${row.kode_cpmk}" data-mk="${row.kode_mk}">`;
 
-            // CPL & MK info (Disembunyikan di HP memakai 'hide-mobile')
             if (!renderedCpl[cplKey]) {
                 tr += `<td class="col-cpl hide-mobile" rowspan="${cplCount[cplKey]}">${row.cpl}</td>`;
                 renderedCpl[cplKey] = true;
@@ -376,24 +428,20 @@
                 tr += `<td class="hide-mobile" style="text-align: left; font-weight: 600;" rowspan="${dataCpmkGrouped.length}">${row.nama_mk}</td>`;
             }
 
-            // Header Kartu di HP / Judul Kolom CPMK di Desktop
             tr += `
                 <td class="col-cpmk">
                     <div class="mobile-cpl-badge show-mobile"><i class="fas fa-tag"></i> ${row.cpl}</div>
                     <span class="cpmk-title">${row.kode_cpmk}</span>
                 </td>`;
 
-            // Render Input Dinamis Berdasarkan Komponen yang Aktif
             activeKomponenIds.forEach(idKomp => {
                 let val = row.bobot_komponen[idKomp] || 0;
                 let labelKomp = getNamaKomponen(idKomp);
                 tr += `<td class="input-cell" data-label="${labelKomp}"><input type="number" class="input-bobot" data-mk="${row.kode_mk}" data-idkomp="${idKomp}" value="${val}" min="0" max="100" oninput="hitungTotalMK('${row.kode_mk}')"></td>`;
             });
 
-            // Kolom kosong Desktop penyangga area bawah tombol [+]
             tr += `<td style="background: #f8fafc;" class="hide-mobile"></td>`;
 
-            // Kolom Grand Total Desktop (Disembunyikan di Mobile)
             if (!renderedMkTotal) {
                 let tempTotal = 0;
                 activeKomponenIds.forEach(idKomp => { tempTotal += (dataCpmkGrouped[0].bobot_komponen[idKomp] || 0) });
@@ -419,7 +467,6 @@
         let sum = 0;
         inputs.forEach(input => { sum += (parseFloat(input.value) || 0); });
 
-        // Update Text di Desktop
         const totalCell = document.getElementById(`total-mk-${kodeMk}`);
         if (totalCell) {
             totalCell.innerText = sum + "%";
@@ -432,7 +479,6 @@
             }
         }
         
-        // Update Panel Sticky di Mobile
         const mobileVal = document.getElementById('mobileTotalValue');
         if (mobileVal) {
             mobileVal.innerText = sum + "%";
@@ -446,7 +492,7 @@
         }
     }
 
-    // 8. Simpan Perubahan Secara Relasional Vertikal ke Database MySQL via n8n
+    // 8. Simpan Perubahan Secara Relasional Vertikal ke Database MySQL via n8n (DIUPDATE: Baca Kurikulum)
     async function simpanBobot() {
         const btnSave = document.querySelector('.btn-save-bobot');
         const oriText = btnSave.innerHTML;
@@ -467,6 +513,9 @@
             return;
         }
 
+        // --- AMBIL KURIKULUM DARI DROPDOWN BARU ---
+        const selectKurikulum = document.getElementById('filterKurikulum');
+        let kurikulumTerpilih = selectKurikulum ? selectKurikulum.value : "25";
         let payloadData = [];
 
         rows.forEach(row => {
@@ -479,7 +528,8 @@
                         kode_cpmk: kodeCpmk,
                         id_komponen: parseInt(idKomp),
                         prodi: PRODI,
-                        bobot: parseFloat(input.value) || 0
+                        bobot: parseFloat(input.value) || 0,
+                        kurikulum: kurikulumTerpilih // <--- DIBUAT DINAMIS
                     });
                 }
             });

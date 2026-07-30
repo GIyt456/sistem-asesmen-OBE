@@ -263,12 +263,19 @@
         }
     }
 
-    // --- FUNGSI SIDEBAR ANTI-BOCOR ---
+    // 1. Fungsi Buka/Tutup dari Navbar 
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('sidebar-container');
+        if (sidebar) sidebar.classList.toggle('active');
+    }
+
+    // 2. Fungsi Buka/Tutup dari dalam Sidebar 
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar-container');
         if (sidebar) sidebar.classList.toggle('active');
     }
-    
+
+    // 3. SENSOR PENUTUP (Deteksi klik di layar gelap)
     document.addEventListener('click', function(event) {
         const sidebar = document.getElementById("sidebar-container");
         const hamburgerBtn = document.querySelector('.hamburger-btn') || document.querySelector('.mobile-menu-btn'); 
