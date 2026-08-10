@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Bentuk Pembelajaran - Sistem OBE</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Gaya spesifik untuk tabel master jika belum ada di style.css */
+        .card-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 30px;
+        }
+
+        .table-master {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-master th,
+        .table-master td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        .table-master th {
+            background: #111827;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .text-center {
+            text-align: center !important;
+        }
+
+        body {
+            animation: transitionIn 0.3s ease-in-out;
+        }
+
+        @keyframes transitionIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <div class="main-content">
+        <div id="navbar-container"></div>
+
+        <div class="content-wrapper">
+            <div class="header-container">
+                <div class="header-title-area">
+                    <div class="header-subtitle">MANAJEMEN RPS</div>
+                    <h1 class="header-title">MASTER <span>BENTUK PEMBELAJARAN</span></h1>
+                </div>
+                <div class="badge-prodi" id="prodiBadge">PRODI</div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px;">
+                <p style="margin: 0; color: #64748b; font-size: 0.95rem;">Kelola referensi bentuk pembelajaran sesuai
+                    standar SN-Dikti untuk penyusunan RPS.</p>
+                <button class="btn-dark" onclick="openModal()">
+                    <i class="fas fa-plus"></i> Tambah Bentuk
+                </button>
+            </div>
+
+            <div class="card-container">
+                <table class="table-master">
+                    <thead>
+                        <tr>
+                            <th width="10%" class="text-center">No</th>
+                            <th width="70%">NAMA BENTUK PEMBELAJARAN</th>
+                            <th width="20%" class="text-center">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyTable">
+                        <tr>
+                            <td colspan="3" class="text-center" style="padding: 30px; color: #64748b;"><i
+                                    class="fas fa-spinner fa-spin"></i> Memuat data dari server n8n...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalTambah" class="modal-overlay">
+        <div class="modal-box">
+            <h3
+                style="margin-top: 0; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; color: #0f172a; font-weight: 800;">
+                Tambah Bentuk Pembelajaran
+            </h3>
+            <div class="form-group">
+                <label style="font-weight: 600; margin-bottom: 8px; display: block;">Nama Bentuk Pembelajaran:</label>
+                <input type="text" id="inputNamaBentuk" class="form-control"
+                    placeholder="Contoh: Diskusi Kelompok, Praktikum...">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px;">
+                <button class="btn-action" style="background: #f3f4f6; color: #4b5563; font-weight: 600;"
+                    onclick="closeModal()">Batal</button>
+                <button class="btn-dark" onclick="simpanData()"><i class="fas fa-save"></i> Simpan Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api_config.js"></script>
+    <script src="/js/template.js"></script>
+
+    <script>
+        // 5. DETEKSI PRODI DINAMIS
+        const PRODI = localStorage.getItem("prodi_aktif") || "si";
+
+        const API_GET_BENTUK = `${API_BASE}/get-master-bentuk?prodi=${PRODI}`;
+
+        // 6. SATPAM HALAMAN
+        const userLogin = localStorage.getItem("user_login");
+        if (!userLogin) window.location.replace("/login/login.html");
+
+        // Set Label Prodi
+        document.addEventListener("DOMContentLoaded", () => {
+            const badge = document.getElementById("prodiBadge");
+            if (badge) badge.innerText = PRODI === "si" ? "Sistem Informasi" : "Teknik Informatika";
+
+            // Ubah tema badge dan tombol jadi teal/hijau jika prodi SI
+            if (PRODI === "si") {
+                badge.style.background = "var(--primary-teal)";
+                document.querySelector('.header-title span').style.color = "var(--primary-teal)";
+            }
+        });
+
+        // FUNGSI LOAD DATA (Menggunakan N8N)
+        async function loadData() {
+            const bodyTbl = document.getElementById("bodyTable");
+            try {
+                const res = await fetch(API_GET_BENTUK);
+                const data = await res.json();
+
+                if (!data || data.length === 0) {
+                    bodyTbl.innerHTML = `<tr><td colspan="3" class="text-center">Belum ada data referensi bentuk pembelajaran.</td></tr>`;
+                    return;
+                }
+
+                let html = "";
+                data.forEach((item, index) => {
+                    html += `
+                        <tr>
+                            <td class="text-center" style="font-weight: bold; color: #475569;">${index + 1}</td>
+                            <td style="font-weight: 600; font-size: 1rem; color: #1e293b;">${item.nama_bentuk}</td>
+                            <td class="text-center">
+                                <div style="display: flex; gap: 8px; justify-content: center;">
+                                    <button class="btn-action btn-dark" style="padding: 8px 12px;"><i class="fas fa-edit"></i></button>
+                                    <button class="btn-action btn-danger" style="padding: 8px 12px;"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                bodyTbl.innerHTML = html;
+
+            } catch (e) {
+                bodyTbl.innerHTML = `<tr><td colspan="3" class="text-center" style="color: red;">Gagal terhubung ke N8N. Pastikan URL Webhook aktif.</td></tr>`;
+            }
+        }
+
+        // KONTROL MODAL
+        function openModal() {
+            document.getElementById("inputNamaBentuk").value = "";
+            document.getElementById("modalTambah").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("modalTambah").style.display = "none";
+        }
+
+        function simpanData() {
+            const nama = document.getElementById("inputNamaBentuk").value.trim();
+            if (!nama) return alert("⚠️ Nama bentuk pembelajaran tidak boleh kosong!");
+
+            // Nantinya dihubungkan dengan fetch POST ke webhook N8N
+            alert(`✅ Berhasil! Data "${nama}" untuk prodi ${PRODI.toUpperCase()} siap dikirim ke database.`);
+            closeModal();
+        }
+
+        // Muat data saat halaman selesai dirakit oleh template.js
+        window.onload = () => {
+            setTimeout(loadData, 300);
+        };
+    </script>
+</body>
+
+</html>

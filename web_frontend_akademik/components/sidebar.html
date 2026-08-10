@@ -10,45 +10,63 @@
     }
 
     /* HEADER MOBILE KHUSUS (Tampil di layar < 768px) */
-    .sidebar-header-mobile { display: none; }
+    .sidebar-header-mobile {
+        display: none;
+    }
+
     @media screen and (max-width: 768px) {
-        .sidebar-header-mobile { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); 
+        .sidebar-header-mobile {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .sidebar-profile { padding-top: 15px !important; border-top: none !important; }
+
+        .sidebar-profile {
+            padding-top: 15px !important;
+            border-top: none !important;
+        }
     }
 
     /* 1. AREA SCROLL MENU (Hanya area menu yang bisa discroll) */
     .nav-menu {
         flex: 1;
         /* PAKSA MUNCUL TERUS meskipun isinya belum penuh */
-        overflow-y: scroll !important; 
+        overflow-y: scroll !important;
         padding-bottom: 20px;
-        
+
         /* BAHASA KHUSUS MOZILLA FIREFOX */
-        scrollbar-width: thin !important; 
+        scrollbar-width: thin !important;
         scrollbar-color: #64748b #1a1d27 !important;
     }
-    
+
     /* 2. CUSTOM SCROLLBAR TERLIHAT (RAMAH DOSEN) - Chrome/Edge/Safari */
-    .nav-menu::-webkit-scrollbar { 
-        width: 14px !important; /* Dipertebal lagi biar makin nyata */
-        display: block !important; /* Paksa render */
+    .nav-menu::-webkit-scrollbar {
+        width: 14px !important;
+        /* Dipertebal lagi biar makin nyata */
+        display: block !important;
+        /* Paksa render */
     }
-    .nav-menu::-webkit-scrollbar-track { 
-        background: rgba(255, 255, 255, 0.08) !important; /* Terangkan sedikit rel-nya */
+
+    .nav-menu::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.08) !important;
+        /* Terangkan sedikit rel-nya */
         border-radius: 10px !important;
-        margin: 5px !important; 
+        margin: 5px !important;
     }
-    .nav-menu::-webkit-scrollbar-thumb { 
-        background: #7b8a9e !important; /* Warna abu-abu yang lebih menyala */
-        border-radius: 10px !important; 
+
+    .nav-menu::-webkit-scrollbar-thumb {
+        background: #7b8a9e !important;
+        /* Warna abu-abu yang lebih menyala */
+        border-radius: 10px !important;
         /* Trik border agar kelihatan seperti tombol pil (pill button) di dalam rel */
-        border: 3px solid #161923 !important; 
+        border: 3px solid #161923 !important;
     }
-    .nav-menu::-webkit-scrollbar-thumb:hover { 
-        background: #cbd5e1 !important; /* Menyala keputihan saat digeser */
+
+    .nav-menu::-webkit-scrollbar-thumb:hover {
+        background: #cbd5e1 !important;
+        /* Menyala keputihan saat digeser */
     }
 
     /* 3. PERCANTIK ITEM MENU (Efek Hover & Jarak) */
@@ -65,20 +83,27 @@
         cursor: pointer;
         transition: all 0.2s ease;
     }
+
     .nav-item:hover {
         background: rgba(255, 255, 255, 0.05);
         color: #ffffff;
-        transform: translateX(4px); /* Animasi geser sedikit ke kanan saat disorot */
+        transform: translateX(4px);
+        /* Animasi geser sedikit ke kanan saat disorot */
     }
+
     .nav-item.active {
         background: rgba(255, 255, 255, 0.1);
         color: #ffffff;
         font-weight: 700;
-        border-left: 4px solid #ffc561; /* Aksen warna emas/kuning */
+        border-left: 4px solid #ffc561;
+        /* Aksen warna emas/kuning */
     }
-    
+
     /* Menyelaraskan ukuran icon agar teks sebelahnya sejajar lurus */
-    .nav-item i:first-child { width: 20px; text-align: center; }
+    .nav-item i:first-child {
+        width: 20px;
+        text-align: center;
+    }
 
     /* 4. PERCANTIK LABEL KATEGORI */
     .menu-category {
@@ -88,36 +113,51 @@
         letter-spacing: 1.5px;
         margin: 25px 20px 10px 20px;
     }
-/* 5. KUNCI TOMBOL LOGOUT DI BAWAH (STICKY) */
+
+    /* 5. KUNCI TOMBOL LOGOUT DI BAWAH (STICKY) */
     .nav-bottom {
         padding: 10px 0 20px 0;
-        background: transparent; /* Hilangkan background kotak gelap */
-        border-top: none; /* Hilangkan garis batas atas */
-        margin-top: auto; /* Mendorong otomatis ke paling bawah */
+        background: transparent;
+        /* Hilangkan background kotak gelap */
+        border-top: none;
+        /* Hilangkan garis batas atas */
+        margin-top: auto;
+        /* Mendorong otomatis ke paling bawah */
     }
+
     .nav-bottom .nav-item {
-        justify-content: flex-start; /* Kembalikan sejajar kiri seperti menu lainnya */
-        color: #fca5a5; /* Warna teks salmon/merah pudar */
+        justify-content: flex-start;
+        /* Kembalikan sejajar kiri seperti menu lainnya */
+        color: #fca5a5;
+        /* Warna teks salmon/merah pudar */
         margin: 4px 16px;
-        background: transparent; /* Hilangkan warna kotak solid */
+        background: transparent;
+        /* Hilangkan warna kotak solid */
         box-shadow: none;
     }
+
     .nav-bottom .nav-item:hover {
-        background: rgba(239, 68, 68, 0.15); /* Efek blok merah lembut saat disorot */
+        background: rgba(239, 68, 68, 0.15);
+        /* Efek blok merah lembut saat disorot */
         color: #f87171;
-        transform: translateX(4px); /* Animasi geser ke kanan konsisten dengan menu lain */
+        transform: translateX(4px);
+        /* Animasi geser ke kanan konsisten dengan menu lain */
         box-shadow: none;
     }
 </style>
 
 <div class="sidebar">
     <div class="sidebar-header-mobile">
-        <p style="color: white; font-weight: 900; font-size: 1.3rem; margin: 0;">SISTEM <span style="color: #ffc561;">OBE</span></p>
-        <button class="close-menu-btn" onclick="toggleSidebar()" style="background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;"><i class="fas fa-times"></i></button>
+        <p style="color: white; font-weight: 900; font-size: 1.3rem; margin: 0;">SISTEM <span
+                style="color: #ffc561;">OBE</span></p>
+        <button class="close-menu-btn" onclick="toggleSidebar()"
+            style="background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;"><i
+                class="fas fa-times"></i></button>
     </div>
 
     <div class="sidebar-profile">
-        <img src="https://ui-avatars.com/api/?name=Admin&background=0097a7&color=fff&bold=true" id="sidebarAvatar" alt="User Avatar">
+        <img src="https://ui-avatars.com/api/?name=Admin&background=0097a7&color=fff&bold=true" id="sidebarAvatar"
+            alt="User Avatar">
         <div class="sidebar-profile-info">
             <span class="name" id="adminName">Loading...</span>
             <span class="role" id="adminRole">FAKULTAS TEKNIK INFORMATIKA</span>
@@ -130,92 +170,139 @@
         <div class="menu-category">MAIN</div>
         <div class="nav-item" data-path="/admin_config.html"><i class="fas fa-home"></i> Home</div>
 
-        <div class="nav-item" data-path="/KRS/import_krs.html"><i class="fas fa-file-excel"></i> Import KRS Mahasiswa</div>
+        <div class="nav-item" data-path="/KRS/import_krs.html"><i class="fas fa-file-excel"></i> Import KRS Mahasiswa
+        </div>
 
         <div class="nav-item" onclick="toggleDropdown('submenu-master', 'chevron-master')">
             <i class="fas fa-book"></i> Master Data
-            <i id="chevron-master" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+            <i id="chevron-master" class="fas fa-chevron-down"
+                style="margin-left: auto; transition: transform 0.3s;"></i>
         </div>
         <div id="submenu-master" style="display: none; flex-direction: column; margin-top: 2px;">
-            <div class="nav-item" data-path="/master_data/mata_kuliah.html" style="padding-left: 48px; font-size: 0.85rem;">Mata Kuliah</div>
-            <div class="nav-item" data-path="/master_data/cpl.html" style="padding-left: 48px; font-size: 0.85rem;">CPL</div>
-            <div class="nav-item" data-path="/master_data/cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">CPMK</div>
-            <div class="nav-item" data-path="/master_data/bahan_kajian.html" style="padding-left: 48px; font-size: 0.85rem;">Bahan Kajian</div>
-            <div class="nav-item" data-path="/master_data/profil_lulusan.html" style="padding-left: 48px; font-size: 0.85rem;">Profil Lulusan</div>
-            <div class="nav-item" data-path="/master_data/profesi.html" style="padding-left: 48px; font-size: 0.85rem;">Profesi</div>
+            <div class="nav-item" data-path="/master_data/mata_kuliah.html"
+                style="padding-left: 48px; font-size: 0.85rem;">Mata Kuliah</div>
+            <div class="nav-item" data-path="/master_data/cpl.html" style="padding-left: 48px; font-size: 0.85rem;">CPL
+            </div>
+            <div class="nav-item" data-path="/master_data/cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">
+                CPMK</div>
+            <div class="nav-item" data-path="/master_data/bahan_kajian.html"
+                style="padding-left: 48px; font-size: 0.85rem;">Bahan Kajian</div>
+            <div class="nav-item" data-path="/master_data/profil_lulusan.html"
+                style="padding-left: 48px; font-size: 0.85rem;">Profil Lulusan</div>
+            <div class="nav-item" data-path="/master_data/profesi.html" style="padding-left: 48px; font-size: 0.85rem;">
+                Profesi</div>
         </div>
 
-         <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')">
+        <div class="nav-item" onclick="toggleDropdown('submenu-mapping', 'chevron-mapping')">
             <i class="fas fa-sitemap"></i> Pemetaan (Mapping)
-            <i id="chevron-mapping" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+            <i id="chevron-mapping" class="fas fa-chevron-down"
+                style="margin-left: auto; transition: transform 0.3s;"></i>
         </div>
         <div id="submenu-mapping" style="display: none; flex-direction: column; margin-top: 2px;">
-            <div class="nav-item" data-path="/mapping/map_cpl_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">CPL - CPMK</div>
-            <div class="nav-item" data-path="/mapping/matriks_cpl_mk.html" style="padding-left: 48px; font-size: 0.85rem;">MK - CPL</div>
-            <div class="nav-item" data-path="/mapping/map_mk_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">MK - CPMK</div>
+            <div class="nav-item" data-path="/mapping/map_cpl_cpmk.html"
+                style="padding-left: 48px; font-size: 0.85rem;">CPL - CPMK</div>
+            <div class="nav-item" data-path="/mapping/matriks_cpl_mk.html"
+                style="padding-left: 48px; font-size: 0.85rem;">MK - CPL</div>
+            <div class="nav-item" data-path="/mapping/map_mk_cpmk.html" style="padding-left: 48px; font-size: 0.85rem;">
+                MK - CPMK</div>
             <!-- <div class="nav-item" data-path="/mata_kuliah/pemetaan_cpl_mk_bk.html" style="padding-left: 48px; font-size: 0.85rem;">Pemetaan CPL - BK - MK</div> -->
-            <div class="nav-item" data-path="/mapping/pemetaan_cpl_bk.html" style="padding-left: 48px; font-size: 0.85rem;">CPL - BK</div>
-            <div class="nav-item" data-path="/mapping/pemetaan_bk_mk.html" style="padding-left: 48px; font-size: 0.85rem;">BK - MK</div>
-            <div class="nav-item" data-path="/mapping/pemetaan_cpl_pl.html" style="padding-left: 48px; font-size: 0.85rem;">CPL - PL</div>
+            <div class="nav-item" data-path="/mapping/pemetaan_cpl_bk.html"
+                style="padding-left: 48px; font-size: 0.85rem;">CPL - BK</div>
+            <div class="nav-item" data-path="/mapping/pemetaan_bk_mk.html"
+                style="padding-left: 48px; font-size: 0.85rem;">BK - MK</div>
+            <div class="nav-item" data-path="/mapping/pemetaan_cpl_pl.html"
+                style="padding-left: 48px; font-size: 0.85rem;">CPL - PL</div>
         </div>
 
-        <div class="nav-item" data-path="/master_bobot/master_bobot.html"><i class="fas fa-balance-scale"></i>Master Bobot</div>
+        <div class="nav-item" data-path="/master_bobot/master_bobot.html"><i class="fas fa-balance-scale"></i>Master
+            Bobot</div>
 
         <div class="nav-item" onclick="toggleDropdown('menu-kelola', 'chevron-kelola')">
             <i class="fas fa-database"></i> Kelola Data
-            <i id="chevron-kelola" class="fas fa-chevron-down" style="margin-left: auto; transition: transform 0.3s;"></i>
+            <i id="chevron-kelola" class="fas fa-chevron-down"
+                style="margin-left: auto; transition: transform 0.3s;"></i>
         </div>
         <div id="menu-kelola" style="display: none; flex-direction: column; padding-left: 20px; margin-top: 4px;">
             <!-- <div class="nav-item" data-path="/master_data/master_tahun.html"><i class="fas fa-calendar-alt"></i> Tahun Kurikulum</div> -->
-            <div class="nav-item" data-path="/kelola_data/matriks_struktur.html" style="padding-left: 48px; font-size: 0.85rem;">Struktur Kurikulum</div>
+            <div class="nav-item" data-path="/kelola_data/matriks_struktur.html"
+                style="padding-left: 48px; font-size: 0.85rem;">Struktur Kurikulum</div>
             <!-- <div class="nav-item" data-path="/master_data/master_rumpun.html"><i class="fas fa-layer-group"></i> Rumpun MK</div> -->
-            <div class="nav-item" data-path="/kelola_data/master_jenis_cpl.html"><i class="fas fa-tags"></i> Jenis CPL</div>
+            <div class="nav-item" data-path="/kelola_data/master_jenis_cpl.html"><i class="fas fa-tags"></i> Jenis CPL
+            </div>
             <div class="nav-item" data-path="/kelola_data/master_rubrik.html"><i class="fas fa-table"></i> Rubrik</div>
-            <div class="nav-item" data-path="/kelola_data/master_mahasiswa.html"><i class="fas fa-users"></i> Mahasiswa</div>
+            <div class="nav-item" data-path="/kelola_data/master_mahasiswa.html"><i class="fas fa-users"></i> Mahasiswa
+            </div>
             <div class="nav-item" data-path="/kelola_data/master_mbkm.html"><i class="fas fa-university"></i> MBKM</div>
-            <div class="nav-item" data-path="/kelola_data/master_dosen.html"><i class="fas fa-chalkboard-teacher"></i> Dosen</div>
-            <div class="nav-item" data-path="/kelola_data/master_mengajar.html"><i class="fas fa-chalkboard"></i> Mengajar</div>
-            <div class="nav-item" data-path="/kelola_data/master_tugas_akhir.html"><i class="fas fa-book-reader"></i> Tugas Akhir</div>
+            <div class="nav-item" data-path="/kelola_data/master_dosen.html"><i class="fas fa-chalkboard-teacher"></i>
+                Dosen</div>
+            <div class="nav-item" data-path="/kelola_data/master_mengajar.html"><i class="fas fa-chalkboard"></i>
+                Mengajar</div>
+            <div class="nav-item" data-path="/kelola_data/master_tugas_akhir.html"><i class="fas fa-book-reader"></i>
+                Tugas Akhir</div>
         </div>
 
         <div class="menu-category">EVALUASI & RPS</div>
 
-        <div class="nav-item" data-path="/rps/rekap_nilai.html"><i class="fas fa-clipboard-list"></i> Rekap Nilai Dosen</div>
-        <div class="nav-item" data-path="/mbkm/rekap_nilai_mbkm.html"><i class="fas fa-award"></i> Rekap Nilai MBKM</div>
+        <div class="nav-item" data-path="/rps/rekap_nilai.html"><i class="fas fa-clipboard-list"></i> Rekap Nilai Dosen
+        </div>
+        <div class="nav-item" data-path="/mbkm/rekap_nilai_mbkm.html"><i class="fas fa-award"></i> Rekap Nilai MBKM
+        </div>
 
         <div class="nav-item has-dropdown" onclick="toggleDropdownPlus(this)">
             <i class="fas fa-chart-pie"></i><span>Pemenuhan CPMK & CPL</span>
             <i class="fas fa-chevron-down arrow-icon" style="font-size: 0.8rem; margin-left: auto; opacity: 0.7;"></i>
         </div>
-        <div class="dropdown-container" style="display: none; flex-direction: column; padding-left: 35px; margin-top: 2px;">
-            <a href="#" data-path="/cpl_cpmk/cpmk_kelas.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Nilai CPMK per Kelas</a>
+        <div class="dropdown-container"
+            style="display: none; flex-direction: column; padding-left: 35px; margin-top: 2px;">
+            <a href="#" data-path="/cpl_cpmk/cpmk_kelas.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Nilai CPMK per
+                Kelas</a>
             <!-- <a href="#" data-path="/cpl_cpmk/cpl_angkatan.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Nilai CPL per Angkatan</a> -->
-            <a href="#" data-path="/cpl_cpmk/eval_cpmk.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Evaluasi CPMK Angkatan</a>
-            <a href="#" data-path="/cpl_cpmk/eval_cpl.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Evaluasi CPL Angkatan</a>
-            <a href="#" data-path="/cpl_cpmk/grafik_cpmk.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Grafik Rerata CPMK</a>
-            <a href="#" data-path="/cpl_cpmk/grafik_cpl.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Grafik Rerata CPL</a>
-            <a href="#" data-path="/cpl_cpmk/portofolio_mk.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Portofolio Mata Kuliah</a>
-            <a href="#" data-path="/cpl_cpmk/portofolio_angkatan.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Portofolio Angkatan</a>
-            <a href="#" data-path="/cpl_cpmk/rekap_bobot_cpl.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Rekap bobot CPL</a>
-            <a href="#" data-path="/cpl_cpmk/skpi.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Cetak SKPI</a>
+            <a href="#" data-path="/cpl_cpmk/eval_cpmk.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Evaluasi CPMK
+                Angkatan</a>
+            <a href="#" data-path="/cpl_cpmk/eval_cpl.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Evaluasi CPL
+                Angkatan</a>
+            <a href="#" data-path="/cpl_cpmk/grafik_cpmk.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Grafik Rerata
+                CPMK</a>
+            <a href="#" data-path="/cpl_cpmk/grafik_cpl.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Grafik Rerata
+                CPL</a>
+            <a href="#" data-path="/cpl_cpmk/portofolio_mk.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Portofolio Mata
+                Kuliah</a>
+            <a href="#" data-path="/cpl_cpmk/portofolio_angkatan.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Portofolio
+                Angkatan</a>
+            <a href="#" data-path="/cpl_cpmk/rekap_bobot_cpl.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Rekap bobot CPL</a>
+            <a href="#" data-path="/cpl_cpmk/skpi.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Cetak SKPI</a>
         </div>
 
         <div class="nav-item has-dropdown" onclick="toggleDropdownPlus(this)">
             <i class="fas fa-book-open"></i><span>Manajemen RPS</span>
             <i class="fas fa-chevron-down arrow-icon" style="font-size: 0.8rem; margin-left: auto; opacity: 0.7;"></i>
         </div>
-        <div class="dropdown-container" style="display: none; flex-direction: column; padding-left: 35px; margin-top: 2px;">
-            <a href="#" data-path="/rps/*" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Bentuk</a>
+        <div class="dropdown-container"
+            style="display: none; flex-direction: column; padding-left: 35px; margin-top: 2px;">
+            <a href="#" data-path="/rps/rps_bentuk.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Bentuk</a>
             <!-- <a href="#" data-path="/rps/rps_metode.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Metode</a> -->
             <!-- <a href="#" data-path="/rps/rps_kriteria.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Kriteria</a> -->
-            <a href="#" data-path="/rps/rps_komponen.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Komponen</a>
-            <a href="#" data-path="/rps/rps_kelola.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Kelola RPS</a>
-            <a href="#" data-path="/rps/rps_pengecekan.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Pengecekan RPS</a>
+            <a href="#" data-path="/rps/rps_komponen.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Master Komponen</a>
+            <a href="#" data-path="/rps/rps_kelola.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Kelola RPS</a>
+            <a href="#" data-path="/rps/rps_pengecekan.html" class="dropdown-item"
+                style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Pengecekan RPS</a>
             <!-- <a href="#" data-path="/rps/rps_serap.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Serap RPS</a> -->
             <!-- <a href="#" data-path="/rps/portofolio_admin.html" class="dropdown-item" style="padding: 10px 0; color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Laporan CPL & CPMK</a> -->
         </div>
 
-       
+
 
         <div class="menu-category" style="margin-top: 20px;">AKSES DOSEN</div>
         <div class="nav-item" onclick="window.location.href='../../../dosen/jadwal_mengajar.html'"
@@ -237,24 +324,24 @@
 <script>
     // 1. Inisialisasi Dinamis Berdasarkan Prodi Aktif
     function initSmartSidebar() {
-        const prodi = localStorage.getItem("prodi_aktif") || "ti"; 
+        const prodi = localStorage.getItem("prodi_aktif") || "ti";
         const loginName = localStorage.getItem("user_login") || `Kaprodi ${prodi.toUpperCase()}`;
-        const basePath = `/kaprodi/kaprodi_${prodi}`; 
+        const basePath = `/kaprodi/kaprodi_${prodi}`;
 
         // Setel UI Profil & Warna Tema
         document.getElementById("adminName").innerText = loginName;
         document.getElementById("adminRole").innerText = prodi === 'si' ? "PRODI SISTEM INFORMASI" : "PRODI TEKNIK INFORMATIKA";
 
-        const avatarColor = prodi === 'si' ? '1e3a8a' : '8b0000'; 
+        const avatarColor = prodi === 'si' ? '1e3a8a' : '8b0000';
         document.getElementById("sidebarAvatar").src = `https://ui-avatars.com/api/?name=${loginName}&background=${avatarColor}&color=fff&bold=true`;
 
         // Terapkan Rute Absolut ke Semua Tombol Menu
         document.querySelectorAll('[data-path]').forEach(el => {
             const path = el.getAttribute('data-path');
             if (el.tagName.toLowerCase() === 'a') {
-                el.href = basePath + path; 
+                el.href = basePath + path;
             } else {
-                el.onclick = () => window.location.href = basePath + path; 
+                el.onclick = () => window.location.href = basePath + path;
             }
         });
     }
@@ -293,7 +380,7 @@
     function logout() {
         if (confirm("Apakah Anda yakin ingin keluar?")) {
             localStorage.clear();
-            window.location.replace('../../index.html'); 
+            window.location.replace('../../index.html');
         }
     }
 </script>
