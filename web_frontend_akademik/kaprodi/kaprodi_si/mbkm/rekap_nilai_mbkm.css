@@ -738,17 +738,17 @@ input[type=number]::-webkit-outer-spin-button {
     td:last-child { border-bottom: none !important; padding-bottom: 0 !important; }
     
     /* Mapping Label untuk Kartu Rekap MBKM */
-    td::before { font-weight: 800; color: #64748b; font-size: 0.75rem; margin-bottom: 8px; text-transform: uppercase; }
-    td:nth-child(1)::before { content: "Mata Kuliah Konversi"; color: var(--primary-red); }
-    td:nth-child(2)::before { content: "SKS"; }
-    td:nth-child(3)::before { content: "Kompetensi / Aktivitas MBKM"; }
-    td:nth-child(4)::before { content: "Status"; }
-    td:nth-child(5)::before { content: "Aksi"; display: none;}
+    #tableContainer td::before { font-weight: 800; color: #64748b; font-size: 0.75rem; margin-bottom: 8px; text-transform: uppercase; }
+    #tableContainer td:nth-child(1)::before { content: "Mata Kuliah Konversi"; color: var(--primary-red); }
+    #tableContainer td:nth-child(2)::before { content: "SKS"; }
+    #tableContainer td:nth-child(3)::before { content: "Kompetensi / Aktivitas MBKM"; }
+    #tableContainer td:nth-child(4)::before { content: "Status"; }
+    #tableContainer td:nth-child(5)::before { content: "Aksi"; display: none;}
     
-    td:nth-child(1) { font-size: 1.1rem !important; border-bottom: 2px solid var(--primary-red) !important; padding-bottom: 10px !important; margin-bottom: 5px !important; font-weight: 800;}
-    td:nth-child(2) { flex-direction: row !important; justify-content: space-between !important; align-items: center !important; }
-    td:nth-child(5) > div { flex-direction: column !important; gap: 8px !important; width: 100% !important; }
-    td:nth-child(5) button { width: 100% !important; justify-content: center !important; padding: 12px !important;}
+    #tableContainer td:nth-child(1) { font-size: 1.1rem !important; border-bottom: 2px solid var(--primary-red) !important; padding-bottom: 10px !important; margin-bottom: 5px !important; font-weight: 800;}
+    #tableContainer td:nth-child(2) { flex-direction: row !important; justify-content: space-between !important; align-items: center !important; }
+    #tableContainer td:nth-child(5) > div { flex-direction: column !important; gap: 8px !important; width: 100% !important; }
+    #tableContainer td:nth-child(5) button { width: 100% !important; justify-content: center !important; padding: 12px !important;}
     
     .comp-wrapper { flex-direction: column; align-items: stretch; gap: 5px; }
     .input-comp { width: 100% !important; }
@@ -757,9 +757,9 @@ input[type=number]::-webkit-outer-spin-button {
     /* Tfoot / Total SKS adjustments */
     tfoot tr { background: #f8fafc !important; border-color: var(--primary-red) !important; border-width: 2px !important;}
     tfoot td { flex-direction: row !important; justify-content: space-between !important; border: none !important; padding: 5px 0 !important;}
-    tfoot td:nth-child(1) { display: none !important; }
-    tfoot td:nth-child(2) { font-size: 1.1rem !important; font-weight: 800 !important; color: var(--primary-red) !important; display: block !important; text-align: center !important;}
-    tfoot td:nth-child(2)::before { content: "Total SKS Diakui:"; color: #1f2937; margin-right: 10px; display: inline-block;}
+    #tableContainer tfoot td:nth-child(1) { display: none !important; }
+    #tableContainer tfoot td:nth-child(2) { font-size: 1.1rem !important; font-weight: 800 !important; color: var(--primary-red) !important; display: block !important; text-align: center !important;}
+    #tableContainer tfoot td:nth-child(2)::before { content: "Total SKS Diakui:"; color: #1f2937; margin-right: 10px; display: inline-block;}
     
     /* Modal Mobile adjustments */
     .modal-box { padding: 20px !important; }
