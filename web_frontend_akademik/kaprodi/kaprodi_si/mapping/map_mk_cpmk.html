@@ -11,12 +11,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Tambahan Library untuk Fitur Search (Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script src="../../../js/api_config.js"></script>
 
     <!-- Panggil CSS -->
     <link rel="stylesheet" href="mk_cpmk.css">
     <link rel="stylesheet" href="../../../css/global_si.css?v=2">
     <link rel="stylesheet" href="../../../css/admin_si.css">
+    
+    <style>
+        .filter-kurikulum-mobile select:focus {
+            border-color: var(--primary-blue) !important;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1) !important;
+        }
+
+        @media screen and (max-width: 768px) {
+            .filter-kurikulum-mobile {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                margin-bottom: 20px !important;
+                gap: 8px !important;
+            }
+            .select-kurikulum-mobile {
+                width: 100% !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -37,7 +61,6 @@
     <div id="navbar-container"></div>
 
     <div class="main-content">
-        <!-- SATUKAN SEMUA KE DALAM CONTENT-WRAPPER -->
         <div class="content-wrapper">
 
             <!-- TEMPLATE: Header -->
@@ -52,9 +75,9 @@
             </div>
 
             <!-- TEMPLATE: Filter Section -->
-            <div class="filter-section">
-                <label for="filterKurikulum">Tampilkan Data Kurikulum:</label>
-                <select id="filterKurikulum" onchange="initDropdownAndCheckboxes()" class="filter-select">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;" class="filter-kurikulum-mobile">
+                <label for="filterKurikulum" style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin: 0;">Tampilkan Data Kurikulum:</label>
+                <select id="filterKurikulum" onchange="initDropdownAndCheckboxes()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-family: 'Inter', sans-serif; font-size: 1rem; color: #1e293b; background-color: #fff; cursor: pointer; outline: none; min-width: 220px; transition: 0.2s;" class="select-kurikulum-mobile">
                     <option value="">Memuat data...</option>
                 </select>
             </div>
@@ -69,11 +92,11 @@
 
             <!-- PANEL MAPPING KONTEN -->
             <div class="mapping-panel">
-                <!-- 1. PILIH MATA KULIAH -->
+                <!-- 1. PILIH MATA KULIAH (SELECT2) -->
                 <div class="form-group">
-                    <label for="selectMk"><i class="fas fa-book dynamic-icon" style="margin-right: 8px;"></i> Pilih Mata
+                    <label for="selectMk"><i class="fas fa-search dynamic-icon" style="margin-right: 8px;"></i> Cari / Pilih Mata
                         Kuliah</label>
-                    <select id="selectMk" class="select-custom" onchange="fetchExistingMapping()">
+                    <select id="selectMk" class="select-custom" style="width: 100%;">
                         <option value="">-- Memuat daftar Mata Kuliah... --</option>
                     </select>
                 </div>
@@ -131,6 +154,20 @@
             }
         });
 
+        // --- INISIALISASI SELECT2 KETIKA HALAMAN DIMUAT ---
+        $(document).ready(function() {
+            $('#selectMk').select2({
+                placeholder: "-- Ketik / Pilih Mata Kuliah --",
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Event listener saat Matkul dipilih
+            $('#selectMk').on('change', function() {
+                fetchExistingMapping();
+            });
+        });
+
         // --- FUNGSI LOAD KURIKULUM ---
         async function loadDropdownKurikulum() {
             try {
@@ -138,17 +175,24 @@
                 const data = await response.json();
                 const selectKurikulum = document.getElementById('filterKurikulum');
                 selectKurikulum.innerHTML = '';
-                data.forEach(item => {
-                    if (item && item.kurikulum) {
-                        let opt = document.createElement('option');
-                        opt.value = item.kurikulum;
-                        opt.text = "Kurikulum 20" + item.kurikulum;
-                        selectKurikulum.appendChild(opt);
-                    }
+                
+                let kurikulumSet = new Set();
+                data.forEach(item => { if (item && item.kurikulum) kurikulumSet.add(String(item.kurikulum)); });
+                kurikulumSet.add("25");
+                kurikulumSet.add("20");
+
+                let sortedKurikulum = Array.from(kurikulumSet).sort((a, b) => b - a);
+
+                sortedKurikulum.forEach(kur => {
+                    let opt = document.createElement('option');
+                    opt.value = kur;
+                    opt.text = "Kurikulum 20" + kur;
+                    selectKurikulum.appendChild(opt);
                 });
                 await initDropdownAndCheckboxes();
             } catch (error) {
-                document.getElementById('filterKurikulum').innerHTML = '<option value="">Gagal memuat kurikulum</option>';
+                document.getElementById('filterKurikulum').innerHTML = '<option value="25">Kurikulum 2025</option><option value="20">Kurikulum 2020</option>';
+                await initDropdownAndCheckboxes();
             }
         }
 
@@ -162,6 +206,13 @@
 
             const selectKurikulum = document.getElementById('filterKurikulum');
             let kurikulum = selectKurikulum ? selectKurikulum.value : "";
+
+            // Reset Select2 State
+            if (selectMk) {
+                $('#selectMk').empty();
+                $('#selectMk').append('<option value="" disabled selected>-- Memuat daftar Mata Kuliah... --</option>');
+                $('#selectMk').trigger('change.select2');
+            }
 
             // Anti-Cache
             const timeStamp = new Date().getTime();
@@ -182,12 +233,16 @@
                 listCPMK = await resCpmk.json();
 
                 if (selectMk) {
-                    selectMk.innerHTML = '<option value="" disabled selected>-- Pilih Mata Kuliah --</option>';
+                    $('#selectMk').empty();
                     if (dataMk.length > 0) {
+                        $('#selectMk').append('<option value="" disabled selected>-- Ketik / Pilih Mata Kuliah --</option>');
                         dataMk.forEach(mk => {
-                            selectMk.innerHTML += `<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`;
+                            $('#selectMk').append(`<option value="${mk.kode_mk}">${mk.kode_mk} - ${mk.nama_mk}</option>`);
                         });
-                    } else { selectMk.innerHTML = '<option value="">Data Mata Kuliah Kosong</option>'; }
+                    } else { 
+                        $('#selectMk').append('<option value="" disabled selected>-- Data Mata Kuliah Kosong --</option>'); 
+                    }
+                    $('#selectMk').val('').trigger('change.select2');
                 }
 
                 if (cpmkContainer) {
@@ -208,7 +263,6 @@
                         });
 
                         sortedCPLs.forEach(cpl => {
-                            // Kategori CPL Header
                             cpmkContainer.innerHTML += `
                             <div class="cpl-divider">
                                 <div class="cpl-divider-title">
@@ -220,7 +274,6 @@
                             </div>
                         `;
 
-                            // Daftar Kartu CPMK
                             groupedCPMK[cpl].forEach(cpmk => {
                                 cpmkContainer.innerHTML += `
                                 <label class="cpmk-card">
@@ -234,7 +287,6 @@
                             });
                         });
 
-                        // Trigger pewarnaan ikon divider
                         const dynamicIcons = document.querySelectorAll('.dynamic-icon');
                         const color = PRODI === 'si' ? '#1e3a8a' : '#8b0000';
                         dynamicIcons.forEach(icon => icon.style.color = color);
@@ -245,7 +297,11 @@
                 }
 
             } catch (error) {
-                if (selectMk) selectMk.innerHTML = '<option value="">Gagal terhubung ke API</option>';
+                if (selectMk) {
+                    $('#selectMk').empty();
+                    $('#selectMk').append('<option value="" disabled selected>Gagal terhubung ke API</option>');
+                    $('#selectMk').trigger('change.select2');
+                }
                 if (cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; text-align:center; padding:20px; font-weight:bold;">Gagal menarik data Master dari Server.</div>';
             }
         }
@@ -334,19 +390,16 @@
             }
         }
 
-        // 1. Fungsi Buka/Tutup dari Navbar 
         function toggleMobileSidebar() {
             const sidebar = document.getElementById('sidebar-container');
             if (sidebar) sidebar.classList.toggle('active');
         }
 
-        // 2. Fungsi Buka/Tutup dari dalam Sidebar 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar-container');
             if (sidebar) sidebar.classList.toggle('active');
         }
 
-        // 3. SENSOR PENUTUP (Deteksi klik di layar gelap)
         document.addEventListener('click', function (event) {
             const sidebar = document.getElementById("sidebar-container");
             const hamburgerBtn = document.querySelector('.hamburger-btn') || document.querySelector('.mobile-menu-btn');

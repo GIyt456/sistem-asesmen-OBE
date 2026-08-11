@@ -9,9 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- MEMANGGIL FILE CSS EKSTERNAL -->
+    <!-- MEMANGGIL FILE CSS EKSTERNAL & CSS KHUSUS -->
     <link rel="stylesheet" href="../../../css/style.css">
-    <!-- MEMANGGIL FILE CSS YANG BARU KITA PISAHKAN -->
     <link rel="stylesheet" href="rekap_nilai_mbkm.css">
     
     <script src="../../../js/template.js"></script>
@@ -32,7 +31,7 @@
         </div>
         
         <div class="profile-btn-mobile" onclick="toggleSidebar()">
-            <img id="mobileNavbarAvatar" src="https://ui-avatars.com/api/?name=K&background=1e3a8a&color=fff&bold=true" alt="Profil Kaprodi">
+            <img id="mobileNavbarAvatar" src="" alt="Profil Kaprodi">
         </div>
     </nav>
 
@@ -219,25 +218,40 @@
     <script>
         const PRODI_AKTIF = localStorage.getItem("prodi_aktif") || "si";
         
-        // Jika yang login adalah Kaprodi SI, sulap semua variabel merah menjadi Biru SI
-        if (PRODI_AKTIF === "si") {
-            document.documentElement.style.setProperty('--primary-red', '#1e3a8a');
-        } else {
-            // Jika TI, biarkan tetap Merah
-            document.documentElement.style.setProperty('--primary-red', '#8b0000');
+        // ==========================================
+        // 0. SIHIR BUNGLON (TEMA DINAMIS SI / TI)
+        // ==========================================
+        document.addEventListener("DOMContentLoaded", () => {
+            if (PRODI_AKTIF === "si") {
+                document.documentElement.style.setProperty('--primary-red', '#1e3a8a');
+            } else {
+                document.documentElement.style.setProperty('--primary-red', '#8b0000');
+            }
+
+            const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
+            const avatarMobile = document.getElementById("mobileNavbarAvatar");
+            if(avatarMobile) {
+                const avatarColor = PRODI_AKTIF === "si" ? "1e3a8a" : "8b0000";
+                avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
+            }
+        });
+
+        // FUNGSI SIDEBAR MOBILE
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-container');
+            const overlay = document.getElementById('mobileOverlay');
+            if (sidebar) sidebar.classList.toggle('active');
+            if (overlay) overlay.classList.toggle('active');
         }
 
         const API_MBKM_LIST = `${API_BASE}/get-mbkm-data`;
         const API_MK_MASTER = `${API_BASE}/get-master-matkul`;
         const API_CHECK_NILAI = `${API_BASE}/get-nilai-mhs`;
-        const API_SAVE_REKAP = `${API_BASE}/save-nilai-mbkm`; // KEMBALIKAN API MBKM INI
+        const API_SAVE_REKAP = `${API_BASE}/save-nilai-mbkm`; 
 
-        // --- API BARU YANG DISAMAKAN DENGAN HALAMAN INPUT NILAI ---
         const API_SIMPAN_OBE = `${API_BASE}/simpan-konfigurasi-input-nilai`;
         const API_GET_DRAFT = `${API_BASE}/get-draft-bobot`;
         const API_GET_REPORT = `${API_BASE}/get-report-obe`;
-        // -----------------------------------------------------------
-
         const API_GET_BOBOT = `${API_BASE}/get-bobot-mbkm`;
         const API_GET_NILAI_DETAIL = `${API_BASE}/get-nilai-mbkm-detail`;
 
@@ -295,14 +309,12 @@
                 allDataMK = safeExtractArray(jsonMk);
                 let dataMasterMhs = safeExtractArray(jsonMasterMhs);
 
-                // --- INJEKSI PRODI ASLI KE DATA MBKM DENGAN FALLBACK NIM ---
                 rawPendaftarMBKM.forEach(pendaftar => {
                     let mhsRef = dataMasterMhs.find(m => String(m.nim) === String(pendaftar.nim));
                     if (mhsRef && (mhsRef.prodi || mhsRef.program_studi)) {
                         pendaftar.prodi = mhsRef.prodi || mhsRef.program_studi;
                     }
 
-                    // Fallback: Jika di database kosong, deteksi otomatis dari NIM
                     let prodiText = (pendaftar.prodi || "").toLowerCase();
                     if (!prodiText) {
                         let nimStr = String(pendaftar.nim).toLowerCase();
@@ -311,29 +323,22 @@
                     }
                 });
 
-                // --- FILTER BERDASARKAN KAPRODI LOGIN ---
-                const prodiKaprodi = (localStorage.getItem("prodi_aktif") || "").toLowerCase();
-
-                if (prodiKaprodi.includes("ti")) {
+                if (PRODI_AKTIF.includes("ti")) {
                     dataPendaftarMBKM = rawPendaftarMBKM.filter(m => {
                         let p = (m.prodi || "").toLowerCase();
                         return p === 'ti' || p.includes("informa");
                     });
-                } else if (prodiKaprodi.includes("si")) {
+                } else if (PRODI_AKTIF.includes("si")) {
                     dataPendaftarMBKM = rawPendaftarMBKM.filter(m => {
                         let p = (m.prodi || "").toLowerCase();
                         return p === 'si' || p.includes("sistem");
                     });
                 } else {
-                    // Jika yang login Admin Pusat/Headadmin (Munculkan semua)
                     dataPendaftarMBKM = rawPendaftarMBKM;
                 }
-                // ---------------------------------------
 
                 inputSearch.disabled = false;
                 inputSearch.placeholder = "Pilih / Ketik NIM atau Nama Peserta...";
-
-                // Render form dropdown dengan data yang sudah di-filter
                 renderDropdownMhs(dataPendaftarMBKM);
             } catch (e) {
                 console.error("Init Error:", e);
@@ -351,7 +356,6 @@
 
             document.getElementById("lblNim").innerText = mhs.nim || "-";
 
-            // --- LOGIKA STIKER PRODI (DENGAN FALLBACK NIM) ---
             let prodiText = (mhs.prodi || "").toLowerCase();
             if (!prodiText) {
                 let nimStr = String(mhs.nim).toLowerCase();
@@ -365,7 +369,6 @@
             } else if (prodiText === 'si' || prodiText.includes('sistem')) {
                 badgeProdi = '<span style="background:#fce7f3; color:#be185d; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:800; margin-left:8px; vertical-align: middle;">SI</span>';
             }
-            // -------------------------------------------------
 
             document.getElementById("lblNama").innerHTML = `${mhs.nama || mhs.nama_mahasiswa || "-"} ${badgeProdi}`;
             document.getElementById("lblProgram").innerText = mhs.program || "-";
@@ -377,7 +380,6 @@
             document.getElementById("mkTableBody").innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Menyelaraskan data nilai...</td></tr>';
 
             try {
-                // 1. Tarik Matkul Konversi, Kompetensi, & Status dari DB MBKM (Tabel nilai_mbkm)
                 const res = await fetch(`${API_CHECK_NILAI}?nim=${mhs.nim}`);
                 const dataTersimpan = await res.json();
                 const dataArray = safeExtractArray(dataTersimpan);
@@ -385,7 +387,6 @@
                 if (dataArray.length > 0) {
                     let tempMKs = [];
 
-                    // 2. Karena nilai sudah dipindah ke OBE DB, kita fetch nilainya dari API OBE secara real-time!
                     for (const m of dataArray) {
                         const kodeValid = m.kode_mk || m.kode;
                         const objMaster = allDataMK.find(x => x.kode_mk === kodeValid);
@@ -395,24 +396,20 @@
                         let detailPenilaian = [];
 
                         try {
-                            // Menembak langsung ke tabel OBE untuk menarik nilai yang sesungguhnya
                             const resReport = await fetch(`${API_GET_REPORT}?mk=${kodeValid}`);
                             const txtReport = await resReport.text();
                             let arrReport = JSON.parse(txtReport);
                             let reportObe = (Array.isArray(arrReport) ? arrReport : []).map(i => i.json ? i.json : i);
 
-                            // Temukan nilai mahasiswa MBKM ini dari seluruh kumpulan data OBE
                             let mhsObe = reportObe.filter(r => String(r.nim || r.NIM).trim() === String(mhs.nim).trim());
 
                             if (mhsObe.length > 0) {
-                                // Ambil nilai akhir & grade dari baris pertama miliknya
                                 finalVal = parseFloat(mhsObe[0].nilai_akhir || mhsObe[0].nilai_angka || 0);
                                 gradeVal = mhsObe[0].grade || mhsObe[0].nilai_huruf || '-';
 
-                                // Rekonstruksi rincian per minggu untuk dimasukkan ke kalkulator
                                 detailPenilaian = mhsObe.map(r => ({
                                     minggu: parseInt(r.pertemuan),
-                                    bobot: 0, // Akan dihitung ulang saat tombol Nilai ditekan
+                                    bobot: 0, 
                                     nilai: parseFloat(r.nilai_asli || r.nilai_mentah || 0)
                                 }));
                             }
@@ -427,8 +424,8 @@
                             kompetensi: m.kompetensi || "",
                             status: m.status || "Diakui",
                             penilaian: detailPenilaian,
-                            nilai_akhir: finalVal,     // Disuntikkan dari Database OBE
-                            grade: gradeVal            // Disuntikkan dari Database OBE
+                            nilai_akhir: finalVal,     
+                            grade: gradeVal            
                         });
                     }
                     selectedMKs = tempMKs;
@@ -1075,20 +1072,11 @@
             }
         }
 
-        // FUNGSI SIDEBAR
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar-container');
-            const overlay = document.getElementById('mobileOverlay');
-            if (sidebar) sidebar.classList.toggle('active');
-            if (overlay) overlay.classList.toggle('active');
-        }
-
         // KENDALI PENYUNTIKAN MENU AKTIF (INTEGRASI TEMPLATE.JS)
         window.onload = () => {
-            initData(); // Pastikan ini sesuai dengan nama fungsi inisiasi di kodemu
+            initData(); 
 
             setTimeout(() => {
-                // Render Sidebar (jika template.js belum jalan)
                 const sidebarContainer = document.getElementById('sidebar-container');
                 if (sidebarContainer && !sidebarContainer.innerHTML.includes('sidebar-profile')) {
                     const prodiAktif = localStorage.getItem("prodi_aktif") || "si";
@@ -1113,7 +1101,6 @@
             if (navDashboard) navDashboard.classList.remove('active');
             if (navRekapMbkm) navRekapMbkm.classList.add('active');
             
-            // Buka dropdown Evaluasi & RPS jika tertutup
             const menuEvaluasi = document.getElementById('menu-evaluasi') || (navRekapMbkm ? navRekapMbkm.closest('.dropdown-container') : null);
             if (menuEvaluasi) {
                 menuEvaluasi.style.display = 'block';

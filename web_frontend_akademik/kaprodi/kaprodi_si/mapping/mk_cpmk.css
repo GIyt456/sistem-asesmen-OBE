@@ -1,14 +1,53 @@
 /* ========================================================================
-   FILE SPESIFIK: MAPPING MK - CPL - CPMK (map_mk_cpmk.css)
+   FILE SPESIFIK: MAPPING MK - CPL - CPMK (mk_cpmk.css)
    ======================================================================== */
 
 .mapping-panel { background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
 .form-group { margin-bottom: 25px; }
 .form-group label { display: block; font-weight: 800; margin-bottom: 15px; font-size: 1.1rem; color: #1e293b; }
 
-/* Kustomisasi Dropdown Pilihan MK */
+/* Kustomisasi Dropdown Pilihan MK (Default) */
 .select-custom { width: 100%; padding: 15px 20px; border-radius: 10px; border: 2px solid #cbd5e1; font-size: 1rem; font-weight: 600; outline: none; background: #f8fafc; cursor: pointer; color: #334155; transition: 0.2s;}
 .select-custom:focus { border-color: var(--primary-blue); background: white; box-shadow: 0 0 0 3px rgba(30,58,138, 0.1);}
+
+/* =========================================
+   ✨ KUSTOMISASI SELECT2 (FITUR SEARCH)
+   ========================================= */
+.select2-container .select2-selection--single {
+    height: 52px !important;
+    border: 2px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    background-color: #f8fafc !important;
+    font-weight: 600 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1rem !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 50px !important;
+    right: 12px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #334155 !important;
+    padding-left: 15px !important;
+}
+.select2-container--open .select2-selection--single {
+    border-color: var(--primary-blue) !important;
+    background: white !important;
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1) !important;
+}
+.select2-dropdown {
+    border: 2px solid var(--primary-blue) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+.select2-search__field {
+    border-radius: 6px !important;
+    font-family: 'Inter', sans-serif !important;
+    padding: 8px !important;
+}
 
 /* Layout Grid Kartu CPMK (Desktop) */
 .cpmk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 15px; }
@@ -34,6 +73,8 @@
     /* Buang jarak pinggir pada Panel Utama */
     .mapping-panel { padding: 0 !important; border: none !important; box-shadow: none !important; background: transparent !important; }
     
+    .select2-container { width: 100% !important; }
+
     /* Ubah Grid menjadi kolom tegak lurus (List) */
     .cpmk-grid { grid-template-columns: 1fr; gap: 0 !important; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; background: white; margin-top: 10px;}
     
