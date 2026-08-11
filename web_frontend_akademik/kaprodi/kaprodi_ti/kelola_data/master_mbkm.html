@@ -166,7 +166,13 @@
                     <div class="header-subtitle">DATA AKADEMIK</div>
                     <h1 class="header-title">DATA <span>MBKM</span></h1>
                 </div>
-                <div class="badge-prodi" id="prodiBadge" style="margin-top: 10px; display: inline-block; width: fit-content;">PRODI</div>
+                <div style="display: flex; gap: 10px; flex-direction: column; align-items: flex-end; margin-top: 10px;">
+                    <div class="badge-prodi" id="prodiBadge"
+                        style="display: inline-block; width: fit-content;">PRODI</div>
+                    <a href="../mbkm/rekap_nilai_mbkm.html" class="btn-primary" style="text-decoration: none; padding: 8px 15px; border-radius: 8px; font-weight: 700; background: var(--primary-blue, #1e3a8a); color: white; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                        <i class="fas fa-arrow-right"></i> Ke Rekap Nilai MBKM
+                    </a>
+                </div>
             </div>
             <div style="border-bottom: 1px solid var(--border-color); margin: 0 0 20px 0;" class="header-master"></div>
         </div>
@@ -229,7 +235,7 @@
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; border-top: 1px dashed #e2e8f0; padding-top: 20px; margin-top: 10px;">
-                    <button class="btn-primary" id="btnSimpan" onclick="simpanDataMBKM()">
+                    <button class="btn-primary" id="btnSimpan" onclick="simpanDataMBKM()" style="background-color: #10b981; border-color: #059669;">
                         <i class="fas fa-save"></i> Simpan Pendaftaran
                     </button>
                 </div>
