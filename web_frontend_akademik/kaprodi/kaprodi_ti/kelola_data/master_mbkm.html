@@ -689,7 +689,7 @@
             dropdownWrapper.classList.remove("active");
         }
 
-        function toggleDropdown(e) {
+        function toggleDropdownMBKM(e) {
             e.stopPropagation();
             if (searchInput.disabled) return;
 
@@ -701,8 +701,8 @@
             }
         }
 
-        searchInput.addEventListener("click", toggleDropdown);
-        toggleBtn.addEventListener("click", toggleDropdown);
+        searchInput.addEventListener("click", toggleDropdownMBKM);
+        toggleBtn.addEventListener("click", toggleDropdownMBKM);
 
         searchInput.addEventListener("input", function (e) {
             dropdownList.classList.add("show");

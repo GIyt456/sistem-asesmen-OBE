@@ -686,9 +686,9 @@
                 let bgRow = isMBKM ? 'background-color: #fef9c3;' : '';
                 let labelMBKM = isMBKM ? '<span style="background: #eab308; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; margin-left: 8px; vertical-align: middle;">MBKM</span>' : '';
 
-                // Jika MBKM, paksa nilai 0 dan kunci form inputnya
-                let nilaiTersimpan = isMBKM ? 0 : (mhs.nilai[idAsesmenAktif] || 0);
-                let lockInput = isMBKM ? 'readonly style="background:#fef9c3; cursor:not-allowed;" title="Peserta MBKM"' : '';
+                // Ambil nilai asli (tidak dipaksa 0), tapi form tetap dikunci
+                let nilaiTersimpan = mhs.nilai[idAsesmenAktif] || 0;
+                let lockInput = isMBKM ? 'readonly style="background:#fef9c3; cursor:not-allowed;" title="Nilai diambil otomatis dari Rekap MBKM"' : '';
                 let valTampil = (nilaiTersimpan === 0 && !isMBKM) ? '' : nilaiTersimpan;
                 // -----------------------
 

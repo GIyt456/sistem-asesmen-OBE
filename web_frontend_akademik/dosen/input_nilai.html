@@ -1358,13 +1358,13 @@
 
             try {
                 let prodiMatkul = document.querySelector(`#pilihMK_SI option[value="${mkKode}"]`) ? "si" : "ti";
-                
+
                 // INJEKSI MULTI-KURIKULUM: Ambil 2 digit pertama kode MK (Contoh: "20" atau "25")
-                let digitKurikulum = mkKode.substring(0, 2); 
-                
+                let digitKurikulum = mkKode.substring(0, 2);
+
                 // Tambahkan parameter &kurikulum=... ke URL API
                 const res = await fetch(`${API_BASE}/get-master-bobot?prodi=${prodiMatkul}&kurikulum=${digitKurikulum}`);
-                
+
                 let rawText = await res.text();
                 let allData = rawText ? JSON.parse(rawText) : [];
                 if (allData.data) allData = allData.data;
@@ -1793,7 +1793,7 @@
 
             try {
                 const res = await fetch(`${API_GET_STUDENTS}?mk=${mkKode}`);
-                let d = await res.json(); listMhs = (d.data || d).filter(m => !daftarNimMBKM.includes(String(m.nim || m.NIM).trim()));
+                let d = await res.json(); listMhs = (d.data || d);
                 listMhs.sort((a, b) => String(a.nim || a.NIM).localeCompare(String(b.nim || b.NIM), undefined, { numeric: true }));
             } catch (e) { }
             if (listMhs.length === 0) listMhs = [{ nim: "22320001", nama: "Fulan" }];
@@ -1947,8 +1947,8 @@
                     c.bobot.forEach((_, idx) => {
                         let nm = parseFloat(m[flatIdx + 2]) || 0;
                         let isBebas = (c.komponen[idx] === "Tidak Dinilai" || c.komponen[idx] === "");
-                        let lock = isMBKM ? 'readonly style="background:#fef9c3;"' : (isBebas ? 'readonly style="background:#f1f5f9;"' : '');
-                        inpHtml += `<td style="padding:8px; text-align:center; background:${bgR}; border-bottom:1px solid #e5e7eb;"><input type="number" value="${isBebas || isMBKM ? 0 : nm}" ${lock} oninput="recalculateRow(${rowIndex})" data-mhs="${rowIndex}" data-pert="${c.pertemuan}" data-idx="${idx}" style="width:55px; text-align:center; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>`;
+                        let lock = isMBKM ? 'readonly style="background:#fef9c3; cursor:not-allowed;" title="Nilai Terintegrasi MBKM"' : (isBebas ? 'readonly style="background:#f1f5f9;"' : '');
+                        inpHtml += `<td style="padding:8px; text-align:center; background:${bgR}; border-bottom:1px solid #e5e7eb;"><input type="number" value="${isBebas ? 0 : nm}" ${lock} oninput="recalculateRow(${rowIndex})" data-mhs="${rowIndex}" data-pert="${c.pertemuan}" data-idx="${idx}" style="width:55px; text-align:center; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>`;
                         flatIdx++;
                     });
                 });
@@ -1984,7 +1984,16 @@
                         let nim = String(mhs.nim || mhs.NIM || "").trim();
                         let isMBKM = daftarNimMBKM.includes(nim);
                         let rowM = [nim, mhs.nama || mhs.nama_mahasiswa || ""];
-                        if (isMBKM) { for (let i = 0; i < flatColCount; i++) rowM.push(0); }
+
+                        if (isMBKM) {
+                            // PROTEKSI: Jika MBKM, ABAIKAN Excel! Amankan nilainya dari Database!
+                            configData.forEach(c => {
+                                c.bobot.forEach((_, bIndex) => {
+                                    let matchDB = globalReportDB.find(db => (db.nim || db.NIM) === nim && parseInt(db.pertemuan) === c.pertemuan && (db.bobot_index == bIndex || db.bobot_index == null));
+                                    rowM.push(matchDB && matchDB.nilai_asli ? parseFloat(matchDB.nilai_asli) : 0);
+                                });
+                            });
+                        }
                         else {
                             let match = dExcel.find(r => String(r[0] || "").trim() === nim);
                             for (let i = 0; i < flatColCount; i++) rowM.push(match ? (parseFloat(match[i + 2]) || 0) : 0);
