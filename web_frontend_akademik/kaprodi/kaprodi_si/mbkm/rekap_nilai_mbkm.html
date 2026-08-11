@@ -43,7 +43,12 @@
 
     <div class="main-content">
         <div class="container">
-            <h1 class="page-title">REKAP NILAI <span>MBKM</span></h1>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                <h1 class="page-title" style="margin-bottom: 0;">REKAP NILAI <span>MBKM</span></h1>
+                <a href="../kelola_data/master_mbkm.html" class="btn-primary" style="text-decoration: none; padding: 10px 15px; border-radius: 8px; font-weight: 700; background: var(--primary-blue, #1e3a8a); color: white; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Master MBKM
+                </a>
+            </div>
 
             <div class="selection-card">
                 <div class="input-group">
@@ -126,7 +131,7 @@
                     <button class="btn-add-mk" onclick="bukaModalMK()">+ Tambah Mata Kuliah Lainnya</button>
 
                     <div class="action-footer">
-                        <button class="btn-save" id="btnSimpanRekap" onclick="simpanKeN8N()">
+                        <button class="btn-save" id="btnSimpanRekap" onclick="simpanKeN8N()" style="background-color: #10b981; border-color: #059669; color: white;">
                             <i class="fas fa-save"></i> Simpan Hasil Konversi & Penilaian
                         </button>
                     </div>
