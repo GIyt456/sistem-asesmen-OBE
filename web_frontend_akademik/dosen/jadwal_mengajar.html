@@ -641,6 +641,16 @@
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #4b5563;">
+                        <label for="filterKurikulum" style="font-weight: 700;"><i class="fas fa-book"></i> Kurikulum:</label>
+                        <select id="filterKurikulum" onchange="filterTable()"
+                            style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); outline: none; font-family: 'Inter'; cursor: pointer; background: white; color: var(--text-dark); font-weight: 600;">
+                            <option value="semua">Semua</option>
+                            <option value="25">Kurikulum 2025</option>
+                            <option value="20">Kurikulum 2020</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #4b5563;">
                         <label for="filterProdi" style="font-weight: 700;"><i class="fas fa-filter"></i> Prodi:</label>
                         <select id="filterProdi" onchange="filterTable()"
                             style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); outline: none; font-family: 'Inter'; cursor: pointer; background: white; color: var(--text-dark); font-weight: 600;">
@@ -840,7 +850,8 @@
                             kelompok: kelasMatch && kelasMatch.kelompok ? kelasMatch.kelompok : "A", // Ambil dari DB atau fallback ke 'A'
                             nama_mk: m.nama_mk || "MK Tidak Ditemukan",
                             sks: m.sks || "-",
-                            prodi: m.prodi || "-"
+                            prodi: m.prodi || "-",
+                            kurikulum: m.kurikulum || "-"
                         };
                     });
                 } else {
@@ -867,7 +878,8 @@
                             kelompok: kelasMatch && kelasMatch.kelompok ? kelasMatch.kelompok : "A", // Ambil dari DB atau fallback ke 'A'
                             nama_mk: mk.label || (matkulCocok ? matkulCocok.nama_mk : "MK Tidak Ditemukan"),
                             sks: matkulCocok ? matkulCocok.sks : "-",
-                            prodi: matkulCocok ? matkulCocok.prodi : mk.prodi_asal
+                            prodi: matkulCocok ? matkulCocok.prodi : mk.prodi_asal,
+                            kurikulum: matkulCocok ? matkulCocok.kurikulum : "-"
                         };
                     });
                 }
@@ -982,7 +994,7 @@
                     <td>2025/2026</td>
                     <td>
                         <strong>${kelas.kode_mk} - ${kelas.nama_mk.toUpperCase()}</strong> ${badgeProdi}<br>
-                        <span style="color:#6b7280; font-size:0.8rem;">Kelompok: ${kelas.kelompok}</span>
+                        <span style="color:#6b7280; font-size:0.8rem;">Kelompok: ${kelas.kelompok} | Kurikulum: ${kelas.kurikulum && kelas.kurikulum !== "-" ? '20' + kelas.kurikulum : 'Tidak Diketahui'}</span>
                     </td>
                     <td style="font-weight: 800; color: #0284c7; text-align: center; font-size: 1.1rem;">${kelas.id_kelas}</td>
                     <td style="text-align: center;">${kelas.semester}</td>
@@ -1038,6 +1050,7 @@
         function filterTable() {
             const keyword = document.getElementById("searchInput").value.toLowerCase();
             const filterProdi = document.getElementById("filterProdi") ? document.getElementById("filterProdi").value.toLowerCase() : 'semua';
+            const filterKurikulum = document.getElementById("filterKurikulum") ? document.getElementById("filterKurikulum").value : 'semua';
 
             filteredDataGlobal = dataJadwalGlobal.filter(kelas => {
                 // 1. Cek pencarian kolom teks
@@ -1056,8 +1069,15 @@
                     }
                 }
 
-                // Harus lolos pencarian teks DAN lolos filter prodi
-                return matchKeyword && matchProdi;
+                // 3. Cek filter kurikulum
+                let matchKurikulum = true;
+                if (filterKurikulum !== 'semua') {
+                    let k = String(kelas.kurikulum || "");
+                    matchKurikulum = (k === filterKurikulum);
+                }
+
+                // Harus lolos pencarian teks DAN lolos filter prodi DAN lolos filter kurikulum
+                return matchKeyword && matchProdi && matchKurikulum;
             });
 
             currentPage = 1;

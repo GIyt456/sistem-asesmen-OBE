@@ -185,6 +185,103 @@
             border: 1px solid #e5e7eb;
         }
 
+        /* TABEL CONTROLS */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .show-entries {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .show-entries select {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            font-family: 'Inter';
+            cursor: pointer;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .search-box input {
+            padding: 8px 15px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            font-family: 'Inter';
+            width: 250px;
+            transition: 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+        }
+
+        /* PAGINATION STYLING */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .page-btn {
+            padding: 6px 12px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #4b5563;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #f1f5f9;
+        }
+
+        .page-btn.active {
+            background: #6b21a8;
+            color: white;
+            border-color: #6b21a8;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-dots {
+            padding: 6px 8px;
+            color: #64748b;
+            font-weight: 700;
+            user-select: none;
+        }
+
         .header-section {
             display: flex;
             justify-content: space-between;
@@ -832,7 +929,50 @@
             </div>
 
             <div class="figma-card">
-                <h3 class="section-title" id="lblProdiTitle" style="border: none;">Program Studi</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 class="section-title" id="lblProdiTitle" style="border: none; margin-bottom: 0; padding-bottom: 0;">Program Studi</h3>
+                </div>
+
+                <div class="table-controls"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                        <div class="show-entries">
+                            Show
+                            <select id="rowsPerPageSelect" onchange="changeRowsPerPage()">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                            entries
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #4b5563;">
+                            <label for="filterKurikulum" style="font-weight: 700;"><i class="fas fa-book"></i> Kurikulum:</label>
+                            <select id="filterKurikulum" onchange="filterTable()"
+                                style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); outline: none; font-family: 'Inter'; cursor: pointer; background: white; color: var(--text-dark); font-weight: 600;">
+                                <option value="semua">Semua</option>
+                                <option value="25">Kurikulum 2025</option>
+                                <option value="20">Kurikulum 2020</option>
+                            </select>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #4b5563;">
+                            <label for="filterProdi" style="font-weight: 700;"><i class="fas fa-filter"></i> Prodi:</label>
+                            <select id="filterProdi" onchange="filterTable()"
+                                style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); outline: none; font-family: 'Inter'; cursor: pointer; background: white; color: var(--text-dark); font-weight: 600;">
+                                <option value="semua">Semua</option>
+                                <option value="ti">Teknik Informatika</option>
+                                <option value="si">Sistem Informasi</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="search-box">
+                        Search: <input type="text" id="searchInput" placeholder="Cari MK..."
+                            oninput="filterTable()">
+                    </div>
+                </div>
 
                 <table id="tabelDaftarRPS">
                     <thead>
@@ -852,6 +992,12 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <div class="pagination-container" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.9rem; color: #64748b;">
+                    <div id="dataCountInfo">Showing 0 entries</div>
+                    <div class="pagination-controls" id="paginationControls" style="display: flex; gap: 5px;">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1205,6 +1351,11 @@
         let currentMkDipilih = "";
         let globalDaftarMK = [];
         let masterCPMK = [];
+        
+        let dataJadwalGlobal = [];
+        let filteredDataGlobal = [];
+        let currentPage = 1;
+        let rowsPerPage = 10;
 
         // FUNGSI EXTRAKSI ARRAY AMAN (DIUPDATE AGAR SAMA DENGAN VERSI CETAK)
         function safeExtractArray(jsonObj) {
@@ -1390,11 +1541,12 @@
                         semester: kelas.semester,
                         nama_mk: matkulCocok ? matkulCocok.nama_mk : "MK Tidak Ditemukan",
                         sks: matkulCocok ? matkulCocok.sks : "-",
-                        prodi: matkulCocok ? matkulCocok.prodi : "-"
+                        prodi: matkulCocok ? matkulCocok.prodi : "-",
+                        kurikulum: matkulCocok ? matkulCocok.kurikulum : "-"
                     };
                 });
 
-                let dataJadwalGlobal = [];
+                dataJadwalGlobal = [];
                 if (userRoleSekarang === "admin") {
                     dataJadwalGlobal = gabunganData.filter(item => item.prodi.toLowerCase() === userProdiSekarang.toLowerCase() || item.prodi === "-");
                 } else if (userNidn) {
@@ -1430,11 +1582,8 @@
 
                 tbody.innerHTML = ""; // Bersihkan tulisan loading
 
-                // === 2. CETAK TABEL BERSAMAAN DENGAN STATUSNYA ===
+                // === 2. SIMPAN METADATA PERSETUJUAN ===
                 globalDaftarMK.forEach((mk, index) => {
-                    const safeKode = mk.kode_mk.replace(/\s+/g, '-');
-
-                    // --- OLAH DATA PERSETUJUAN ---
                     let dataSetuju = null;
                     try {
                         if (persetujuanResults[index]) {
@@ -1444,7 +1593,7 @@
                     } catch (e) { }
 
                     let strStatus = "Belum Disetujui";
-                    let bgStatus = "#ef4444"; // Merah (Default Pending)
+                    let bgStatus = "#ef4444"; // Merah
                     let strCatatan = "-";
 
                     if (dataSetuju) {
@@ -1455,59 +1604,162 @@
                             strStatus = "Perlu Revisi";
                             bgStatus = "#f59e0b"; // Oranye
                         }
-
                         if (dataSetuju.catatan && dataSetuju.catatan.trim() !== '') {
                             strCatatan = dataSetuju.catatan;
-                            // Potong teks jika terlalu panjang agar tabel tidak melar/rusak
                             if (strCatatan.length > 45) strCatatan = strCatatan.substring(0, 45) + "...";
                         }
                     }
 
-                    const statusAcc = `<span class="badge-status" style="background:${bgStatus}; display:inline-block; width:100%; max-width:130px;">${strStatus}</span>`;
-                    const dosenHtml = `<span class="badge-dosen-blue">${userLogin}</span><br><small style="color:#64748b; font-weight:600; margin-left:5px;">Koordinator</small>`;
-
-                    // CEK ROLE: Buat item dropdown "Catatan Revisi" HANYA untuk Admin/Kaprodi
-                    let tombolCatatanHTML = "";
-                    if (userRoleSekarang === "admin" || userRoleSekarang === "headadmin") {
-                        tombolCatatanHTML = `
-                            <div class="dropdown-item" style="color: #ea580c;" onclick="bukaCatatanRevisi('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')">
-                                <i class="fas fa-comment-dots" style="width:20px;"></i> Beri Catatan Revisi
-                            </div>
-                        `;
-                    }
-
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>
-                                <strong>${mk.kode_mk} - ${mk.nama_mk.toUpperCase()}</strong><br>
-                                <span style="font-size:0.8rem; color:#64748b;">S1 - ${stringProdi}</span>
-                            </td>
-                            <td style="text-align: center; font-weight:bold;">${mk.semester}</td>
-                            <td>${dosenHtml}</td>
-                            <td style="text-align: center;">${statusAcc}</td>
-                            <td style="text-align: left; color: #475569; font-size: 0.8rem; font-style: italic;">${strCatatan}</td>
-                            <td style="text-align: center;">
-                                <div class="btn-dropdown-wrapper">
-                                    <button class="btn-opsi" onclick="toggleOpsiMenu(event, 'menu-${safeKode}')">
-                                        <i class="fas fa-cog"></i> Opsi RPS
-                                    </button>
-                                    <div class="dropdown-menu" id="menu-${safeKode}" style="text-align: left;">
-                                        <div class="dropdown-item" onclick="bukaDetailRPS('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')"><i class="fas fa-file-alt" style="width:20px;"></i> Detail RPS</div>
-                                        
-                                        ${tombolCatatanHTML}
-                                        
-                                        <div class="dropdown-item" onclick="bukaHalamanCetak('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')"><i class="fas fa-print" style="width:20px;"></i> Cetak RPS</div>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
+                    mk.status_str = strStatus;
+                    mk.bg_status = bgStatus;
+                    mk.catatan = strCatatan;
                 });
+
+                filteredDataGlobal = globalDaftarMK;
+                renderTable();
 
             } catch (e) {
                 console.error(e);
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:red;">Gagal memuat data dari server.</td></tr>`;
             }
+        }
+
+        // ==========================================
+        // RENDER TABEL & PAGINATION
+        // ==========================================
+        function changeRowsPerPage() {
+            rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value);
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById("bodyDaftarRPS");
+            tbody.innerHTML = "";
+
+            if (filteredDataGlobal.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;">Tidak ada RPS yang ditemukan.</td></tr>`;
+                document.getElementById("dataCountInfo").innerText = "Showing 0 entries";
+                document.getElementById("paginationControls").innerHTML = "";
+                return;
+            }
+
+            const totalPages = Math.ceil(filteredDataGlobal.length / rowsPerPage);
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, filteredDataGlobal.length);
+            const currentDataPage = filteredDataGlobal.slice(startIndex, endIndex);
+
+            currentDataPage.forEach((mk) => {
+                const safeKode = mk.kode_mk.replace(/\s+/g, '-');
+                const statusAcc = `<span class="badge-status" style="background:${mk.bg_status}; display:inline-block; width:100%; max-width:130px;">${mk.status_str}</span>`;
+                const dosenHtml = `<span class="badge-dosen-blue">${userLogin}</span><br><small style="color:#64748b; font-weight:600; margin-left:5px;">Koordinator</small>`;
+
+                let tombolCatatanHTML = "";
+                if (userRoleSekarang === "admin" || userRoleSekarang === "headadmin") {
+                    tombolCatatanHTML = `
+                        <div class="dropdown-item" style="color: #ea580c;" onclick="bukaCatatanRevisi('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')">
+                            <i class="fas fa-comment-dots" style="width:20px;"></i> Beri Catatan Revisi
+                        </div>
+                    `;
+                }
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>
+                        <strong>${mk.kode_mk} - ${mk.nama_mk.toUpperCase()}</strong><br>
+                        <span style="font-size:0.8rem; color:#64748b;">S1 - ${stringProdi} | Kurikulum: ${mk.kurikulum && mk.kurikulum !== "-" ? '20' + mk.kurikulum : 'Tidak Diketahui'}</span>
+                    </td>
+                    <td style="text-align: center; font-weight:bold;">${mk.semester}</td>
+                    <td>${dosenHtml}</td>
+                    <td style="text-align: center;">${statusAcc}</td>
+                    <td style="text-align: left; color: #475569; font-size: 0.8rem; font-style: italic;">${mk.catatan}</td>
+                    <td style="text-align: center;">
+                        <div class="btn-dropdown-wrapper">
+                            <button class="btn-opsi" onclick="toggleOpsiMenu(event, 'menu-${safeKode}')">
+                                <i class="fas fa-cog"></i> Opsi RPS
+                            </button>
+                            <div class="dropdown-menu" id="menu-${safeKode}" style="text-align: left;">
+                                <div class="dropdown-item" onclick="bukaDetailRPS('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')"><i class="fas fa-file-alt" style="width:20px;"></i> Detail RPS</div>
+                                ${tombolCatatanHTML}
+                                <div class="dropdown-item" onclick="bukaHalamanCetak('${mk.kode_mk}', '${mk.nama_mk}', '${mk.semester}', '${mk.sks}')"><i class="fas fa-print" style="width:20px;"></i> Cetak RPS</div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById("dataCountInfo").innerText = `Showing ${startIndex + 1} to ${endIndex} of ${filteredDataGlobal.length} entries`;
+            renderSmartPagination(totalPages);
+        }
+
+        function renderSmartPagination(totalPages) {
+            const paginationEl = document.getElementById("paginationControls");
+            let html = "";
+
+            html += `<button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+                if (startPage > 2) html += `<span class="page-dots">...</span>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += `<span class="page-dots">...</span>`;
+                html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+            }
+
+            html += `<button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>`;
+            paginationEl.innerHTML = html;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredDataGlobal.length / rowsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderTable();
+            }
+        }
+
+        function filterTable() {
+            const keyword = document.getElementById("searchInput").value.toLowerCase();
+            const filterProdi = document.getElementById("filterProdi") ? document.getElementById("filterProdi").value.toLowerCase() : 'semua';
+            const filterKurikulum = document.getElementById("filterKurikulum") ? document.getElementById("filterKurikulum").value : 'semua';
+
+            filteredDataGlobal = globalDaftarMK.filter(mk => {
+                const matchKeyword = mk.kode_mk.toLowerCase().includes(keyword) ||
+                    mk.nama_mk.toLowerCase().includes(keyword);
+
+                let matchProdi = true;
+                if (filterProdi !== 'semua') {
+                    let p = (mk.prodi || "").toLowerCase();
+                    if (filterProdi === 'ti') {
+                        matchProdi = (p === 'ti' || p.includes('informa') || p === 'teknik informatika');
+                    } else if (filterProdi === 'si') {
+                        matchProdi = (p === 'si' || p.includes('sistem') || p === 'sistem informasi');
+                    }
+                }
+
+                let matchKurikulum = true;
+                if (filterKurikulum !== 'semua') {
+                    let k = String(mk.kurikulum || "");
+                    matchKurikulum = (k === filterKurikulum);
+                }
+
+                return matchKeyword && matchProdi && matchKurikulum;
+            });
+
+            currentPage = 1;
+            renderTable();
         }
 
         async function loadInfoKelengkapanRPS(kodeMK) {

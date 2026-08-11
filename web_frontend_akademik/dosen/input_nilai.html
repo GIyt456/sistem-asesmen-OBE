@@ -1054,6 +1054,18 @@
             <h3 class="card-title">1. Konfigurasi Bobot Penilaian</h3>
             <p class="card-subtitle" style="margin-bottom: 20px;">Pilih Mata Kuliah untuk memulai.</p>
 
+            <!-- FILTER KURIKULUM -->
+            <div style="margin-bottom: 15px; max-width: 300px;">
+                <label style="font-weight: 700; font-size: 0.85rem; color: #475569; display: block; margin-bottom: 8px;">
+                    <i class="fas fa-filter" style="color: #64748b;"></i> Filter Kurikulum
+                </label>
+                <select id="filterKurikulum" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Inter';" onchange="renderSelectMK()">
+                    <option value="all">Semua Kurikulum</option>
+                    <option value="25">Kurikulum 2025</option>
+                    <option value="20">Kurikulum 2020</option>
+                </select>
+            </div>
+
             <div class="mk-grid-responsive"
                 style="display: grid; gap: 20px; margin-bottom: 20px; background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0;">
 
@@ -1284,6 +1296,7 @@
         let configData = [];
         let studentData = [];
         let mkSudahInput = [];
+        let globalDaftarMK = [];
         let templateAktif = "Template_Nilai_Mahasiswa.xlsx";
 
         let cpmkTersedia = [];
@@ -1470,29 +1483,9 @@
                     });
                 }
 
-                let htmlTI = '<option value="" disabled selected>-- Cari MK Teknik Informatika --</option>';
-                let htmlSI = '<option value="" disabled selected>-- Cari MK Sistem Informasi --</option>';
-
-                daftarMK.forEach(mk => {
-                    let sTxt = mkSudahInput.includes(mk.kode) ? " 🔒 (Selesai)" : "";
-                    let opt = `<option value="${mk.kode}">[${mk.kode}] ${mk.label}${sTxt}</option>`;
-                    let p = (mk.parent || "").toLowerCase();
-                    if (p === 'ti' || p.includes('informa')) htmlTI += opt; else if (p === 'si' || p.includes('sistem')) htmlSI += opt;
-                    else { if (userProdi.includes('ti')) htmlTI += opt; if (userProdi.includes('si')) htmlSI += opt; }
-                });
-
-                if (window.jQuery && $.fn.select2) {
-                    if ($('#pilihMK_TI').hasClass("select2-hidden-accessible")) $('#pilihMK_TI').select2('destroy');
-                    if ($('#pilihMK_SI').hasClass("select2-hidden-accessible")) $('#pilihMK_SI').select2('destroy');
-                    $('#pilihMK_TI').html(htmlTI).select2({ placeholder: "Cari MK Teknik Informatika...", allowClear: true, width: '100%' });
-                    $('#pilihMK_SI').html(htmlSI).select2({ placeholder: "Cari MK Sistem Informasi...", allowClear: true, width: '100%' });
-
-                    $('#pilihMK_TI').on('select2:select', function () { $('#pilihMK_SI').val(null).trigger('change.select2'); document.getElementById('pilihMK').value = this.value; loadMappingOtomatis(); });
-                    $('#pilihMK_SI').on('select2:select', function () { $('#pilihMK_TI').val(null).trigger('change.select2'); document.getElementById('pilihMK').value = this.value; loadMappingOtomatis(); });
-                    $('#pilihMK_TI, #pilihMK_SI').on('select2:unselect', function () { document.getElementById('pilihMK').value = ""; });
-                } else {
-                    document.getElementById('pilihMK_TI').innerHTML = htmlTI; document.getElementById('pilihMK_SI').innerHTML = htmlSI;
-                }
+                // SIMPAN KE GLOBAL UNTUK FILTERING
+                globalDaftarMK = daftarMK;
+                renderSelectMK();
 
                 let savedMK = localStorage.getItem("draft_mk_terpilih");
                 if (savedMK) {
@@ -1505,6 +1498,39 @@
                     }, 300);
                 }
             } catch (e) { }
+        }
+
+        function renderSelectMK() {
+            let filterKur = document.getElementById("filterKurikulum").value;
+            let filteredMK = globalDaftarMK;
+
+            if (filterKur !== "all") {
+                filteredMK = globalDaftarMK.filter(mk => String(mk.kode).startsWith(filterKur));
+            }
+
+            let htmlTI = '<option value="" disabled selected>-- Cari MK Teknik Informatika --</option>';
+            let htmlSI = '<option value="" disabled selected>-- Cari MK Sistem Informasi --</option>';
+
+            filteredMK.forEach(mk => {
+                let sTxt = mkSudahInput.includes(mk.kode) ? " 🔒 (Selesai)" : "";
+                let opt = `<option value="${mk.kode}">[${mk.kode}] ${mk.label}${sTxt}</option>`;
+                let p = (mk.parent || "").toLowerCase();
+                if (p === 'ti' || p.includes('informa')) htmlTI += opt; else if (p === 'si' || p.includes('sistem')) htmlSI += opt;
+                else { if (userProdi.includes('ti')) htmlTI += opt; if (userProdi.includes('si')) htmlSI += opt; }
+            });
+
+            if (window.jQuery && $.fn.select2) {
+                if ($('#pilihMK_TI').hasClass("select2-hidden-accessible")) $('#pilihMK_TI').select2('destroy');
+                if ($('#pilihMK_SI').hasClass("select2-hidden-accessible")) $('#pilihMK_SI').select2('destroy');
+                $('#pilihMK_TI').html(htmlTI).select2({ placeholder: "Cari MK Teknik Informatika...", allowClear: true, width: '100%' });
+                $('#pilihMK_SI').html(htmlSI).select2({ placeholder: "Cari MK Sistem Informasi...", allowClear: true, width: '100%' });
+
+                $('#pilihMK_TI').on('select2:select', function () { $('#pilihMK_SI').val(null).trigger('change.select2'); document.getElementById('pilihMK').value = this.value; loadMappingOtomatis(); });
+                $('#pilihMK_SI').on('select2:select', function () { $('#pilihMK_TI').val(null).trigger('change.select2'); document.getElementById('pilihMK').value = this.value; loadMappingOtomatis(); });
+                $('#pilihMK_TI, #pilihMK_SI').on('select2:unselect', function () { document.getElementById('pilihMK').value = ""; document.getElementById("card-master-bobot").style.display = "none"; document.getElementById("card-quota").style.display = "none"; renderTableAsesmen(); });
+            } else {
+                document.getElementById('pilihMK_TI').innerHTML = htmlTI; document.getElementById('pilihMK_SI').innerHTML = htmlSI;
+            }
         }
 
         async function loadMappingOtomatis() {
