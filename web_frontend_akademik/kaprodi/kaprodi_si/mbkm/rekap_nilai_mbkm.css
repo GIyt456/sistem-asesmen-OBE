@@ -687,6 +687,33 @@ input[type=number]::-webkit-outer-spin-button {
 
 .navbar-mobile { display: none; }
 
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #10b981; /* Hijau Sukses */
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    z-index: 10000;
+    transform: translateX(150%); /* Tersembunyi di luar layar kanan */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast-notification.show {
+    transform: translateX(0); /* Masuk ke layar */
+}
+
+.toast-error {
+    background-color: #ef4444 !important; /* Merah Error */
+}
 /* =========================================
    📱 RESPONSIVE MOBILE (AKTIF KHUSUS DI HP)
 ========================================= */

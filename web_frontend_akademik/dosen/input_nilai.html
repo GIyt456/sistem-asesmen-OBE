@@ -478,7 +478,6 @@
                 cursor: pointer;
             }
 
-            /* PERBAIKAN MENU LINKS AGAR MUNCUL SAAT SIDEBAR AKTIF */
             .nav-menu-wrapper.active .nav-links {
                 flex-direction: column;
                 gap: 10px;
@@ -555,7 +554,7 @@
                 justify-content: center;
             }
 
-            /* --- MASTER BOBOT KAPRODI --- */
+            /* --- MASTER BOBOT KAPRODI (PERBAIKAN DINAMIS) --- */
             #card-master-bobot>div:first-child {
                 flex-direction: column !important;
                 align-items: flex-start !important;
@@ -599,12 +598,15 @@
                 border-bottom: none !important;
             }
 
+            /* ✨ JURUS DATA-LABEL DINAMIS UNTUK HP ✨ */
             #masterBobotTable td::before {
+                content: attr(data-label);
                 font-weight: 800;
                 color: #475569;
                 font-size: 0.8rem;
                 flex-basis: 40%;
                 text-align: left;
+                text-transform: uppercase;
             }
 
             #masterBobotTable tbody td:nth-child(1) {
@@ -612,40 +614,18 @@
                 color: white !important;
                 font-weight: 900 !important;
             }
+            #masterBobotTable tbody td:nth-child(1)::before { display: none; } 
 
             #masterBobotTable tbody td:nth-child(2) {
                 font-weight: 800;
                 color: var(--primary-blue);
             }
+            #masterBobotTable tbody td:nth-child(2)::before { display: none; } 
 
-            #masterBobotTable tbody td:nth-child(3)::before {
-                content: "ATTITUDE";
-            }
-
-            #masterBobotTable tbody td:nth-child(4)::before {
-                content: "KEHADIRAN";
-            }
-
-            #masterBobotTable tbody td:nth-child(5)::before {
-                content: "TUGAS";
-            }
-
-            #masterBobotTable tbody td:nth-child(6)::before {
-                content: "UTS";
-            }
-
-            #masterBobotTable tbody td:nth-child(7)::before {
-                content: "UAS";
-            }
-
-            #masterBobotTable tbody td:nth-child(8) {
+            #masterBobotTable tbody td:last-child {
                 background: #e0f2fe !important;
                 font-weight: 900 !important;
                 color: #0369a1 !important;
-            }
-
-            #masterBobotTable tbody td:nth-child(8)::before {
-                content: "TOTAL BOBOT";
             }
 
             /* --- PILIH MATA KULIAH --- */
@@ -674,7 +654,6 @@
                 display: none !important;
             }
 
-            /* Sembunyikan semua baris konfigurasi, HANYA tampilkan yang aktif (untuk efek pagination) */
             #configTable tbody tr.config-row {
                 display: none !important;
             }
@@ -727,29 +706,11 @@
                 font-size: 0.8rem;
             }
 
-            #configTable tbody td:nth-child(2)::before {
-                content: "BENTUK PEMBELAJARAN";
-            }
-
-            #configTable tbody td:nth-child(3)::before {
-                content: "CPL";
-                display: none;
-            }
-
-            #configTable tbody td:nth-child(4)::before {
-                content: "CPMK";
-                display: none;
-            }
-
-            #configTable tbody td:nth-child(5)::before {
-                content: "KOMPONEN PENILAIAN";
-                display: none;
-            }
-
-            #configTable tbody td:nth-child(6)::before {
-                content: "BOBOT (%)";
-                display: none;
-            }
+            #configTable tbody td:nth-child(2)::before { content: "BENTUK PEMBELAJARAN"; }
+            #configTable tbody td:nth-child(3)::before { content: "CPL"; display: none; }
+            #configTable tbody td:nth-child(4)::before { content: "CPMK"; display: none; }
+            #configTable tbody td:nth-child(5)::before { content: "KOMPONEN PENILAIAN"; display: none; }
+            #configTable tbody td:nth-child(6)::before { content: "BOBOT (%)"; display: none; }
 
             #configTable input[type="number"],
             #configTable select {
@@ -773,9 +734,7 @@
                 border: none !important;
             }
 
-            #configTable tfoot td:nth-child(1) {
-                display: none !important;
-            }
+            #configTable tfoot td:nth-child(1) { display: none !important; }
 
             #configTable tfoot td:nth-child(2)::before {
                 content: "TOTAL KESELURUHAN:";
@@ -783,7 +742,6 @@
                 font-size: 0.9rem;
             }
 
-            /* Munculkan Tombol Pagination HP */
             .mobile-pagination {
                 display: flex !important;
                 justify-content: space-between !important;
@@ -848,13 +806,8 @@
                 white-space: nowrap !important;
             }
 
-            #previewArea thead {
-                display: table-header-group !important;
-            }
-
-            #previewArea tbody {
-                display: table-row-group !important;
-            }
+            #previewArea thead { display: table-header-group !important; }
+            #previewArea tbody { display: table-row-group !important; }
 
             #previewArea tr {
                 display: table-row !important;
@@ -877,11 +830,8 @@
                 flex-direction: row !important;
             }
 
-            #previewArea td::before {
-                display: none !important;
-            }
+            #previewArea td::before { display: none !important; }
 
-            /* Sticky Header & Kolom */
             #studentHead th {
                 position: sticky !important;
                 top: 0 !important;
@@ -915,15 +865,8 @@
                 z-index: 12 !important;
             }
 
-            /* --- FOOTER --- */
-            .footer {
-                padding: 40px 20px 20px 20px !important;
-            }
-
-            .footer-grid {
-                grid-template-columns: 1fr !important;
-                gap: 30px !important;
-            }
+            .footer { padding: 40px 20px 20px 20px !important; }
+            .footer-grid { grid-template-columns: 1fr !important; gap: 30px !important; }
         }
     </style>
 </head>
@@ -1002,30 +945,7 @@
                 <table style="width: 100%; border-collapse: collapse; text-align: center;" id="masterBobotTable">
                     <thead style="background: #f8fafc; color: var(--text-dark); border-bottom: 2px solid #e5e7eb;">
                         <tr>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                CPL</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                CPMK</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                ATTITUDE</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                KEHADIRAN</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                TUGAS</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                UTS</th>
-                            <th
-                                style="padding: 15px; border-right: 1px solid #e5e7eb; font-size: 0.85rem; font-weight: 700;">
-                                UAS</th>
-                            <th
-                                style="padding: 15px; font-size: 0.85rem; font-weight: 800; background: #e0f2fe; color: #0369a1;">
-                                TOTAL</th>
+                            <!-- Diisi oleh Javascript -->
                         </tr>
                     </thead>
                     <tbody id="bodyMasterBobot" style="font-size: 0.95rem;">
@@ -1363,6 +1283,9 @@
             else studentData.push(mhsObject);
         }
 
+        // ===============================================
+        // MENGHAPUS HARDCODE CSS DARI JAVASCRIPT
+        // ===============================================
         async function fetchMasterBobotDosen(mkKode) {
             const tbody = document.getElementById("bodyMasterBobot");
             const gTotal = document.getElementById("grandTotalMaster");
@@ -1371,11 +1294,8 @@
 
             try {
                 let prodiMatkul = document.querySelector(`#pilihMK_SI option[value="${mkKode}"]`) ? "si" : "ti";
-
-                // INJEKSI MULTI-KURIKULUM: Ambil 2 digit pertama kode MK (Contoh: "20" atau "25")
                 let digitKurikulum = mkKode.substring(0, 2);
 
-                // Tambahkan parameter &kurikulum=... ke URL API
                 const res = await fetch(`${API_BASE}/get-master-bobot?prodi=${prodiMatkul}&kurikulum=${digitKurikulum}`);
 
                 let rawText = await res.text();
@@ -1407,12 +1327,25 @@
                 let htmlBody = ''; let grandTotal = 0; kaprodiQuotas = [];
                 urutanCpmk.forEach(cKey => {
                     let b = grouped[cKey]; let tb = 0;
-                    let trHtml = `<tr><td style="padding:15px; color:darkred; font-weight:800;">${b.cpl}</td><td style="padding:15px; font-weight:800;">${b.cpmk}</td>`;
+                    
+                    // ✨ MENYUNTIKKAN DATA-LABEL DINAMIS ✨
+                    let trHtml = `<tr>
+                        <td data-label="CPL" style="padding:15px; color:darkred; font-weight:800;">${b.cpl}</td>
+                        <td data-label="CPMK" style="padding:15px; font-weight:800;">${b.cpmk}</td>`;
+                        
                     listKomp.forEach(k => {
-                        let nil = b.bobot[k.nama] || 0; tb += nil; trHtml += `<td>${nil}%</td>`;
+                        let nil = b.bobot[k.nama] || 0; tb += nil; 
+                        
+                        // Menambahkan data-label sesuai nama komponen dari DB
+                        trHtml += `<td data-label="${k.nama}">${nil}%</td>`;
+                        
                         if (nil > 0) kaprodiQuotas.push({ cpl: b.cpl, cpmk: b.cpmk, kategori: k.nama, bobot: nil });
                     });
-                    grandTotal += tb; trHtml += `<td style="background:#f8fafc; font-weight:800; color:#0369a1;">${tb}%</td></tr>`;
+                    grandTotal += tb; 
+                    
+                    // Menambahkan data-label untuk Total Bobot
+                    trHtml += `<td data-label="TOTAL BOBOT" style="background:#f8fafc; font-weight:800; color:#0369a1;">${tb}%</td></tr>`;
+                    
                     htmlBody += trHtml;
                 });
                 tbody.innerHTML = htmlBody;
@@ -1483,7 +1416,6 @@
                     });
                 }
 
-                // SIMPAN KE GLOBAL UNTUK FILTERING
                 globalDaftarMK = daftarMK;
                 renderSelectMK();
 
@@ -1783,12 +1715,10 @@
                 btnSimpan.style.opacity = btnSimpan.disabled ? '0.5' : '1';
 
                 if (btnSimpan.disabled) {
-                    // Tampilan saat bobot belum 100% atau kuota belum terpenuhi (Hitam/Navy Gelap)
                     btnSimpan.innerHTML = '<i class="fas fa-lock"></i> Penuhi Kuota & 100%';
                     btnSimpan.style.background = '#0f172a';
                     btnSimpan.style.color = 'white';
                 } else {
-                    // Tampilan menyala terang saat siap disave (Hijau)
                     btnSimpan.innerHTML = '<i class="fas fa-check-circle"></i> Simpan Final 100%';
                     btnSimpan.style.background = '#16a34a';
                     btnSimpan.style.color = 'white';
@@ -1824,23 +1754,18 @@
             } catch (e) { }
             if (listMhs.length === 0) listMhs = [{ nim: "22320001", nama: "Fulan" }];
 
-            // 1. Inisialisasi Workbook ExcelJS
             const workbook = new ExcelJS.Workbook();
             const sheet = workbook.addWorksheet("Template Nilai");
 
             let rowCPL = ["", ""], rowCPMK = ["", ""], rowBentuk = ["NIM", "NAMA MAHASISWA"], rowBobot = ["", "BOBOT PENILAIAN (%)"];
             let flatColCount = 0;
 
-            // 2. Susun Struktur Header
             configData.forEach(c => {
                 c.bobot.forEach((b, idx) => {
                     rowCPL.push(c.cpl[idx] || "-");
                     rowCPMK.push(c.cpmk[idx] || "-");
-
-                    // PERMINTAAN ANDA: Tambahkan nama komponen penilaian di bawah tulisan P1-P16
                     let namaKomponen = (c.komponen[idx] && c.komponen[idx] !== "Tidak Dinilai") ? c.komponen[idx] : c.bentuk;
                     rowBentuk.push(`P${c.pertemuan}\n(${namaKomponen})`);
-
                     rowBobot.push((parseFloat(b) || 0) + "%");
                     flatColCount++;
                 });
@@ -1851,25 +1776,21 @@
 
             sheet.addRow(rowCPL); sheet.addRow(rowCPMK); sheet.addRow(rowBentuk); sheet.addRow(rowBobot);
 
-            // 3. Deteksi Kolom dengan Bobot Aktif (> 0%)
-            let hasBobotArray = [false, false]; // Index 0 (NIM) & Index 1 (NAMA) selalu putih
+            let hasBobotArray = [false, false]; 
             configData.forEach(c => {
                 c.bobot.forEach(b => {
                     hasBobotArray.push((parseFloat(b) || 0) > 0);
                 });
             });
-            hasBobotArray.push(false, false); // Index Akhir (NILAI AKHIR) & GRADE selalu putih
+            hasBobotArray.push(false, false); 
 
-            // 4. Modifikasi Style Header (Biru Muda jika ada bobot, Putih jika 0%)
             for (let i = 1; i <= 4; i++) {
                 let row = sheet.getRow(i);
                 row.eachCell((cell, colNumber) => {
-                    let isKolomBobot = hasBobotArray[colNumber - 1]; // Array index mulai dari 0, colNumber dari 1
-
+                    let isKolomBobot = hasBobotArray[colNumber - 1]; 
                     cell.fill = {
                         type: 'pattern',
                         pattern: 'solid',
-                        // Menggunakan biru muda pastel persis seperti gambar Excel (FFDDEBF7)
                         fgColor: { argb: isKolomBobot ? 'FFDDEBF7' : 'FFFFFFFF' }
                     };
                     cell.font = { color: { argb: 'FF000000' }, bold: true, name: 'Arial', size: 10 };
@@ -1877,9 +1798,8 @@
                     cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
                 });
             }
-            sheet.getRow(3).height = 40; // Tinggikan baris 3 agar teks komponen bisa turun ke bawah
+            sheet.getRow(3).height = 40; 
 
-            // 5. Menggabungkan Cell (Merge) agar kolom NIM, NAMA, Akhir, dan Grade rapi
             sheet.mergeCells('A1:A4'); sheet.mergeCells('B1:B4');
             let endCol1 = sheet.getColumn(flatColCount + 3).letter;
             let endCol2 = sheet.getColumn(flatColCount + 4).letter;
@@ -1888,12 +1808,11 @@
             sheet.getCell('A1').value = "NIM"; sheet.getCell('B1').value = "NAMA MAHASISWA";
             sheet.getCell(`${endCol1}1`).value = "NILAI AKHIR"; sheet.getCell(`${endCol2}1`).value = "GRADE";
 
-            // 6. Masukkan Data Mahasiswa & Rumus Excel-nya
             let currRow = 5;
 
             listMhs.forEach(mhs => {
                 let row = [mhs.nim || mhs.NIM || "", mhs.nama || mhs.nama_mahasiswa || ""];
-                for (let k = 0; k < flatColCount; k++) row.push(""); // Slot kosong untuk diisi nanti
+                for (let k = 0; k < flatColCount; k++) row.push(""); 
 
                 let fParts = []; let flatIdx = 0;
                 configData.forEach(c => {
@@ -1910,7 +1829,6 @@
 
                 let sheetRow = sheet.addRow(row);
 
-                // B. Styling Garis dan Penentuan Warna Kolom Aktif/Tidak Aktif untuk Data
                 sheetRow.eachCell((cell, colNumber) => {
                     cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
                     cell.alignment = { vertical: 'middle', horizontal: colNumber > 2 ? 'center' : 'left' };
@@ -1918,21 +1836,18 @@
                     let isKolomBobot = hasBobotArray[colNumber - 1];
 
                     if (isKolomBobot) {
-                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDDEBF7' } }; // Biru Muda Pastel
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDDEBF7' } }; 
                     } else {
-                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } }; // Putih bersih
-                        // Angka 0 telah dihapus. Sel tanpa bobot akan murni dibiarkan kosong
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } }; 
                     }
                 });
                 currRow++;
             });
 
-            // 6. Atur Lebar Kolom
             sheet.getColumn(1).width = 15; sheet.getColumn(2).width = 35;
             for (let k = 0; k < flatColCount; k++) sheet.getColumn(k + 3).width = 16;
             sheet.getColumn(flatColCount + 3).width = 15; sheet.getColumn(flatColCount + 4).width = 12;
 
-            // 7. Eksekusi Download FileSaver
             try {
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
@@ -2012,7 +1927,6 @@
                         let rowM = [nim, mhs.nama || mhs.nama_mahasiswa || ""];
 
                         if (isMBKM) {
-                            // PROTEKSI: Jika MBKM, ABAIKAN Excel! Amankan nilainya dari Database!
                             configData.forEach(c => {
                                 c.bobot.forEach((_, bIndex) => {
                                     let matchDB = globalReportDB.find(db => (db.nim || db.NIM) === nim && parseInt(db.pertemuan) === c.pertemuan && (db.bobot_index == bIndex || db.bobot_index == null));
