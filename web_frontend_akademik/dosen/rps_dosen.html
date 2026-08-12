@@ -36,837 +36,211 @@
         /* =========================================
            TAMBAHAN: PAGINATION PERTEMUAN (SMART MODE)
         ========================================= */
-        /* 1. Aturan Khusus Layar HP (Aktifkan Pagination) */
         @media screen and (max-width: 768px) {
-            .hidden-row {
-                display: none !important;
-            }
+            .hidden-row { display: none !important; }
+            
+            /* SULAP FILTER & PENCARIAN DI MOBILE AGAR RAPI */
+            .table-controls { flex-direction: column !important; align-items: stretch !important; gap: 15px !important; }
+            .table-controls > div { width: 100% !important; flex-wrap: wrap; justify-content: space-between; }
+            .search-box { width: 100% !important; justify-content: space-between; }
+            .search-box input { width: 100% !important; flex: 1; }
+            .filter-group { flex: 1; min-width: 45%; }
+            .filter-group select { width: 100%; }
         }
 
-        /* 2. Aturan Khusus Layar Laptop (Matikan Pagination, Tampilkan Semua) */
         @media screen and (min-width: 769px) {
-            .hidden-row {
-                display: table-row !important;
-            }
-
-            /* Munculkan semua 16 baris */
-            #sesiPaginationContainer {
-                display: none !important;
-            }
-
-            /* Sembunyikan pil angka */
-            #sesiNavButtons {
-                display: none !important;
-            }
-
-            /* Sembunyikan tombol next/prev */
+            .hidden-row { display: table-row !important; }
+            #sesiPaginationContainer { display: none !important; }
+            #sesiNavButtons { display: none !important; }
         }
 
-        /* Desain Tombol Pil Angka (Berlaku saat muncul di HP) */
-        #sesiPaginationContainer::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        #sesiPaginationContainer::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        #sesiPaginationContainer::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
+        #sesiPaginationContainer::-webkit-scrollbar { height: 6px; }
+        #sesiPaginationContainer::-webkit-scrollbar-track { background: transparent; }
+        #sesiPaginationContainer::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         .btn-pertemuan {
-            padding: 8px 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 50px;
-            background: white;
-            cursor: pointer;
-            font-weight: 600;
-            color: #334155;
-            white-space: nowrap;
-            transition: 0.2s;
-            font-size: 0.85rem;
+            padding: 8px 16px; border: 1px solid #cbd5e1; border-radius: 50px; background: white;
+            cursor: pointer; font-weight: 600; color: #334155; white-space: nowrap; transition: 0.2s; font-size: 0.85rem;
         }
-
-        .btn-pertemuan:hover {
-            background: #f1f5f9;
-        }
-
-        /* ========================================= */
+        .btn-pertemuan:hover { background: #f1f5f9; }
 
         /* NAVBAR DOSEN */
         .navbar {
-            position: sticky;
-            top: 0;
-            width: 100%;
-            z-index: 100;
-            background-color: var(--primary-navy);
-            padding: 15px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
+            position: sticky; top: 0; width: 100%; z-index: 100; background-color: var(--primary-navy);
+            padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; color: white;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            font-weight: 500;
-            font-size: 0.95rem;
-            align-items: center;
-        }
+        .nav-links { display: flex; gap: 30px; font-weight: 500; font-size: 0.95rem; align-items: center; }
+        .nav-links a { color: white; text-decoration: none; transition: 0.3s; padding-bottom: 4px; opacity: 0.8; }
+        .nav-links a:hover { opacity: 1; }
+        .nav-links a.active { opacity: 1; font-weight: 800; border-bottom: 2px solid #ffc561; }
 
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            transition: 0.3s;
-            padding-bottom: 4px;
-            opacity: 0.8;
-        }
+        .nav-user { display: flex; align-items: center; gap: 16px; font-weight: 600; }
+        .user-chip { background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .btn-logout { background: var(--primary-red); color: white; padding: 8px 24px; border-radius: 50px; border: none; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; }
+        .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
 
-        .nav-links a:hover {
-            opacity: 1;
-        }
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+        .figma-card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02); border: 1px solid #e5e7eb; }
 
-        .nav-links a.active {
-            opacity: 1;
-            font-weight: 800;
-            border-bottom: 2px solid #ffc561;
-        }
-
-        .nav-user {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-weight: 600;
-        }
-
-        .user-chip {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-logout {
-            background: var(--primary-red);
-            color: white;
-            padding: 8px 24px;
-            border-radius: 50px;
-            border: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-logout:hover {
-            background: #b91c1c;
-            transform: translateY(-2px);
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        .figma-card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-            border: 1px solid #e5e7eb;
-        }
-
-        /* TABEL CONTROLS */
+        /* =========================================
+           ✨ PERBAIKAN FILTER & SEARCH BAR
+        ========================================= */
         .table-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .show-entries {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            color: #4b5563;
-        }
-
-        .show-entries select {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            outline: none;
-            font-family: 'Inter';
-            cursor: pointer;
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            color: #4b5563;
-        }
-
-        .search-box input {
-            padding: 8px 15px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            outline: none;
-            font-family: 'Inter';
-            width: 250px;
-            transition: 0.2s;
-        }
-
-        .search-box input:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
-        }
-
-        /* PAGINATION STYLING */
-        .pagination-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-
-        .pagination-controls {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .page-btn {
-            padding: 6px 12px;
-            border: 1px solid #e5e7eb;
-            background: white;
-            color: #4b5563;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-
-        .page-btn:hover:not(:disabled) {
-            background: #f1f5f9;
-        }
-
-        .page-btn.active {
-            background: #6b21a8;
-            color: white;
-            border-color: #6b21a8;
-        }
-
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .page-dots {
-            padding: 6px 8px;
-            color: #64748b;
-            font-weight: 700;
-            user-select: none;
-        }
-
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .header-title {
-            margin: 0 0 5px 0;
-            font-size: 1.8rem;
-            color: var(--primary-navy);
-            font-weight: 800;
-        }
-
-        /* VIEW 1: DAFTAR RPS */
-        #view-list {
-            display: block;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-        }
-
-        table tr:first-child th:first-child {
-            border-top-left-radius: 8px;
-        }
-
-        table tr:first-child th:last-child {
-            border-top-right-radius: 8px;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #334155;
-            padding: 16px 15px;
-            text-align: left;
-            font-size: 0.85rem;
-            font-weight: 700;
-            border-bottom: 2px solid #e5e7eb;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #e5e7eb;
-            font-size: 0.9rem;
-            color: #1f2937;
-            vertical-align: middle;
-            background: white;
-        }
-
-        tr:hover td {
-            background-color: #f8fafc;
-        }
-
-        .badge-dosen-blue {
-            background: #3b82f6;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            display: inline-block;
-            margin-bottom: 5px;
-        }
-
-        .badge-status {
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            color: white;
-            text-align: center;
-        }
-
-        .status-pend {
-            background: #ef4444;
-        }
-
-        .btn-dropdown-wrapper {
-            position: relative;
-            display: inline-block;
-        }
-
-        .btn-opsi {
-            background: var(--primary-purple);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-        }
-
-        .btn-opsi:hover {
-            background: #581c87;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-            margin-top: 5px;
-            min-width: 180px;
-            z-index: 999;
-            display: none;
-            overflow: hidden;
-        }
-
-        .dropdown-menu.show {
-            display: block;
-        }
-
-        .dropdown-item {
-            padding: 12px 15px;
-            display: block;
-            color: #334155;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border-bottom: 1px solid #f1f5f9;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-
-        .dropdown-item:hover {
-            background: #f8fafc;
-            color: var(--primary-purple);
-            padding-left: 20px;
-        }
-
-        /* VIEW 2: KELENGKAPAN RPS (TABS) */
-        #view-detail {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-
-        .tabs-header {
-            display: flex;
-            overflow-x: auto;
-            background: white;
-            border: 1px solid var(--border-color);
-            border-bottom: none;
-            border-radius: 12px 12px 0 0;
-        }
-
-        .tab-btn {
-            padding: 16px 20px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #64748b;
-            background: white;
-            border: none;
-            border-right: 1px solid var(--border-color);
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            transition: 0.2s;
-            white-space: nowrap;
-            font-family: 'Inter';
-        }
-
-        .tab-btn:hover {
-            background: #f8fafc;
-            color: var(--primary-navy);
-        }
-
-        .tab-btn.active {
-            color: var(--primary-purple);
-            border-bottom-color: var(--primary-purple);
-            background: #fbf5ff;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 30px;
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-            min-height: 400px;
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .grid-2-col {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: #64748b;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-family: 'Inter';
-            font-size: 0.95rem;
-            background: #f8fafc;
-            color: #334155;
-        }
-
-        .box-catatan {
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 15px;
-            background: white;
-        }
-
-        .box-catatan h4 {
-            margin: 0 0 10px 0;
-            font-size: 0.9rem;
-            color: #334155;
-        }
-
-        .box-catatan p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #3b82f6;
-            font-style: italic;
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: #1e293b;
             margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f1f5f9;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        /* TABEL SESI PERTEMUAN (TAB 5) - FORMAT LAMA (9 KOLOM) */
-        .table-sesi {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #cbd5e1;
-            font-size: 0.85rem;
-        }
-
-        .table-sesi th {
-            background: var(--primary-navy);
-            color: white;
-            padding: 12px 10px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            text-transform: uppercase;
-        }
-
-        .table-sesi td {
-            padding: 8px;
-            border: 1px solid #cbd5e1;
-            vertical-align: top;
-            background: white;
-        }
-
-        .input-rps {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-family: 'Inter';
-            font-size: 0.85rem;
-            resize: vertical;
-            overflow: hidden !important;
-            background: #f8fafc;
-            transition: 0.2s;
-            display: block;
-            min-height: 50px;
-        }
-
-        .input-rps:focus {
-            border-color: var(--primary-purple);
-            outline: none;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1);
-        }
-
-        .row-ujian {
-            background: #fef2f2 !important;
-        }
-
-        .btn-action {
-            background: var(--primary-purple);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
+        .filter-container {
             display: flex;
+            gap: 15px;
             align-items: center;
-            gap: 8px;
-            transition: 0.2s;
-            font-size: 0.95rem;
-        }
-
-        .btn-action:hover {
-            background: #581c87;
-            transform: translateY(-2px);
-        }
-
-        .btn-kembali {
-            background: white;
-            border: 1px solid #cbd5e1;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            color: #334155;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-kembali:hover {
-            background: #f1f5f9;
-        }
-
-        .content-box {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 15px;
-            font-size: 0.95rem;
-            color: #334155;
-            line-height: 1.6;
-            min-height: 100px;
-        }
-
-        .list-bullet {
-            margin-left: 20px;
-            line-height: 1.6;
-            color: #475569;
-            font-size: 0.95rem;
-        }
-
-        .list-bullet li {
-            margin-bottom: 8px;
-        }
-
-        /* TOMBOL KECIL TAMBAH CPMK */
-        .select-cpmk-kecil {
-            background: transparent;
-            color: #64748b;
-            border: 1px dashed #cbd5e1;
-            border-radius: 4px;
-            padding: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            text-align: center;
-            transition: 0.2s;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-        }
-
-        .select-cpmk-kecil:hover {
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
-            background: #f8fafc;
-        }
-
-        /* =========================================
-           RESPONSIVE NAVBAR (SIDEBAR BIRU DI HP)
-        ========================================= */
-        .hamburger-btn,
-        .close-menu-btn,
-        .mobile-overlay,
-        .sidebar-header-mobile {
-            display: none;
-        }
-
-        .nav-menu-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 40px;
+            flex-wrap: wrap;
             flex: 1;
         }
 
+        .show-entries { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #4b5563; }
+        .show-entries select { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); outline: none; font-family: 'Inter'; cursor: pointer; background: white; font-weight: 600;}
+
+        .filter-group {
+            position: relative;
+        }
+        
+        .filter-group select {
+            padding: 8px 12px 8px 32px; /* Ruang untuk icon */
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            outline: none;
+            font-family: 'Inter';
+            cursor: pointer;
+            background: white;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+            appearance: none; /* Hilangkan panah bawaan di beberapa browser */
+            min-width: 150px;
+        }
+
+        .filter-group i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            pointer-events: none;
+        }
+
+        .search-box { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: #4b5563; font-weight: 600;}
+        .search-box input { padding: 8px 15px; border-radius: 6px; border: 1px solid var(--border-color); outline: none; font-family: 'Inter'; width: 250px; transition: 0.2s; font-size: 0.9rem;}
+        .search-box input:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1); }
+
+        /* PAGINATION STYLING */
+        .pagination-container { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.9rem; color: #64748b; }
+        .pagination-controls { display: flex; gap: 5px; align-items: center; }
+        .page-btn { padding: 6px 12px; border: 1px solid #e5e7eb; background: white; color: #4b5563; border-radius: 6px; cursor: pointer; font-weight: 500; transition: 0.2s; }
+        .page-btn:hover:not(:disabled) { background: #f1f5f9; }
+        .page-btn.active { background: #6b21a8; color: white; border-color: #6b21a8; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .page-dots { padding: 6px 8px; color: #64748b; font-weight: 700; user-select: none; }
+
+        .header-section { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--border-color); }
+        .header-title { margin: 0 0 5px 0; font-size: 1.8rem; color: var(--primary-navy); font-weight: 800; }
+
+        /* VIEW 1: DAFTAR RPS */
+        #view-list { display: block; }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 8px; border: 1px solid #e5e7eb; }
+        table tr:first-child th:first-child { border-top-left-radius: 8px; }
+        table tr:first-child th:last-child { border-top-right-radius: 8px; }
+        th { background: #f8fafc; color: #334155; padding: 16px 15px; text-align: left; font-size: 0.85rem; font-weight: 700; border-bottom: 2px solid #e5e7eb; }
+        td { padding: 15px; border-bottom: 1px solid #e5e7eb; font-size: 0.9rem; color: #1f2937; vertical-align: middle; background: white; }
+        tr:hover td { background-color: #f8fafc; }
+
+        .badge-dosen-blue { background: #3b82f6; color: white; padding: 5px 12px; border-radius: 50px; font-weight: 600; font-size: 0.8rem; display: inline-block; margin-bottom: 5px; }
+        .badge-status { padding: 6px 12px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; color: white; text-align: center; }
+        .status-pend { background: #ef4444; }
+
+        .btn-dropdown-wrapper { position: relative; display: inline-block; }
+        .btn-opsi { background: var(--primary-purple); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .btn-opsi:hover { background: #581c87; }
+
+        .dropdown-menu { position: absolute; top: 100%; right: 0; background: white; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2); margin-top: 5px; min-width: 180px; z-index: 999; display: none; overflow: hidden; }
+        .dropdown-menu.show { display: block; }
+        .dropdown-item { padding: 12px 15px; display: block; color: #334155; text-decoration: none; font-size: 0.85rem; font-weight: 600; border-bottom: 1px solid #f1f5f9; transition: 0.2s; cursor: pointer; }
+        .dropdown-item:hover { background: #f8fafc; color: var(--primary-purple); padding-left: 20px; }
+
+        /* VIEW 2: KELENGKAPAN RPS (TABS) */
+        #view-detail { display: none; animation: fadeIn 0.4s ease; }
+        .tabs-header { display: flex; overflow-x: auto; background: white; border: 1px solid var(--border-color); border-bottom: none; border-radius: 12px 12px 0 0; }
+        .tab-btn { padding: 16px 20px; font-weight: 600; font-size: 0.85rem; color: #64748b; background: white; border: none; border-right: 1px solid var(--border-color); border-bottom: 3px solid transparent; cursor: pointer; transition: 0.2s; white-space: nowrap; font-family: 'Inter'; }
+        .tab-btn:hover { background: #f8fafc; color: var(--primary-navy); }
+        .tab-btn.active { color: var(--primary-purple); border-bottom-color: var(--primary-purple); background: #fbf5ff; }
+
+        .tab-content { display: none; padding: 30px; background: white; border: 1px solid var(--border-color); border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02); min-height: 400px; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .grid-2-col { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; color: #64748b; font-weight: 600; margin-bottom: 5px; }
+        .form-control { width: 100%; padding: 10px 15px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: 'Inter'; font-size: 0.95rem; background: #f8fafc; color: #334155; }
+
+        .box-catatan { border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; background: white; }
+        .box-catatan h4 { margin: 0 0 10px 0; font-size: 0.9rem; color: #334155; }
+        .box-catatan p { margin: 0; font-size: 0.9rem; color: #3b82f6; font-style: italic; }
+
+        .section-title { font-size: 1.2rem; font-weight: 800; color: #1e293b; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #f1f5f9; }
+
+        /* TABEL SESI PERTEMUAN */
+        .table-sesi { width: 100%; border-collapse: collapse; margin-top: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1; font-size: 0.85rem; }
+        .table-sesi th { background: var(--primary-navy); color: white; padding: 12px 10px; font-size: 0.8rem; font-weight: 700; text-align: center; border: 1px solid rgba(255, 255, 255, 0.15); text-transform: uppercase; }
+        .table-sesi td { padding: 8px; border: 1px solid #cbd5e1; vertical-align: top; background: white; }
+        .input-rps { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: 'Inter'; font-size: 0.85rem; resize: vertical; overflow: hidden !important; background: #f8fafc; transition: 0.2s; display: block; min-height: 50px; }
+        .input-rps:focus { border-color: var(--primary-purple); outline: none; background: white; box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1); }
+        .row-ujian { background: #fef2f2 !important; }
+
+        .btn-action { background: var(--primary-purple); color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; font-size: 0.95rem; }
+        .btn-action:hover { background: #581c87; transform: translateY(-2px); }
+        .btn-kembali { background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 6px; font-weight: 600; color: #334155; cursor: pointer; transition: 0.2s; }
+        .btn-kembali:hover { background: #f1f5f9; }
+
+        .content-box { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; font-size: 0.95rem; color: #334155; line-height: 1.6; min-height: 100px; }
+        .list-bullet { margin-left: 20px; line-height: 1.6; color: #475569; font-size: 0.95rem; }
+        .list-bullet li { margin-bottom: 8px; }
+
+        .select-cpmk-kecil { background: transparent; color: #64748b; border: 1px dashed #cbd5e1; border-radius: 4px; padding: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; width: 100%; text-align: center; transition: 0.2s; appearance: none; -webkit-appearance: none; -moz-appearance: none; }
+        .select-cpmk-kecil:hover { border-color: var(--primary-blue); color: var(--primary-blue); background: #f8fafc; }
+
+        /* RESPONSIVE NAVBAR DI HP */
+        .hamburger-btn, .close-menu-btn, .mobile-overlay, .sidebar-header-mobile { display: none; }
+        .nav-menu-wrapper { display: flex; align-items: center; justify-content: flex-end; gap: 40px; flex: 1; }
+
         @media screen and (max-width: 768px) {
-            .navbar {
-                padding: 15px 20px !important;
-                justify-content: flex-start !important;
-            }
-
-            .hamburger-btn {
-                display: block;
-                background: transparent;
-                border: none;
-                color: white;
-                font-size: 1.5rem;
-                cursor: pointer;
-            }
-
-            /* Sidebar Kiri dengan Warna Biru Navy */
-            .nav-menu-wrapper {
-                position: fixed;
-                top: 0;
-                left: -320px;
-                width: 280px;
-                height: 100vh;
-                background: var(--primary-navy);
-                flex-direction: column;
-                align-items: flex-start;
-                justify-content: flex-start;
-                padding: 0;
-                box-shadow: 10px 0 25px rgba(0, 0, 0, 0.5);
-                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                z-index: 1000;
-                overflow-y: auto;
-                display: flex !important;
-            }
-
-            .nav-menu-wrapper.active {
-                left: 0;
-            }
-
-            .sidebar-header-mobile {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                padding: 25px 20px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-            .sidebar-brand {
-                font-size: 1.3rem;
-                font-weight: 900;
-                color: white;
-                margin: 0;
-            }
-
-            .sidebar-brand span {
-                color: #ffc561;
-            }
-
-            .close-menu-btn {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: rgba(239, 68, 68, 0.2);
-                border: none;
-                color: #fca5a5;
-                width: 32px;
-                height: 32px;
-                border-radius: 8px;
-                font-size: 1.2rem;
-                cursor: pointer;
-                transition: 0.2s;
-            }
-
-            .close-menu-btn:hover {
-                background: rgba(239, 68, 68, 0.5);
-                color: white;
-            }
-
-            .nav-links {
-                flex-direction: column;
-                gap: 8px;
-                width: 100%;
-                padding: 20px;
-                align-items: flex-start;
-                display: flex !important;
-            }
-
-            .nav-links a {
-                color: #cbd5e1;
-                width: 100%;
-                padding: 14px 16px;
-                border-radius: 10px;
-                border: none;
-                font-weight: 600;
-                font-size: 0.95rem;
-                transition: 0.2s;
-                margin-bottom: 5px;
-                background: transparent;
-            }
-
-            .nav-links a.active {
-                background: rgba(255, 255, 255, 0.1);
-                color: white;
-                border-left: 4px solid #ffc561;
-                border-radius: 0 10px 10px 0;
-                font-weight: 800;
-                border-bottom: none;
-            }
-
-            .nav-links a:hover:not(.active) {
-                background: rgba(255, 255, 255, 0.05);
-                color: white;
-                opacity: 1;
-            }
-
-            .nav-user {
-                flex-direction: column;
-                width: 100%;
-                padding: 20px;
-                margin-top: auto;
-                border-top: 1px solid rgba(255, 255, 255, 0.1);
-                justify-content: center !important;
-            }
-
-            .user-chip {
-                width: 100%;
-                background: rgba(255, 255, 255, 0.05);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                color: white;
-                padding: 12px 16px;
-                border-radius: 10px;
-                justify-content: flex-start;
-                margin-bottom: 12px;
-                gap: 12px;
-            }
-
-            .user-chip i {
-                color: #ffc561 !important;
-                font-size: 1.8rem;
-            }
-
-            .btn-logout {
-                width: 100%;
-            }
-
-            .mobile-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100vh;
-                background: rgba(15, 23, 42, 0.6);
-                backdrop-filter: blur(3px);
-                z-index: 999;
-                display: none;
-            }
-
-            .mobile-overlay.active {
-                display: block;
-            }
+            .navbar { padding: 15px 20px !important; justify-content: flex-start !important; }
+            .hamburger-btn { display: block; background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+            .nav-menu-wrapper { position: fixed; top: 0; left: -320px; width: 280px; height: 100vh; background: var(--primary-navy); flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 0; box-shadow: 10px 0 25px rgba(0, 0, 0, 0.5); transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; overflow-y: auto; display: flex !important; }
+            .nav-menu-wrapper.active { left: 0; }
+            .sidebar-header-mobile { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 25px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+            .sidebar-brand { font-size: 1.3rem; font-weight: 900; color: white; margin: 0; }
+            .sidebar-brand span { color: #ffc561; }
+            .close-menu-btn { display: flex; align-items: center; justify-content: center; background: rgba(239, 68, 68, 0.2); border: none; color: #fca5a5; width: 32px; height: 32px; border-radius: 8px; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+            .close-menu-btn:hover { background: rgba(239, 68, 68, 0.5); color: white; }
+            .nav-links { flex-direction: column; gap: 8px; width: 100%; padding: 20px; align-items: flex-start; display: flex !important; }
+            .nav-links a { color: #cbd5e1; width: 100%; padding: 14px 16px; border-radius: 10px; border: none; font-weight: 600; font-size: 0.95rem; transition: 0.2s; margin-bottom: 5px; background: transparent; }
+            .nav-links a.active { background: rgba(255, 255, 255, 0.1); color: white; border-left: 4px solid #ffc561; border-radius: 0 10px 10px 0; font-weight: 800; border-bottom: none; }
+            .nav-links a:hover:not(.active) { background: rgba(255, 255, 255, 0.05); color: white; opacity: 1; }
+            .nav-user { flex-direction: column; width: 100%; padding: 20px; margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.1); justify-content: center !important; }
+            .user-chip { width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 12px 16px; border-radius: 10px; justify-content: flex-start; margin-bottom: 12px; gap: 12px; }
+            .user-chip i { color: #ffc561 !important; font-size: 1.8rem; }
+            .btn-logout { width: 100%; }
+            .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 999; display: none; }
+            .mobile-overlay.active { display: block; }
         }
     </style>
     <link rel="stylesheet" href="css_dosen/index_mobile.css?v=9">
@@ -898,7 +272,6 @@
                 <a href="input_nilai.html">Input Asesmen</a>
                 <a href="rps_dosen.html" class="active">Penyusunan RPS</a>
                 <a href="../dosen/laporan.html">Output nilai</a>
-                <!-- <a href="portofolio.html">Portofolio</a> -->
             </div>
 
             <div class="nav-user" id="navRightContainer">
@@ -917,14 +290,14 @@
 
         </div>
     </nav>
+    
     <main class="container">
 
         <div id="view-list">
             <div class="header-section">
                 <div>
                     <h1 class="header-title">Rencana Pembelajaran Semester (RPS)</h1>
-                    <p style="margin: 0; color: var(--text-gray);">Daftar RPS dari mata kuliah yang Anda ampu pada
-                        semester ini.</p>
+                    <p style="margin: 0; color: var(--text-gray);">Daftar RPS dari mata kuliah yang Anda ampu pada semester ini.</p>
                 </div>
             </div>
 
@@ -933,10 +306,9 @@
                     <h3 class="section-title" id="lblProdiTitle" style="border: none; margin-bottom: 0; padding-bottom: 0;">Program Studi</h3>
                 </div>
 
-                <div class="table-controls"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-
-                    <div style="display: flex; gap: 20px; align-items: center;">
+                <!-- ✨ PERBAIKAN FILTER & SEARCH BAR SESUAI PERMINTAAN ✨ -->
+                <div class="table-controls">
+                    <div class="filter-container">
                         <div class="show-entries">
                             Show
                             <select id="rowsPerPageSelect" onchange="changeRowsPerPage()">
@@ -947,21 +319,21 @@
                             entries
                         </div>
 
-                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #4b5563;">
-                            <label for="filterKurikulum" style="font-weight: 700;"><i class="fas fa-book"></i> Kurikulum:</label>
-                            <select id="filterKurikulum" onchange="filterTable()"
-                                style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); outline: none; font-family: 'Inter'; cursor: pointer; background: white; color: var(--text-dark); font-weight: 600;">
-                                <option value="semua">Semua</option>
+                        <!-- Filter Kurikulum Diubah Lebih Minimalis -->
+                        <div class="filter-group">
+                            <i class="fas fa-book"></i>
+                            <select id="filterKurikulum" onchange="filterTable()" title="Filter berdasarkan Kurikulum">
+                                <option value="semua">Semua Kurikulum</option>
                                 <option value="25">Kurikulum 2025</option>
                                 <option value="20">Kurikulum 2020</option>
                             </select>
                         </div>
 
-                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #4b5563;">
-                            <label for="filterProdi" style="font-weight: 700;"><i class="fas fa-filter"></i> Prodi:</label>
-                            <select id="filterProdi" onchange="filterTable()"
-                                style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); outline: none; font-family: 'Inter'; cursor: pointer; background: white; color: var(--text-dark); font-weight: 600;">
-                                <option value="semua">Semua</option>
+                        <!-- Filter Prodi Diubah Lebih Minimalis -->
+                        <div class="filter-group">
+                            <i class="fas fa-filter"></i>
+                            <select id="filterProdi" onchange="filterTable()" title="Filter berdasarkan Program Studi">
+                                <option value="semua">Semua Program Studi</option>
                                 <option value="ti">Teknik Informatika</option>
                                 <option value="si">Sistem Informasi</option>
                             </select>
@@ -969,8 +341,7 @@
                     </div>
 
                     <div class="search-box">
-                        Search: <input type="text" id="searchInput" placeholder="Cari MK..."
-                            oninput="filterTable()">
+                        Search: <input type="text" id="searchInput" placeholder="Cari MK..." oninput="filterTable()">
                     </div>
                 </div>
 
@@ -993,14 +364,15 @@
                     </tbody>
                 </table>
 
-                <div class="pagination-container" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 0.9rem; color: #64748b;">
+                <div class="pagination-container">
                     <div id="dataCountInfo">Showing 0 entries</div>
-                    <div class="pagination-controls" id="paginationControls" style="display: flex; gap: 5px;">
+                    <div class="pagination-controls" id="paginationControls">
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Sisa Kode Modal dan Tab Content... (Tetap dibiarkan utuh) -->
         <div id="view-detail">
             <div class="header-section">
                 <div>
@@ -1336,7 +708,7 @@
         const API_GET_INFO_MK = `${API_BASE}/get-info-mk`;
         const API_GET_CPL_CPMK = `${API_BASE}/get-cpl-cpmk`;
         const API_GET_BOBOT = `${API_BASE}/get-master-bobot`;
-        const API_CPMK_LIST = `${API_BASE}/get-cpmk-list`; // API Untuk Auto-fill CPMK
+        const API_CPMK_LIST = `${API_BASE}/get-cpmk-list`; 
 
         const userLogin = localStorage.getItem("user_login") || "Dosen Pengampu";
         const userNidn = localStorage.getItem("user_nidn");
@@ -1357,14 +729,12 @@
         let currentPage = 1;
         let rowsPerPage = 10;
 
-        // FUNGSI EXTRAKSI ARRAY AMAN (DIUPDATE AGAR SAMA DENGAN VERSI CETAK)
         function safeExtractArray(jsonObj) {
             if (!jsonObj) return [];
             let data = jsonObj;
             if (jsonObj.data) data = jsonObj.data;
             if (!Array.isArray(data)) data = [data];
             data = data.flat(Infinity);
-            // Ini yang membedakan: Membongkar bungkus "json" dari n8n
             return data.map(item => item.json ? item.json : item);
         }
 
@@ -1396,21 +766,15 @@
             navRightContainer.insertBefore(btnKembali, navRightContainer.firstChild);
         }
 
-        // ==========================================
-        // FUNGSI LOAD MASTER CPMK UNTUK AUTOFILL
-        // ==========================================
         async function loadMasterCPMK() {
             try {
                 const res = await fetch(`${API_CPMK_LIST}?prodi=${userProdiSekarang}`);
                 if (res.ok) {
                     const rawJson = await res.json();
-
-                    // PERBAIKAN: Gunakan safeExtractArray agar bungkusan "json" dari n8n terbongkar!
                     masterCPMK = safeExtractArray(rawJson);
 
                     let htmlOptions = "";
                     masterCPMK.forEach(item => {
-                        // Amankan pembacaan nama kolom yang mungkin berbeda
                         let kode = item.kode_cpmk || item.id_cpmk || item.cpmk || '';
                         let desc = item.deskripsi_cpmk || item.deskripsi || item.kemampuan_akhir || '';
 
@@ -1422,10 +786,6 @@
                 }
             } catch (e) { console.error("Gagal memuat master CPMK:", e); }
         }
-
-        // ==========================================
-        // SISTEM BADGE MULTI-CPMK
-        // ==========================================
 
         function tambahCpmkKeSesi(indexBaris) {
             const selectEl = document.getElementById(`select_cpmk_${indexBaris}`);
@@ -1441,14 +801,12 @@
                 renderBadgeCpmk(indexBaris, true);
             }
 
-            selectEl.value = ""; // Reset kembali ke placeholder kosong
+            selectEl.value = ""; 
         }
 
         function hapusCpmkDariSesi(indexBaris, kodeDihapus) {
             const hiddenInput = document.getElementById(`id_cpmk_${indexBaris}`);
             let currentArray = hiddenInput.value.split(',').map(k => k.trim()).filter(k => k !== '');
-
-            // Buang kode yang diklik silang
             currentArray = currentArray.filter(kode => kode !== kodeDihapus);
             hiddenInput.value = currentArray.join(', ');
 
@@ -1460,11 +818,9 @@
             const badgeContainer = document.getElementById(`badge_container_${indexBaris}`);
             const selectEl = document.getElementById(`select_cpmk_${indexBaris}`);
 
-            // AMANKAN ARRAY DARI STRING KOTOR SEPERTI "NONE"
             let currentArray = hiddenInput.value.split(',').map(k => k.trim()).filter(k => k !== '' && k !== 'NONE' && k !== 'null' && k !== 'undefined');
             hiddenInput.value = currentArray.join(', ');
 
-            // 1. Cetak ulang HTML Stiker/Badge di Atas
             badgeContainer.innerHTML = "";
             currentArray.forEach(kode => {
                 badgeContainer.innerHTML += `
@@ -1475,7 +831,6 @@
                 `;
             });
 
-            // 2. Logika Animasi Dropdown
             if (currentArray.length === 0) {
                 selectEl.className = "input-rps";
                 selectEl.options[0].text = "+ Pilih CPMK...";
@@ -1494,7 +849,6 @@
             let combinedDesc = [];
 
             kodeArray.forEach(kode => {
-                // Tembak memori global
                 let teksDesc = window.cpmkDescriptions ? window.cpmkDescriptions[kode] : null;
 
                 if (!teksDesc) {
@@ -1509,7 +863,6 @@
             const colDesc = document.getElementById(`sub_cpmk_${indexBaris}`);
             colDesc.value = combinedDesc.length > 0 ? combinedDesc.join('\n\n') : '';
 
-            // Animasi visual flash
             colDesc.style.backgroundColor = "#ccfbf1";
             setTimeout(() => {
                 colDesc.style.backgroundColor = (indexBaris === 8 || indexBaris === 16) ? "#fef2f2" : "#f8fafc";
@@ -1570,7 +923,6 @@
                     return;
                 }
 
-                // === 1. TARIK DATA PERSETUJUAN SECARA SERENTAK ===
                 tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px;"><i class="fas fa-spinner fa-spin"></i> Menarik data status persetujuan...</td></tr>`;
 
                 const persetujuanPromises = globalDaftarMK.map(mk =>
@@ -1580,9 +932,8 @@
                 );
                 const persetujuanResults = await Promise.all(persetujuanPromises);
 
-                tbody.innerHTML = ""; // Bersihkan tulisan loading
+                tbody.innerHTML = ""; 
 
-                // === 2. SIMPAN METADATA PERSETUJUAN ===
                 globalDaftarMK.forEach((mk, index) => {
                     let dataSetuju = null;
                     try {
@@ -1593,16 +944,16 @@
                     } catch (e) { }
 
                     let strStatus = "Belum Disetujui";
-                    let bgStatus = "#ef4444"; // Merah
+                    let bgStatus = "#ef4444"; 
                     let strCatatan = "-";
 
                     if (dataSetuju) {
                         if (dataSetuju.status === 'approved') {
                             strStatus = "Telah Disetujui";
-                            bgStatus = "#10b981"; // Hijau
+                            bgStatus = "#10b981"; 
                         } else if (dataSetuju.status === 'revisi') {
                             strStatus = "Perlu Revisi";
-                            bgStatus = "#f59e0b"; // Oranye
+                            bgStatus = "#f59e0b"; 
                         }
                         if (dataSetuju.catatan && dataSetuju.catatan.trim() !== '') {
                             strCatatan = dataSetuju.catatan;
@@ -1624,9 +975,6 @@
             }
         }
 
-        // ==========================================
-        // RENDER TABEL & PAGINATION
-        // ==========================================
         function changeRowsPerPage() {
             rowsPerPage = parseInt(document.getElementById("rowsPerPageSelect").value);
             currentPage = 1;
@@ -1766,33 +1114,25 @@
             document.getElementById('valCpl').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--primary-blue);"></i> Menarik pemetaan CPL...';
             document.getElementById('valCpmk').innerHTML = '<i class="fas fa-spinner fa-spin" style="color:var(--primary-blue);"></i> Menarik pemetaan CPMK...';
 
-            // 1. SET TANGGAL & JAM OTOMATIS SAAT INI (LIVE)
             const now = new Date();
             const formatTgl = now.toLocaleString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' WIB';
             document.getElementById('dtlTgl').value = formatTgl;
 
-            // 2. TARIK DATA BAHAN KAJIAN (Menggunakan Webhook LAMA: get-rumpun-bk)
             try {
                 const resRumpun = await fetch(`${API_BASE}/get-rumpun-bk?kode_mk=${kodeMK}`);
                 if (resRumpun.ok) {
                     const jsonRumpun = await resRumpun.json();
-
-                    // PERBAIKAN: Gunakan safeExtractArray agar bungkusan "json" dari n8n terbongkar sempurna!
                     const dataRumpun = safeExtractArray(jsonRumpun);
 
                     if (dataRumpun.length > 0) {
-                        // Saring murni berdasarkan 'kode_bk' agar tidak ada duplikat
                         const uniqueMap = new Map();
                         dataRumpun.forEach(item => {
-                            // Karena sudah dibongkar oleh safeExtractArray, kita bisa langsung panggil item.kode_bk
                             if (item.kode_bk && item.kode_bk !== 'undefined' && !uniqueMap.has(item.kode_bk)) {
                                 uniqueMap.set(item.kode_bk, item);
                             }
                         });
 
                         const cleanData = Array.from(uniqueMap.values());
-
-                        // Tarik "kode_bk" saja lalu gabungkan dengan koma
                         const rawBahanKajian = cleanData.map(item => item.kode_bk);
                         document.getElementById('valBahanKajian').value = rawBahanKajian.join(', ');
 
@@ -1805,27 +1145,18 @@
                 document.getElementById('valBahanKajian').value = "Gagal terhubung ke webhook N8N.";
             }
 
-            // 3. TARIK INFO LAMA (Hanya Pustaka - Bahan Kajian sudah diurus di atas)
             try {
                 const resInfo = await fetch(`${API_GET_INFO_MK}?kode_mk=${kodeMK}`);
                 if (resInfo.ok) {
                     const infoData = safeExtractArray(await resInfo.json());
                     const data = infoData[0] || {};
-
-                    // HAPUS ATAU KOMENTARI 2 BARIS INI:
-                    // document.getElementById('valPustakaUtama').innerHTML = data.pustaka_utama || "Belum ada pustaka";
-                    // document.getElementById('valPustakaPendukung').innerHTML = data.pustaka_pendukung || "Belum ada pustaka";
-
                     localStorage.setItem('cetak_koordinator', data.koordinator || "Belum Diatur");
                     localStorage.setItem('cetak_kaprodi', data.kaprodi || "Belum Diatur");
                 }
             } catch (e) { console.warn("API Get Info MK error/tidak lengkap"); }
 
-            // 4. TARIK CPL & CPMK (Sambil menyimpan memori relasi CPL ke CPMK)
             let validCpmkKodes = [];
             let mapCpmkToCpl = {};
-
-            // --- TAMBAHAN BARU: WADAH MEMORI GLOBAL DESKRIPSI ---
             window.cpmkDescriptions = {};
 
             try {
@@ -1843,8 +1174,6 @@
                             if (row.kode_cpmk) {
                                 validCpmkKodes.push(row.kode_cpmk);
                                 if (row.kode_cpl) mapCpmkToCpl[row.kode_cpmk] = row.kode_cpl;
-
-                                // BAJAK & SIMPAN DESKRIPSI KE MEMORI BROWSER
                                 if (row.deskripsi_cpmk) window.cpmkDescriptions[row.kode_cpmk] = row.deskripsi_cpmk;
                             }
                             if (row.kode_cpl && row.deskripsi_cpl) cplMap.set(row.kode_cpl, row.deskripsi_cpl);
@@ -1870,18 +1199,14 @@
                 document.getElementById('valCpmk').innerHTML = "Gagal terhubung ke Webhook Get CPL CPMK.";
             }
 
-            // 5. TARIK DATA BOBOT PENILAIAN (DISAMAKAN DENGAN INPUT_NILAI.HTML)
-            // 5. TARIK DATA BOBOT PENILAIAN (DISAMAKAN DENGAN INPUT_NILAI.HTML)
             try {
-                // Cari prodi dari matkul ini untuk ditarik master bobotnya
                 let matkulData = globalDaftarMK.find(m => m.kode_mk === kodeMK);
-                let prodiMatkul = "ti"; // Default TI
+                let prodiMatkul = "ti"; 
                 if (matkulData && matkulData.prodi && matkulData.prodi !== "-") {
                     let p = matkulData.prodi.toLowerCase();
                     if (p.includes('si') || p.includes('sistem')) prodiMatkul = 'si';
                 }
 
-                // INJEKSI MULTI-KURIKULUM
                 let digitKurikulum = kodeMK.substring(0, 2);
                 const resBobot = await fetch(`${API_GET_BOBOT}?prodi=${prodiMatkul}&kurikulum=${digitKurikulum}`);
                 let rawText = await resBobot.text();
@@ -1892,10 +1217,9 @@
 
                 const dataMk = allData.filter(d => d.kode_mk === kodeMK);
                 const tbodyBobot = document.getElementById('valBobotPenilaian');
-                const theadBobot = document.querySelector('#tab-penilaian .table-sesi thead'); // Target header tabel
+                const theadBobot = document.querySelector('#tab-penilaian .table-sesi thead'); 
 
                 if (dataMk.length > 0) {
-                    // Ambil daftar komponen unik dari Kaprodi (Dinamis)
                     let setKomp = new Set();
                     let listKomp = [];
                     dataMk.forEach(r => {
@@ -1905,16 +1229,14 @@
                         }
                     });
 
-                    // 1. Ganti Header Tabel secara Otomatis
                     let newHeadHtml = `<tr><th width="10%">CPL</th><th width="15%">ID CPMK</th>`;
-                    let wKomp = 65 / (listKomp.length || 1); // Bagi sisa lebar dengan rata
+                    let wKomp = 65 / (listKomp.length || 1); 
                     listKomp.forEach(k => {
                         newHeadHtml += `<th width="${wKomp}%">${k.toUpperCase()} (%)</th>`;
                     });
                     newHeadHtml += `<th width="10%">TOTAL</th></tr>`;
                     theadBobot.innerHTML = newHeadHtml;
 
-                    // 2. Grouping Data berdasarkan CPMK
                     let grouped = {};
                     let urutanCpmk = [];
                     dataMk.forEach(r => {
@@ -1925,7 +1247,6 @@
                         grouped[r.cpmk].bobot[r.nama_komponen] = parseFloat(r.bobot) || 0;
                     });
 
-                    // 3. Cetak Body Tabel
                     tbodyBobot.innerHTML = "";
                     let grandTotal = 0;
 
@@ -1938,7 +1259,6 @@
                                 <td style="font-weight:bold; text-align:center;">${b.cpmk}</td>
                         `;
 
-                        // Isi bobot sesuai kolom dinamis yang ditemukan
                         listKomp.forEach(k => {
                             let nil = b.bobot[k] || 0;
                             tb += nil;
@@ -1950,7 +1270,6 @@
                         tbodyBobot.innerHTML += trHtml;
                     });
 
-                    // Cetak baris Total
                     const warnaTotal = grandTotal === 100 ? "#10b981" : "#ef4444";
                     tbodyBobot.innerHTML += `
                         <tr style="background-color: #f8fafc; border-top: 2px solid #cbd5e1;">
@@ -1967,7 +1286,6 @@
                 document.getElementById('valBobotPenilaian').innerHTML = `<tr><td colspan="10" style="text-align:center; color:red;">Gagal terhubung ke N8N Bobot.</td></tr>`;
             }
 
-            // 6. TARIK DATA RPS LAINNYA (Info Tambahan) DARI N8N
             try {
                 const resLain = await fetch(`${API_BASE}/get-rps-lainnya?kode_mk=${kodeMK}`);
                 if (resLain.ok) {
@@ -1981,7 +1299,6 @@
                         document.getElementById('valSyarat').value = data.matkul_syarat || '';
                         document.getElementById('valBatasMhs').value = data.batas_mhs || '50.01';
                         document.getElementById('valBatasMk').value = data.batas_mk || '85.00%';
-                        // --- DATA BARU: RUMPUN & PUSTAKA ---
                         let rpn = data.rumpun;
                         let pstU = data.pustaka_utama;
                         let pstP = data.pustaka_pendukung;
@@ -2004,19 +1321,15 @@
                 }
             } catch (e) { console.warn("Belum ada data di rps_lainnya"); }
 
-            // 7. TARIK DATA STATUS & CATATAN PERSETUJUAN RPS
             try {
                 const resPersetujuan = await fetch(`${API_BASE}/persetujuan-rps?kode_mk=${kodeMK}`);
                 if (resPersetujuan.ok) {
-                    // Gunakan fungsi aman untuk bongkar bungkus n8n
                     const jsonPersetujuan = safeExtractArray(await resPersetujuan.json());
                     const dataSetuju = jsonPersetujuan[0];
 
                     if (dataSetuju) {
-                        // Tampilkan teks di layar dosen
                         document.getElementById("textCatatanDosen").innerText = dataSetuju.catatan || "Belum/tidak ada catatan dari prodi.";
 
-                        // Isi nilai di form Kaprodi (jika Kaprodi yang sedang buka)
                         if (document.getElementById("valStatusRps")) document.getElementById("valStatusRps").value = dataSetuju.status || 'pending';
                         if (document.getElementById("valCatatanRps")) document.getElementById("valCatatanRps").value = dataSetuju.catatan || '';
                     } else {
@@ -2039,18 +1352,13 @@
             document.getElementById('dtlMk').value = `${kode_mk} - ${nama_mk.toUpperCase()}`;
             document.getElementById('dtlSem').value = semester;
 
-            // TUNGGU DATA CPL & CPMK SELESAI DITARIK DULU
             await loadInfoKelengkapanRPS(kode_mk);
-            // BARU RENDER TABEL 16 MINGGU
             loadDataRPSTable(kode_mk);
         }
 
-        // FUNGSI KHUSUS KAPRODI UNTUK LANGSUNG MELOMPAT KE TAB PERSETUJUAN
         async function bukaCatatanRevisi(kode_mk, nama_mk, semester, sks) {
-            // 1. Buka halaman detail (menunggu data ditarik dari server)
             await bukaDetailRPS(kode_mk, nama_mk, semester, sks);
 
-            // 2. Simulasikan klik pada Tab "Persetujuan Kaprodi" agar langsung terbuka
             const tabSetuju = document.getElementById("btnTabPersetujuan");
             if (tabSetuju) {
                 tabSetuju.click();
@@ -2078,16 +1386,12 @@
             evt.currentTarget.classList.add("active");
         }
 
-        // ==========================================
-        // RENDER TABEL 16 MINGGU (BISA DIISI UTS/UAS)
-        // ==========================================
         async function loadDataRPSTable(kodeMK) {
             const tbodySesi = document.getElementById("bodyTabelSesi");
 
             tbodySesi.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 40px;">Menarik rencana 16 pertemuan... <i class="fas fa-spinner fa-spin"></i></td></tr>`;
 
             try {
-                // TRIK ANTI-CACHE: Menambahkan waktu agar URL selalu dianggap baru
                 const timeCache = new Date().getTime();
                 const res = await fetch(`${API_GET_RPS}?kode=${kodeMK}&t=${timeCache}`);
 
@@ -2096,18 +1400,14 @@
                     try { rpsDataJSON = await res.json(); } catch (e) { }
                 }
 
-                // PERBAIKAN: Gunakan method map/flat langsung di sini jika safeExtractArray masih gagal membongkar n8n
                 let rawData = rpsDataJSON.data || rpsDataJSON;
                 if (!Array.isArray(rawData)) rawData = [rawData];
                 rawData = rawData.flat(Infinity);
 
-                // Ekstrak properti .json jika data dibungkus oleh n8n
                 const extractedData = rawData.map(item => item.json ? item.json : item);
 
-                // Saring hanya data yang memiliki nomor pertemuan valid
                 const rpsData = extractedData.filter(item => item.pertemuan);
 
-                // --- TARIK DATA CPL, CPMK & KOMPONEN DARI OBE_RENCANA_BOBOT ---
                 let draftBobotData = [];
                 try {
                     const resBobot = await fetch(`${API_BASE}/get-draft-bobot?mk=${kodeMK}`);
@@ -2141,15 +1441,12 @@
             for (let i = 1; i <= 16; i++) {
                 const rowData = existingData.find(item => parseInt(item.pertemuan) === i) || {};
 
-                // Ambil CPL, CPMK, dan Komponen Penilaian langsung dari Database OBE_RENCANA_BOBOT
                 let barisBobot = draftBobotData.filter(d => parseInt(d.pertemuan) === i);
 
-                // Gabungkan dengan koma jika ada lebih dari 1 CPMK di pertemuan yang sama
                 let valCpl = barisBobot.map(b => b.kode_cpl || '').filter(Boolean).join(', ');
                 let valCpmk = barisBobot.map(b => b.kode_cpmk || '').filter(Boolean).join(', ');
                 let valKomponen = barisBobot.map(b => b.komponen_penilaian || '').filter(Boolean).join(', ');
 
-                // Fallback jika API bobot sedang kosong (menggunakan memori rps lama)
                 if (barisBobot.length === 0) {
                     valCpmk = rowData.id_cpmk || '';
                     valKomponen = rowData.assessmen || rowData.bentuk_pembelajaran || '';
@@ -2159,14 +1456,12 @@
 
                 let valDeskripsi = rowData.deskripsi_cpmk || rowData.sub_cpmk || rowData.kemampuan_akhir || '';
 
-                // PENCARIAN DARI MEMORI YANG SUDAH PASTI ADA DESKRIPSINYA
                 if (valCpmk !== '') {
                     let descTemp = [];
                     let arrKodes = valCpmk.split(',').map(k => k.trim()).filter(k => k !== '');
                     arrKodes.forEach(kode => {
                         let teksDesc = window.cpmkDescriptions ? window.cpmkDescriptions[kode] : null;
 
-                        // Fallback darurat
                         if (!teksDesc) {
                             let cpmkDitemukan = masterCPMK.find(m => m.kode_cpmk === kode || m.id_cpmk === kode || m.cpmk === kode);
                             if (cpmkDitemukan) teksDesc = cpmkDitemukan.deskripsi_cpmk || cpmkDitemukan.deskripsi || cpmkDitemukan.kemampuan_akhir || '';
@@ -2202,7 +1497,6 @@
             }
 
             tbodySesi.innerHTML = htmlSesi;
-            // Fitur auto-tambah CPMK dihapus, data hanya ditarik murni (read-only)
             const textareas = document.querySelectorAll('.input-rps');
             textareas.forEach(tx => {
                 tx.style.height = 'auto';
@@ -2213,13 +1507,11 @@
                 });
             });
 
-            // MUNCULKAN PAGINATION & TOMBOL NAVIGASI
             document.getElementById('sesiNavButtons').style.display = 'flex';
             renderSesiPagination();
-            showPertemuan(1); // Buka langsung pertemuan 1
+            showPertemuan(1); 
         }
 
-        // --- FUNGSI BARU UNTUK NAVIGASI PERTEMUAN ---
         function renderSesiPagination() {
             const container = document.getElementById('sesiPaginationContainer');
             if (!container) return;
@@ -2238,13 +1530,11 @@
                 const row = document.getElementById(`row_pertemuan_${i}`);
                 const btn = document.getElementById(`btn_pert_${i}`);
 
-                // Atur Sembunyi/Tampil Baris
                 if (row) {
                     if (i === num) row.classList.remove('hidden-row');
                     else row.classList.add('hidden-row');
                 }
 
-                // Atur Warna Tombol Aktif
                 if (btn) {
                     if (i === num) {
                         btn.style.background = (i === 8 || i === 16) ? 'var(--primary-red)' : 'var(--primary-navy)';
@@ -2256,13 +1546,11 @@
                 }
             }
 
-            // Scroll otomatis kotak navigasi agar tombol selalu terlihat
             const activeBtn = document.getElementById(`btn_pert_${num}`);
             if (activeBtn) {
                 activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
 
-            // Atur Muncul/Hilang Tombol Next-Prev
             const btnPrev = document.getElementById('btnPrevSesi');
             const btnNext = document.getElementById('btnNextSesi');
             if (btnPrev) btnPrev.style.visibility = (num === 1) ? 'hidden' : 'visible';
@@ -2273,13 +1561,10 @@
             let nextSesi = currentSesi + arah;
             if (nextSesi >= 1 && nextSesi <= 16) {
                 showPertemuan(nextSesi);
-                // Kembalikan scroll layar sedikit ke atas agar nyaman dilihat
                 document.querySelector('.header-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
-        // ==========================================
-        // SIMPAN KE DATABASE (TIDAK ADA LAGI `CONTINUE` 8 & 16)
-        // ==========================================
+
         async function simpanRPSDosen() {
             if (!currentMkDipilih) return;
 
@@ -2289,7 +1574,6 @@
 
             let dataPertemuan = [];
             for (let i = 1; i <= 16; i++) {
-                // Menambahkan pengamanan teks (replace petik) untuk semua kolom teks bebas
                 dataPertemuan.push({
                     pertemuan: i,
                     id_cpmk: (document.getElementById(`id_cpmk_${i}`).value || '').trim(),
@@ -2347,7 +1631,6 @@
                 matkul_syarat: document.getElementById('valSyarat').value,
                 batas_mhs: document.getElementById('valBatasMhs').value,
                 batas_mk: document.getElementById('valBatasMk').value,
-                // --- DATA BARU KEDALAM PAYLOAD N8N ---
                 rumpun: document.getElementById('dtlRumpun').value,
                 pustaka_utama: document.getElementById('valPustakaUtama').value,
                 pustaka_pendukung: document.getElementById('valPustakaPendukung').value
@@ -2392,7 +1675,6 @@
 
                 if (res.ok) {
                     alert("✅ Status & Catatan RPS Berhasil Disimpan ke Database!");
-                    // Langsung update layar teks dosen agar sinkron
                     document.getElementById("textCatatanDosen").innerText = payload.catatan || "Belum/tidak ada catatan dari prodi.";
                 } else {
                     alert("❌ Gagal menyimpan. Periksa webhook n8n Anda.");
@@ -2447,30 +1729,23 @@
             await loadDaftarRPS();
             await loadMasterCPMK();
 
-            // === ALGORITMA BARU: AUTO-OPEN MATA KULIAH ===
-            // 1. Cek apakah ada parameter '?mk=' di URL
             const urlParams = new URLSearchParams(window.location.search);
             const autoMk = urlParams.get('mk');
 
             if (autoMk && globalDaftarMK) {
-                // 2. Cari data detail Mata Kuliah tersebut dari daftar yang sudah diload
                 const matkulTarget = globalDaftarMK.find(m => m.kode_mk === autoMk);
 
                 if (matkulTarget) {
-                    // 3. Eksekusi fungsi buka detail (Klik Otomatis)
                     bukaDetailRPS(matkulTarget.kode_mk, matkulTarget.nama_mk, matkulTarget.semester, matkulTarget.sks);
                 }
             }
 
-            // Tampilkan Tab Persetujuan jika rolenya Kaprodi (Admin)
             if (userRoleSekarang === "admin" || userRoleSekarang === "headadmin") {
                 const tabSetuju = document.getElementById("btnTabPersetujuan");
                 if (tabSetuju) tabSetuju.style.display = "inline-block";
             }
         };
-        // ==========================================
-        // FUNGSI NAVIGASI MOBILE (HAMBURGER)
-        // ==========================================
+
         function toggleMenu() {
             document.getElementById('navMenuWrapper').classList.toggle('active');
             document.getElementById('mobileOverlay').classList.toggle('active');
