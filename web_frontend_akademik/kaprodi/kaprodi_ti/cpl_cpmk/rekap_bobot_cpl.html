@@ -6,11 +6,12 @@
     <title>Rekap Bobot CPL Kurikulum - Sistem OBE</title>
     
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/global_ti.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="/js/api_config.js"></script>
-    <script src="/js/template.js"></script> 
+    <script src="/js/template.js"></script>
     
     <style>
         .dashboard-container { display: flex; flex-direction: column; gap: 30px; margin-top: 20px; }
@@ -38,6 +39,41 @@
         
         body { animation: transitionIn 0.3s ease-in-out; }
         @keyframes transitionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Mobile Card Layout Khusus Tabel 1 & 2 */
+        @media screen and (max-width: 768px) {
+            .card-table-mobile table, .card-table-mobile thead, .card-table-mobile tbody, .card-table-mobile th, .card-table-mobile td, .card-table-mobile tr {
+                display: block; width: 100%; white-space: normal;
+            }
+            .card-table-mobile table {
+                min-width: 0 !important; /* Mencegah tabel melebar 1000px pada mode card */
+            }
+            .card-table-mobile thead tr {
+                position: absolute; top: -9999px; left: -9999px;
+            }
+            .card-table-mobile tr { 
+                border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; 
+                background: white; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+            }
+            .card-table-mobile td { 
+                border: none; border-bottom: 1px solid #f1f5f9; 
+                display: flex !important; justify-content: space-between !important; align-items: center !important;
+                padding: 12px 15px !important; text-align: right !important; 
+                min-height: 45px; font-size: 0.9rem;
+            }
+            .card-table-mobile td.sticky-col { 
+                position: static; text-align: right !important; background: white; 
+                border-right: none;
+            }
+            .card-table-mobile td:before { 
+                content: attr(data-label);
+                font-weight: 700; color: #475569;
+                text-align: left; width: 40%; flex-shrink: 0; padding-right: 10px;
+            }
+            .card-table-mobile td .cell-val {
+                width: 60%; text-align: right;
+            }
+        }
     </style>
 </head>
 <body>
@@ -61,35 +97,77 @@
                 
                 <!-- TABEL 1: DETAIL PER MATAKULIAH -->
                 <div class="card-box">
-                    <h3 class="section-header">1. Distribusi Bobot per Mata Kuliah</h3>
-                    <table class="table-excel">
-                        <thead id="headTableMK">
-                            <tr>
-                                <th>Smt</th>
-                                <th class="sticky-col">Kode & Nama Mata Kuliah</th>
-                                <!-- Kolom CPL akan di-generate via JS -->
-                            </tr>
-                        </thead>
-                        <tbody id="bodyTableMK">
-                            <tr><td colspan="15"><i class="fas fa-spinner fa-spin"></i> Memuat data dan menghitung agregat...</td></tr>
-                        </tbody>
-                    </table>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px; border-bottom: 2px dashed #e5e7eb; padding-bottom: 15px; gap: 15px;">
+                        <div class="section-title-area">
+                            <h3 class="section-title" style="margin:0; font-size: 1.4rem; font-weight: 800; color: #111827; border-left: 5px solid #2563eb; padding-left: 15px;">1. Distribusi Bobot per Mata Kuliah</h3>
+                        </div>
+                        <div class="filter-section" style="margin-bottom:0;">
+                            <label for="filterSmtMK">Semester:</label>
+                            <select id="filterSmtMK" class="filter-select" onchange="applyFilterSmtMK()" style="min-width: 150px; padding: 8px 12px;">
+                                <option value="ALL">Semua Semester</option>
+                                <option value="1">Semester 1</option>
+                                <option value="2">Semester 2</option>
+                                <option value="3">Semester 3</option>
+                                <option value="4">Semester 4</option>
+                                <option value="5">Semester 5</option>
+                                <option value="6">Semester 6</option>
+                                <option value="7">Semester 7</option>
+                                <option value="8">Semester 8</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="table1-container" class="card-table-mobile">
+                        <table class="table-excel">
+                            <thead id="headTableMK">
+                                <tr>
+                                    <th>Smt</th>
+                                    <th class="sticky-col">Kode & Nama Mata Kuliah</th>
+                                    <!-- Kolom CPL akan di-generate via JS -->
+                                </tr>
+                            </thead>
+                            <tbody id="bodyTableMK">
+                                <tr><td colspan="15"><i class="fas fa-spinner fa-spin"></i> Memuat data dan menghitung agregat...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- TABEL 2: AGREGAT PER SEMESTER -->
                 <div class="card-box">
-                    <h3 class="section-header">2. Akumulasi Bobot per Semester</h3>
-                    <table class="table-excel">
-                        <thead id="headTableSemester">
-                            <tr>
-                                <th class="sticky-col" style="background:#1e293b; color:white;">SEMESTER</th>
-                                <!-- Kolom CPL akan di-generate via JS -->
-                            </tr>
-                        </thead>
-                        <tbody id="bodyTableSemester">
-                            <tr><td colspan="15" class="cell-empty">Menunggu data...</td></tr>
-                        </tbody>
-                    </table>
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px; border-bottom: 2px dashed #e5e7eb; padding-bottom: 15px; gap: 15px;">
+                        <div class="section-title-area">
+                            <h3 class="section-title" style="margin:0; font-size: 1.4rem; font-weight: 800; color: #111827; border-left: 5px solid #2563eb; padding-left: 15px;">2. Akumulasi Bobot per Semester</h3>
+                        </div>
+                        <div class="filter-section" style="margin-bottom:0;">
+                            <label for="filterSmtAccum">Semester:</label>
+                            <select id="filterSmtAccum" class="filter-select" onchange="applyFilterSmtAccum()" style="min-width: 150px; padding: 8px 12px;">
+                                <option value="ALL">Semua Semester</option>
+                                <option value="1">Semester 1</option>
+                                <option value="2">Semester 2</option>
+                                <option value="3">Semester 3</option>
+                                <option value="4">Semester 4</option>
+                                <option value="5">Semester 5</option>
+                                <option value="6">Semester 6</option>
+                                <option value="7">Semester 7</option>
+                                <option value="8">Semester 8</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="table2-container" class="card-table-mobile">
+                        <table class="table-excel">
+                            <thead id="headTableSemester">
+                                <tr>
+                                    <th class="sticky-col" style="background:#1e293b; color:white;">SEMESTER</th>
+                                    <!-- Kolom CPL akan di-generate via JS -->
+                                </tr>
+                            </thead>
+                            <tbody id="bodyTableSemester">
+                                <tr><td colspan="15" class="cell-empty">Menunggu data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- TABEL 3: GRAND TOTAL (TARGET VS SEMENTARA) -->
@@ -177,8 +255,7 @@
             document.getElementById('headTableMK').innerHTML = headerHtmlMK;
             document.getElementById('headTableSemester').innerHTML = headerHtmlSmt;
 
-            // 2. Render Tabel 1 & Hitung Agregat
-            let htmlMK = '';
+            // 2. Hitung Agregat dan Render Tabel 1
             let agregatSemester = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{}, 6:{}, 7:{}, 8:{} };
             let grandTotal = {};
             
@@ -186,35 +263,21 @@
             for(let s=1; s<=8; s++) { cplKeys.forEach(c => { agregatSemester[s][c] = 0; }); }
 
             dataMK.forEach(mk => {
-                htmlMK += `<tr>
-                    <td style="font-weight:bold; color:#475569; background:${mk.smt % 2 === 0 ? '#fee2e2' : '#fef9c3'}">${mk.smt}</td>
-                    <td class="sticky-col"><span style="color:#64748b; font-size:0.8rem; margin-right:8px;">${mk.kode}</span> <b>${mk.nama}</b></td>`;
-                
                 cplKeys.forEach(c => {
                     let val = mk.bobot[c] || 0;
                     if(val > 0) {
-                        htmlMK += `<td class="cell-bobot">${val.toFixed(2).replace('.',',')}</td>`;
                         agregatSemester[mk.smt][c] += val;
                         grandTotal[c] += val;
-                    } else {
-                        htmlMK += `<td class="cell-empty">-</td>`;
                     }
                 });
-                htmlMK += `</tr>`;
             });
-            document.getElementById('bodyTableMK').innerHTML = htmlMK;
+            
+            window.globalCPLKeys = cplKeys; // Simpan keys untuk filter render
+            renderTabelMKBody(dataMK); // Render Tabel 1
 
             // 3. Render Tabel 2 (Akumulasi Semester)
-            let htmlSmt = '';
-            for(let s=1; s<=8; s++) {
-                htmlSmt += `<tr><td class="sticky-col" style="font-weight:bold;">Semester ${s}</td>`;
-                cplKeys.forEach(c => {
-                    let val = agregatSemester[s][c];
-                    htmlSmt += val > 0 ? `<td style="font-weight:bold; color:#0f172a;">${val.toFixed(2).replace('.',',')}</td>` : `<td class="cell-empty">0,00</td>`;
-                });
-                htmlSmt += `</tr>`;
-            }
-            document.getElementById('bodyTableSemester').innerHTML = htmlSmt;
+            window.globalAgregatSemester = agregatSemester;
+            renderTabelSmtBody([1,2,3,4,5,6,7,8]);
 
             // 4. Render Tabel 3 (Grand Total Target vs Berjalan)
             let htmlSummary = '';
@@ -286,6 +349,7 @@
                 });
 
                 // Lempar ke fungsi perenderan tabel
+                window.globalDataMK = dataMK; // Simpan ke global untuk filter
                 renderTabel(dataMK);
 
             } catch(e) {
@@ -293,6 +357,94 @@
                 tbodyMK.innerHTML = `<tr><td colspan="15" style="color:red; padding:20px;"><i class="fas fa-wifi"></i> Error: Gagal terhubung ke N8N atau API belum siap.</td></tr>`;
             }
         }
+
+        // Render hanya isi Tabel 1
+        function renderTabelMKBody(data) {
+            let htmlMK = '';
+            let cplKeys = window.globalCPLKeys || [];
+            if(data.length === 0) {
+                document.getElementById('bodyTableMK').innerHTML = `<tr><td colspan="15" style="padding:20px; color:#dc2626;">Data mata kuliah tidak ditemukan pada semester tersebut.</td></tr>`;
+                return;
+            }
+            
+            data.forEach(mk => {
+                htmlMK += `<tr>
+                    <td data-label="Semester" style="background:${mk.smt % 2 === 0 ? '#fee2e2' : '#fef9c3'}"><div class="cell-val" style="font-weight:bold; color:#475569;">${mk.smt}</div></td>
+                    <td data-label="Kode & Nama MK" class="sticky-col"><div class="cell-val"><span style="color:#64748b; font-size:0.8rem; margin-right:8px; display:inline-block;">${mk.kode}</span> <b>${mk.nama}</b></div></td>`;
+                
+                cplKeys.forEach(c => {
+                    let val = mk.bobot[c] || 0;
+                    let label = c.replace('CPL0', 'CPL ').replace('CPL', 'CPL ');
+                    if(val > 0) {
+                        htmlMK += `<td data-label="${label}" class="cell-bobot"><div class="cell-val">${val.toFixed(2).replace('.',',')}</div></td>`;
+                    } else {
+                        htmlMK += `<td data-label="${label}" class="cell-empty"><div class="cell-val">-</div></td>`;
+                    }
+                });
+                htmlMK += `</tr>`;
+            });
+            document.getElementById('bodyTableMK').innerHTML = htmlMK;
+        }
+
+        // Fungsi filter semester khusus Tabel 1
+        function applyFilterSmtMK() {
+            const smt = document.getElementById('filterSmtMK').value;
+            if(!window.globalDataMK) return;
+            
+            if(smt === 'ALL') {
+                renderTabelMKBody(window.globalDataMK);
+            } else {
+                const filtered = window.globalDataMK.filter(mk => mk.smt == smt);
+                renderTabelMKBody(filtered);
+            }
+        }
+
+        // Render hanya isi Tabel 2
+        function renderTabelSmtBody(semestersArr) {
+            let htmlSmt = '';
+            let cplKeys = window.globalCPLKeys || [];
+            let agregatSemester = window.globalAgregatSemester || {};
+
+            semestersArr.forEach(s => {
+                htmlSmt += `<tr><td data-label="Semester" class="sticky-col" style="background: #f8fafc;"><div class="cell-val" style="font-weight:bold; color:#0f172a;">Semester ${s}</div></td>`;
+                cplKeys.forEach(c => {
+                    let val = agregatSemester[s][c] || 0;
+                    let label = c.replace('CPL0', 'CPL ').replace('CPL', 'CPL ');
+                    if(val > 0) {
+                        htmlSmt += `<td data-label="${label}"><div class="cell-val" style="font-weight:bold; color:#0f172a;">${val.toFixed(2).replace('.',',')}</div></td>`;
+                    } else {
+                        htmlSmt += `<td data-label="${label}" class="cell-empty"><div class="cell-val">0,00</div></td>`;
+                    }
+                });
+                htmlSmt += `</tr>`;
+            });
+            document.getElementById('bodyTableSemester').innerHTML = htmlSmt;
+        }
+
+        // Fungsi filter semester khusus Tabel 2
+        function applyFilterSmtAccum() {
+            const smt = document.getElementById('filterSmtAccum').value;
+            if(!window.globalAgregatSemester) return;
+            
+            if(smt === 'ALL') {
+                renderTabelSmtBody([1,2,3,4,5,6,7,8]);
+            } else {
+                renderTabelSmtBody([parseInt(smt)]);
+            }
+        }
+
+        // Fungsi Buka/Tutup dari Navbar (delegasi ke fungsi di template.js atau lokal)
+        function toggleMobileSidebar() {
+            if (typeof window.toggleSidebar === 'function') {
+                window.toggleSidebar();
+            } else {
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar) sidebar.classList.toggle('active');
+            }
+        }
+        
+        // Hapus toggleSidebar lokal karena sudah didefinisikan secara global di template.js
+
 
         window.onload = () => { setTimeout(loadRekapBobot, 400); };
     </script>

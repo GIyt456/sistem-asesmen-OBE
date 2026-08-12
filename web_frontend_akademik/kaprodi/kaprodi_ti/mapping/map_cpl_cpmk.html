@@ -197,8 +197,8 @@
             }
 
         } catch (error) {
-            if(selectCpl) selectCpl.innerHTML = '<option value="">❌ Gagal terhubung ke API</option>';
-            if(cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; padding:20px; text-align:center;">❌ Gagal menarik data dari server.</div>';
+            if(selectCpl) selectCpl.innerHTML = '<option value=""> --- belum ada mapping --- </option>';
+            if(cpmkContainer) cpmkContainer.innerHTML = '<div style="color: red; grid-column: 1 / -1; padding:20px; text-align:center;">Tidak ada mapping</div>';
         } 
     }
 

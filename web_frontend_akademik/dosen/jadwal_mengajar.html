@@ -670,7 +670,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 15%;">Tahun Akademik</th>
                         <th style="width: 35%;">Mata Kuliah</th>
                         <th style="width: 10%; text-align: center;">ID Kelas</th>
                         <th style="width: 10%; text-align: center;">Semester</th>
@@ -991,7 +990,6 @@
                 const safeId = kelas.kode_mk.replace(/\s+/g, '-');
 
                 tr.innerHTML = `
-                    <td>2025/2026</td>
                     <td>
                         <strong>${kelas.kode_mk} - ${kelas.nama_mk.toUpperCase()}</strong> ${badgeProdi}<br>
                         <span style="color:#6b7280; font-size:0.8rem;">Kelompok: ${kelas.kelompok} | Kurikulum: ${kelas.kurikulum && kelas.kurikulum !== "-" ? '20' + kelas.kurikulum : 'Tidak Diketahui'}</span>

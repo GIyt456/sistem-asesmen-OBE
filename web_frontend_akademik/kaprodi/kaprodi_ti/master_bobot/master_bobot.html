@@ -124,7 +124,7 @@
         const namaLogin = localStorage.getItem("user_login") || "Kaprodi";
         const avatarMobile = document.getElementById("mobileNavbarAvatar");
         if(avatarMobile) {
-            const avatarColor = PRODI === "si" ? "1e3a8a" : "8b0000";
+            const avatarColor = PRODI === "ti" ? "1e3a8a" : "8b0000";
             avatarMobile.src = `https://ui-avatars.com/api/?name=${namaLogin}&background=${avatarColor}&color=fff&bold=true`;
         }
     });
@@ -249,7 +249,7 @@
                 selectMk.innerHTML = '<option value="" disabled selected>-- Belum ada pemetaan di Kurikulum ini --</option>';
             }
         } catch (error) {
-            if(selectMk) selectMk.innerHTML = '<option value="">❌ Gagal memuat daftar matkul. Cek n8n!</option>';
+            if(selectMk) selectMk.innerHTML = '<option value="">❌ belum ada matkul (mapping CPL dan CPMK dulu).</option>';
         }
     }
 
